@@ -37,8 +37,10 @@ function! statusline#typeinfo() abort
 endfunction
 
 function! statusline#bufinfo() abort
-  let l:statuslinetext = ' %p%% ☰ '  " U+2630
-  let l:statuslinetext .= '%l/%L : %c '
+  let l:linedigits = printf('%d', float2nr(ceil(log10(line('$')))))
+  let l:nwid = '%' . l:linedigits . '.' . l:linedigits
+  let l:statuslinetext = ' %2p%% ☰ '  " U+2630
+  let l:statuslinetext .= l:nwid . 'l/' . l:nwid .  'L : %02c '
   return l:statuslinetext
 endfunction
 
