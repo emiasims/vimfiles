@@ -258,9 +258,17 @@ nnoremap <C-Right> <C-w>>
 nnoremap 0 g^
 xnoremap 0 g^
 onoremap 0 g^
+nnoremap g0 ^
+xnoremap g0 ^
+onoremap g0 ^
 nnoremap ^ 0
 xnoremap ^ 0
 onoremap ^ 0
+
+nnoremap $ g$
+xnoremap $ g$
+nnoremap g$ $
+xnoremap g$ $
 
 nnoremap Q q
 
@@ -272,11 +280,6 @@ nnoremap gj j
 xnoremap gj j
 nnoremap gk k
 xnoremap gk k
-
-nnoremap $ g$
-xnoremap $ g$
-nnoremap g$ $
-xnoremap g$ $
 
 nnoremap n /<C-r>/<CR>
 nnoremap N ?<C-r>/<CR>
@@ -321,7 +324,7 @@ nnoremap g= gg=G``zz
 nnoremap gQ gggqG``
 nnoremap g<CR> i<CR><Esc>
 
-inoremap <C-u> <Esc>hgUiwea
+inoremap <C-u> <Esc>v`[gU`]a
 " }}}
 " Leader: {{{
 nnoremap <leader><CR> :nohlsearch<CR>
