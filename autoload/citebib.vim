@@ -105,7 +105,7 @@ endfunction
 
 function! s:reducer(lines) abort
   call map(a:lines, {i, x -> split(x, ' ')[-1][1:-2]})
-  return '[@' . join(a:lines, '][@') . ']'
+  return '[@' . join(a:lines, '] [@') . ']'
 endfunction
 
 function! s:run_fzf() abort
@@ -123,6 +123,5 @@ function! citebib#fzf() abort
   call s:find_bibfiles()
   call s:check_modtimes_and_parse()
   call s:check_cache()
-  echom s:bib_cache[b:git_dir][0]
   return s:run_fzf()
 endfunction

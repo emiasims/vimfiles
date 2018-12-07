@@ -35,8 +35,3 @@ def parse_bibtex(fname):
         nodes = ['entrytype', 'author', 'journal', 'year', 'title', 'id']
         bib.append([d[n] for n in nodes if d[n]])
     vim.command('let l:return = {}'.format(str(bib)))
-    return bib
-
-
-if __name__ == "__main__":
-    pass
