@@ -193,76 +193,75 @@ elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
   highlight debugBreakpoint  ctermbg=red
 endif
 " }}}
-" linked groups {{{
-hi link Boolean        PreProc
-hi link Character      String
-hi link Float          Number
-
-hi link Conditional    PreProc
-hi link Repeat         PreProc
-hi link Label          PreProc
-hi link Operator       PreProc
-hi link Exception      PreProc
-hi link Keyword        PreProc
-
-hi link Include        PreProc
-hi link Define         PreProc
-hi link Macro          PreProc
-hi link PreCondit      PreProc
-
-hi link Debug          Special
-hi link Delimiter      Special
-hi link Tag            Special
-
-hi link StorageClass   PreProc
-hi link Structure      PreProc
-hi link Typedef        PreProc
-
-" plugins
-hi link pythonDocstring SpecialKey
-
-hi link BufTabLineActive   TabLineSel
-hi link BufTabLineCurrent  PmenuSel
-hi link BufTabLineHidden   TabLine
-hi link BufTabLineFill     TabLineFill
-
-hi link User1 TabLine
-hi link User2 IncSearch
-hi link User3 StatusLineTermNC
-hi link User4 PmenuSel
-hi link User5 IncSearch
-hi link User6 WildMenu
-hi link User7 DiffAdd
-hi link User8 StatusLineTerm
-hi link User9 StatusLineTerm
-
-" }}}
 " terminal colors {{{
 if has('nvim')
-  let g:terminal_color_0 = '#1d2021'
-  let g:terminal_color_8 = '#948774'
-
-  let g:terminal_color_1 = '#D84A44'
-  let g:terminal_color_9 = '#D84A44'
-
-  let g:terminal_color_2 = '#91ba93'
+  let g:terminal_color_0  = '#1d2021'
+  let g:terminal_color_1  = '#D84A44'
+  let g:terminal_color_2  = '#91ba93'
+  let g:terminal_color_3  = '#d65d0e'
+  let g:terminal_color_4  = '#83a598'
+  let g:terminal_color_5  = '#b48ead'
+  let g:terminal_color_6  = '#84d4d2'
+  let g:terminal_color_7  = '#a89984'
+  let g:terminal_color_8  = '#948774'
+  let g:terminal_color_9  = '#D84A44'
   let g:terminal_color_10 = '#679a69'
-
-  let g:terminal_color_3 = '#d65d0e'
   let g:terminal_color_11 = '#d79921'
-
-  let g:terminal_color_4 = '#83a598'
   let g:terminal_color_12 = '#6fa3a6'
-
-  let g:terminal_color_5 = '#b48ead'
   let g:terminal_color_13 = '#b48ead'
-
-  let g:terminal_color_6 = '#84d4d2'
   let g:terminal_color_14 = '#72b7b5'
-
-  let g:terminal_color_7 = '#a89984'
   let g:terminal_color_15 = '#d5c4a1'
+else
+  let g:terminal_ansi_colors = [
+              \ '#1d2021',
+              \ '#D84A44',
+              \ '#91ba93',
+              \ '#d65d0e',
+              \ '#83a598',
+              \ '#b48ead',
+              \ '#84d4d2',
+              \ '#a89984',
+              \ '#948774',
+              \ '#D84A44',
+              \ '#679a69',
+              \ '#d79921',
+              \ '#6fa3a6',
+              \ '#b48ead',
+              \ '#72b7b5',
+              \ '#d5c4a1'
+              \ ]
 endif
 " }}}
+" linked groups {{{
+let s:links = [
+            \ ['Boolean',        'PreProc'],
+            \ ['Character',      'String'],
+            \ ['Float',          'Number'],
+            \ ['Conditional',    'PreProc'],
+            \ ['Define',         'PreProc'],
+            \ ['Exception',      'PreProc'],
+            \ ['Include',        'PreProc'],
+            \ ['Keyword',        'PreProc'],
+            \ ['Label',          'PreProc'],
+            \ ['Macro',          'PreProc'],
+            \ ['Operator',       'PreProc'],
+            \ ['PreCondit',      'PreProc'],
+            \ ['Repeat',         'PreProc'],
+            \ ['StorageClass',   'PreProc'],
+            \ ['Structure',      'PreProc'],
+            \ ['Typedef',        'PreProc'],
+            \ ['Debug',          'Special'],
+            \ ['Delimiter',      'Special'],
+            \ ['Tag',            'Special'],
+            \ ['SpecialChar',    'Special'],
+            \ ['SpecialComment', 'Special'],
+            \ ['Terminal',       'Normal'],
+            \ ['Conceal',        'Statement'],
+            \ ]
 
+augroup colorscheme_evolution
+    autocmd!
+    autocmd ColorScheme * if expand("<amatch>") == "evolution" | for link in s:links | execute 'hi link' link[0] link[1] | endfor | else | for link in s:links | execute 'hi link' link[0] 'NONE' | endfor | endif
+augroup END
+" }}}
 " vim: set ts=2 sw=2 et :

@@ -182,6 +182,24 @@ let g:signify_sign_delete = '-'
 let g:signify_sign_change = '~'
 let g:signify_skip_filetype = { 'markdown': 1 }
 " }}}
+" vim-buftabline {{{
+highlight link BufTabLineActive   TabLineSel
+highlight link BufTabLineCurrent  PmenuSel
+highlight link BufTabLineHidden   TabLine
+highlight link BufTabLineFill     TabLineFill
+" }}}
+" vim-buftabline {{{
+hi link User1 TabLine
+hi link User2 IncSearch
+hi link User3 StatusLineTermNC
+hi link User4 PmenuSel
+hi link User5 IncSearch
+hi link User6 WildMenu
+hi link User7 DiffAdd
+hi link User8 StatusLineTerm
+hi link User9 StatusLineTerm
+" }}}
+
 
 if has('nvim')
   " ultisnips {{{
@@ -193,7 +211,11 @@ if has('nvim')
   " }}}
   " coc {{{
   if executable('node') && executable('yarn')
-    " packadd! coc.nvim
+    packadd! coc.nvim
+
+   inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<C-j>"
+   inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<C-k>"
+   inoremap <expr> <CR>  pumvisible() ? "\<C-y><CR>" : "\<CR>"
   endif
   " }}}
   " ale {{{
