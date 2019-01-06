@@ -1,6 +1,6 @@
 scriptencoding utf-8
 
-if !has('packages')
+if !has('packages') || exists('$SUDO_USER')
   finish
 endif
 
@@ -27,7 +27,9 @@ function! PackInit() abort
   call minpac#add('itchyny/vim-cursorword')
   call minpac#add('christoomey/vim-tmux-navigator')
   call minpac#add('jeetsukumaran/vim-filebeagle')
-  call minpac#add('junegunn/fzf.vim', {'type': 'opt'})  " Slow?
+  " if executable('fzf')
+  call minpac#add('junegunn/fzf.vim')  " Slow?
+  " endif
   call minpac#add('junegunn/vim-easy-align')
 
   call minpac#add('justinmk/vim-sneak')
@@ -39,7 +41,9 @@ function! PackInit() abort
   call minpac#add('ludovicchabant/vim-gutentags')
 
   call minpac#add('SirVer/ultisnips')  " Slow?
-  call minpac#add('neoclide/coc.nvim', {'type': 'opt'})
+  " if executable('node') && executable('yarn')
+  call minpac#add('neoclide/coc.nvim')
+  " endif
   call minpac#add('neoclide/jsonc.vim')
 
   call minpac#add('vim-pandoc/vim-pandoc', {'type' : 'opt'})
@@ -117,7 +121,6 @@ if executable('fzf')
   " TODO: command history: https://goo.gl/aGkUbx
   set runtimepath+=~/.fzf
   source ~/local/src/fzf/plugin/fzf.vim
-  packadd! fzf.vim
 
   let $FZF_DEFAULT_COMMAND = 'ag -g ""'
   nnoremap <silent> <leader>af  :Files<CR>
@@ -163,6 +166,8 @@ if executable('fzf')
     endif
   augroup END
 
+  nnoremap <leader>ev :Files $CFGDIR<CR>
+
 endif
 " }}}
 " vim-signify {{{
@@ -188,7 +193,7 @@ highlight link BufTabLineCurrent  PmenuSel
 highlight link BufTabLineHidden   TabLine
 highlight link BufTabLineFill     TabLineFill
 " }}}
-" vim-buftabline {{{
+" statusline {{{
 hi link User1 TabLine
 hi link User2 IncSearch
 hi link User3 StatusLineTermNC
@@ -204,19 +209,30 @@ hi link User9 StatusLineTerm
 if has('nvim')
   " ultisnips {{{
   let g:UltiSnipsSnippetDirectories = [$CFGDIR . '/snips', 'UltiSnips']
-  let g:UltiSnipsExpandTrigger = '<Tab>'
-  let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+  " imap <tab>:
+  " Expand snippet if possible.
+  " if there is is a pumvisible, accept the next one.
+  " TODO: detect if selected: autocmd MenuPopup & CompleteDone, map <C-n>
+  " then if we know we've selected something, do not <C-n>
+  let g:ulti_expand_or_jump_res = 0  " default value, just set once
+  function! s:expandSnipOrJump() abort
+    call UltiSnips#ExpandSnippetOrJump()
+    return g:ulti_expand_or_jump_res
+  endfunction
+
+  function! s:select_accept() abort
+    return (pumvisible() ? "\<C-n>\<C-y>" : "\<Tab>")
+  endfunction
+
+  inoremap <Tab> <C-r>=ExpandSnipOrJump() ? '' : SelectAccept()<CR>
+
+  let g:UltiSnipsExpandTrigger = '<Nop>'  " prevent tab from being bound
+  let g:UltiSnipsJumpForwardTrigger = '<Nop>'
   let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
   let g:UltiSnipsRemoveSelectModeMappings = 0
   " }}}
   " coc {{{
-  if executable('node') && executable('yarn')
-    packadd! coc.nvim
-
-   inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<C-j>"
-   inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<C-k>"
-   inoremap <expr> <CR>  pumvisible() ? "\<C-y><CR>" : "\<CR>"
-  endif
+  inoremap <expr> <CR> pumvisible() ? "\<C-y><CR>" : "\<CR>"
   " }}}
   " ale {{{
   set signcolumn=yes
