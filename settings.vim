@@ -22,9 +22,24 @@ set updatetime=500
 set winaltkeys=no
 set pastetoggle=<F2>
 set viewoptions=folds,cursor,slash,unix
+
 if has('clipboard')
   set clipboard+=unnamedplus
 endif
+
+" " TODO: get working over ssh!
+" function! Osc52Yank() abort
+"   let l:buffer=system('base64 -w0', @")
+"   let l:buffer=substitute(l:buffer, "\n$", "", "")
+"   let l:buffer='\e]52;c;'.l:buffer.'\x07'
+"   silent exe "!echo -ne ".shellescape(l:buffer)." > $SSH_TTY"
+" endfunction
+" command! Osc52CopyYank call Osc52Yank()
+" augroup Example
+"   autocmd!
+"   autocmd TextYankPost * if v:event.operator ==# 'y' | call Osc52Yank() | endif
+" augroup END
+
 set timeout ttimeout
 set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
@@ -127,6 +142,8 @@ set showbreak=↘
 set fillchars=vert:┃
 set nojoinspaces
 
+set wildmenu
+set wildmode=longest:full,full
 
 if has('termguicolors')
   set termguicolors
@@ -272,6 +289,9 @@ xnoremap g$ $
 
 nnoremap Q q
 
+nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
+nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
+
 nnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 xnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 nnoremap <expr> k (v:count > 4 ? "m'" . v:count . 'k' : 'gk')
@@ -307,7 +327,11 @@ if has('mac')
   vnoremap <D-k> <M-k>
 endif
 
+
 cnoreabbrev vh <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert help' : 'vh')<CR>
+cnoreabbrev hh <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'help' : 'hh')<CR>
+cnoreabbrev h <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert help' : 'h')<CR>
+cnoreabbrev f <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'find' : 'h')<CR>
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
@@ -335,9 +359,8 @@ nnoremap <leader>P "0P
 xnoremap <leader>p "0p
 xnoremap <leader>P "0P
 
-nnoremap <leader>evr :e $MYVIMRC<CR>
-nnoremap <leader>evs :e $CFGDIR/settings.vim<CR>
-nnoremap <leader>evp :e $CFGDIR/plugins.vim<CR>
+" Overwritten in plugins.vim.
+nnoremap <leader>ev :e $CFGDIR/settings.vim<CR>
 nnoremap <leader>rv :so $MYVIMRC<CR>:execute 'set ft='.&ft<CR>:echo 'reloaded vimrc'<CR>zv
 
 nnoremap <silent> <leader>tws :let @/='\v\s+$'<CR>:set hls<CR>
