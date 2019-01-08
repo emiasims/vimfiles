@@ -1,6 +1,7 @@
 let s:pairs = {'(': ')', '[': ']', '{': '}', '"': '"', "'": "'"}
 let s:end_pairs = {')': '(', ']': '[', '}': '{', '"': '"', "'": "'"}
 let s:empty = '[ 	)\]}''"]'
+" TODO: if typing in a comment, do not use ' as an autopair
 
 augroup aupairs
   autocmd!

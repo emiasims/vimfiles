@@ -213,18 +213,17 @@ if has('nvim')
   " Expand snippet if possible.
   " if there is is a pumvisible, accept the next one.
   " TODO: detect if selected: autocmd MenuPopup & CompleteDone, map <C-n>
-  " then if we know we've selected something, do not <C-n>
   let g:ulti_expand_or_jump_res = 0  " default value, just set once
-  function! s:expandSnipOrJump() abort
+  function! s:expand_snip_or_jump() abort
     call UltiSnips#ExpandSnippetOrJump()
     return g:ulti_expand_or_jump_res
   endfunction
 
-  function! s:select_accept() abort
+  function! s:select_and_accept() abort
     return (pumvisible() ? "\<C-n>\<C-y>" : "\<Tab>")
   endfunction
 
-  inoremap <Tab> <C-r>=ExpandSnipOrJump() ? '' : SelectAccept()<CR>
+  inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
 
   let g:UltiSnipsExpandTrigger = '<Nop>'  " prevent tab from being bound
   let g:UltiSnipsJumpForwardTrigger = '<Nop>'
