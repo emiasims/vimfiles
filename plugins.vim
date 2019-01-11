@@ -9,7 +9,7 @@ function! PackInit() abort
   packadd minpac
 
   call minpac#init()
-  call minpac#add('k-takata/minpac', {'type': 'opt'})
+  call minpac#add('k-takata/minpac', {'type' : 'opt'})
 
   call minpac#add('vim-scripts/python_match.vim')
   call minpac#add('jeetsukumaran/vim-pythonsense')
@@ -21,6 +21,7 @@ function! PackInit() abort
   call minpac#add('tpope/vim-surround')
   call minpac#add('tpope/vim-commentary')
   call minpac#add('tpope/vim-unimpaired')
+  call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
 
   call minpac#add('ap/vim-buftabline')
   call minpac#add('machakann/vim-highlightedyank')
@@ -51,7 +52,7 @@ function! PackInit() abort
   call minpac#add('mbbill/undotree', {'type' : 'opt'})  " TODO?
 endfunction
 
-command! PackUpdate call PackInit() | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate call PackInit() | call minpac#update('', {'do' : 'call minpac#status()'})
 command! PackClean  call PackInit() | call minpac#clean()
 command! PackStatus call PackInit() | call minpac#status()
 " }}}
@@ -243,7 +244,7 @@ if has('nvim')
 
   augroup vimrc_ale
     autocmd!
-    autocmd Filetype python let b:ale_linters = ['pycodestyle', 'pydocstyle', 'pyflakes']
+    autocmd Filetype python let b:ale_linters = ['flake8', 'pydocstyle']
   augroup END
 
   " }}}
