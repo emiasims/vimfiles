@@ -224,8 +224,11 @@ if has('nvim')
     return (pumvisible() ? "\<C-n>\<C-y>" : "\<Tab>")
   endfunction
 
+  " We can either have tab on a mapping evaluating after ultisnips, or
+  " we can just manually do the maps we want. Here, we do the latter.
   inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
-  xnoremap <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
+  xnoremap <silent> <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
+  snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<CR>
 
   let g:UltiSnipsExpandTrigger = '<Nop>'  " prevent tab from being bound
   let g:UltiSnipsJumpForwardTrigger = '<Nop>'
