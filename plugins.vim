@@ -225,6 +225,7 @@ if has('nvim')
   endfunction
 
   inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
+  xnoremap <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
 
   let g:UltiSnipsExpandTrigger = '<Nop>'  " prevent tab from being bound
   let g:UltiSnipsJumpForwardTrigger = '<Nop>'
