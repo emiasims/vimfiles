@@ -1,6 +1,7 @@
 if has ('vim_starting')
   set encoding=utf-8
 endif
+
 scriptencoding utf-8
 " Note: Settings only wrapped with an 'if has...' if it
 " has caused an issue on one of the systems I vim on.
@@ -233,8 +234,6 @@ augroup END
 " Simple: {{{
 nnoremap <Space> <nop>
 xnoremap <Space> <nop>
-nnoremap '       <nop>
-xnoremap '       <nop>
 
 nnoremap <Up>    <nop>
 nnoremap <Down>  <nop>
@@ -272,20 +271,10 @@ endif
 nnoremap <C-Left> <C-w><
 nnoremap <C-Right> <C-w>>
 
-nnoremap 0 g^
-xnoremap 0 g^
-onoremap 0 g^
-nnoremap g0 ^
-xnoremap g0 ^
-onoremap g0 ^
+nnoremap 0 ^
+xnoremap 0 ^
 nnoremap ^ 0
 xnoremap ^ 0
-onoremap ^ 0
-
-nnoremap $ g$
-xnoremap $ g$
-nnoremap g$ $
-xnoremap g$ $
 
 nnoremap Q q
 
@@ -399,9 +388,10 @@ inoremap <M-k> <C-c>:move .-2<CR>==gi
 
 " }}}
 " Autoload: {{{
+" I want these to load even if --noplugins is used.
 nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>du :call difference#undobuf()<cr>
-nnoremap <silent> <Leader>ml :call modeline#append()<CR>
+nnoremap <silent> <leader>ml :call modeline#append()<CR>
 
 inoremap <silent> ( <C-r>=autopairs#check_and_insert('(')<CR>
 inoremap <silent> ) <C-r>=autopairs#check_and_insert(')')<CR>

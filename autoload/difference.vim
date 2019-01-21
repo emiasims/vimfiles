@@ -40,16 +40,22 @@ function! difference#undobuf() abort
   set foldlevel=1
 endfunction
 
+function! s:diff_and_set_bindings() abort
+  nmap <buffer> [q <Plug>unimpairedQPrevious:call <SID>diff_and_set_bindings()<CR>
+  nmap <buffer> ]q <Plug>unimpairedQNext:call <SID>diff_and_set_bindings()<CR>
+  nnoremap <buffer> q :diffoff!<CR>:bd<CR>
+  diffthis
+endfunction
+
 function! difference#gitlog() abort
   if !exists('g:loaded_fugitive')
     echom 'Fugitive not loaded.'
     return
   endif
-  diffthis
+  diffoff! | diffthis
   vsplit
   silent Glog
-  diffthis
-  nnoremap <buffer> q :diffoff!<CR>:bd<CR>
+  call s:diff_and_set_bindings()
   wincmd p
 endfunction
 
