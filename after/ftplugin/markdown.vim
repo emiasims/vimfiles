@@ -26,6 +26,7 @@ setlocal commentstring=<!--%s-->
 
 let b:ncm2_look_enabled = 1
 let b:autopairs_skip = ["'"]
+let b:post_pumaccept = ' '
 
 imap <buffer> <c-x><c-i> <plug>(citebib-complete)
 

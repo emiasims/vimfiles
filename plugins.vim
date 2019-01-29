@@ -221,7 +221,7 @@ if has('nvim')
   endfunction
 
   function! s:select_and_accept() abort
-    return (pumvisible() ? "\<C-n>\<C-y>" : "\<Tab>")
+    return (pumvisible() ? "\<C-n>\<C-y>" . get(b:, 'post_pumaccept', '') : "\<Tab>")
   endfunction
 
   " We can either have tab on a mapping evaluating after ultisnips, or
