@@ -271,8 +271,9 @@ endif
 nnoremap <C-Left> <C-w><
 nnoremap <C-Right> <C-w>>
 
-nnoremap 0 ^
-xnoremap 0 ^
+nnoremap 0 0^
+xnoremap 0 0^
+onoremap 0 ^
 nnoremap ^ 0
 xnoremap ^ 0
 

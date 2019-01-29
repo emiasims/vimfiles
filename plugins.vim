@@ -87,6 +87,9 @@ if !exists('##TextYankPost')
   xmap y <Plug>(highlightedyank)
 endif
 " }}}
+" vim-tmux-navigator {{{
+let g:tmux_navigator_disable_when_zoomed = 1
+" }}}
 " vim-easy-align {{{
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
