@@ -4,6 +4,7 @@ setlocal tabstop=2
 setlocal shiftwidth=2
 setlocal expandtab
 setlocal iskeyword-=#
+setlocal colorcolumn = 100
 
 let b:autopairs_skip = ['"']
 
