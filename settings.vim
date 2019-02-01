@@ -291,8 +291,8 @@ xnoremap gj j
 nnoremap gk k
 xnoremap gk k
 
-nnoremap n /<C-r>/<CR>
-nnoremap N ?<C-r>/<CR>
+nnoremap <expr> n 'Nn'[v:searchforward]
+nnoremap <expr> N 'nN'[v:searchforward]
 
 if has('nvim')
   augroup vimrc_term
