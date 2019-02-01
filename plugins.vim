@@ -160,14 +160,6 @@ if executable('fzf')
     autocmd!
     autocmd FileType python let b:fzf_defprefix = "'def | 'class "
     autocmd FileType python let b:fzf_fsuffix = '('
-
-    if has('nvim')
-      autocmd FileType fzf tunmap <buffer> <Esc>
-      autocmd FileType fzf tunmap <buffer> <C-h>
-      autocmd FileType fzf tunmap <buffer> <C-j>
-      autocmd FileType fzf tunmap <buffer> <C-k>
-      autocmd FileType fzf tunmap <buffer> <C-l>
-    endif
   augroup END
 
   nnoremap <leader>ev :Files $CFGDIR<CR>

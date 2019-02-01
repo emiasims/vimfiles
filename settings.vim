@@ -300,13 +300,14 @@ if has('nvim')
     autocmd WinEnter term://* nohlsearch
     autocmd WinEnter term://* startinsert
 
-    " Currently like this so I can unmap for specific plugins/terminal progs.
-    autocmd TermOpen * tnoremap <buffer> <C-h> <C-\><C-n><C-w>h
-    autocmd TermOpen * tnoremap <buffer> <C-j> <C-\><C-n><C-w>j
-    autocmd TermOpen * tnoremap <buffer> <C-k> <C-\><C-n><C-w>k
-    autocmd TermOpen * tnoremap <buffer> <C-l> <C-\><C-n><C-w>l
-    autocmd TermOpen * tnoremap <buffer> <Esc> <C-\><C-n>
   augroup END
+
+  tnoremap <C-h> <C-\><C-n><C-w>h
+  tnoremap <C-j> <C-\><C-n><C-w>j
+  tnoremap <C-k> <C-\><C-n><C-w>k
+  tnoremap <C-l> <C-\><C-n><C-w>l
+  tnoremap <Esc> <C-\><C-n>
+
 endif
 
 " Make cmd work as alt in MacVim
