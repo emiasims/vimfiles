@@ -46,11 +46,20 @@ function! PackInit() abort
   call minpac#add('neoclide/coc.nvim')
   " endif
   call minpac#add('neoclide/jsonc.vim')
+  call minpac#add('prabirshrestha/async.vim')
+  " call minpac#add('prabirshrestha/vim-lsp')
 
   call minpac#add('vim-pandoc/vim-pandoc', {'type' : 'opt'})
   call minpac#add('vim-pandoc/vim-pandoc-syntax', {'type' : 'opt'})
   call minpac#add('mbbill/undotree', {'type' : 'opt'})  " TODO?
 endfunction
+
+" let g:lsp_log_verbose = 1
+" let g:lsp_log_file = expand('~/vim-lsp.log')
+" au User lsp_setup call lsp#register_server({'name': 'mspyls',
+"       \ 'cmd': {server_info->[expand('$HOME/testdn/dotnet $HOME/python-language-server/output/bin/Release/Microsoft.Python.LanguageServer.dll')]},
+"       \ 'whitelist': ['python']})
+
 
 command! PackUpdate call PackInit() | call minpac#update('', {'do' : 'call minpac#status()'})
 command! PackClean  call PackInit() | call minpac#clean()
@@ -130,10 +139,12 @@ if executable('fzf')
   nnoremap <silent> <leader>af  :Files<CR>
   nnoremap <silent> <leader>f   :GFiles<CR>
   nnoremap <silent> <leader>gst :GFiles?<CR>
-  nnoremap <silent> <leader>b   :Buffers<CR>
-  nnoremap <silent> <leader>l   :Lines<CR>
+  nnoremap <silent> <leader>b   :Lines<CR>
+  nnoremap <silent> <leader>l   :Buffers<CR>
   nnoremap <silent> <leader>/   :BLines<CR>
-  nnoremap <expr> <silent> <leader>O    ':Tags<CR>' . "'" . expand('<cword>') . ' '
+  " TODO: display preview  of function in tags See GFiles?
+  nnoremap <silent> <leader>t   :Tags<CR>
+  nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
   nnoremap <silent> <leader>mr  :History<CR>
   nnoremap <silent> <leader>A   :Ag<CR>
   nnoremap <silent> <leader>ht  :Helptags<CR>
@@ -141,8 +152,10 @@ if executable('fzf')
   nnoremap <silent> <leader>gl :BCommits<CR>
 
   " TODO: :h K and :h 'keywordprg'
-  nnoremap <expr> <silent> <F3> ':Ag<CR>' . get(b:, 'fzf_defprefix', '') . "'" . expand('<cword>') . ' '
-  xnoremap <expr> <silent> <F3> ':y a<CR>:Ag<CR>' . get(b:, 'fzf_defprefix', '') . "'" . @a . ' '
+  nnoremap <expr> <silent> <F3> ':Ag<CR>' . "'" . expand('<cword>') . ' '
+  xnoremap <expr> <silent> <F3> ':y a<CR>:Ag<CR>' . "'" . @a . ' '
+  nnoremap <expr> <silent> <F4> ':Tags<CR>' . "'" . expand('<cword>') . ' '
+  xnoremap <expr> <silent> <F4> ':y t<CR>:Tags<CR>' . "'" . @t . ' '
   nnoremap <expr> <silent> <F5> ':Ag<CR>' . "'" . expand('<cword>') . get(b:, 'fzf_fsuffix', '')
 
   function! s:build_quickfix_list(lines)
