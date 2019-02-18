@@ -207,6 +207,12 @@ augroup vimrc_general
   autocmd WinLeave * setlocal nocursorline
 
 augroup END
+
+augroup vimrc_numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu | set rnu   | endif
+  autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
+augroup END
 " }}}
 " Filetype: {{{
 augroup vimrc_filetype
@@ -220,14 +226,6 @@ augroup vimrc_filetype
   autocmd FileType sh let g:sh_fold_enabled=5
   autocmd BufRead * if empty(&filetype) | set commentstring=#%s | endif
 augroup END    " vimrc_filetype
-" }}}
-" Numbertoggle: {{{
-" -------------
-augroup vimrc_numbertoggle
-  autocmd!
-  autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu | set rnu   | endif
-  autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
-augroup END
 " }}}
 
 " Mappings:
