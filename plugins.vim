@@ -21,6 +21,7 @@ function! PackInit() abort
   call minpac#add('tpope/vim-surround')
   call minpac#add('tpope/vim-commentary')
   call minpac#add('tpope/vim-unimpaired')
+  " call minpac#add('tpope/vim-endwise')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
 
   call minpac#add('ap/vim-buftabline')
@@ -28,9 +29,7 @@ function! PackInit() abort
   call minpac#add('itchyny/vim-cursorword')
   call minpac#add('christoomey/vim-tmux-navigator')
   call minpac#add('jeetsukumaran/vim-filebeagle')
-  " if executable('fzf')
   call minpac#add('junegunn/fzf.vim')  " Slow?
-  " endif
   call minpac#add('junegunn/vim-easy-align')
 
   call minpac#add('justinmk/vim-sneak')
@@ -42,12 +41,8 @@ function! PackInit() abort
   call minpac#add('ludovicchabant/vim-gutentags')
 
   call minpac#add('SirVer/ultisnips')  " Slow?
-  " if executable('node') && executable('yarn')
-  call minpac#add('neoclide/coc.nvim')
-  " endif
+  call minpac#add('neoclide/coc.nvim', {'do': { -> coc#util#build()}})
   call minpac#add('neoclide/jsonc.vim')
-  call minpac#add('prabirshrestha/async.vim')
-  " call minpac#add('prabirshrestha/vim-lsp')
 
   call minpac#add('vim-pandoc/vim-pandoc', {'type' : 'opt'})
   call minpac#add('vim-pandoc/vim-pandoc-syntax', {'type' : 'opt'})
@@ -88,6 +83,9 @@ xmap , <Plug>Sneak_,
 
 nmap s <Plug>Sneak_s
 nmap S <Plug>Sneak_S
+
+let g:sneak#label = 1
+let g:sneak#absolute_dir = 1
 
 " }}}
 " vim-highlightedyank {{{
