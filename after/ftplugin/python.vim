@@ -9,6 +9,9 @@ if executable('yapf')
   setlocal formatexpr=yapf#yapfify(v:lnum,v:lnum+v:count-1)
 endif
 
+nnoremap <buffer><silent> gO :lvimgrep /^\s*\%(def \|class \)/ %<CR>:lopen<CR>
+nnoremap <buffer><silent> gO :lvimgrep /^\s*\%(def \\|class \)/ %<CR>:lopen<CR>
+
 augroup vimrc_python
   autocmd!
   autocmd BufWritePre *.py %s/\s\+$//e
