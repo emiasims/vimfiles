@@ -317,10 +317,19 @@ if has('mac')
 endif
 
 
-cnoreabbrev vh <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert help' : 'vh')<CR>
-cnoreabbrev hh <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'help' : 'hh')<CR>
-cnoreabbrev h <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'vert help' : 'h')<CR>
-cnoreabbrev f <c-r>=(getcmdtype()==':' && getcmdpos()==1 ? 'find' : 'h')<CR>
+" Just makes sure the abbrev only works at the start of the command
+function! s:cnoreabbrev_at_command_start(lhs, ...) abort
+  let l:rhs = join(a:000)
+  let l:cmdcheck = ' <c-r>=(getcmdtype()==":" && getcmdpos()==1 ? "'
+  execute 'cnoreabbrev ' . a:lhs . l:cmdcheck . l:rhs . '" : "' . a:lhs . '" )<CR>'
+endfunction
+command! -nargs=+ Cnoreabbrevs call <SID>cnoreabbrev_at_command_start(<f-args>)
+
+Cnoreabbrevs e! mkview \| edit!
+Cnoreabbrevs vh vert help
+Cnoreabbrevs he help
+Cnoreabbrevs h vert help
+Cnoreabbrevs f find
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
@@ -338,6 +347,9 @@ nnoremap gQ gggqG``
 nnoremap g<CR> i<CR><Esc>
 
 inoremap <C-u> <Esc>v`[gU`]a
+inoremap <C-f> <C-g>U<Right>
+inoremap <C-b> <C-g>U<Left>
+
 " }}}
 " Leader: {{{
 nnoremap <leader><CR> :nohlsearch<CR>
