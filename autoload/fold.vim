@@ -18,4 +18,15 @@ function! fold#text() abort
   return l:line . l:expansionString . l:foldSizeStr . l:foldLevelStr
 endfunction
 
+function! fold#markdown(lnum) abort
+  let l:level = matchend(getline(a:lnum), '^#*')
+  let l:nextlevel =  matchend(getline(a:lnum + 1), '^#*')
+  if l:level > 0
+    return '>' . l:level
+  elseif l:nextlevel > 0
+    return '<' . l:nextlevel
+  endif
+  return '='
+endfunction
+
 " vim: set ts=2 sw=2 tw=99 et :
