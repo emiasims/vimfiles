@@ -1,6 +1,8 @@
 scriptencoding utf-8
 
-function! statusline#gitinfo() abort
+
+function! s:gitinfo() abort
+  " Returns: ' (BRANCH)' or ' '
   let l:statuslinetext = ' '
   if exists('g:loaded_fugitive') && &modifiable
     let l:statuslinetext .= '(' . fugitive#head() . ')'
@@ -9,35 +11,45 @@ function! statusline#gitinfo() abort
 endfunction
 
 function! statusline#dirinfo() abort
+  " Returns: '(BRANCH)DIR/ ' or 'DIR ' or 'TERM_TITLE '
   if exists('b:term_title')
-    return ' ' . b:term_title . ' '
+    let b:stl_dirinfo = ' ' . b:term_title . ' '
+    return b:stl_dirinfo
+  elseif &filetype ==# 'help'
+    let b:stl_dirinfo = ''
+    return ''
   endif
-  let l:statuslinetext = expand('%:h')
-  if l:statuslinetext !=# '.'
-    let l:statuslinetext .= '/'
-  else
-    let l:statuslinetext = ''
-  endif
-  return statusline#gitinfo() . l:statuslinetext . ' '
+  let l:statuslinetext = expand('%:h') !=# '.' ? expand('%:h') . '/' : ''
+  let l:statuslinetext = s:gitinfo() . l:statuslinetext . ' '
+  let b:stl_dirinfo = l:statuslinetext
+  return l:statuslinetext
 endfunction
 
 function! statusline#fileinfo() abort
-  " TODO: modified changes color. choose %#HLname# based on &modified
-  let l:statuslinetext = ' %t'
-  let l:statuslinetext .= ' %m'
+  " Returns: 'filename modified spacer'
+  let l:statuslinetext = '%*'
+  let l:statuslinetext .= ' %t'
+  " Should catch attention when unfocused
+  let l:statuslinetext .= ' %#stlModified#'
+  let l:statuslinetext .= '%m'
+  let l:statuslinetext .= '%*'
   let l:statuslinetext .= '%='
-  let l:statuslinetext .= '%y '
   return l:statuslinetext
 endfunction
 
-function! statusline#typeinfo() abort
-  let l:statuslinetext = ' %{&fileencoding?&fileencoding:&encoding}'
-  let l:statuslinetext .= '[%{&fileformat}] '
-  return l:statuslinetext
+function! statusline#encoding()
+  " Returns: 'encoding[lineendings]' in the same width as statusline#cursorinfo()
+  let l:linedigits = float2nr(ceil(log10(line('$') + 1)))
+  let l:stl_typeinfo = (&fileencoding ? &fileencoding : &encoding) . '[' . &fileformat . ']'
+  let l:stl_typeinfo .= repeat(' ', 14 + 2 * l:linedigits - len(l:stl_typeinfo))
+  return l:stl_typeinfo
 endfunction
 
-function! statusline#bufinfo() abort
-  let l:linedigits = printf('%d', float2nr(ceil(log10(line('$')))))
+let s:test = 1
+
+function! statusline#cursorinfo() abort
+  " Returns: '%line/lines ☰ lineno/lines : colnum'
+  let l:linedigits = float2nr(ceil(log10(line('$') + 1)))
   let l:nwid = '%' . l:linedigits . '.' . l:linedigits
   let l:statuslinetext = ' %2p%% ☰ '  " U+2630
   let l:statuslinetext .= l:nwid . 'l/' . l:nwid .  'L : %02c '
@@ -45,18 +57,18 @@ function! statusline#bufinfo() abort
 endfunction
 
 let s:modes ={
-      \ 'n'  : ['%#stlNormal#', 'n'],
-      \ 'i'  : ['%#stlInsert#', 'i'],
-      \ 'v'  : ['%#stlVisual#', 'v'],
-      \ 'V'  : ['%#stlVisual#', '☴'],
-      \ '' : ['%#stlVisual#', '◧'],
-      \ 'R'  : ['%#stlReplace#', 'R'],
-      \ 's'  : ['%#stlSelect#', 's'],
-      \ 'S'  : ['%#stlSelect#', 'S'],
-      \ '' : ['%#stlSelect#', 'S'],
-      \ 'c'  : ['%#stlTerminal#', '⌘'],
-      \ 't'  : ['%#stlTerminal#', '▣'],
-      \ '-'  : ['%#stlNormal#', '-']}
+      \ 'n'  : ['%#stlNormalMode#', 'n'],
+      \ 'i'  : ['%#stlInsertMode#', 'i'],
+      \ 'v'  : ['%#stlVisualMode#', 'v'],
+      \ 'V'  : ['%#stlVisualMode#', 'V'],
+      \ '' : ['%#stlVisualMode#', 'B'],
+      \ 'R'  : ['%#stlReplaceMode#', 'R'],
+      \ 's'  : ['%#stlSelectMode#', 's'],
+      \ 'S'  : ['%#stlSelectMode#', 'S'],
+      \ '' : ['%#stlSelectMode#', 'S'],
+      \ 'c'  : ['%#stlTerminalMode#', 'c'],
+      \ 't'  : ['%#stlTerminalMode#', 't'],
+      \ '-'  : ['%#stlNormalMode#', '-']}
 
 function! statusline#modecolor() abort
   return get(s:modes, mode(), '%*')[0]
@@ -67,10 +79,25 @@ function! statusline#mode() abort
 endfunction
 
 function! statusline#errors() abort
-  " Trailing whitespace
-  " quickfix, location-list
-  " mixed indentation
-  return ''
+  if exists('b:stl_noerr')
+    return ''
+  endif
+
+  let l:statuslinetext = ''
+  " TODO: Currently, message goes away if modified. If we remove the check, we get spammed by
+  " the message. Sovled via caching?
+  if !&modified && &modifiable && !exists('b:stl_skip_trailing_whitespace') && search('\s$', 'nw')
+    let l:statuslinetext .= ' TRAILING WHITESPACE '
+  endif
+
+  if &modifiable && search('^\t', 'nw') && search('^  [^\s]', 'nw')
+    let l:statuslinetext .= ' MIXED INDENT '
+  endif
+
+  " TODO: Once added to neovim, add idx for which element we're on of the list
+  let l:statuslinetext .= len(getloclist(0)) > 0 ? ' (ll:' . len(getloclist(0)) . ') ' : ''
+  let l:statuslinetext .= len(getqflist()) > 0 ? '(qf:' . len(getqflist()) . ')' : ''
+  return l:statuslinetext
 endfunction
 
 " vim: set ts=2 sw=2 tw=99 et :
