@@ -5,20 +5,18 @@ endif
 scriptencoding utf-8
 " Note: Settings only wrapped with an 'if has...' if it
 " has caused an issue on one of the systems I vim on.
+
 " Settings:
 " General: {{{
 set mouse=niv
-set modeline
 set report=0
 set hidden
 set path=.,**
 set virtualedit=block
 set formatoptions=1crl
-set autoread
 if has('patch-7.3.541')
   set formatoptions+=j
 endif
-set ttyfast
 set updatetime=500
 set winaltkeys=no
 set pastetoggle=<F2>
@@ -116,7 +114,6 @@ if exists('+inccommand')
 endif
 " }}}
 " UI: {{{
-set noshowmode
 set shortmess=aAoOTI
 set scrolloff=4
 set sidescrolloff=2
@@ -125,13 +122,11 @@ set relativenumber
 set lazyredraw
 set showtabline=2
 set pumheight=20
-set showcmd
 set cmdheight=2
 set cmdwinheight=5
 set laststatus=2
 set colorcolumn=80
 set cursorline
-set display=lastline
 
 set list
 set listchars=nbsp:⊗
@@ -142,8 +137,6 @@ set listchars+=trail:•
 set showbreak=↘
 set fillchars=vert:┃
 set nojoinspaces
-
-set wildmenu
 set wildmode=longest:full,full
 
 if has('termguicolors')
@@ -173,7 +166,6 @@ set foldtext=fold#text()
 if has('packages')
   set packpath+=$CFGDIR
 endif
-let g:python_highlight_all = 1
 " }}}
 
 " Autocommands:
@@ -217,9 +209,6 @@ augroup END
 " Filetype: {{{
 augroup vimrc_filetype
   autocmd!
-  if has('nvim')
-    autocmd FileType help setlocal nu rnu signcolumn=no
-  endif
   autocmd FileType qfreplace setlocal nofoldenable
   autocmd BufNewFile,BufRead *.yapf set filetype=cfg
   autocmd FileType sh let g:is_bash=1
@@ -229,27 +218,20 @@ augroup END    " vimrc_filetype
 " }}}
 
 " Mappings:
-" Simple: {{{
+let g:mapleader=' '
+let g:maplocalleader="\\"
+" File navigation {{{
+" Overwritten in plugins.vim.
+nnoremap <leader>ev :e $CFGDIR<CR>
+" }}}
+" Cursor Navigation and Windows: {{{
 nnoremap <Space> <nop>
 xnoremap <Space> <nop>
 
-nnoremap <Up>    <nop>
-nnoremap <Down>  <nop>
-nnoremap <Left>  <nop>
-nnoremap <Right> <nop>
-
-let g:mapleader=' '
-let g:maplocalleader="\\"
 inoremap jk <Esc>
 snoremap jk <Esc>
 nnoremap Y y$
 xnoremap $ $h
-
-inoremap <M-n> <Esc>
-vnoremap <M-n> <Esc>
-if has('nvim')
-  tnoremap <M-n> <C-\><C-n>
-endif
 
 augroup vimrc_crmap
   autocmd!
@@ -269,16 +251,15 @@ endif
 nnoremap <C-Left> <C-w><
 nnoremap <C-Right> <C-w>>
 
-nnoremap 0 0^
-xnoremap 0 0^
-onoremap 0 ^
-nnoremap ^ 0
-xnoremap ^ 0
+nnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
+xnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
+onoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
 
 nnoremap Q q
 
-nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
-nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
+" Emacs-like
+inoremap <C-f> <C-g>U<Right>
+inoremap <C-b> <C-g>U<Left>
 
 nnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 xnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
@@ -292,6 +273,9 @@ xnoremap gk k
 nnoremap <expr> n 'Nn'[v:searchforward]
 nnoremap <expr> N 'nN'[v:searchforward]
 
+nnoremap <silent><C-w>b :vert resize<CR>:resize<CR>:normal! ze<CR>
+" }}}
+" Terminal bindings: {{{
 if has('nvim')
   augroup vimrc_term
     autocmd!
@@ -305,18 +289,20 @@ if has('nvim')
   tnoremap <C-k> <C-\><C-n><C-w>k
   tnoremap <C-l> <C-\><C-n><C-w>l
   tnoremap <Esc> <C-\><C-n>
+  tnoremap <M-n> <C-\><C-n>
 
 endif
-
-" Make cmd work as alt in MacVim
+" }}}
+" MacVim {{{
 if has('mac')
+  " Make cmd work as alt
   nnoremap <D-j> <M-j>
   nnoremap <D-k> <M-k>
   vnoremap <D-j> <M-j>
   vnoremap <D-k> <M-k>
 endif
-
-
+" }}}
+" Command: {{{
 " Just makes sure the abbrev only works at the start of the command
 function! s:cnoreabbrev_at_command_start(lhs, ...) abort
   let l:rhs = join(a:000)
@@ -330,66 +316,21 @@ Cnoreabbrevs vh vert help
 Cnoreabbrevs he help
 Cnoreabbrevs h vert help
 Cnoreabbrevs f find
+Cnoreabbrevs W!! w !sudo tee % >/dev/null
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
-
-nnoremap <C-q> <C-w>
-xnoremap < <gv
-xnoremap > >gv
-cmap W!! w !sudo tee % >/dev/null
-nnoremap cp yap<S-}>p
+" }}}
+" Searching: {{{
 nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
 xnoremap / y/\<<C-r>"\><CR>zv
-
-nnoremap g= gg=G``zz
-nnoremap gQ gggqG``
-nnoremap g<CR> i<CR><Esc>
-
-inoremap <C-u> <Esc>v`[gU`]a
-inoremap <C-f> <C-g>U<Right>
-inoremap <C-b> <C-g>U<Left>
-
-" }}}
-" Leader: {{{
-nnoremap <leader><CR> :nohlsearch<CR>
-nnoremap <leader>cd :lcd %:p:h<CR>:pwd<CR>
-
-nnoremap <leader>p "0p
-nnoremap <leader>P "0P
-xnoremap <leader>p "0p
-xnoremap <leader>P "0P
-
-" Overwritten in plugins.vim.
-nnoremap <leader>ev :e $CFGDIR/settings.vim<CR>
-nnoremap <leader>rv :so $MYVIMRC<CR>:execute 'set ft='.&ft<CR>:echo 'reloaded vimrc'<CR>zv
-
-nnoremap <silent> <leader>tws :let @/='\v\s+$'<CR>:set hls<CR>
-
-" Select last edited text. improved over `[v`], eg works with visual block
-nnoremap <expr> <leader>v '`['.strpart(getregtype(), 0, 1).'`]'
-nnoremap <leader>w :write<CR>
-nnoremap <silent> <leader>col :syntax sync fromstart<CR>
-" }}}
-" Filetype: {{{
-augroup vimrc_filetype_mappings
-  autocmd!
-  if exists(':helpclose')
-    autocmd FileType help nnoremap <buffer> q :helpclose<CR>
-  else
-    autocmd FileType help nnoremap <buffer> q :q<CR>
-  endif
-
-  nnoremap <silent> <Plug>FirstSuggestionFixSpelling 1z= :call repeat#set("\<Plug>FirstSuggestionFixSpelling")<CR>
-  autocmd FileType markdown nnoremap <buffer> <localleader>s <Plug>FirstSuggestionFixSpelling
-augroup END  " vimrc_filetype_mappings"
-" }}}
-" LessSimple: {{{
-
-nnoremap <silent><C-w>b :vert resize<CR>:resize<CR>:normal! ze<CR>
-
 xnoremap s :s//g<Left><Left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
+nnoremap <leader><CR> :nohlsearch<CR>
+" }}}
+" Moving text: {{{
+nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
+nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
 
 xnoremap <M-j> :move '>+1<CR>gv=gv
 xnoremap <M-k> :move '<-2<CR>gv=gv
@@ -398,8 +339,24 @@ nnoremap <M-k> :move .-2<CR>==
 inoremap <M-j> <C-c>:move .+1<CR>==gi
 inoremap <M-k> <C-c>:move .-2<CR>==gi
 
+xnoremap < <gv
+xnoremap > >gv
 " }}}
-" Autoload: {{{
+" Editing text: {{{
+nnoremap <expr> ~ matchstr(getline('.'), '\%' . col('.') . 'c.') =~# '\a' ? '~' : 'w~'
+nnoremap cp yap<S-}>p
+nnoremap g<CR> i<CR><Esc>
+
+nnoremap <leader>p "0p
+nnoremap <leader>P "0P
+xnoremap <leader>p "0p
+xnoremap <leader>P "0P
+
+" Select last edited text. improved over `[v`], eg works with visual block
+nnoremap <expr> gz '`['.strpart(getregtype(), 0, 1).'`]'
+nnoremap <leader>w :write<CR>
+" }}}
+" Plugins (manual): {{{
 " I want these to load even if --noplugins is used.
 nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>du :call difference#undobuf()<cr>
@@ -420,6 +377,7 @@ onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Esc>:call textobjects#indent(1)<CR><Esc>gv
 
+" Not plugins but fits in with the text objects above
 xnoremap il ^og_
 xnoremap al 0o$
 onoremap il :<C-u>normal! ^vg_<CR>
