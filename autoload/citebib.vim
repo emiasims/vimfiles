@@ -18,8 +18,10 @@ endif
 
 let g:loaded_citebib = 1
 
+" TODO: viml bibtex parser. should just be able to use regex.
+
 function! citebib#reset() abort
-  let s:bib = {}  " gitdir: {filename: [modtime, [bibitem... bibitem...]], ...}
+  let s:bib = {}  " gitdir: {filename: [modtime, [bibitem... bibitem...]], filename: [...]}
   let s:bib_cache = {}  " gitdir: [concat bibitems]
   let s:update_cache = {}  " gitdir: 1 or 0
   " See: escape codes
@@ -118,7 +120,10 @@ endfunction
 function! citebib#fzf() abort
   if !exists('b:git_dir')
     echoerr 'No git dir found.'
-    return
+    return ''
+  endif
+  if get(b:, 'loaded_ale', 0) && get(b:, 'ale_enabled', 1) && get(g:, 'ale_enabled', 1)
+    ALEDisableBuffer
   endif
   call s:find_bibfiles()
   call s:check_modtimes_and_parse()
