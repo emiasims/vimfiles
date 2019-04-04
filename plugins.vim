@@ -11,7 +11,6 @@ function! PackInit() abort
   call minpac#init()
   call minpac#add('k-takata/minpac', {'type' : 'opt'})
 
-  call minpac#add('vim-scripts/python_match.vim')
   call minpac#add('jeetsukumaran/vim-pythonsense')
   call minpac#add('Vimjas/vim-python-pep8-indent')
   call minpac#add('vim-jp/syntax-vim-ex')
@@ -23,6 +22,7 @@ function! PackInit() abort
   call minpac#add('tpope/vim-unimpaired')
   " call minpac#add('tpope/vim-endwise')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
+  call minpac#add('andymass/vim-matchup')
 
   call minpac#add('ap/vim-buftabline')
   call minpac#add('machakann/vim-highlightedyank')
@@ -145,7 +145,7 @@ if executable('fzf')
   nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
   nnoremap <silent> <leader>mr  :History<CR>
   nnoremap <silent> <leader>A   :Ag<CR>
-  nnoremap <silent> <leader>ht  :Helptags<CR>
+  nnoremap <silent> <leader>h  :Helptags<CR>
   nnoremap <silent> <leader>gal :Commits<CR>
   nnoremap <silent> <leader>gl :BCommits<CR>
 
@@ -216,6 +216,12 @@ hi link User9 StatusLineTerm
 if has('nvim')
   " ultisnips {{{
   let g:UltiSnipsSnippetDirectories = [$CFGDIR . '/snips', 'UltiSnips']
+
+  let g:UltiSnipsExpandTrigger = '<Tab>'
+  let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+  let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+  let g:UltiSnipsRemoveSelectModeMappings = 0
+
   " imap <tab>:
   " Expand snippet if possible.
   " if there is is a pumvisible, accept the next one.
@@ -235,11 +241,6 @@ if has('nvim')
   inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
   xnoremap <silent> <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
   snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<CR>
-
-  let g:UltiSnipsExpandTrigger = '<Nop>'  " prevent tab from being bound
-  let g:UltiSnipsJumpForwardTrigger = '<Nop>'
-  let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
-  let g:UltiSnipsRemoveSelectModeMappings = 0
   " }}}
   " coc {{{
   inoremap <expr> <CR> pumvisible() ? "\<C-y><CR>" : "\<CR>"
@@ -254,6 +255,7 @@ if has('nvim')
 
   augroup vimrc_ale
     autocmd!
+    autocmd Filetype markdown let b:ale_enabled = 0
     autocmd Filetype python let b:ale_linters = ['flake8', 'pydocstyle']
   augroup END
 
