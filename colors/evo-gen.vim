@@ -95,187 +95,90 @@ let s:yellow = [172, '#d79921']
 
 " }}}
 " True and 256 colors {{{
-if ($TERM =~# '256' || &t_Co >= 256) || has('gui_running')
+Highlight Normal           fg=s:light0 bg=s:dark0  attr=NONE
+set background=dark
 
-  Highlight Normal           fg=s:light0 bg=s:dark0  attr=NONE
-  set background=dark
+Highlight LineNr           fg=s:dark3  bg=s:dark0  attr=NONE
+Highlight SignColumn       fg=s:dark1  bg=s:dark0  attr=NONE
+Highlight FoldColumn       fg=s:dark3  bg=s:dark0  attr=NONE
+Highlight MatchParen       fg=s:aqua   bg=s:dark3  attr=NONE
 
-  Highlight LineNr           fg=s:dark3  bg=s:dark0  attr=NONE
-  Highlight SignColumn       fg=s:dark1  bg=s:dark0  attr=NONE
-  Highlight FoldColumn       fg=s:dark3  bg=s:dark0  attr=NONE
-  Highlight MatchParen       fg=s:aqua   bg=s:dark3  attr=NONE
+Highlight Statement        fg=s:lblue  bg=NONE     attr=bold
+Highlight PreProc          fg=s:lblue  bg=NONE     attr=NONE
+Highlight Function         fg=s:blue   bg=NONE     attr=NONE
+Highlight String           fg=s:green  bg=NONE     attr=NONE
+Highlight Number           fg=s:violet bg=NONE     attr=NONE
 
-  Highlight Statement        fg=s:lblue  bg=NONE     attr=bold
-  Highlight PreProc          fg=s:lblue  bg=NONE     attr=NONE
-  Highlight Function         fg=s:blue   bg=NONE     attr=NONE
-  Highlight String           fg=s:green  bg=NONE     attr=NONE
-  Highlight Number           fg=s:violet bg=NONE     attr=NONE
+Highlight Folded           fg=s:light3 bg=s:dark1  attr=NONE
+Highlight Comment          fg=s:light3 bg=NONE     attr=italic
+Highlight Identifier       fg=s:lgreen bg=NONE     attr=NONE
+Highlight Type             fg=s:lblue  bg=NONE     attr=NONE
+Highlight Special          fg=s:light0 bg=NONE     attr=NONE
+Highlight Constant         fg=s:light0 bg=NONE     attr=NONE
+Highlight Error            fg=s:red    bg=NONE     attr=bold
+Highlight Todo             fg=s:yellow bg=NONE     attr=bold
+Highlight NonText          fg=s:dark2  bg=NONE     attr=NONE
 
-  Highlight Folded           fg=s:light3 bg=s:dark1  attr=NONE
-  Highlight Comment          fg=s:light3 bg=NONE     attr=italic
-  Highlight Identifier       fg=s:lgreen bg=NONE     attr=NONE
-  Highlight Type             fg=s:lblue  bg=NONE     attr=NONE
-  Highlight Special          fg=s:light0 bg=NONE     attr=NONE
-  Highlight Constant         fg=s:light0 bg=NONE     attr=NONE
-  Highlight Error            fg=s:red    bg=NONE     attr=bold
-  Highlight Todo             fg=s:yellow bg=NONE     attr=bold
-  Highlight NonText          fg=s:dark2  bg=NONE     attr=NONE
+Highlight WildMenu         fg=s:aqua   bg=s:dark3  attr=NONE
+Highlight PMenu            fg=s:light0 bg=s:dark1  attr=NONE
+Highlight PmenuSbar        fg=s:light0 bg=s:dark1  attr=NONE
+Highlight PMenuSel         fg=s:aqua   bg=s:dark2  attr=NONE
+Highlight PmenuThumb       fg=s:light2 bg=s:dark2  attr=NONE
 
-  Highlight WildMenu         fg=s:aqua   bg=s:dark3  attr=NONE
-  Highlight PMenu            fg=s:light0 bg=s:dark1  attr=NONE
-  Highlight PmenuSbar        fg=s:light0 bg=s:dark1  attr=NONE
-  Highlight PMenuSel         fg=s:aqua   bg=s:dark2  attr=NONE
-  Highlight PmenuThumb       fg=s:light2 bg=s:dark2  attr=NONE
+Highlight ErrorMsg         fg=s:light0 bg=s:red    attr=NONE
+Highlight ModeMsg          fg=s:light0 bg=NONE     attr=NONE
+Highlight MoreMsg          fg=s:light0 bg=NONE     attr=NONE
+Highlight Question         fg=s:light0 bg=NONE     attr=NONE
+Highlight WarningMsg       fg=s:red    bg=s:dark0  attr=NONE
+Highlight TabLine          fg=s:light3 bg=s:dark1  attr=NONE
+Highlight TabLineFill      fg=s:light3 bg=s:dark1  attr=NONE
+Highlight TabLineSel       fg=s:light3 bg=s:dark3  attr=NONE
+Highlight Cursor           fg=s:dark0  bg=s:light0 attr=NONE
+Highlight CursorColumn     fg=NONE     bg=s:dark1  attr=NONE
+Highlight CursorLineNr     fg=s:aqua    bg=s:dark0  attr=NONE
+Highlight CursorLine       fg=NONE     bg=s:dark1  attr=NONE
+Highlight ColorColumn      fg=NONE     bg=s:dark1  attr=NONE
+Highlight StatusLine       fg=s:light1 bg=s:dark1  attr=NONE
+Highlight StatusLineNC     fg=s:light3 bg=s:dark2  attr=NONE
+Highlight StatusLineTerm   fg=s:aqua   bg=s:dark2  attr=NONE
+Highlight StatusLineTermNC fg=s:light0 bg=s:dark1  attr=NONE
 
-  Highlight ErrorMsg         fg=s:light0 bg=s:red    attr=NONE
-  Highlight ModeMsg          fg=s:light0 bg=NONE     attr=NONE
-  Highlight MoreMsg          fg=s:light0 bg=NONE     attr=NONE
-  Highlight Question         fg=s:light0 bg=NONE     attr=NONE
-  Highlight WarningMsg       fg=s:red    bg=s:dark0  attr=NONE
-  Highlight TabLine          fg=s:light3 bg=s:dark1  attr=NONE
-  Highlight TabLineFill      fg=s:light3 bg=s:dark1  attr=NONE
-  Highlight TabLineSel       fg=s:light3 bg=s:dark3  attr=NONE
-  Highlight Cursor           fg=s:dark0  bg=s:light0 attr=NONE
-  Highlight CursorColumn     fg=NONE     bg=s:dark1  attr=NONE
-  Highlight CursorLineNr     fg=s:aqua    bg=s:dark0  attr=NONE
-  Highlight CursorLine       fg=NONE     bg=s:dark1  attr=NONE
-  Highlight ColorColumn      fg=NONE     bg=s:dark1  attr=NONE
-  Highlight StatusLine       fg=s:light1 bg=s:dark1  attr=NONE
-  Highlight StatusLineNC     fg=s:light3 bg=s:dark2  attr=NONE
-  Highlight StatusLineTerm   fg=s:aqua   bg=s:dark2  attr=NONE
-  Highlight StatusLineTermNC fg=s:light0 bg=s:dark1  attr=NONE
+Highlight Visual           fg=NONE     bg=s:dark2  attr=NONE
+Highlight VisualNOS        fg=NONE     bg=s:dark2  attr=NONE
+Highlight VertSplit        fg=s:dark2  bg=NONE  attr=NONE
+Highlight SpecialKey       fg=s:light3  bg=NONE     attr=NONE
+Highlight Title            fg=s:light0 bg=NONE     attr=NONE
+Highlight DiffAdd          fg=s:green  bg=s:dark1  attr=reverse
+Highlight DiffChange       fg=s:yellow bg=s:dark1  attr=reverse
+Highlight DiffDelete       fg=s:red    bg=s:dark1  attr=reverse
+Highlight DiffText         fg=s:lblue  bg=s:dark1  attr=reverse
+Highlight IncSearch        fg=s:dark1  bg=s:orange   attr=NONE
+Highlight Search           fg=s:dark1  bg=s:orange   attr=NONE
+Highlight Directory        fg=s:aqua   bg=NONE     attr=NONE
+Highlight SpecialChar      fg=s:yellow bg=NONE     attr=NONE
+Highlight SpecialComment   fg=s:aqua   bg=NONE     attr=italic
 
-  Highlight Visual           fg=NONE     bg=s:dark2  attr=NONE
-  Highlight VisualNOS        fg=NONE     bg=s:dark2  attr=NONE
-  Highlight VertSplit        fg=s:dark2  bg=NONE  attr=NONE
-  Highlight SpecialKey       fg=s:light3  bg=NONE     attr=NONE
-  Highlight Title            fg=s:light0 bg=NONE     attr=NONE
-  Highlight DiffAdd          fg=s:green  bg=s:dark1  attr=reverse
-  Highlight DiffChange       fg=s:yellow bg=s:dark1  attr=reverse
-  Highlight DiffDelete       fg=s:red    bg=s:dark1  attr=reverse
-  Highlight DiffText         fg=s:lblue  bg=s:dark1  attr=reverse
-  Highlight IncSearch        fg=s:dark1  bg=s:orange   attr=NONE
-  Highlight Search           fg=s:dark1  bg=s:orange   attr=NONE
-  Highlight Directory        fg=s:aqua   bg=NONE     attr=NONE
-  Highlight SpecialChar      fg=s:yellow bg=NONE     attr=NONE
-  Highlight SpecialComment   fg=s:aqua   bg=NONE     attr=italic
+Highlight stlTypeInfo      fg=s:blue   bg=s:dark0  attr=NONE
+Highlight stlErrorInfo     fg=s:dark0  bg=s:orange attr=bold
+Highlight stlDirInfo       fg=s:laqua   bg=s:dark2  attr=NONE
 
-  Highlight stlTypeInfo      fg=s:blue   bg=s:dark0  attr=NONE
-  Highlight stlErrorInfo     fg=s:dark0  bg=s:orange attr=bold
-  Highlight stlDirInfo       fg=s:laqua   bg=s:dark2  attr=NONE
+Highlight stlNormal        fg=s:yellow bg=s:dark3  attr=bold
+Highlight stlInsert        fg=s:dark0  bg=s:green  attr=bold
+Highlight stlVisual        fg=s:dark0  bg=s:orange attr=NONE
+Highlight stlReplace       fg=s:dark0  bg=s:blue   attr=NONE
+Highlight stlSelect        fg=s:dark0  bg=s:blue   attr=NONE
+Highlight stlTerminal      fg=s:violet bg=s:dark3  attr=NONE
 
-  Highlight stlNormal        fg=s:yellow bg=s:dark3  attr=bold
-  Highlight stlInsert        fg=s:dark0  bg=s:green  attr=bold
-  Highlight stlVisual        fg=s:dark0  bg=s:orange attr=NONE
-  Highlight stlReplace       fg=s:dark0  bg=s:blue   attr=NONE
-  Highlight stlSelect        fg=s:dark0  bg=s:blue   attr=NONE
-  Highlight stlTerminal      fg=s:violet bg=s:dark3  attr=NONE
+Highlight debugPC          bg=s:blue
+Highlight debugBreakpoint  bg=s:red
 
-  Highlight debugPC          bg=s:blue
-  Highlight debugBreakpoint  bg=s:red
+Highlight SpellBad   bg=NONE fg=s:red                       attr=undercurl guisp=NONE
+Highlight SpellCap   bg=NONE fg=s:aqua                      attr=undercurl guisp=NONE
+Highlight SpellLocal bg=NONE fg=s:green                     attr=undercurl guisp=NONE
+Highlight SpellRare  bg=NONE fg=s:orange                    attr=undercurl guisp=NONE
 
-  if has('gui_running')
-    Highlight SpellBad   bg=NONE ctermfg=s:red[0]    guifg=NONE attr=undercurl guisp=s:red[1]
-    Highlight SpellCap   bg=NONE ctermfg=s:aqua[0]   guifg=NONE attr=undercurl guisp=s:aqua[1]
-    Highlight SpellLocal bg=NONE ctermfg=s:green[0]  guifg=NONE attr=undercurl guisp=s:green[1]
-    Highlight SpellRare  bg=NONE ctermfg=s:orange[0] guifg=NONE attr=undercurl guisp=s:orange[1]
-  else
-    Highlight SpellBad   bg=NONE fg=s:red                       attr=undercurl guisp=NONE
-    Highlight SpellCap   bg=NONE fg=s:aqua                      attr=undercurl guisp=NONE
-    Highlight SpellLocal bg=NONE fg=s:green                     attr=undercurl guisp=NONE
-    Highlight SpellRare  bg=NONE fg=s:orange                    attr=undercurl guisp=NONE
-  endif
-
-  " }}}
+" }}}
 " term colors {{{
-elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
-  set t_Co=16
-  " term colors from romainl's apprentice
-  highlight Normal           ctermbg=NONE       ctermfg=white       cterm=NONE
-  set       background=dark
-
-  highlight Comment          ctermbg=NONE       ctermfg=gray        cterm=NONE
-  highlight Conceal          ctermbg=NONE       ctermfg=white       cterm=NONE
-  highlight Constant         ctermbg=NONE       ctermfg=red         cterm=NONE
-  highlight Function         ctermbg=NONE       ctermfg=yellow      cterm=NONE
-  highlight Identifier       ctermbg=NONE       ctermfg=darkblue    cterm=NONE
-  highlight PreProc          ctermbg=NONE       ctermfg=darkcyan    cterm=NONE
-  highlight Special          ctermbg=NONE       ctermfg=darkgreen   cterm=NONE
-  highlight Statement        ctermbg=NONE       ctermfg=blue        cterm=NONE
-  highlight String           ctermbg=NONE       ctermfg=green       cterm=NONE
-  highlight Todo             ctermbg=NONE       ctermfg=NONE        cterm=reverse
-  highlight Type             ctermbg=NONE       ctermfg=magenta     cterm=NONE
-
-  highlight Error            ctermbg=NONE       ctermfg=darkred     cterm=reverse
-  highlight Ignore           ctermbg=NONE       ctermfg=NONE        cterm=NONE
-  highlight Underlined       ctermbg=NONE       ctermfg=NONE        cterm=reverse
-
-  highlight LineNr           ctermbg=black      ctermfg=gray        cterm=NONE
-  highlight NonText          ctermbg=NONE       ctermfg=darkgray    cterm=NONE
-
-  highlight Pmenu            ctermbg=darkgray   ctermfg=white       cterm=NONE
-  highlight PmenuSbar        ctermbg=gray       ctermfg=NONE        cterm=NONE
-  highlight PmenuSel         ctermbg=darkcyan   ctermfg=black       cterm=NONE
-  highlight PmenuThumb       ctermbg=darkcyan   ctermfg=NONE        cterm=NONE
-
-  highlight ErrorMsg         ctermbg=darkred    ctermfg=black       cterm=NONE
-  highlight ModeMsg          ctermbg=darkgreen  ctermfg=black       cterm=NONE
-  highlight MoreMsg          ctermbg=NONE       ctermfg=darkcyan    cterm=NONE
-  highlight Question         ctermbg=NONE       ctermfg=green       cterm=NONE
-  highlight WarningMsg       ctermbg=NONE       ctermfg=darkred     cterm=NONE
-
-  highlight TabLine          ctermbg=darkgray   ctermfg=darkyellow  cterm=NONE
-  highlight TabLineFill      ctermbg=darkgray   ctermfg=black       cterm=NONE
-  highlight TabLineSel       ctermbg=darkyellow ctermfg=black       cterm=NONE
-
-  highlight Cursor           ctermbg=NONE       ctermfg=NONE        cterm=NONE
-  highlight CursorColumn     ctermbg=darkgray   ctermfg=NONE        cterm=NONE
-  highlight CursorLineNr     ctermbg=black      ctermfg=cyan        cterm=NONE
-  highlight CursorLine       ctermbg=darkgray   ctermfg=NONE        cterm=NONE
-
-  highlight helpLeadBlank    ctermbg=NONE       ctermfg=NONE        cterm=NONE
-  highlight helpNormal       ctermbg=NONE       ctermfg=NONE        cterm=NONE
-
-  highlight StatusLine       ctermbg=darkyellow ctermfg=black       cterm=NONE
-  highlight StatusLineNC     ctermbg=darkgray   ctermfg=darkyellow  cterm=NONE
-
-  highlight StatusLineterm   ctermbg=darkyellow ctermfg=black       cterm=NONE
-  highlight StatusLinetermNC ctermbg=darkgray   ctermfg=darkyellow  cterm=NONE
-
-  highlight Visual           ctermbg=black      ctermfg=blue        cterm=reverse
-  highlight VisualNOS        ctermbg=black      ctermfg=white       cterm=reverse
-
-  highlight FoldColumn       ctermbg=black      ctermfg=darkgray    cterm=NONE
-  highlight Folded           ctermbg=black      ctermfg=darkgray    cterm=NONE
-
-  highlight VertSplit        ctermbg=darkgray   ctermfg=darkgray    cterm=NONE
-  highlight WildMenu         ctermbg=blue       ctermfg=black       cterm=NONE
-
-  highlight SpecialKey       ctermbg=NONE       ctermfg=darkgray    cterm=NONE
-  highlight Title            ctermbg=NONE       ctermfg=white       cterm=NONE
-
-  highlight DiffAdd          ctermbg=black      ctermfg=green       cterm=reverse
-  highlight DiffChange       ctermbg=black      ctermfg=magenta     cterm=reverse
-  highlight DiffDelete       ctermbg=black      ctermfg=darkred     cterm=reverse
-  highlight DiffText         ctermbg=black      ctermfg=red         cterm=reverse
-
-  highlight IncSearch        ctermbg=darkred    ctermfg=black       cterm=NONE
-  highlight Search           ctermbg=yellow     ctermfg=black       cterm=NONE
-
-  highlight Directory        ctermbg=NONE       ctermfg=cyan        cterm=NONE
-  highlight MatchParen       ctermbg=black      ctermfg=yellow      cterm=NONE
-
-  highlight SpellBad         ctermbg=NONE       ctermfg=darkred     cterm=undercurl
-  highlight SpellCap         ctermbg=NONE       ctermfg=darkyellow  cterm=undercurl
-  highlight SpellLocal       ctermbg=NONE       ctermfg=darkgreen   cterm=undercurl
-  highlight SpellRare        ctermbg=NONE       ctermfg=darkmagenta cterm=undercurl
-
-  highlight ColorColumn      ctermbg=black      ctermfg=NONE        cterm=NONE
-  highlight SignColumn       ctermbg=black      ctermfg=darkgray    cterm=NONE
-
-  highlight debugPC          ctermbg=blue
-  highlight debugBreakpoint  ctermbg=red
-endif
 " }}}
 " linked groups {{{
 hi link Boolean        PreProc
