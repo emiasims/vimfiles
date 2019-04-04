@@ -30,8 +30,7 @@ function! statusline#fileinfo() abort
   let l:statuslinetext = '%*'
   let l:statuslinetext .= ' %t'
   " Should catch attention when unfocused
-  let l:statuslinetext .= ' %#stlModified#'
-  let l:statuslinetext .= '%m'
+  let l:statuslinetext .= &modifiable ? ' %#stlModified#%m' : ' %m'
   let l:statuslinetext .= '%*'
   let l:statuslinetext .= '%='
   return l:statuslinetext
