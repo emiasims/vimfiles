@@ -27,8 +27,7 @@ endfunction
 
 function! statusline#fileinfo() abort
   " Returns: 'filename modified spacer'
-  let l:statuslinetext = '%*'
-  let l:statuslinetext .= ' %t'
+  let l:statuslinetext = ' %t'
   " Should catch attention when unfocused
   let l:statuslinetext .= &modifiable ? ' %#stlModified#%m' : ' %m'
   let l:statuslinetext .= '%*'

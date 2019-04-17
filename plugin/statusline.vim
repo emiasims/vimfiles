@@ -11,13 +11,14 @@ function! Statusline_active() abort
   let l:statuslinetext  = ' %3.3('.statusline#modecolor().statusline#mode().'%)'
   let l:statuslinetext .= '%#stlDirInfo#'
   let l:statuslinetext .= statusline#dirinfo()
+  let l:statuslinetext .= '%*'
   let l:statuslinetext .= statusline#fileinfo()
+  let l:statuslinetext .= '%#stlErrorInfo#'
+  let l:statuslinetext .= statusline#errors()
   let l:statuslinetext .= '%#stlTypeInfo# '
   let l:statuslinetext .= '%y '
   let l:statuslinetext .= statusline#modecolor()
   let l:statuslinetext .= statusline#cursorinfo()
-  let l:statuslinetext .= '%#stlErrorInfo#'
-  let l:statuslinetext .= statusline#errors()
   return l:statuslinetext
 endfunction
 
