@@ -145,26 +145,27 @@ let s:links = [
 
 " TODO: just put colors in a different file to load from or something for use elsewhere.
 " vim only default in here.
-highlight Sneak            ctermfg=108 guifg=#d79921    ctermbg=235  guibg=#3c3836 cterm=bold    gui=bold
-highlight SneakLabel       ctermfg=108 guifg=#d79921    ctermbg=235  guibg=#3c3836 cterm=bold    gui=bold
 
-highlight StatusLine       ctermfg=144  guifg=#bdae93 ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
-highlight StatusLineNC     ctermfg=102  guifg=#948774 ctermbg=237  guibg=#3c3836 cterm=NONE      gui=NONE
+highlight Sneak               ctermfg=108 guifg=#d79921 ctermbg=235 guibg=#3c3836 cterm=bold gui=bold
+highlight SneakLabel          ctermfg=108 guifg=#d79921 ctermbg=235 guibg=#3c3836 cterm=bold gui=bold
 
-highlight StatusLineTerm   ctermfg=73   guifg=#72b7b5 ctermbg=237  guibg=#3c3836 cterm=NONE      gui=NONE
-highlight StatusLineTermNC ctermfg=187  guifg=#d5c4a1 ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
+highlight StatusLine          ctermfg=144 guifg=#bdae93 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight StatusLineNC        ctermfg=102 guifg=#948774 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
 
-highlight stlModified      ctermfg=167  guifg=#d84a44 ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
-highlight stlTypeInfo      ctermfg=73   guifg=#6fa3a6 ctermbg=235  guibg=#282828 cterm=NONE    gui=NONE
-highlight stlDirInfo       ctermfg=116  guifg=#84d4d2 ctermbg=237  guibg=#3c3836 cterm=NONE    gui=NONE
-highlight stlErrorInfo     ctermfg=234  guifg=#1d2021 ctermbg=173  guibg=#c7743e cterm=bold    gui=bold
+highlight StatusLineTerm      ctermfg=73  guifg=#72b7b5 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
+highlight StatusLineTermNC    ctermfg=187 guifg=#d5c4a1 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
 
-highlight stlNormalMode    ctermfg=172  guifg=#d79921 ctermbg=239  guibg=#504945 cterm=bold    gui=bold
-highlight stlInsertMode    ctermfg=234  guifg=#1d2021 ctermbg=65   guibg=#679a69 cterm=bold    gui=bold
-highlight stlVisualMode    ctermfg=234  guifg=#1d2021 ctermbg=173  guibg=#c7743e cterm=NONE    gui=NONE
-highlight stlReplaceMode   ctermfg=234  guifg=#1d2021 ctermbg=73   guibg=#6fa3a6 cterm=NONE    gui=NONE
-highlight stlSelectMode    ctermfg=234  guifg=#1d2021 ctermbg=73   guibg=#6fa3a6 cterm=NONE    gui=NONE
-highlight stlTerminalMode  ctermfg=139  guifg=#b48ead ctermbg=239  guibg=#504945 cterm=NONE    gui=NONE
+highlight stlModified         ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight stlTypeInfo         ctermfg=73  guifg=#6fa3a6 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight stlDirInfo          ctermfg=116 guifg=#84d4d2 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
+highlight stlErrorInfo        ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+
+highlight stlNormalMode       ctermfg=172 guifg=#d79921 ctermbg=239 guibg=#504945 cterm=bold gui=bold
+highlight stlInsertMode       ctermfg=234 guifg=#1d2021 ctermbg=65  guibg=#679a69 cterm=bold gui=bold
+highlight stlVisualMode       ctermfg=234 guifg=#1d2021 ctermbg=173 guibg=#c7743e cterm=NONE gui=NONE
+highlight stlReplaceMode      ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
+highlight stlSelectMode       ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
+highlight stlTerminalMode     ctermfg=139 guifg=#b48ead ctermbg=239 guibg=#504945 cterm=NONE gui=NONE
 
 augroup colorscheme_evolution
     autocmd!
