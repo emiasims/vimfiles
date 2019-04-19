@@ -7,12 +7,15 @@ let g:loaded_statusline = 1
 
 set laststatus=2
 
+" TODO: come up with better standard for how where (here vs autoload) things are
 function! Statusline_active() abort
   let l:statuslinetext  = ' %3.3('.statusline#modecolor().statusline#mode().'%)'
   let l:statuslinetext .= '%#stlDirInfo#'
   let l:statuslinetext .= statusline#dirinfo()
   let l:statuslinetext .= '%*'
   let l:statuslinetext .= statusline#fileinfo()
+  let l:statuslinetext .= '%*'
+  let l:statuslinetext .= statusline#plugins()
   let l:statuslinetext .= '%#stlErrorInfo#'
   let l:statuslinetext .= statusline#errors()
   let l:statuslinetext .= '%#stlTypeInfo# '
