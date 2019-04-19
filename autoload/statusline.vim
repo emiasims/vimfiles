@@ -1,5 +1,11 @@
 scriptencoding utf-8
 
+" TODO move this
+function! statusline#plugins() abort
+  if exists('g:loaded_obsession')
+    return ObsessionStatus()
+  endif
+endfunction
 
 function! s:gitinfo() abort
   " Returns: ' (BRANCH)' or ' '

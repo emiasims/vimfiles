@@ -20,6 +20,8 @@ function! PackInit() abort
   call minpac#add('tpope/vim-surround')
   call minpac#add('tpope/vim-commentary')
   call minpac#add('tpope/vim-unimpaired')
+  call minpac#add('tpope/vim-speeddating')
+  call minpac#add('tpope/vim-obsession')
   " call minpac#add('tpope/vim-endwise')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
   call minpac#add('andymass/vim-matchup')
@@ -178,27 +180,32 @@ if executable('fzf')
 endif
 " }}}
 " vim-signify {{{
-highlight link SignifyLineAdd             String
-highlight link SignifyLineChange          Todo
-highlight link SignifyLineDelete          Error
-highlight link SignifyLineChangeDelete    SignifyLineChange
-highlight link SignifyLineDeleteFirstLine SignifyLineDelete
+augroup vimrc_signify
+  autocmd!
+  autocmd ColorScheme * highlight link SignifyLineAdd             String
+  autocmd ColorScheme * highlight link SignifyLineChange          Todo
+  autocmd ColorScheme * highlight link SignifyLineDelete          Error
+  autocmd ColorScheme * highlight link SignifyLineChangeDelete    SignifyLineChange
+  autocmd ColorScheme * highlight link SignifyLineDeleteFirstLine SignifyLineDelete
 
-highlight link SignifySignAdd             String
-highlight link SignifySignChange          Todo
-highlight link SignifySignDelete          Error
-highlight link SignifySignChangeDelete    SignifyLineChange
-highlight link SignifySignDeleteFirstLine SignifyLineDelete
+  autocmd ColorScheme * highlight link SignifySignAdd             String
+  autocmd ColorScheme * highlight link SignifySignChange          Todo
+  autocmd ColorScheme * highlight link SignifySignDelete          Error
+  autocmd ColorScheme * highlight link SignifySignChangeDelete    SignifyLineChange
+  autocmd ColorScheme * highlight link SignifySignDeleteFirstLine SignifyLineDelete
+augroup END
 let g:signify_vcs_list = ['git']
 let g:signify_sign_delete = '-'
 let g:signify_sign_change = '~'
 let g:signify_skip_filetype = { 'markdown': 1 }
 " }}}
 " vim-buftabline {{{
-highlight link BufTabLineActive   TabLineSel
-highlight link BufTabLineCurrent  PmenuSel
-highlight link BufTabLineHidden   TabLine
-highlight link BufTabLineFill     TabLineFill
+augroup vimrc_buftabline
+  autocmd ColorScheme * highlight link BufTabLineActive   TabLineSel
+  autocmd ColorScheme * highlight link BufTabLineCurrent  PmenuSel
+  autocmd ColorScheme * highlight link BufTabLineHidden   TabLine
+  autocmd ColorScheme * highlight link BufTabLineFill     TabLineFill
+augroup END
 " }}}
 " statusline {{{
 hi link User1 TabLine

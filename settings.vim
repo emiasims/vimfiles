@@ -384,4 +384,9 @@ onoremap il :<C-u>normal! ^vg_<CR>
 onoremap al :<C-u>normal! 0v$<CR>
 " }}}
 
+" TODO from unimpaired
+" [b] [l] [L] [ ] [e] [q]
+" TODO: exchange mappings
+let g:exchange_no_mappings = 1
+
 " vim: set ts=2 sw=2 tw=99 et :
