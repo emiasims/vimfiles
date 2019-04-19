@@ -59,4 +59,24 @@ function! difference#gitlog() abort
   wincmd p
 endfunction
 
+" TODO: doesn't really work yet. Also fix yapfify
+function! difference#format(type) abort
+  let [l:lnum_start, l:col_start] = getpos("'[")[1:2]
+  let [l:lnum_end, l:col_end] = getpos("']")[1:2]
+  let l:filetype = &filetype
+  let l:text = getline(1, '$')
+  diffoff! | diffthis
+  vert new
+  set buftype=nofile
+  setlocal modifiable
+  silent put =l:text | 0d_
+  setlocal nomodifiable
+  let &filetype = l:filetype
+  nnoremap <buffer> q :diffoff!<CR>:bd<CR>
+  normal gggqG
+  set foldlevel=1
+  diffthis
+  set foldlevel=1
+endfunction
+
 " vim: set ts=2 sw=2 tw=99 et :

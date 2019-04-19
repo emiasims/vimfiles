@@ -346,6 +346,8 @@ xnoremap > >gv
 nnoremap <expr> ~ matchstr(getline('.'), '\%' . col('.') . 'c.') =~# '\a' ? '~' : 'w~'
 nnoremap cp yap<S-}>p
 nnoremap g<CR> i<CR><Esc>
+nnoremap g<Space> i <Esc>
+nnoremap g2<Space> xi <C-r>" <Esc>
 
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
