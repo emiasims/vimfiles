@@ -26,19 +26,6 @@ if has('clipboard')
   set clipboard+=unnamedplus
 endif
 
-" " TODO: get working over ssh!
-" function! Osc52Yank() abort
-"   let l:buffer=system('base64 -w0', @")
-"   let l:buffer=substitute(l:buffer, "\n$", "", "")
-"   let l:buffer='\e]52;c;'.l:buffer.'\x07'
-"   silent exe "!echo -ne ".shellescape(l:buffer)." > $SSH_TTY"
-" endfunction
-" command! Osc52CopyYank call Osc52Yank()
-" augroup Example
-"   autocmd!
-"   autocmd TextYankPost * if v:event.operator ==# 'y' | call Osc52Yank() | endif
-" augroup END
-
 set timeout ttimeout
 set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
@@ -137,12 +124,14 @@ set listchars+=trail:•
 set showbreak=↘
 set fillchars=vert:┃
 set nojoinspaces
-set wildmode=longest:full,full
+set wildmenu wildmode=longest:full,full
 
 if has('termguicolors')
   set termguicolors
-elseif match($TERM, 256) >= 0
-  set t_Co=256
+  if !has('nvim')
+    let &t_8f = "\<Esc>[38:2:%lu:%lu:%lum"
+    let &t_8b = "\<Esc>[48:2:%lu:%lu:%lum"
+  endif
 endif
 colorscheme evolution
 
@@ -165,6 +154,9 @@ set foldtext=fold#text()
 " Plugin setup: {{{
 if has('packages')
   set packpath+=$CFGDIR
+endif
+if has('nvim') && !empty($CONDA_PYTHON_EXE)
+  let g:python3_host_prog = $CONDA_PYTHON_EXE
 endif
 " }}}
 
