@@ -22,7 +22,6 @@ function! PackInit() abort
   call minpac#add('tpope/vim-unimpaired')
   call minpac#add('tpope/vim-speeddating')
   call minpac#add('tpope/vim-obsession')
-  " call minpac#add('tpope/vim-endwise')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
   call minpac#add('andymass/vim-matchup')
 
@@ -38,25 +37,29 @@ function! PackInit() abort
   call minpac#add('wellle/targets.vim')
   call minpac#add('tommcdo/vim-exchange')
 
-  call minpac#add('w0rp/ale')
-  call minpac#add('mhinz/vim-signify')  " Slow?
-  call minpac#add('ludovicchabant/vim-gutentags')
+  " Nvim specific for me. {{{
+  call minpac#add('w0rp/ale', {'type' : 'opt'})
+  call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
+  call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
 
-  call minpac#add('SirVer/ultisnips')  " Slow?
-  call minpac#add('neoclide/coc.nvim', {'do': { -> coc#util#build()}})
-  call minpac#add('neoclide/jsonc.vim')
+  call minpac#add('SirVer/ultisnips', {'type' : 'opt'})  " Slow?
+  call minpac#add('neoclide/coc.nvim', {'do': { -> coc#util#build()}, 'type': 'opt'})
+  call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
+  " }}}
 
   call minpac#add('vim-pandoc/vim-pandoc', {'type' : 'opt'})
   call minpac#add('vim-pandoc/vim-pandoc-syntax', {'type' : 'opt'})
   call minpac#add('mbbill/undotree', {'type' : 'opt'})  " TODO?
 endfunction
 
-" let g:lsp_log_verbose = 1
-" let g:lsp_log_file = expand('~/vim-lsp.log')
-" au User lsp_setup call lsp#register_server({'name': 'mspyls',
-"       \ 'cmd': {server_info->[expand('$HOME/testdn/dotnet $HOME/python-language-server/output/bin/Release/Microsoft.Python.LanguageServer.dll')]},
-"       \ 'whitelist': ['python']})
-
+if has('nvim')
+  packadd! ale
+  packadd! vim-signify
+  packadd! vim-gutentags
+  packadd! ultisnips
+  packadd! coc.nvim
+  packadd! jsonc.vim
+endif
 
 command! PackUpdate call PackInit() | call minpac#update('', {'do' : 'call minpac#status()'})
 command! PackClean  call PackInit() | call minpac#clean()
@@ -220,62 +223,60 @@ hi link User9 StatusLineTerm
 " }}}
 
 
-if has('nvim')
-  " ultisnips {{{
-  let g:UltiSnipsSnippetDirectories = [$CFGDIR . '/snips', 'UltiSnips']
+" ultisnips {{{
+let g:UltiSnipsSnippetDirectories = [$CFGDIR . '/snips', 'UltiSnips']
 
-  let g:UltiSnipsExpandTrigger = '<Tab>'
-  let g:UltiSnipsJumpForwardTrigger = '<Tab>'
-  let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
-  let g:UltiSnipsRemoveSelectModeMappings = 0
+let g:UltiSnipsExpandTrigger = '<Tab>'
+let g:UltiSnipsJumpForwardTrigger = '<C-j>'
+let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
+let g:UltiSnipsRemoveSelectModeMappings = 0
 
-  " imap <tab>:
-  " Expand snippet if possible.
-  " if there is is a pumvisible, accept the next one.
-  " TODO: detect if selected: autocmd MenuPopup & CompleteDone, map <C-n>
-  let g:ulti_expand_or_jump_res = 0  " default value, just set once
-  function! s:expand_snip_or_jump() abort
-    call UltiSnips#ExpandSnippetOrJump()
-    return g:ulti_expand_or_jump_res
-  endfunction
+" imap <tab>:
+" Expand snippet if possible.
+" if there is is a pumvisible, accept the next one.
+" TODO: detect if selected: autocmd MenuPopup & CompleteDone, map <C-n>
+let g:ulti_expand_or_jump_res = 0  " default value, just set once
+function! s:expand_snip_or_jump() abort
+  call UltiSnips#ExpandSnippetOrJump()
+  return g:ulti_expand_or_jump_res
+endfunction
 
-  function! s:select_and_accept() abort
-    return (pumvisible() ? "\<C-n>\<C-y>" . get(b:, 'post_pumaccept', '') : "\<Tab>")
-  endfunction
+function! s:select_and_accept() abort
+  return (pumvisible() ? "\<C-n>\<C-y>" . get(b:, 'post_pumaccept', '') : "\<Tab>")
+endfunction
 
-  " We can either have tab on a mapping evaluating after ultisnips, or
-  " we can just manually do the maps we want. Here, we do the latter.
-  inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
-  xnoremap <silent> <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
-  snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<CR>
-  " }}}
-  " coc {{{
-  inoremap <expr> <CR> pumvisible() ? "\<C-y><CR>" : "\<CR>"
-  " }}}
-  " ale {{{
-  set signcolumn=yes
-  let g:ale_sign_error = '✖'  " U-2716
-  let g:ale_sign_warning = '⚠'  " U-26A0
-  let g:ale_sign_style_error = '➤'  " U-27A4
-  hi! link ALEErrorSign WarningMsg
-  hi! link ALEWarningSign Constant
+" We can either have tab on a mapping evaluating after ultisnips, or
+" we can just manually do the maps we want. Here, we do the latter.
+inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
+xnoremap <silent> <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
+snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<CR>
+" }}}
+" coc {{{
+inoremap <expr> <CR> pumvisible() ? "\<C-y><CR>" : "\<CR>"
+" }}}
+" ale {{{
+set signcolumn=yes
+let g:ale_sign_error = '✖'  " U-2716
+let g:ale_sign_warning = '⚠'  " U-26A0
+let g:ale_sign_style_error = '➤'  " U-27A4
+hi! link ALEErrorSign WarningMsg
+hi! link ALEWarningSign Constant
 
-  augroup vimrc_ale
-    autocmd!
-    autocmd Filetype markdown let b:ale_enabled = 0
-    autocmd Filetype python let b:ale_linters = ['flake8', 'pydocstyle']
-  augroup END
+augroup vimrc_ale
+  autocmd!
+  autocmd Filetype markdown let b:ale_enabled = 0
+  autocmd Filetype python let b:ale_linters = ['flake8', 'pydocstyle']
+augroup END
 
-  " }}}
-  " vim-gutentags {{{
-  if executable($HOME.'/local/bin/ctags')
-    let g:gutentags_cache_dir = $DATADIR.'/tags'
-    let g:gutentags_ctags_executable = $HOME.'/local/bin/ctags'
-  else
-    let g:gutentags_enabled = 0
-  endif
-  " }}}
+" }}}
+" vim-gutentags {{{
+if executable($HOME.'/local/bin/ctags')
+  let g:gutentags_cache_dir = $DATADIR.'/tags'
+  let g:gutentags_ctags_executable = $HOME.'/local/bin/ctags'
+else
+  let g:gutentags_enabled = 0
 endif
+" }}}
 
 " Windows {{{
 if has('win32')
