@@ -246,10 +246,6 @@ if !exists('g:loaded_tmux_navigator')
   nnoremap <C-k> <C-w>k
   nnoremap <C-l> <C-w>l
 endif
-" TODO: get window layout, sensibly use left/right to move the split, rather
-" than 'increase or decrease size'. Also have up/down not function on cmd window
-nnoremap <C-Left> <C-w><
-nnoremap <C-Right> <C-w>>
 
 nnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
 xnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
@@ -378,6 +374,11 @@ onoremap <silent>ai :<C-u>call textobjects#indent(0)<CR>
 onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Esc>:call textobjects#indent(1)<CR><Esc>gv
+
+nnoremap <silent> <C-Up>    :call winresize#up(v:count1)<CR>
+nnoremap <silent> <C-Down>  :call winresize#down(v:count1)<CR>
+nnoremap <silent> <C-Left>  :call winresize#left(v:count1)<CR>
+nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
