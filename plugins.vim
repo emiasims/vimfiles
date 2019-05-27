@@ -32,6 +32,7 @@ function! PackInit() abort
   call minpac#add('jeetsukumaran/vim-filebeagle')
   call minpac#add('junegunn/fzf.vim')  " Slow?
   call minpac#add('junegunn/vim-easy-align')
+  call minpac#add('junegunn/vader.vim')
 
   call minpac#add('justinmk/vim-sneak')
   call minpac#add('wellle/targets.vim')
