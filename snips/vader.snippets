@@ -1,0 +1,48 @@
+snippet giv "Given block" b
+Given ${1:filetype} (${2:description}):
+	${0:${VISUAL:input text}}
+
+endsnippet
+
+snippet gdoe "GivenDoExpect block" b
+Given ${1:filetype} (${2:description}):
+	${3:${VISUAL:input text}}
+
+Do (${4:description}):
+	${0:[keystrokes]}
+
+Expect $1 ($2):
+	$3
+endsnippet
+
+snippet gdo "GivenDo block" b
+Given ${1:filetype} (${2:description}):
+	${3:${VISUAL:input text}}
+
+Do (${4:description}):
+	${5:[keystrokes]}
+endsnippet
+
+snippet gex "GivenExecute block" b
+Given ${1:filetype} (${2:description}):
+	${3:${VISUAL:input text}}
+
+Execute (${4:description}):
+	${0:[vimscript]}
+endsnippet
+
+snippet ex "Execute block" b
+Execute (${1:description}):
+	${0:[vimscript]}
+endsnippet
+
+snippet do "Do block" b
+Do (${1:description}):
+	${0:[keystrokes]}
+endsnippet
+
+snippet exp "Expect block" b
+Expect (${1:description}):
+	${0:[output text]}
+endsnippet
+
