@@ -79,12 +79,18 @@ set breakat=\ \	;:,!?
 set nostartofline
 set whichwrap+=[,]
 
-" Save when exiting a buffer/window. Saving on idle is too aggressive for me.
+" Save when exiting a buffer/window. Saving on idle is a bit too aggressive for me.
 set autowriteall
 augroup vimrc_writeall
   autocmd!
   autocmd WinLeave * if &modifiable && &modified && filereadable(expand('%')) | write | endif
 augroup END
+
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor
+  " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  " let g:ctrlp_use_caching = 0
+endif
 
 set splitright
 set switchbuf=useopen,usetab
@@ -228,8 +234,6 @@ xnoremap $ $h
 augroup vimrc_crmap
   autocmd!
   autocmd BufRead * if &modifiable | nnoremap <buffer> <CR> za| endif
-  autocmd BufRead * if &modifiable | xnoremap <buffer> <CR> za| endif
-  autocmd BufRead * if &modifiable | nnoremap <buffer> <BS> <c-^>| endif
 augroup END
 
 if !exists('g:loaded_tmux_navigator')
@@ -377,6 +381,11 @@ xnoremap il ^og_
 xnoremap al 0o$
 onoremap il :<C-u>normal! ^vg_<CR>
 onoremap al :<C-u>normal! 0v$<CR>
+" }}}
+" Commands: {{{
+command! Clearqflist call setqflist([])
+command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
+
 " }}}
 
 " TODO from unimpaired
