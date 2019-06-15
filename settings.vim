@@ -376,6 +376,9 @@ nnoremap <silent> <C-Down>  :call winresize#down(v:count1)<CR>
 nnoremap <silent> <C-Left>  :call winresize#left(v:count1)<CR>
 nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
 
+nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
+nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
+
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
 xnoremap al 0o$
