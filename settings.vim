@@ -33,7 +33,6 @@ set ttimeoutlen=250 " for key codes
 " Backup, Swap, Undo, History: {{{
 if exists('$SUDO_USER')
   set nowritebackup
-  set noswapfile
 else
   set backupdir=$DATADIR/tmp/backup
   set backupdir+=.
@@ -49,6 +48,7 @@ else
 endif
 set fileformats=unix,dos,mac
 set history=10000
+set noswapfile
 if has('nvim')
   if exists('$SUDO_USER') | set shada= | endif
   set shada='300,<10,@50,s100,h
@@ -247,6 +247,14 @@ nnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
 xnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
 onoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
 
+nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
+xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
+onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
+
+nnoremap - k$
+xnoremap - k$h
+onoremap - k$
+
 nnoremap Q q
 
 " Emacs-like
@@ -338,8 +346,9 @@ xnoremap > >gv
 nnoremap <expr> ~ matchstr(getline('.'), '\%' . col('.') . 'c.') =~# '\a' ? '~' : 'w~'
 nnoremap cp yap<S-}>p
 nnoremap g<CR> i<CR><Esc>
-nnoremap g<Space> i <Esc>
-nnoremap g2<Space> xi <C-r>" <Esc>
+" TODO make repeatable
+nnoremap g<Space> i <Esc>r
+nnoremap g<Space><CR> xi <C-r>" <Esc>
 
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
@@ -347,7 +356,7 @@ xnoremap <leader>p "0p
 xnoremap <leader>P "0P
 
 " Select last edited text. improved over `[v`], eg works with visual block
-nnoremap <expr> gz '`['.strpart(getregtype(), 0, 1).'`]'
+nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 nnoremap <leader>w :write<CR>
 " }}}
 " Plugins (manual): {{{
@@ -379,7 +388,7 @@ nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
 
-nnoremap gr :<C-u>set opfunc=rename#opfunc<CR>g@
+xnoremap R <Esc>:<C-u>call refactor#expression_to_variable()<CR>gvc
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
