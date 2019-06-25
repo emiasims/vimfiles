@@ -26,7 +26,8 @@ highlight String           ctermfg=65   guifg=#679a69 ctermbg=NONE guibg=NONE   
 highlight Number           ctermfg=139  guifg=#b48ead ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 
 highlight Folded           ctermfg=102  guifg=#948774 ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
-highlight Comment          ctermfg=102  guifg=#948774 ctermbg=NONE guibg=NONE    cterm=italic    gui=italic
+highlight Comment          ctermfg=102  guifg=#948774 ctermbg=NONE guibg=NONE    cterm=NONE    gui=NONE
+" highlight Comment          ctermfg=102  guifg=#948774 ctermbg=NONE guibg=NONE    cterm=italic    gui=italic
 highlight Identifier       ctermfg=65   guifg=#91ba93 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight Type             ctermfg=108  guifg=#83a598 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight Special          ctermfg=187  guifg=#d5c4a1 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
@@ -72,7 +73,8 @@ highlight IncSearch        ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e
 highlight Search           ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e cterm=NONE      gui=NONE
 highlight Directory        ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight SpecialChar      ctermfg=172  guifg=#d79921 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
-highlight SpecialComment   ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=italic    gui=italic
+" highlight SpecialComment   ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=italic    gui=italic
+highlight SpecialComment   ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=NONE    gui=NONE
 
 highlight SpellBad         ctermbg=NONE guibg=NONE    ctermfg=167  guifg=#D84A44 cterm=undercurl gui=undercurl guisp=NONE
 highlight SpellCap         ctermbg=NONE guibg=NONE    ctermfg=73   guifg=#72b7b5 cterm=undercurl gui=undercurl guisp=NONE
