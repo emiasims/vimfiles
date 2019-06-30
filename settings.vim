@@ -404,7 +404,5 @@ command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) 
 
 " TODO from unimpaired
 " [b] [l] [L] [ ] [e] [q]
-" TODO: exchange mappings
-let g:exchange_no_mappings = 1
 
 " vim: set ts=2 sw=2 tw=99 et :

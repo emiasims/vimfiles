@@ -36,7 +36,6 @@ function! PackInit() abort
 
   call minpac#add('justinmk/vim-sneak')
   call minpac#add('wellle/targets.vim')
-  call minpac#add('tommcdo/vim-exchange')
 
   " Nvim specific for me. {{{
   call minpac#add('w0rp/ale', {'type' : 'opt'})
