@@ -16,6 +16,8 @@ function! refactor#expression_to_variable() abort
     autocmd TextChangedI,TextChangedP * call s:update_refactor()
   augroup END
   let @" = l:savereg
+  normal! gvd
+  startinsert
 endfunction
 
 function! s:update_refactor() abort
