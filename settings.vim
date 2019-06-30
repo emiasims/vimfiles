@@ -388,7 +388,10 @@ nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
 
-xnoremap R <Esc>:<C-u>call refactor#expression_to_variable()<CR>
+xnoremap <silent> R         :<C-u>call refactor#expression_to_variable(visualmode(), 1)<CR>
+nnoremap <silent> <leader>R :<C-u>set opfunc=refactor#expression_to_variable<CR>g@
+xnoremap <silent> gR        :<C-u>set opfunc=refactor#function_in_project(visualmode(), 1)<CR>
+nnoremap <silent> gR        :<C-u>set opfunc=refactor#function_in_project<CR>g@
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
