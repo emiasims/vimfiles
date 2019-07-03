@@ -14,6 +14,7 @@ set hidden
 set path=.,**
 set virtualedit=block
 set formatoptions=1crl
+set nomodeline
 if has('patch-7.3.541')
   set formatoptions+=j
 endif
@@ -363,7 +364,6 @@ nnoremap <leader>w :write<CR>
 " I want these to load even if --noplugins is used.
 nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>du :call difference#undobuf()<cr>
-nnoremap <silent> <leader>ml :call modeline#append()<CR>
 
 inoremap <silent> ( <C-r>=autopairs#check_and_insert('(')<CR>
 inoremap <silent> ) <C-r>=autopairs#check_and_insert(')')<CR>
@@ -407,5 +407,3 @@ command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) 
 
 " TODO from unimpaired
 " [b] [l] [L] [ ] [e] [q]
-
-" vim: set ts=2 sw=2 tw=99 et :

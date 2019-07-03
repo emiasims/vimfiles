@@ -40,5 +40,3 @@ augroup vimrc_statusline
   autocmd WinLeave * setlocal statusline=%!Statusline_inactive()
   autocmd WinEnter,BufEnter * setlocal statusline=%!Statusline_active()
 augroup END
-
-" vim: set ts=2 sw=2 tw=99 et :

@@ -8,4 +8,3 @@ let &viewdir=$DATADIR.'/view'
 
 runtime settings.vim
 runtime plugins.vim
-" vim: set ts=2 sw=2 tw=99 noet :

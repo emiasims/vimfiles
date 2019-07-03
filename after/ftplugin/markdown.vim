@@ -46,5 +46,3 @@ nnoremap <buffer><silent> <F9>      viw"ty:ThesaurusQueryReplace <C-r>t<CR>
 setlocal completefunc=thesaurus_query#auto_complete_integrate
 
 nnoremap <buffer> <localleader>w :%s/\s\+$// \| normal! ``<CR>
-
-" vim: set ts=2 sw=2 tw=99 et :

@@ -6,5 +6,3 @@ let $DATADIR=empty($XDG_DATA_HOME) ? s:defaultdir : $XDG_DATA_HOME.'/vim'
 
 runtime settings.vim
 runtime plugins.vim
-
-" vim: set ts=2 sw=2 tw=99 et :

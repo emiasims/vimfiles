@@ -103,5 +103,3 @@ function! statusline#errors() abort
   let l:statuslinetext .= len(getqflist()) > 0 ? '(qf:' . len(getqflist()) . ')' : ''
   return l:statuslinetext
 endfunction
-
-" vim: set ts=2 sw=2 tw=99 et :

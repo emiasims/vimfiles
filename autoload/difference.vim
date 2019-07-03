@@ -78,5 +78,3 @@ function! difference#format(type) abort
   diffthis
   set foldlevel=1
 endfunction
-
-" vim: set ts=2 sw=2 tw=99 et :

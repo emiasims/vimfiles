@@ -171,5 +171,3 @@ if exists('python_highlight_space_errors')
 endif
 
 let b:current_syntax = 'python'
-
-" vim: set ts=2 sw=2 tw=99 et :

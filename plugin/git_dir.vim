@@ -14,4 +14,3 @@ augroup vimrc_gitchdir
 augroup END
 
 call defer#onidle('call git_dir#gotodir()')
-" vim: set ts=2 sw=2 tw=99 et :

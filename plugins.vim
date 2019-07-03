@@ -286,5 +286,3 @@ if has('win32')
   call defer#onidle('call s:setup_guifont()')
 endif
 " }}}
-
-" vim: set ts=2 sw=2 tw=99 et :

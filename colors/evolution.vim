@@ -174,4 +174,3 @@ augroup colorscheme_evolution
     autocmd ColorScheme * if expand("<amatch>") == "evolution" | for link in s:links | execute 'hi link' link[0] link[1] | endfor | else | for link in s:links | execute 'hi link' link[0] 'NONE' | endfor | endif
 augroup END
 " }}}
-" vim: set ts=2 sw=2 et :

@@ -34,5 +34,3 @@ function! repl#opfunc(type) abort
   let l:lines = getline(l:lnum_start, l:lnum_end)
   call s:send_lines(l:lines)
 endfunction
-
-" vim: set ts=2 sw=2 tw=99 et :

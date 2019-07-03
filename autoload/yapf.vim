@@ -11,5 +11,3 @@ function! yapf#yapfify(start, end) abort
   endif
   call setpos('.', l:cursor)
 endfunction
-
-" vim: set ts=2 sw=2 tw=99 et :

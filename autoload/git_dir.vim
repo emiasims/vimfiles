@@ -19,5 +19,3 @@ function! git_dir#gotodir() abort
   let b:autochdir = get(b:, 'autochdir', git_dir#getdir())
   execute 'lcd ' . b:autochdir
 endfunction
-
-" vim: set ts=2 sw=2 tw=99 et :
