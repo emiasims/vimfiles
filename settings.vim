@@ -196,12 +196,18 @@ augroup vimrc_numbertoggle
   autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu | set rnu   | endif
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
 augroup END
+
+augroup vimrc_savemarks
+  autocmd!
+  autocmd TextChanged,InsertLeave,TextYankPost * let b:savemarks = [getpos("'["), getpos("']")]
+  autocmd BufWritePost * if exists('b:savemarks') | call setpos("'[", b:savemarks[0]) | call setpos("']", b:savemarks[1]) | endif
+augroup end
+
 " }}}
 " Filetype: {{{
 augroup vimrc_filetype
   autocmd!
   autocmd FileType qfreplace setlocal nofoldenable
-  autocmd BufNewFile,BufRead *.yapf set filetype=cfg
   autocmd FileType sh let g:is_bash=1
   autocmd FileType sh let g:sh_fold_enabled=5
   autocmd BufRead * if empty(&filetype) | set commentstring=#%s | endif
@@ -212,17 +218,21 @@ augroup END    " vimrc_filetype
 let g:mapleader=' '
 let g:maplocalleader="\\"
 " File navigation {{{
-" Overwritten in plugins.vim.
-nnoremap <leader>ev :e $CFGDIR<CR>
+if !exists('g:loaded_fzf')
+  nnoremap <leader>ev :e $CFGDIR<CR>
+endif
 " }}}
 " Cursor Navigation and Windows: {{{
 nnoremap <Space> <nop>
 xnoremap <Space> <nop>
 
+inoremap <C-c> <Esc>
+inoremap <Esc> <C-c>
+snoremap <C-c> <Esc>
+snoremap <Esc> <C-c>
 inoremap jk <Esc>
 snoremap jk <Esc>
 nnoremap Y y$
-xnoremap $ $h
 
 augroup vimrc_crmap
   autocmd!
@@ -244,13 +254,13 @@ nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
 onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 
-nnoremap - k$
-xnoremap - k$h
-onoremap - k$
+nnoremap - -i
+nnoremap + +i
+nnoremap _ kA
+nnoremap <expr> = (v:count > 0 ? 'jA' : '=')
 
 nnoremap Q q
 
-" Emacs-like
 inoremap <C-f> <C-g>U<Right>
 inoremap <C-b> <C-g>U<Left>
 
@@ -267,6 +277,19 @@ nnoremap <expr> n 'Nn'[v:searchforward]
 nnoremap <expr> N 'nN'[v:searchforward]
 
 nnoremap <silent><C-w>b :vert resize<CR>:resize<CR>:normal! ze<CR>
+
+nnoremap [a :previous<CR>
+nnoremap ]a :next<CR>
+nnoremap [b :bprevious<CR>
+nnoremap ]b :bnext<CR>
+nnoremap [l :lprevious<CR>
+nnoremap ]l :lnext<CR>
+nnoremap [L :lfirst<CR>
+nnoremap ]L :llast<CR>
+nnoremap [q :cprevious<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [<Space> :<C-u>put!=repeat(nr2char(10), v:count1) \| ']+1 <CR>
+nnoremap ]<Space> :<C-u>put =repeat(nr2char(10), v:count1) \| '[-1 <CR>
 " }}}
 " Terminal bindings: {{{
 if has('nvim')
@@ -274,7 +297,6 @@ if has('nvim')
     autocmd!
     autocmd WinEnter term://* nohlsearch
     autocmd WinEnter term://* startinsert
-
   augroup END
 
   tnoremap <C-h> <C-\><C-n><C-w>h
@@ -284,15 +306,6 @@ if has('nvim')
   tnoremap <Esc> <C-\><C-n>
   tnoremap <M-n> <C-\><C-n>
 
-endif
-" }}}
-" MacVim {{{
-if has('mac')
-  " Make cmd work as alt
-  nnoremap <D-j> <M-j>
-  nnoremap <D-k> <M-k>
-  vnoremap <D-j> <M-j>
-  vnoremap <D-k> <M-k>
 endif
 " }}}
 " Command: {{{
@@ -310,6 +323,7 @@ Cnoreabbrevs he help
 Cnoreabbrevs h vert help
 Cnoreabbrevs f find
 Cnoreabbrevs W!! w !sudo tee % >/dev/null
+Cnoreabbrevs t Terminal
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
@@ -324,6 +338,8 @@ nnoremap <leader><CR> :nohlsearch<CR>
 " Moving text: {{{
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
+xnoremap < <gv
+xnoremap > >gv
 
 xnoremap <M-j> :move '>+1<CR>gv=gv
 xnoremap <M-k> :move '<-2<CR>gv=gv
@@ -331,9 +347,6 @@ nnoremap <M-j> :move .+1<CR>==
 nnoremap <M-k> :move .-2<CR>==
 inoremap <M-j> <C-c>:move .+1<CR>==gi
 inoremap <M-k> <C-c>:move .-2<CR>==gi
-
-xnoremap < <gv
-xnoremap > >gv
 " }}}
 " Editing text: {{{
 nnoremap <expr> ~ matchstr(getline('.'), '\%' . col('.') . 'c.') =~# '\a' ? '~' : 'w~'
@@ -396,6 +409,3 @@ command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 
 " }}}
-
-" TODO from unimpaired
-" [b] [l] [L] [ ] [e] [q]
