@@ -1,5 +1,3 @@
-scriptencoding utf-8
-
 if !has('packages') || exists('$SUDO_USER')
   finish
 endif

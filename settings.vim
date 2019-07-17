@@ -1,11 +1,3 @@
-if has ('vim_starting')
-  set encoding=utf-8
-endif
-
-scriptencoding utf-8
-" Note: Settings only wrapped with an 'if has...' if it
-" has caused an issue on one of the systems I vim on.
-
 " Settings:
 " General: {{{
 set mouse=niv

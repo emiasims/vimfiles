@@ -1,5 +1,3 @@
-scriptencoding utf-8
-
 " TODO move this
 function! statusline#plugins() abort
   if exists('g:loaded_obsession')

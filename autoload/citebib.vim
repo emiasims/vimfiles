@@ -1,5 +1,3 @@
-scriptencoding utf-8
-
 if exists('g:loaded_citebib')
   finish
 endif
