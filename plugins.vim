@@ -2,66 +2,18 @@ if !has('packages') || exists('$SUDO_USER')
   finish
 endif
 
-" minpac setup: {{{
-function! PackInit() abort
-  packadd minpac
-
-  call minpac#init()
-  call minpac#add('k-takata/minpac', {'type' : 'opt'})
-
-  call minpac#add('jeetsukumaran/vim-pythonsense')
-  call minpac#add('Vimjas/vim-python-pep8-indent')
-  call minpac#add('vim-jp/syntax-vim-ex')
-
-  call minpac#add('tpope/vim-repeat')
-  call minpac#add('tpope/vim-fugitive')
-  call minpac#add('tpope/vim-surround')
-  call minpac#add('tpope/vim-commentary')
-  call minpac#add('tpope/vim-unimpaired')
-  call minpac#add('tpope/vim-speeddating')
-  call minpac#add('tpope/vim-obsession')
-  call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
-  call minpac#add('andymass/vim-matchup')
-
-  call minpac#add('ap/vim-buftabline')
-  call minpac#add('machakann/vim-highlightedyank')
-  call minpac#add('itchyny/vim-cursorword')
-  call minpac#add('christoomey/vim-tmux-navigator')
-  call minpac#add('jeetsukumaran/vim-filebeagle')
-  call minpac#add('junegunn/fzf.vim')  " Slow?
-  call minpac#add('junegunn/vim-easy-align')
-  call minpac#add('junegunn/vader.vim')
-
-  call minpac#add('justinmk/vim-sneak')
-  call minpac#add('wellle/targets.vim')
-
-  " Nvim specific for me. {{{
-  call minpac#add('w0rp/ale', {'type' : 'opt'})
-  call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
-  call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
-
-  call minpac#add('SirVer/ultisnips', {'type' : 'opt'})  " Slow?
-  call minpac#add('neoclide/coc.nvim', {'do': { -> coc#util#build()}, 'type': 'opt'})
-  call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
-  " }}}
-
-  call minpac#add('vim-pandoc/vim-pandoc', {'type' : 'opt'})
-  call minpac#add('vim-pandoc/vim-pandoc-syntax', {'type' : 'opt'})
-  call minpac#add('mbbill/undotree', {'type' : 'opt'})  " TODO?
-endfunction
-
+" minpac {{{
 if has('nvim')
-  packadd! ale
   packadd! vim-signify
   packadd! vim-gutentags
-  packadd! ultisnips
   packadd! coc.nvim
   packadd! jsonc.vim
 endif
 
-command! PackUpdate call PackInit() | call minpac#update('', {'do' : 'call minpac#status()'})
-command! PackClean  call PackInit() | call minpac#clean()
-command! PackStatus call PackInit() | call minpac#status()
+command! PackUpdate call pack#update()
+command! PackClean  call pack#clean()
+command! PackStatus call pack#status()
+
 " }}}
 
 " vim-sneak {{{
@@ -91,12 +43,6 @@ let g:sneak#label = 1
 let g:sneak#absolute_dir = 1
 
 " }}}
-" vim-highlightedyank {{{
-if !exists('##TextYankPost')
-  nmap y <Plug>(highlightedyank)
-  xmap y <Plug>(highlightedyank)
-endif
-" }}}
 " vim-tmux-navigator {{{
 let g:tmux_navigator_disable_when_zoomed = 1
 " }}}
@@ -121,14 +67,8 @@ nmap cgc <Plug>ChangeCommentary
 nmap gcu <Plug>Commentary<Plug>Commentary
 " }}}
 " vim-fugitive {{{
-nnoremap <silent> <leader>dgl :call difference#gitlog()<cr>
-" }}}
-" thesaurus_query.vim {{{
-let g:tq_map_keys = 0
-let g:tq_use_vim_autocomplete = 0
-" }}}
-" vim-pandoc {{{
-let g:pandoc#folding#fdc = 0
+" Not working.
+" command! GitDiff call difference#gitlog()
 " }}}
 " fzf.vim {{{
 if executable('fzf')
@@ -200,14 +140,6 @@ let g:signify_sign_delete = '-'
 let g:signify_sign_change = '~'
 let g:signify_skip_filetype = { 'markdown': 1 }
 " }}}
-" vim-buftabline {{{
-augroup vimrc_buftabline
-  autocmd ColorScheme * highlight link BufTabLineActive   TabLineSel
-  autocmd ColorScheme * highlight link BufTabLineCurrent  PmenuSel
-  autocmd ColorScheme * highlight link BufTabLineHidden   TabLine
-  autocmd ColorScheme * highlight link BufTabLineFill     TabLineFill
-augroup END
-" }}}
 " statusline {{{
 hi link User1 TabLine
 hi link User2 IncSearch
@@ -219,61 +151,23 @@ hi link User7 DiffAdd
 hi link User8 StatusLineTerm
 hi link User9 StatusLineTerm
 " }}}
-
-
-" ultisnips {{{
-let g:UltiSnipsSnippetDirectories = [$CFGDIR . '/snips', 'UltiSnips']
-
-let g:UltiSnipsExpandTrigger = '<Tab>'
-let g:UltiSnipsJumpForwardTrigger = '<C-j>'
-let g:UltiSnipsJumpBackwardTrigger = '<C-k>'
-let g:UltiSnipsRemoveSelectModeMappings = 0
-
-" imap <tab>:
-" Expand snippet if possible.
-" if there is is a pumvisible, accept the next one.
-" TODO: detect if selected: autocmd MenuPopup & CompleteDone, map <C-n>
-let g:ulti_expand_or_jump_res = 0  " default value, just set once
-function! s:expand_snip_or_jump() abort
-  call UltiSnips#ExpandSnippetOrJump()
-  return g:ulti_expand_or_jump_res
-endfunction
-
-function! s:select_and_accept() abort
-  return (pumvisible() ? "\<C-n>\<C-y>" . get(b:, 'post_pumaccept', '') : "\<Tab>")
-endfunction
-
-" We can either have tab on a mapping evaluating after ultisnips, or
-" we can just manually do the maps we want. Here, we do the latter.
-inoremap <silent> <Tab> <C-r>=<SID>expand_snip_or_jump() ? '' : <SID>select_and_accept()<CR>
-xnoremap <silent> <Tab> :call UltiSnips#SaveLastVisualSelection()<CR>gvs
-snoremap <silent> <Tab> <Esc>:call UltiSnips#ExpandSnippetOrJump()<CR>
+" undotree {{{
+nnoremap <F8> :UndotreeToggle<CR>
+let g:undotree_DiffAutoOpen = 0
+let undotree_HighlightChangedText = 0
 " }}}
-" coc {{{
+" vim-org {{{
+let g:org_bibtex_dirlist = ['~/org/literature']
+" }}}
+" coc.nvim {{{
 inoremap <expr> <CR> pumvisible() ? "\<C-y><CR>" : "\<CR>"
-" }}}
-" ale {{{
-set signcolumn=yes
-let g:ale_sign_error = '✖'  " U-2716
-let g:ale_sign_warning = '⚠'  " U-26A0
-let g:ale_sign_style_error = '➤'  " U-27A4
-hi! link ALEErrorSign WarningMsg
-hi! link ALEWarningSign Constant
-
-augroup vimrc_ale
-  autocmd!
-  autocmd Filetype markdown let b:ale_enabled = 0
-  autocmd Filetype python let b:ale_linters = ['flake8', 'pydocstyle']
-augroup END
-
+if has('nvim')
+  nmap <silent> ]e <Plug>(coc-diagnostic-next)
+  nmap <silent> [e <Plug>(coc-diagnostic-prev)
+endif
 " }}}
 " vim-gutentags {{{
-if executable($HOME.'/local/bin/ctags')
-  let g:gutentags_cache_dir = $DATADIR.'/tags'
-  let g:gutentags_ctags_executable = $HOME.'/local/bin/ctags'
-else
-  let g:gutentags_enabled = 0
-endif
+let g:gutentags_cache_dir = $DATADIR.'/tags'
 " }}}
 
 " Windows {{{
