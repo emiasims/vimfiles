@@ -65,10 +65,10 @@ highlight VisualNOS        ctermfg=NONE guifg=NONE    ctermbg=237  guibg=#3c3836
 highlight VertSplit        ctermfg=237  guifg=#3c3836 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight SpecialKey       ctermfg=102  guifg=#948774 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight Title            ctermfg=187  guifg=#d5c4a1 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
-highlight DiffAdd          ctermfg=65   guifg=#679a69 ctermbg=235  guibg=#282828 cterm=reverse   gui=reverse
-highlight DiffChange       ctermfg=172  guifg=#d79921 ctermbg=235  guibg=#282828 cterm=reverse   gui=reverse
-highlight DiffDelete       ctermfg=167  guifg=#D84A44 ctermbg=235  guibg=#282828 cterm=reverse   gui=reverse
-highlight DiffText         ctermfg=108  guifg=#83a598 ctermbg=235  guibg=#282828 cterm=reverse   gui=reverse
+highlight DiffAdd          ctermfg=NONE guifg=NONE    ctermbg=65   guibg=#29342d cterm=NONE      gui=NONE
+highlight DiffChange       ctermfg=NONE guifg=NONE    ctermbg=172  guibg=#3c3421 cterm=NONE      gui=NONE
+highlight DiffDelete       ctermfg=NONE guifg=NONE    ctermbg=167  guibg=#4c2b2a cterm=NONE      gui=NONE
+highlight DiffText         ctermfg=NONE guifg=NONE    ctermbg=108  guibg=#2b393a cterm=NONE      gui=NONE
 highlight IncSearch        ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e cterm=NONE      gui=NONE
 highlight Search           ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e cterm=NONE      gui=NONE
 highlight Directory        ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
