@@ -1,3 +1,5 @@
+finish
+
 function! yankring#reset() abort
   let s:enabled = 1
   let s:count = 0
