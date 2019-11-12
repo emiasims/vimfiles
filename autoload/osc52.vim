@@ -1,3 +1,5 @@
+finish
+
 function! s:clear_kitty_clipboard()
   call s:send_text('\!')  " Invalid base64 wipes kitty clipboard, otherwise it appends.
 endfunction
