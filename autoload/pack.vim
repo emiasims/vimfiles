@@ -25,7 +25,6 @@ function! s:setup() abort
   call minpac#add('junegunn/fzf.vim')  " Slow?
   call minpac#add('tommcdo/vim-lion')
   call minpac#add('junegunn/vader.vim')
-  call minpac#add('SirVer/ultisnips')
 
   call minpac#add('justinmk/vim-sneak')
   call minpac#add('wellle/targets.vim')
@@ -40,6 +39,7 @@ function! s:setup() abort
   call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
   call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
+  call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
 
 endfunction
 

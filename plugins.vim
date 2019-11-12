@@ -8,6 +8,7 @@ if has('nvim')
   silent! packadd! vim-gutentags
   silent! packadd! coc.nvim
   silent! packadd! jsonc.vim
+  silent! packadd! ultisnips
 endif
 
 command! PackUpdate call pack#update()
