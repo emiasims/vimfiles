@@ -1,17 +1,16 @@
 {
-  "coc.preferences.autoTrigger": "always",
-  // only used when autoTrigger is always
-  "coc.preferences.triggerAfterInsertEnter": false,
-  // timeout for completion
-  "coc.preferences.timeout": 2000,
-  // not make vim select first item on completion start
-  "coc.preferences.noselect": true,
-  // enable formatOnType feature
   "coc.preferences.formatOnType": false,
-  // command used for jump to other buffer
   "coc.preferences.jumpCommand": "edit",
-  // executable path for https://facebook.github.io/watchman/, detected from $PATH by default
-  // "coc.preferences.watchmanPath": "",
-  // enable diagnostic
-  "coc.preferences.diagnostic.enable": false,
+  "diagnostic.errorSign": "✖",   // U-2716
+  "diagnostic.warningSign": "⚠", // U-26A0
+  "diagnostic.infoSign": "➤",    // U-27A4
+  "diagnostic.hintSign": "➤",
+  "diagnostic.maxWindowHeight": 14,
+  "coc.source.word.filetypes": ["text", "org", "markdown"],
+  "snippets.ultisnips.directories": ["snips"],
+  "snippets.userSnippetsDirectory": "~/.config/nvim/snips",
+  "snippets.loadFromExtensions": false,
+  "python.jediEnabled": false,
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "/usr/bin/black",
 }

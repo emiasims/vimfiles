@@ -16,31 +16,37 @@ function! s:setup() abort
   call minpac#add('tpope/vim-obsession')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
   call minpac#add('andymass/vim-matchup')
+  call minpac#add('tommcdo/vim-exchange')
 
   call minpac#add('machakann/vim-highlightedyank')
   call minpac#add('itchyny/vim-cursorword')
   call minpac#add('christoomey/vim-tmux-navigator')
   call minpac#add('jeetsukumaran/vim-filebeagle')
   call minpac#add('junegunn/fzf.vim')  " Slow?
-  call minpac#add('junegunn/vim-easy-align')
+  call minpac#add('tommcdo/vim-lion')
   call minpac#add('junegunn/vader.vim')
+  call minpac#add('SirVer/ultisnips')
 
   call minpac#add('justinmk/vim-sneak')
   call minpac#add('wellle/targets.vim')
 
   call minpac#add('inkarkat/vim-SyntaxRange')
   call minpac#add('mbbill/undotree')
+  call minpac#add('chrisbra/unicode.vim')
+  call minpac#add('liuchengxu/vim-clap')
 
   " Nvim specific:
   call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
   call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
   call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
+
 endfunction
 
 let s:coc_packages = [
-      \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-snippets',
-      \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json']
+      \ 'coc-python', 'coc-vimlsp', 'coc-lists',
+      \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json', 'coc-ultisnips']
+ " 'coc-snippets',
 
 function! pack#coc_install(...) abort
   for l:cp in s:coc_packages

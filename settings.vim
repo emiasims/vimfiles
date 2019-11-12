@@ -88,7 +88,9 @@ endif
 set splitright
 set switchbuf=useopen,usetab
 set backspace=indent,eol,start
-set diffopt=filler,iwhite
+" set diffopt=filler,iwhite
+" set diffopt=indent-heuristic,algorithm:histogram
+set diffopt=algorithm:histogram
 set showfulltag
 set completeopt=menuone
 if has('patch-7.4.784')
@@ -113,6 +115,7 @@ set cmdwinheight=5
 set laststatus=2
 set colorcolumn=80
 set cursorline
+set signcolumn=yes
 
 set list
 set listchars=nbsp:⊗
@@ -239,6 +242,11 @@ augroup vimrc_crmap
   autocmd BufRead * if &modifiable | nnoremap <buffer> <CR> za| endif
 augroup END
 
+nnoremap zO zCzO
+nnoremap zV zMzv
+
+nnoremap <C-]> g<C-]>
+
 if !exists('g:loaded_tmux_navigator')
   nnoremap <C-h> <C-w>h
   nnoremap <C-j> <C-w>j
@@ -254,10 +262,7 @@ nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
 onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 
-nnoremap - -i
-nnoremap + +i
-nnoremap _ kA
-nnoremap <expr> = (v:count > 0 ? 'jA' : '=')
+nnoremap - :e .<Cr>
 
 nnoremap Q q
 
@@ -278,18 +283,18 @@ nnoremap <expr> N 'nN'[v:searchforward]
 
 nnoremap <silent><C-w>b :vert resize<CR>:resize<CR>:normal! ze<CR>
 
-nnoremap [a :previous<CR>
-nnoremap ]a :next<CR>
-nnoremap [b :bprevious<CR>
-nnoremap ]b :bnext<CR>
-nnoremap [l :lprevious<CR>
-nnoremap ]l :lnext<CR>
-nnoremap [L :lfirst<CR>
-nnoremap ]L :llast<CR>
-nnoremap [q :cprevious<CR>
-nnoremap ]q :cnext<CR>
-nnoremap [<Space> :<C-u>put!=repeat(nr2char(10), v:count1) \| ']+1 <CR>
-nnoremap ]<Space> :<C-u>put =repeat(nr2char(10), v:count1) \| '[-1 <CR>
+nnoremap <silent> [a :<C-u>execute v:count1 . 'previous'<CR>
+nnoremap <silent> ]a :<C-u>execute v:count1 . 'next'<CR>
+nnoremap <silent> [b :<C-u>execute v:count1 . 'bprevious'<CR>
+nnoremap <silent> ]b :<C-u>execute v:count1 . 'bnext'<CR>
+nnoremap <silent> [l :<C-u>execute v:count1 . 'lprevious'<CR>
+nnoremap <silent> ]l :<C-u>execute v:count1 . 'lnext'<CR>
+nnoremap <silent> [q :<C-u>execute v:count1 . 'cprevious'<CR>
+nnoremap <silent> ]q :<C-u>execute v:count1 . 'cnext'<CR>
+nnoremap <silent> [L :lfirst<CR>
+nnoremap <silent> ]L :llast<CR>
+nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10), v:count1) \| ']+1 <CR>
+nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1) \| '[-1 <CR>
 " }}}
 " Terminal bindings: {{{
 if has('nvim')
@@ -330,8 +335,8 @@ cnoremap <C-e> <End>
 " }}}
 " Searching: {{{
 nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
-xnoremap / y/\<<C-r>"\><CR>zv
 xnoremap s :s//g<Left><Left>
+xnoremap <C-s> :s/<C-r>///g<left><left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
 nnoremap <leader><CR> :nohlsearch<CR>
 " }}}
@@ -349,12 +354,21 @@ inoremap <M-j> <C-c>:move .+1<CR>==gi
 inoremap <M-k> <C-c>:move .-2<CR>==gi
 " }}}
 " Editing text: {{{
-nnoremap <expr> ~ matchstr(getline('.'), '\%' . col('.') . 'c.') =~# '\a' ? '~' : 'w~'
-nnoremap cp yap<S-}>p
+nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
+nnoremap cp yap}p
 nnoremap g<CR> i<CR><Esc>
-" TODO make repeatable
-nnoremap g<Space> i <Esc>r
-nnoremap g<Space><CR> xi <C-r>" <Esc>
+
+nnoremap <silent> g<Space> :autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
+" TODO make repeatable?
+nnoremap <silent> g2<Space> :autocmd InsertCharPre <buffer> ++once call feedkeys('lli' . v:char . '<C-v><Esc>', 'n') \| stopinsert<Cr>i
+" vim-surround:
+xmap g2<Space> S
+
+" nnoremap <silent> <C-]> g<C-]>
+" " TODO: Generalized split function that simply splits vertical or horizontal depending on how those
+" " are already split. Vert first, then horizontal.
+" nnoremap <silent> g] :vert stjump<CR>
+" nnoremap <silent> g<C-]> :stjump<CR>
 
 nnoremap <leader>p "0p
 nnoremap <leader>P "0P
@@ -363,10 +377,10 @@ xnoremap <leader>P "0P
 
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
-nnoremap <leader>w :write<CR>
 " }}}
 " Plugins (manual): {{{
 " I want these to load even if --noplugins is used.
+" nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>du :call difference#undobuf()<cr>
 
@@ -393,10 +407,13 @@ nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
 
-xnoremap <silent> R         :<C-u>call refactor#expression_to_variable(visualmode(), 1)<CR>
 nnoremap <silent> <leader>R :<C-u>set opfunc=refactor#expression_to_variable<CR>g@
-xnoremap <silent> gR        :<C-u>set opfunc=refactor#function_in_project(visualmode(), 1)<CR>
+xnoremap <silent> R         :<C-u>call refactor#expression_to_variable(visualmode(), 1)<CR>
 nnoremap <silent> gR        :<C-u>set opfunc=refactor#function_in_project<CR>g@
+xnoremap <silent> gR        :<C-u>call refactor#function_in_project(visualmode(), 1)<CR>
+
+nnoremap <silent> <F2> :call util#openf(expand("<cfile>"))<CR>
+xnoremap <silent> <F2> :call util#openf(util#get_visual_selection())<CR>
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
@@ -409,3 +426,5 @@ command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 
 " }}}
+
+nnoremap <silent> <Leader>c :OrgCapture<CR>

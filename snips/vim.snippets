@@ -1,4 +1,4 @@
-priority -2
+# priority -2
 
 ###########################################################################
 #                            SnipMate Snippets                            #
@@ -17,43 +17,48 @@ let $1 = 1$3
 endsnippet
 
 # TODO: check for autoload and insert appropriate text
-snippet fun "function" b
-function! ${1:function_name}($2) abort
+snippet fun "function" bA
+function! ${1:function_name}($2) abort " {{{${3:1}
 	${0:${VISUAL}}
 endfunction
 endsnippet
 
-
 # Note: only }} because autopairs inserts the third
-snippet { "fold makers" b
+snippet { "fold makers" bA
 " $1 {{{
 ${0:${VISUAL}}
 " }}
 endsnippet
 
-snippet if "if" b
-if ${1}
+snippet if "if block" bA
+if ${1:condition}
+	${0:${VISUAL:1}}
+endif
+endsnippet
+
+snippet for "for loop" bA
+for ${1:var} in ${2:iterable}
 	${0:${VISUAL}}
-endif
+endfor
 endsnippet
 
-snippet ife "if else" b
-if ${1}
-	${2:${VISUAL}}
-else
-	${3:${VISUAL}}
-endif
-endsnippet
+# snippet ife "if else" b
+# if ${1}
+# 	${2:${VISUAL}}
+# else
+# 	${3:${VISUAL}}
+# endif
+# endsnippet
 
-snippet ifei "if elseif" b
-if ${1}
-	${2:${VISUAL}}
-elseif ${3}
-	${4:${VISUAL}}
-endif
-endsnippet
+# snippet ifei "if elseif" b
+# if ${1}
+# 	${2:${VISUAL}}
+# elseif ${3}
+# 	${4:${VISUAL}}
+# endif
+# endsnippet
 
-snippet mess "message clear" b
+snippet mess "message clear" bA
 messages clear
 echom ${0:${VISUAL}}
 endsnippet
