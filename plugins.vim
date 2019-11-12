@@ -67,7 +67,7 @@ nmap gcu <Plug>Commentary<Plug>Commentary
 " Not working.
 " command! GitDiff call difference#gitlog()
 " }}}
-" vim-clap {
+" vim-clap {{{
 
 nnoremap <silent> <leader>f  :Clap files<Cr>
 nnoremap <silent> <leader>gf :Clap git_files<Cr>
@@ -90,7 +90,7 @@ nnoremap <silent> <leader>ev :Files $CFGDIR<Cr>
 " nnoremap <silent> <leader>t :Clap tags<Cr>
 "   nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
 
-" }
+" }}}
 " vim-signify {{{
 augroup vimrc_signify
   autocmd!
@@ -138,7 +138,7 @@ if has('nvim')
 endif
 " for coc-calc
 imap <expr> <C-e> getline('.') =~# '=\s*$' ? "\<C-o>\<Plug>(coc-calc-result-append)" : "\<C-o>\<Plug>(coc-calc-result-replace)"
-" xmap <Tab> <Plug>(coc-snippets-select)
+xmap <Tab> <Plug>(coc-snippets-select)
 
 " }}}
 " vim-gutentags {{{
