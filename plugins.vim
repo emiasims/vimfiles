@@ -67,28 +67,44 @@ nmap gcu <Plug>Commentary<Plug>Commentary
 " Not working.
 " command! GitDiff call difference#gitlog()
 " }}}
-" vim-clap {{{
+" fzf {{{
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+nnoremap <silent> <leader>af  :Files<CR>
+nnoremap <silent> <leader>f   :GFiles<CR>
+nnoremap <silent> <leader>gst :GFiles?<CR>
+nnoremap <silent> <leader>b   :Lines<CR>
+nnoremap <silent> <leader>l   :Buffers<CR>
+nnoremap <silent> <leader>/   :BLines<CR>
+" TODO: display preview  of function in tags See GFiles?
+nnoremap <silent> <leader>t   :Tags<CR>
+nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
+nnoremap <silent> <leader>mr  :History<CR>
+nnoremap <silent> <leader>A   :Ag<CR>
+nnoremap <silent> <leader>h  :Helptags<CR>
+nnoremap <silent> <leader>gal :Commits<CR>
+nnoremap <silent> <leader>gl :BCommits<CR>
 
-nnoremap <silent> <leader>f  :Clap files<Cr>
-nnoremap <silent> <leader>gf :Clap git_files<Cr>
-nnoremap <silent> <leader>l  :Clap buffers<Cr>
-nnoremap <silent> <leader>L  :Clap lines<Cr>
-nnoremap <silent> <leader>y  :Clap yanks<Cr>
-nnoremap <silent> <leader>A  :Clap grep<Cr>
+nnoremap <leader>ev :Files $CFGDIR<CR>
+if has('nvim')
+  let g:fzf_layout = { 'window': 'call fzf#floating_win()' }
+endif
 
-nnoremap <silent> <leader>ev :Clap files ++finder=fd --type f "$CFGDIR"<Cr>
+" function! s:build_quickfix_list(lines)
+"   call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+"   copen
+"   cc
+" endfunction
 
-" TODO: autoload, :h clap-registering-providers
-let g:clap_provider_ctags = {'source': function('tags#to_list'), 'sink': function('tags#sink')}
+" let g:fzf_action = {
+"       \ 'ctrl-q': function('s:build_quickfix_list'),
+"       \ 'ctrl-s': 'split',
+"       \ 'ctrl-v': 'vsplit' }
 
-let g:clap_provider_grep_executable = 'ag'
-
-" fzf still
-nnoremap <silent> <leader>t :Tags<Cr>
-nnoremap <silent> <leader>ev :Files $CFGDIR<Cr>
-
-" nnoremap <silent> <leader>t :Clap tags<Cr>
-"   nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
+" augroup vimrc_term_fzf
+"   autocmd!
+"   autocmd FileType python let b:fzf_defprefix = "'def | 'class "
+"   autocmd FileType python let b:fzf_fsuffix = '('
+" augroup END
 
 " }}}
 " vim-signify {{{
@@ -131,14 +147,18 @@ let undotree_HighlightChangedText = 0
 let g:org_bibtex_dirlist = ['~/org/literature']
 " }}}
 " coc.nvim {{{
-imap <C-y> <Plug>(coc-snippets-expand)
 if has('nvim')
   nmap <silent> ]e <Plug>(coc-diagnostic-next)
   nmap <silent> [e <Plug>(coc-diagnostic-prev)
 endif
 " for coc-calc
 imap <expr> <C-e> getline('.') =~# '=\s*$' ? "\<C-o>\<Plug>(coc-calc-result-append)" : "\<C-o>\<Plug>(coc-calc-result-replace)"
-xmap <Tab> <Plug>(coc-snippets-select)
+
+" imap <C-y> <Plug>(coc-snippets-expand)
+" xmap <Tab> <Plug>(coc-snippets-select)
+
+let g:UltiSnipsEditSplit = 'tabdo'
+let g:UltiSnipsSnippetDirectories = ['snips']
 
 " }}}
 " vim-gutentags {{{

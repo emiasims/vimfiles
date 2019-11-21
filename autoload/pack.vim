@@ -32,21 +32,21 @@ function! s:setup() abort
   call minpac#add('inkarkat/vim-SyntaxRange')
   call minpac#add('mbbill/undotree')
   call minpac#add('chrisbra/unicode.vim')
-  call minpac#add('liuchengxu/vim-clap')
 
   " Nvim specific:
   call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
   call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
   call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
-  call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
+  call minpac#add('SirVer/ultisnips')
 
 endfunction
 
+
+
 let s:coc_packages = [
-      \ 'coc-python', 'coc-vimlsp', 'coc-lists',
-      \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json', 'coc-ultisnips']
- " 'coc-snippets',
+      \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-ultisnips',
+      \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json']
 
 function! pack#coc_install(...) abort
   for l:cp in s:coc_packages
