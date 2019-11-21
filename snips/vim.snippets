@@ -1,8 +1,5 @@
 # priority -2
 
-###########################################################################
-#                            SnipMate Snippets                            #
-###########################################################################
 snippet gvar "Global / configuration variable" b
 if !exists("g:${1:MyUltraImportantVar}")
 	let g:$1 = ${2:"${3:<tab>}"}
@@ -17,28 +14,28 @@ let $1 = 1$3
 endsnippet
 
 # TODO: check for autoload and insert appropriate text
-snippet fun "function" bA
+snippet fun "function" b
 function! ${1:function_name}($2) abort " {{{${3:1}
-	${0:${VISUAL}}
+	${0:${VISUAL:return}}
 endfunction
 endsnippet
 
 # Note: only }} because autopairs inserts the third
-snippet { "fold makers" bA
+snippet { "fold makers" b
 " $1 {{{
 ${0:${VISUAL}}
 " }}
 endsnippet
 
-snippet if "if block" bA
+snippet if "if block" b
 if ${1:condition}
-	${0:${VISUAL:1}}
+	${0:${VISUAL:break}}
 endif
 endsnippet
 
-snippet for "for loop" bA
+snippet for "for loop" b
 for ${1:var} in ${2:iterable}
-	${0:${VISUAL}}
+	${0:${VISUAL:continue}}
 endfor
 endsnippet
 
@@ -58,7 +55,7 @@ endsnippet
 # endif
 # endsnippet
 
-snippet mess "message clear" bA
+snippet mess "message clear" b
 messages clear
 echom ${0:${VISUAL}}
 endsnippet

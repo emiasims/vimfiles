@@ -31,9 +31,9 @@ Execute (${4:description}):
 	${0:[vimscript]}
 endsnippet
 
-snippet ex "Execute block" b
-Execute (${1:description}):
-	${0:[vimscript]}
+snippet exe "Execute block" b
+Execute (${1:${VISUAL:description}}):
+	${0:call ${VISUAL:[vimscript]}}
 endsnippet
 
 snippet do "Do block" b
