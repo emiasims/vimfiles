@@ -17,19 +17,19 @@
 #from ${1:package} import ${0:module}
 #endsnippet
 
-snippet if "if block" bA
+snippet if "if block" b
 if $1:
 	${2:pass}
 endsnippet
 
-snippet ife "if else block" bA
+snippet ife "if else block" b
 if $1:
 	${2:pass}
 else:
 	${3:pass}
 endsnippet
 
-snippet ifel "if elif else block" bA
+snippet ifel "if elif else block" b
 if ${1:cond}:
 	${3:pass}
 elif ${2:cond}:
@@ -38,39 +38,27 @@ else:
 	${5:pass}
 endsnippet
 
-snippet el "else block" bA
+snippet el "else block" b
 else:
 	${3:pass}
 endsnippet
 
-snippet ei "elif bloc" bA
+snippet ei "elif bloc" b
 elif ${1:cond}:
 	${2:pass}
 endsnippet
 
-snippet ifmain "if name is main cli block" bA
+snippet ifmain "if name is main cli block" b
 if __name__ == "__main__":
 	${1:${VISUAL:main()}}
 endsnippet
 
-snippet pdb "python debugger" bA
-__import__('pdb').set_trace()
-endsnippet
-
-snippet ipdb "ipython debugger" bA
-__import__('ipdb').set_trace()
-endsnippet
-
-snippet iem "embed ipython" bA
-__import__('IPython').embed()
-endsnippet
-
-snippet init "init dunder method" bA
+snippet init "init dunder method" b
 def __init__(self, $1):
 	${2:pass}
 endsnippet
 
-snippet call "call dunder method" bA
+snippet call "call dunder method" b
 def __call__(self, $1):
 	${2:pass}
 endsnippet
@@ -91,31 +79,31 @@ snippet scp "set comprehension" A
 {${1} for ${2} in ${3:${VISUAL}}}${0}
 endsnippet
 
-snippet for "for loop" bA
+snippet for "for loop" b
 for ${1:item} in ${2:iterable}:
 	${3:${VISUAL:pass}}
 endsnippet
 
-snippet fel "for else loop" bA
+snippet fel "for else loop" b
 for ${1:item} in ${2:iterable}:
 	${3:${VISUAL:pass}}
 else:
 	${4:pass}
 endsnippet
 
-snippet whi "while loop" bA
+snippet whi "while loop" b
 while ${1:condition}:
 	${0:${VISUAL}}
 endsnippet
 
-snippet wel "while else loop" bA
+snippet wel "while else loop" b
 while ${1:condition}:
 	${0:${VISUAL}}
 else:
 	${2:pass}
 endsnippet
 
-snippet dowi "do while loop" bA
+snippet dowi "do while loop" b
 while True:
 	${0:${VISUAL}}
 
@@ -123,14 +111,14 @@ while True:
 		break
 endsnippet
 
-snippet trye "try except block" bA
+snippet try "try except block" b
 try:
 	${0:${VISUAL:pass}}
-except ${1:Error}:
-	${2:pass}
+except ${1}Error:
+	${2:__import__('ipdb').set_trace()}
 endsnippet
 
-snippet trf "try except block" bA
+snippet tryf "try finally block" b
 try:
 	${0:${VISUAL:pass}}
 finally:
@@ -168,7 +156,7 @@ endsnippet
 # Functions #
 #############
 
-snippet def "function body" bA
+snippet def "function body" b
 def ${1:funcname}($2):
 	${3:${VISUAL:pass}}
 endsnippet

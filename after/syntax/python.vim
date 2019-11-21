@@ -28,6 +28,7 @@ syn keyword pythonStatement	as assert break continue del exec global
 syn keyword pythonStatement	lambda nonlocal pass print return with yield
 syn keyword pythonStatement class def contained nextgroup=pythonFunction skipwhite
       \ containedin=pythonFunctionFold,pythonMethodFold,pythonClassFold
+syntax keyword pythonClassVar self cls containedin=pythonMethodFold
 
 syntax region pythonFunctionFold	start="^\%(@.\+\ndef\|\%(@.\+\n\)\@80<!def\)\>"
       \ end="\%(\s*\n\)\{2,3}\ze\%(\s*\n\)*[^)[:space:]]" fold transparent
@@ -37,7 +38,7 @@ syntax region pythonMethodFold	start="^\(\z(\s\+\)\)@.\+\n\1def\>" fold transpar
       \ start="\%(@.\+\n\)\@80<!\_^\z(\s\+\)def\>"
       \ end="\n\%(\s*\n\)\+\ze\%(\z1\s\@![^)]\)"
       \ end="\n\ze\%(\%(\s*\n\)*\%(\z1\)\@![^)]\)"
-      \ containedin=pythonClassFold
+      \ contained containedin=pythonClassFold
 
 syntax region pythonClassFold	start="\%(@.\+\n\)\@80<!\_^\z(\s*\)class\>" fold transparent
       \ start="^\(\z(\s*\)\)\%(@.\+\n\1class\)\>"
@@ -53,7 +54,12 @@ syntax region pythonDocString		start=/\v[uU]?\z("""|''')/ end=/\z1/ fold contain
 
 hi def link pythonString String
 hi def link pythonDocString Comment
+hi def link pythonClassVar Identifier
 " hi def link pythonStatement
 
-syntax sync fromstart
+if has("vim_starting")
+  call defer#onidle("syntax sync fromstart")  " This is quite slow
+else
+  syntax sync fromstart
+endif
 let b:current_syntax = "python"
