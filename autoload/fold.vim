@@ -61,3 +61,11 @@ function! fold#markdown(lnum) abort " {{{1
   endif
   return '='
 endfunction
+
+function! fold#goto_open(direction) abort " {{{1
+  let lnum = line('.')
+  while foldclosed(lnum)
+    let lnum = lnum + a:direction
+  endwhile
+  call cursor(start, 0)
+endfunction

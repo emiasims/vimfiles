@@ -88,9 +88,7 @@ endif
 set splitright
 set switchbuf=useopen,usetab
 set backspace=indent,eol,start
-" set diffopt=filler,iwhite
-" set diffopt=indent-heuristic,algorithm:histogram
-set diffopt=algorithm:histogram
+set diffopt=algorithm:histogram,filler
 set showfulltag
 set completeopt=menuone
 if has('patch-7.4.784')
@@ -242,6 +240,7 @@ augroup vimrc_crmap
   autocmd BufRead * if &modifiable | nnoremap <buffer> <CR> za| endif
 augroup END
 
+nnoremap zE zMzO
 nnoremap zO zCzO
 nnoremap zV zMzv
 
@@ -328,7 +327,7 @@ Cnoreabbrevs he help
 Cnoreabbrevs h vert help
 Cnoreabbrevs f find
 Cnoreabbrevs W!! w !sudo tee % >/dev/null
-Cnoreabbrevs t Terminal
+Cnoreabbrevs use UltiSnipsEdit
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
@@ -414,6 +413,9 @@ xnoremap <silent> gR        :<C-u>call refactor#function_in_project(visualmode()
 
 nnoremap <silent> <F2> :call util#openf(expand("<cfile>"))<CR>
 xnoremap <silent> <F2> :call util#openf(util#get_visual_selection())<CR>
+
+nnoremap ]z zj:call fold#goto_open(1)<Cr>
+nnoremap [z zk:call fold#goto_open(-1)<Cr>
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
