@@ -10,8 +10,8 @@ nnoremap <silent> gx<CR> :<C-u>call repl#send("\<lt>CR>")<CR>
 nnoremap <silent> gx     :<C-u>set opfunc=repl#opfunc<CR>g@
 xnoremap <silent> gx     :call repl#send()<CR>
 
-let g:repl_termid = -1
-augroup vimrc_repl
-  autocmd!
-  autocmd BufLeave * let g:repl_termid = get(b:, 'terminal_job_id', g:repl_termid)
-augroup END
+command! TermRepl terminal | let [repl#termid, repl#bufid] = [b:terminal_job_id, bufnr()]
+command! SetRepl let [repl#termid, repl#bufid] = [b:terminal_job_id, bufnr()]
+
+let repl#termid = -1
+let repl#bufid = -1

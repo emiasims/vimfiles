@@ -328,6 +328,9 @@ Cnoreabbrevs h vert help
 Cnoreabbrevs f find
 Cnoreabbrevs W!! w !sudo tee % >/dev/null
 Cnoreabbrevs use UltiSnipsEdit
+" repl plugin
+Cnoreabbrevs sr SetRepl
+Cnoreabbrevs tr TermRepl
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>

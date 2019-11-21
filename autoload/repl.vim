@@ -19,12 +19,12 @@ function! s:send_line_or_fold() abort
 endfunction
 
 function! s:send_lines(lines) abort
-  if g:repl_termid == -1
-    throw 'g:repl_termid is default value, term might not be open'
+  if g:repl#termid == -1
+    throw 'g:repl#termid is default value, term might not be open'
   endif
-  call chansend(g:repl_termid, ["\<C-u>" . join(a:lines, "\<CR>\<C-u>"), ''])
+  call chansend(g:repl#termid, ["\<C-u>" . join(a:lines, "\<CR>\<C-u>"), ''])
   if &filetype ==# 'python' && len(a:lines) > 1
-    call chansend(g:repl_termid, "\<CR>")
+    call chansend(g:repl#termid, "\<CR>")
   endif
 endfunction
 
