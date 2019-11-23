@@ -33,12 +33,14 @@ function! s:setup() abort
   call minpac#add('mbbill/undotree')
   call minpac#add('chrisbra/unicode.vim')
 
+  call minpac#add('glacambre/firenvim', { 'do': function('firenvim#install') })
+
   " Nvim specific:
   call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
   call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
   call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
-  call minpac#add('SirVer/ultisnips')
+  call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
 
 endfunction
 

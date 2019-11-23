@@ -4,10 +4,12 @@ endif
 
 " minpac {{{
 if has('nvim')
-  silent! packadd! vim-signify
-  silent! packadd! vim-gutentags
-  silent! packadd! coc.nvim
-  silent! packadd! jsonc.vim
+  if !exists('g:started_by_firenvim')
+    silent! packadd! vim-signify
+    silent! packadd! vim-gutentags
+    silent! packadd! coc.nvim
+    silent! packadd! jsonc.vim
+  endif
   silent! packadd! ultisnips
 endif
 
@@ -163,6 +165,22 @@ let g:UltiSnipsSnippetDirectories = ['snips']
 " }}}
 " vim-gutentags {{{
 let g:gutentags_cache_dir = $DATADIR.'/tags'
+" }}}
+" firenvim {{{
+if exists('g:started_by_firenvim')
+  set laststatus=0
+  set showtabline=0
+  let g:loaded_statusline = 1
+  set guifont=monospace:h10
+  nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
+  augroup vimrc_firenvim
+    autocmd!
+    autocmd TextChanged * ++nested write
+    autocmd InsertEnter,InsertLeave * ++nested write
+    autocmd BufEnter github.com_*.txt set filetype=markdown
+  augroup END
+  startinsert!
+endif
 " }}}
 
 " Windows {{{
