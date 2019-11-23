@@ -1,11 +1,8 @@
-" TODO: List of 'files' to call in order
-let s:filename = 'DeferVim'
-
 function! s:onidle() abort
   autocmd! defer_idle
 
-  execute 'doautocmd User ' . s:filename
-  execute 'autocmd! User ' . s:filename
+  execute 'doautocmd User DeferVim'
+  execute 'autocmd! User DeferVim'
 endfunction
 
 augroup defer_idle
@@ -15,7 +12,7 @@ augroup defer_idle
 augroup END
 
 function! defer#onidle(evalable) abort
-  execute 'autocmd User ' . s:filename . ' ' . a:evalable
+  execute 'autocmd User DeferVim ' . a:evalable
 endfunction
 
 call defer#onidle('set updatetime=' . &updatetime)
