@@ -314,20 +314,25 @@ endif
 " }}}
 " Command: {{{
 " Just makes sure the abbrev only works at the start of the command
-function! s:cnoreabbrev_at_command_start(lhs, ...) abort
-  let l:rhs = join(a:000)
-  let l:cmdcheck = ' <c-r>=(getcmdtype()==":" && getcmdpos()==1 ? "'
-  execute 'cnoreabbrev ' . a:lhs . l:cmdcheck . l:rhs . '" : "' . a:lhs . '" )<CR>'
+function! s:cnoreabbrev_at_command_start(...) abort
+  let [options, rhs] = [[], []]
+  let expr = a:000[0] =~? '^<expr>$'
+  let expr = index(a:000, '<expr>', 0, 1) >= 0
+  let buffer = index(a:000, '<buffer>', 0, 1) >= 0
+  let mods = expr + buffer
+  let lhs =  a:000[mods]
+  let rhs = substitute(join(a:000[mods + 1:]), "'", '"', 'g')
+  let truefalse = (expr ? rhs : '"' . rhs . '"') . ' : "' . lhs . '"'
+  execute 'cnoreabbrev ' . (buffer ? '<buffer> ' : '') . lhs . ' <C-r>=(getcmdtype()==":" && getcmdpos()==1 ? ' . truefalse . ')<Cr>'
 endfunction
+
 command! -nargs=+ Cnoreabbrevs call <SID>cnoreabbrev_at_command_start(<f-args>)
 
 Cnoreabbrevs e! mkview \| edit!
-Cnoreabbrevs vh vert help
 Cnoreabbrevs he help
 Cnoreabbrevs h vert help
-Cnoreabbrevs f find
-Cnoreabbrevs W!! w !sudo tee % >/dev/null
 Cnoreabbrevs use UltiSnipsEdit
+Cnoreabbrevs <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
 " repl plugin
 Cnoreabbrevs sr SetRepl
 Cnoreabbrevs tr TermRepl
