@@ -152,15 +152,21 @@ let g:org_bibtex_dirlist = ['~/org/literature']
 if has('nvim')
   nmap <silent> ]e <Plug>(coc-diagnostic-next)
   nmap <silent> [e <Plug>(coc-diagnostic-prev)
-endif
 " for coc-calc
 imap <expr> <C-e> getline('.') =~# '=\s*$' ? "\<C-o>\<Plug>(coc-calc-result-append)" : "\<C-o>\<Plug>(coc-calc-result-replace)"
 
 " imap <C-y> <Plug>(coc-snippets-expand)
 " xmap <Tab> <Plug>(coc-snippets-select)
+endif
 
+" Ultisnips {{{
 let g:UltiSnipsEditSplit = 'tabdo'
 let g:UltiSnipsSnippetDirectories = ['snips']
+let g:UltiSnipsRemoveSelectModeMappings = 0
+let g:UltiSnipsExpandTrigger = '<Tab>'
+let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+" }}}
 
 " }}}
 " vim-gutentags {{{
@@ -168,18 +174,29 @@ let g:gutentags_cache_dir = $DATADIR.'/tags'
 " }}}
 " firenvim {{{
 if exists('g:started_by_firenvim')
-  set laststatus=0
+  let g:firenvim_config = {'localSettings': {'.*': { 'selector': '', 'priority': 0, },
+        \ 'mail\.google\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
+        \ 'outlook\.office365\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
+        \ 'github\.com': {'selector': 'textarea', 'priority': 1, 'takeover': 'once'},
+        \ }}
+  setlocal laststatus=0
   set showtabline=0
   let g:loaded_statusline = 1
-  set guifont=monospace:h10
+  set guifont=DejaVu\ Sans\ Mono:h9
+  nnoremap ZZ :xa<Cr>
+  nnoremap ZQ :qa!<Cr>
   nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
   augroup vimrc_firenvim
     autocmd!
+    autocmd VimEnter * startinsert!
+    autocmd BufEnter mail*,outlook* set filetype=mail
     autocmd TextChanged * ++nested write
     autocmd InsertEnter,InsertLeave * ++nested write
     autocmd BufEnter github.com_*.txt set filetype=markdown
   augroup END
-  startinsert!
+  set wrap
+  set colorcolumn=100
+  " set spell
 endif
 " }}}
 
