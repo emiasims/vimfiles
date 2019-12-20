@@ -23,6 +23,7 @@ highlight Statement        ctermfg=108  guifg=#83a598 ctermbg=NONE guibg=NONE   
 highlight PreProc          ctermfg=108  guifg=#83a598 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight Function         ctermfg=73   guifg=#6fa3a6 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight String           ctermfg=65   guifg=#679a69 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
+" highlight Number           ctermfg=139  guifg=#c099c9 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight Number           ctermfg=139  guifg=#b48ead ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 
 highlight Folded           ctermfg=102  guifg=#948774 ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
@@ -71,6 +72,7 @@ highlight DiffDelete       ctermfg=NONE guifg=NONE    ctermbg=167  guibg=#4c2b2a
 highlight DiffText         ctermfg=NONE guifg=NONE    ctermbg=108  guibg=#2b393a cterm=NONE      gui=NONE
 highlight IncSearch        ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e cterm=NONE      gui=NONE
 highlight Search           ctermfg=235  guifg=#282828 ctermbg=173  guibg=#c7743e cterm=NONE      gui=NONE
+highlight QuickFixLine     ctermfg=NONE guifg=NONE    ctermbg=173  guibg=#2c2824 cterm=NONE      gui=NONE
 highlight Directory        ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 highlight SpecialChar      ctermfg=172  guifg=#d79921 ctermbg=NONE guibg=NONE    cterm=NONE      gui=NONE
 " highlight SpecialComment   ctermfg=73   guifg=#72b7b5 ctermbg=NONE guibg=NONE    cterm=italic    gui=italic
@@ -121,32 +123,28 @@ else
 endif
 " }}}
 " linked groups {{{
-let s:links = [
-            \ ['Boolean',        'PreProc'],
-            \ ['Character',      'String'],
-            \ ['Float',          'Number'],
-            \ ['Conditional',    'PreProc'],
-            \ ['Define',         'PreProc'],
-            \ ['Exception',      'PreProc'],
-            \ ['Include',        'PreProc'],
-            \ ['Keyword',        'PreProc'],
-            \ ['Label',          'PreProc'],
-            \ ['Macro',          'PreProc'],
-            \ ['Operator',       'PreProc'],
-            \ ['PreCondit',      'PreProc'],
-            \ ['Repeat',         'PreProc'],
-            \ ['StorageClass',   'PreProc'],
-            \ ['Structure',      'PreProc'],
-            \ ['Typedef',        'PreProc'],
-            \ ['Debug',          'Special'],
-            \ ['Delimiter',      'Special'],
-            \ ['Tag',            'Special'],
-            \ ['Terminal',       'Normal'],
-            \ ['Conceal',        'Statement'],
-            \ ]
 
-" TODO: just put colors in a different file to load from or something for use elsewhere.
-" vim only default in here.
+hi! link Boolean        PreProc
+hi! link Character      String
+hi! link Float          Number
+hi! link Conditional    PreProc
+hi! link Define         PreProc
+hi! link Exception      PreProc
+hi! link Include        PreProc
+hi! link Keyword        PreProc
+hi! link Label          PreProc
+hi! link Macro          PreProc
+hi! link Operator       PreProc
+hi! link PreCondit      PreProc
+hi! link Repeat         PreProc
+hi! link StorageClass   PreProc
+hi! link Structure      PreProc
+hi! link Typedef        PreProc
+hi! link Debug          Special
+hi! link Delimiter      Special
+hi! link Tag            Special
+hi! link Terminal       Normal
+hi! link Conceal        Whitespace
 
 highlight Sneak               ctermfg=108 guifg=#d79921 ctermbg=235 guibg=#3c3836 cterm=bold gui=bold
 highlight SneakLabel          ctermfg=108 guifg=#d79921 ctermbg=235 guibg=#3c3836 cterm=bold gui=bold
@@ -157,7 +155,7 @@ highlight StatusLineNC        ctermfg=102 guifg=#948774 ctermbg=237 guibg=#3c383
 highlight StatusLineTerm      ctermfg=73  guifg=#72b7b5 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
 highlight StatusLineTermNC    ctermfg=187 guifg=#d5c4a1 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
 
-highlight stlModified         ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight stlModified         ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=bold gui=bold
 highlight stlTypeInfo         ctermfg=73  guifg=#6fa3a6 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
 highlight stlDirInfo          ctermfg=116 guifg=#84d4d2 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
 highlight stlErrorInfo        ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
@@ -169,8 +167,4 @@ highlight stlReplaceMode      ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a
 highlight stlSelectMode       ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
 highlight stlTerminalMode     ctermfg=139 guifg=#b48ead ctermbg=239 guibg=#504945 cterm=NONE gui=NONE
 
-augroup colorscheme_evolution
-    autocmd!
-    autocmd ColorScheme * if expand("<amatch>") == "evolution" | for link in s:links | execute 'hi link' link[0] link[1] | endfor | else | for link in s:links | execute 'hi link' link[0] 'NONE' | endfor | endif
-augroup END
 " }}}
