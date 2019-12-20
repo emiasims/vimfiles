@@ -23,7 +23,7 @@ endfunction
 
 " TODO rename like above in file, but not cross project.
 " TODO after that, in all visible windows.
-function! refactor#function_in_project(type, ...) abort
+function! refactor#name_in_project(type, ...) abort
   let [l:lnum_start, l:col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
   let [l:lnum_end, l:col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
   let l:expr = getline(line('.'))[l:col_start - 1 : l:col_end - 1]

@@ -76,7 +76,7 @@ set whichwrap+=[,]
 set autowriteall
 augroup vimrc_writeall
   autocmd!
-  autocmd WinLeave * if &modifiable && &modified && filereadable(expand('%')) | write | endif
+  autocmd WinLeave * ++nested if &modifiable && &modified && filereadable(expand('%')) | write | endif
 augroup END
 
 if executable('ag')
@@ -411,8 +411,8 @@ nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
 
 nnoremap <silent> <leader>R :<C-u>set opfunc=refactor#expression_to_variable<CR>g@
 xnoremap <silent> R         :<C-u>call refactor#expression_to_variable(visualmode(), 1)<CR>
-nnoremap <silent> gR        :<C-u>set opfunc=refactor#function_in_project<CR>g@
-xnoremap <silent> gR        :<C-u>call refactor#function_in_project(visualmode(), 1)<CR>
+nnoremap <silent> gR        :<C-u>set opfunc=refactor#name_in_project<CR>g@
+xnoremap <silent> gR        :<C-u>call refactor#name_in_project(visualmode(), 1)<CR>
 
 nnoremap <silent> <F2> :call util#openf(expand("<cfile>"))<CR>
 xnoremap <silent> <F2> :call util#openf(util#get_visual_selection())<CR>

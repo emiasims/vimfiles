@@ -12,7 +12,7 @@ endfunction
 function! autopairs#backspace() abort
   let l:prev = s:prevchar()
   if has_key(s:pairs, l:prev) && s:pairs[l:prev] ==# s:nextchar()
-    return "\<BS>\<DEL>"
+    return "\<BS>\<Del>"
   endif
   return "\<BS>"
 endfunction
@@ -33,9 +33,9 @@ endfunction
 
 function! autopairs#check_and_insert(char) abort
   if s:completing_pair(a:char)
-    return "\<C-g>U\<right>"
+    return "\<C-g>U\<Right>"
   elseif s:is_pair(a:char)
-    return a:char . s:pairs[a:char] . "\<C-g>U\<left>"
+    return a:char . s:pairs[a:char] . "\<C-g>U\<Left>"
   endif
   return a:char
 endfunction
