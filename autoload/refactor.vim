@@ -1,8 +1,8 @@
 function! refactor#expression_to_variable(type, ...) abort
-  let [l:lnum_start, l:col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
-  let [l:lnum_end, l:col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
+  let [lnum_start, col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
+  let [lnum_end, col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
   let s:lnum = line('.')
-  let s:expr = getline(s:lnum)[l:col_start - 1 : l:col_end - 1]
+  let s:expr = getline(s:lnum)[col_start - 1 : col_end - 1]
   messages clear
   echom '"'.s:expr.'"'
   call append(s:lnum - 1, '')
@@ -24,16 +24,29 @@ endfunction
 " TODO rename like above in file, but not cross project.
 " TODO after that, in all visible windows.
 function! refactor#name_in_project(type, ...) abort
-  let [l:lnum_start, l:col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
-  let [l:lnum_end, l:col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
-  let l:expr = getline(line('.'))[l:col_start - 1 : l:col_end - 1]
-  execute 'vimgrep /' . l:expr . '/j **/*.' . &filetype
-  call feedkeys(":cdo s/" . l:expr . "//g\<Left>\<Left>")
+  let [lnum_start, col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
+  let [lnum_end, col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
+  let name = getline(line('.'))[col_start - 1 : col_end - 1]
+  if &filetype == 'vim'
+    let default = matchstr(name, '\v^([^#]+#)*\ze[^#]*$')
+  endif
+  let newname = input("Refactoring " . name . ":\n> ", default)
+
+  let ssop = &sessionoptions
+  set ssop=buffers,folds
+  mksession refactor_restore
+  execute 'vimgrep /' . name . '/j **/*.' . &filetype
+  execute 'cdo s/' . name . '/' . newname . '/g'
+  source refactor_restore
+  let &sessionoptions = ssop
+  call delete('refactor_restore')
+  cwin
+  wincmd p
 endfunction
 
 function! s:update_refactor() abort
-  let l:text = getline('.')[ (s:start - 1) : (getcurpos()[2] - 2) ]
-  call setline(s:lnum, s:indent . s:prefix . l:text . s:equals . s:expr)
+  let text = getline('.')[ (s:start - 1) : (getcurpos()[2] - 2) ]
+  call setline(s:lnum, s:indent . s:prefix . text . s:equals . s:expr)
 endfunction
 
 augroup refactor_clear
