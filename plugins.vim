@@ -81,14 +81,12 @@ nnoremap <silent> <leader>gst :GFiles?<CR>
 nnoremap <silent> <leader>b   :Lines<CR>
 nnoremap <silent> <leader>l   :Buffers<CR>
 nnoremap <silent> <leader>/   :BLines<CR>
-" TODO: display preview  of function in tags See GFiles?
 nnoremap <silent> <leader>t   :Tags<CR>
-nnoremap <expr> <silent> <leader>T    ':Tags<CR>' . "'" . expand('<cword>') . ' '
 nnoremap <silent> <leader>mr  :History<CR>
 nnoremap <silent> <leader>A   :Ag<CR>
-nnoremap <silent> <leader>h  :Helptags<CR>
+nnoremap <silent> <leader>h   :Helptags<CR>
 nnoremap <silent> <leader>gal :Commits<CR>
-nnoremap <silent> <leader>gl :BCommits<CR>
+nnoremap <silent> <leader>gl  :BCommits<CR>
 
 nnoremap <leader>ev :Files $CFGDIR<CR>
 if has('nvim')
