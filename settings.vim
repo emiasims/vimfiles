@@ -410,10 +410,10 @@ onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Esc>:call textobjects#indent(1)<CR><Esc>gv
 
-nnoremap <silent> <C-Up>    :call winresize#up(v:count1)<CR>
-nnoremap <silent> <C-Down>  :call winresize#down(v:count1)<CR>
-nnoremap <silent> <C-Left>  :call winresize#left(v:count1)<CR>
-nnoremap <silent> <C-Right> :call winresize#right(v:count1)<CR>
+nnoremap <silent> <C-Up>    :<C-u>call winresize#up(v:count1)<CR>
+nnoremap <silent> <C-Down>  :<C-u>call winresize#down(v:count1)<CR>
+nnoremap <silent> <C-Left>  :<C-u>call winresize#left(v:count1)<CR>
+nnoremap <silent> <C-Right> :<C-u>call winresize#right(v:count1)<CR>
 
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
