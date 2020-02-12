@@ -21,6 +21,14 @@ inoremap <buffer> ipdb __import__('ipdb').set_trace()<Esc>
 inoremap <buffer> pdb __import__('pdb').set_trace()<Esc>
 inoremap <buffer> iem __import__('IPython').embed()<Esc>
 
+iabbrev <buffer> true True
+iabbrev <buffer> false False
+iabbrev <buffer> && and
+iabbrev <buffer> \|\| or
+
 " Requires pythonsense:
 nmap <expr> <buffer> go (getline('.') =~# '^\s*def' ? '' : '[m') . 'yy]M] jpCdef<Tab>'
 nmap <expr> <buffer> gO (getline('.') =~# '^\s*def' ? '' : '[m') . 'yy[ kPCdef<Tab>'
+
+inoremap <buffer> """ """ """<C-g>U<Left><C-g>U<Left><C-g>U<Left>
+inoremap <buffer> """<Cr> """<Cr>"""<esc>O
