@@ -13,6 +13,6 @@ endfunction
 
 function! util#openf(text) abort
   if filereadable(a:text) || expand(a:text) =~? '^http'
-    execute "!xdg-open " . shellescape(a:text)
+    execute "!xdg-open " . substitute(shellescape(a:text), '[#%]', '\\&', 'g')
   endif
 endfunction
