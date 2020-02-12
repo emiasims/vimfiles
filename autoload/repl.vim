@@ -34,3 +34,12 @@ function! repl#opfunc(type) abort
   let l:lines = getline(l:lnum_start, l:lnum_end)
   call s:send_lines(l:lines)
 endfunction
+
+function! repl#goto_expr() abort " {{{1
+  let winid = win_findbuf(g:repl#bufid)[0]
+  if empty(winid)
+    return ''
+  endif
+  echom '<C-w>' . win_id2win(winid) . 'w'
+  return '<C-w>' . win_id2win(winid) . 'w'
+endfunction
