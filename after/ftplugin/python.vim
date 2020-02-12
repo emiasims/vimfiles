@@ -13,9 +13,6 @@ augroup vimrc_python
   autocmd BufWritePre *.py %s/\s\+$//e
 augroup END
 
-nmap <buffer> go [myy]M] jpCdef
-nmap <buffer> gO [myy[ kPCdef
-
 nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| cfirst<Cr>
 
 command! -nargs=0 -buffer CocFormat call CocAction('format')
@@ -23,3 +20,7 @@ command! -nargs=0 -buffer CocFormat call CocAction('format')
 inoremap <buffer> ipdb __import__('ipdb').set_trace()<Esc>
 inoremap <buffer> pdb __import__('pdb').set_trace()<Esc>
 inoremap <buffer> iem __import__('IPython').embed()<Esc>
+
+" Requires pythonsense:
+nmap <expr> <buffer> go (getline('.') =~# '^\s*def' ? '' : '[m') . 'yy]M] jpCdef<Tab>'
+nmap <expr> <buffer> gO (getline('.') =~# '^\s*def' ? '' : '[m') . 'yy[ kPCdef<Tab>'
