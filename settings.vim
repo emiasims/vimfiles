@@ -240,8 +240,6 @@ nnoremap zE zMzO
 nnoremap zO zCzO
 nnoremap zV zMzv
 
-nnoremap <C-]> g<C-]>
-
 if !exists('g:loaded_tmux_navigator')
   nnoremap <C-h> <C-w>h
   nnoremap <C-j> <C-w>j
