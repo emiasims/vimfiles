@@ -25,3 +25,5 @@ omap <buffer> if :normal [[jV][k<Cr>
 
 nmap go ][o<Cr>fun<Tab>
 nmap gO [[O<Cr><Up>fun<Tab>
+
+nnoremap <silent> <expr> <buffer> K ':help ' . expand('<cword>') . ((expand('<cWORD>') =~# expand('<cword>') . '(') ? "(\<Cr>" : "\<Cr>")
