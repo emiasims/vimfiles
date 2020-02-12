@@ -25,7 +25,7 @@ function! fzf#floating_win()
   let opts = {
         \ 'relative': 'cursor',
         \ 'row': 1,
-        \ 'col': -15,
+        \ 'col': -3,
         \ 'anchor': anchor,
         \ 'width': 120,
         \ 'height': fw_height
