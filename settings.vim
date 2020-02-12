@@ -440,5 +440,3 @@ command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 
 " }}}
-
-nnoremap <silent> <Leader>c :OrgCapture<CR>
