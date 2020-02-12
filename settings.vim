@@ -335,12 +335,15 @@ Cnoreabbrevs he help
 Cnoreabbrevs h vert help
 Cnoreabbrevs use UltiSnipsEdit
 Cnoreabbrevs <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
-" repl plugin
+Cnoreabbrevs ase AutoSourceEnable
+Cnoreabbrevs asd AutoSourceDisable
 Cnoreabbrevs sr SetRepl
 Cnoreabbrevs tr TermRepl
 
+cnoremap <expr> vga getcmdtype()==":" && getcmdpos()==1 ? 'vimgrep // **/*.' . &ft . "\<C-Left><Left><Left>" : 'vga'
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
+cnoremap <C-x> <C-a>
 " }}}
 " Searching: {{{
 nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
