@@ -76,6 +76,7 @@ nmap gcu <Plug>Commentary<Plug>Commentary
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 nnoremap <silent> <leader>af  :Files<CR>
 nnoremap <silent> <leader>f   :GFiles<CR>
+nnoremap <silent> <leader>o   :Files ~/org<CR>
 nnoremap <silent> <leader>gst :GFiles?<CR>
 nnoremap <silent> <leader>b   :Lines<CR>
 nnoremap <silent> <leader>l   :Buffers<CR>
