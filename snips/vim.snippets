@@ -85,3 +85,10 @@ let cursor = getcurpos()[1:]
 ${0:${VISUAL}}
 call cursor(cursor)
 endsnippet
+
+snippet aug "autogroup" b
+augroup ${1:name}
+	autocmd!
+	autocmd ${0:${VISUAL}}
+augroup END
+endsnippet
