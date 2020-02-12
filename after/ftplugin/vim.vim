@@ -16,6 +16,7 @@ inoremap <silent> <buffer> <C-l> <C-o>:call feedkeys('<C-o>b' . nr2char(getchar(
 for i in range(97, 122)  " a-z, make <C-v><C-a> insert <C-a>.
   execute 'inoremap <buffer> <C-v><C-' . nr2char(i) . '> <lt>C-' . nr2char(i) . '>'
 endfor
+inoremap <buffer> <C-v><Esc> <lt>Esc>
 
 xmap <buffer> af :normal [[V][<Cr>
 xmap <buffer> if :normal [[jV][k<Cr>
