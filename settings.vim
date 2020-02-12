@@ -298,13 +298,17 @@ if has('nvim')
   augroup vimrc_term
     autocmd!
     autocmd WinEnter term://* nohlsearch
-    autocmd WinEnter term://* startinsert
+    autocmd WinEnter term://* if !exists('b:last_mode') | let b:last_mode = 't' | endif
+    autocmd WinEnter term://* if b:last_mode == 't' | startinsert | endif
+    autocmd TermLeave term://* let b:last_mode = 'n'
   augroup END
 
-  tnoremap <C-h> <C-\><C-n><C-w>h
-  tnoremap <C-j> <C-\><C-n><C-w>j
-  tnoremap <C-k> <C-\><C-n><C-w>k
-  tnoremap <C-l> <C-\><C-n><C-w>l
+  tnoremap <Plug>(term2nmode) <C-\><C-n>:silent let b:last_mode = 't'<Cr>
+  tmap <C-h> <Plug>(term2nmode)<C-w>h
+  tmap <C-j> <Plug>(term2nmode)<C-w>j
+  tmap <C-k> <Plug>(term2nmode)<C-w>k
+  tmap <C-l> <Plug>(term2nmode)<C-w>l
+  tmap <C-\> <Plug>(term2nmode)<C-w>p
   tnoremap <Esc> <C-\><C-n>
   tnoremap <M-n> <C-\><C-n>
 
