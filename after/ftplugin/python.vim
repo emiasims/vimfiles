@@ -6,8 +6,7 @@ setlocal colorcolumn=100
 setlocal foldmethod=syntax
 setlocal foldtext=fold#pythontext()
 
-nnoremap <buffer><silent> gO :lvimgrep /^\s*\%(def \|class \)/ %<CR>:lopen<CR>
-nnoremap <buffer><silent> gO :lvimgrep /^\s*\%(def \\|class \)/ %<CR>:lopen<CR>
+command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
 
 augroup vimrc_python
   autocmd!
