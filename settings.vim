@@ -264,6 +264,7 @@ inoremap <C-b> <C-g>U<Left>
 
 inoremap <C-w> <C-g>u<C-w><C-g>u
 inoremap <C-u> <C-g>u<C-u><C-g>u
+inoremap <M-u> <C-k>*
 
 nnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 xnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
