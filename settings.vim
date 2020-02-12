@@ -15,10 +15,6 @@ set winaltkeys=no
 set pastetoggle=<F2>
 set viewoptions=folds,cursor,slash,unix
 
-if has('clipboard')
-  set clipboard+=unnamedplus
-endif
-
 set timeout ttimeout
 set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
