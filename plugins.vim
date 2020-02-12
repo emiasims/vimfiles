@@ -192,7 +192,8 @@ if exists('g:started_by_firenvim')
   nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
   augroup vimrc_firenvim
     autocmd!
-    autocmd VimEnter * startinsert!
+    " Not working
+    autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
     autocmd BufEnter mail*,outlook* set filetype=mail
     autocmd TextChanged * ++nested write
     autocmd InsertEnter,InsertLeave * ++nested write
@@ -200,7 +201,7 @@ if exists('g:started_by_firenvim')
   augroup END
   set wrap
   set colorcolumn=100
-  " set spell
+  setlocal spell
 endif
 " }}}
 
