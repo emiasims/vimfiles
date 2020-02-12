@@ -57,6 +57,9 @@ let g:filebeagle_suppress_keymaps = 1
 nmap <silent> <leader>- <Plug>FileBeagleOpenCurrentBufferDir
 let g:loaded_netrwPlugin = 'v9999'
 " }}}
+" vim-matchup {{{
+let g:matchup_matchparen_offscreen = {}
+" }}}
 " vim-commentary {{{
 xmap gc  <Plug>Commentary
 nmap gc  <Plug>Commentary
