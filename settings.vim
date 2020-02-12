@@ -257,8 +257,6 @@ nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
 onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 
-nnoremap - :e .<Cr>
-
 nnoremap Q q
 
 inoremap <C-f> <C-g>U<Right>
