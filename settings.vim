@@ -345,7 +345,6 @@ nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
 xnoremap s :s//g<Left><Left>
 xnoremap <C-s> :s/<C-r>///g<left><left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
-nnoremap <leader><CR> :nohlsearch<CR>
 " }}}
 " Moving text: {{{
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
