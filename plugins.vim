@@ -151,6 +151,56 @@ let undotree_HighlightChangedText = 0
 " }}}
 " vim-org {{{
 let g:org_bibtex_dirlist = ['~/org/literature']
+
+let g:org#capture#templates = {}
+let t = g:org#capture#templates
+
+let t.n = {'type': 'entry', 'description': 'Note', 'target': 'inbox.org/Notes'}
+let t.e = {'type': 'entry', 'description': 'Event', 'target': 'events.org'}
+let t.t = {'type': 'entry', 'description': 'TODO item'}
+let t.b = {'type': 'entry', 'description': 'Shopping item', 'target': 'shopping.org/Capture'}
+
+let t.w = {'type': 'entry', 'description': 'Work TODO'}
+let t.wp = {'type': 'checkitem', 'description': 'Work TODO: Paper'}
+let t.wp.target = 'literature.org/Papers to Lookup'
+let t.wp.opts = {'quit': 1}
+let t.ws = {'type': 'entry', 'description': 'Work TODO: Simulations', 'target': 'work.org/Project Ideas'}
+let t.wi = {'type': 'entry', 'description': 'Work project idea', 'target': 'work.org/Project Ideas'}
+
+let t.pv = {'type': 'entry', 'description': 'Project TODO: vim', 'target': 'vim.org'}
+let t.po = {'type': 'entry', 'description': 'Project TODO: vim-org', 'target': 'vim.org/vim-org/Capture'}
+let t.ps = {'type': 'entry', 'description': 'Project TODO: simbiofilm', 'target': 'work.vim/simbiofilm'}
+
+let projecttemplate =<< ENDTMPL
+* TODO `input("Project TODO> ")`
+:PROPERTIES:
+:captured-at: `org#timestamp#date2text(localtime())`
+:captured-in: `resolve(fnamemodify(expand('%'), ':p:~'))`
+:END:
+ENDTMPL
+
+let t.e.template =<< ENDTMPL
+* `input("Name> ")`
+`input("Datetime> ", "", "customlist,org#timestamp#completion")`
+:PROPERTIES:
+:captured-at: `org#timestamp#date2text(localtime())`
+:END:
+ENDTMPL
+
+let t.b.template =<< ENDTMPL
+${0:I NEEEED IT}
+:PROPERTIES:
+:captured-at: `!v org#timestamp#date2text(localtime())`
+:captured-in: `!o resolve(fnamemodify(expand('%'), ':p:~'))`
+:END:
+ENDTMPL
+let t.b.snippet = 1
+
+nmap <leader>c <Plug>(org-capture)
+xmap <leader>c <Plug>(org-capture)
+
+let g:org#capture#opts = {'editcmd': 'SmartSplit'}
+
 " }}}
 " coc.nvim {{{
 if has('nvim')
