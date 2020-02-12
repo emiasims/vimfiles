@@ -167,7 +167,7 @@ augroup vimrc_general
 
   " Update filetype on save if empty
   autocmd BufWritePost * nested
-        \ if &l:filetype ==# '' || exists('b:ftdetect')
+        \ if &filetype ==# '' || exists('b:ftdetect')
         \ |   unlet! b:ftdetect
         \ |   filetype detect
         \ | endif
@@ -180,7 +180,7 @@ augroup vimrc_general
 
   " Disable paste and/or update diff when leaving insert mode
   autocmd InsertLeave * if &paste | setlocal nopaste | echo 'nopaste' | endif
-  autocmd InsertLeave * if &l:diff | diffupdate | endif
+  autocmd InsertLeave * if &diff | diffupdate | endif
 
   " TODO: save values
   autocmd WinEnter * setlocal cursorline
