@@ -170,12 +170,21 @@ let t.po = {'type': 'entry', 'description': 'Project TODO: vim-org', 'target': '
 let t.ps = {'type': 'entry', 'description': 'Project TODO: simbiofilm', 'target': 'work.vim/simbiofilm'}
 
 let projecttemplate =<< ENDTMPL
-* TODO `input("Project TODO> ")`
+${1:Description}
 :PROPERTIES:
-:captured-at: `org#timestamp#date2text(localtime())`
-:captured-in: `resolve(fnamemodify(expand('%'), ':p:~'))`
+:captured-at: `!v org#timestamp#date2text(localtime())`
 :END:
+$0
 ENDTMPL
+let t.b.snippet = 1
+
+let t.wi.template = deepcopy(projecttemplate)
+let t.wi.template[0] = '${1:Idea title}'
+let t.wi.snippet = 1
+
+let t.po.template = deepcopy(projecttemplate)
+let t.po.template[0] = 'TODO ${1:A thing}'
+let t.po.snippet = 1
 
 let t.e.template =<< ENDTMPL
 * `input("Name> ")`
