@@ -1,8 +1,8 @@
-function! tags#smartsplit(text) abort " {{{1
+function! tags#smartedit(text) abort " {{{1
   " Should be like <C-]>, but use smartsplit
   let tags = taglist(a:text)
   if len(tags) == 1
-    execute 'SmartSplit' tags[0].filename
+    execute 'JumpOrEdit' tags[0].filename
     silent execute tags[0].cmd
   elseif len(tags) > 1
     let s:tags = tags
@@ -15,9 +15,9 @@ endfunction
 
 function! s:fzf_sink(selection) abort " {{{2
   let tag = s:tags[split(a:selection, ':')[0]]
-  execute 'SmartSplit' tag.filename
+  execute 'JumpOrEdit' tag.filename
   silent execute tag.cmd
   unlet s:tags
 endfunction
 
-nnoremap <C-]> :<C-u>call tags#smartsplit(expand('<cword>'))<Cr>
+nnoremap <C-]> :<C-u>call tags#smartedit(expand('<cword>'))<Cr>
