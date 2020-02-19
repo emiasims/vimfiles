@@ -1,4 +1,4 @@
-function! wincmds#split(fname) abort " {{{1
+function! wincmds#jumporsplit(fname) abort " {{{1
   let buf = bufnr(resolve(fnamemodify(a:fname, ':p')))
   if buf < 0 || bufwinnr(buf) < 0
     execute 'vertical split' a:fname
@@ -11,4 +11,14 @@ function! wincmds#split(fname) abort " {{{1
   endif
 endfunction
 
-command! -nargs=1 -complete=file SmartSplit call wincmds#split(<q-args>)
+function! wincmds#jumporedit(fname) abort " {{{1
+  let buf = bufnr(resolve(fnamemodify(a:fname, ':p')))
+  if buf < 0 || bufwinnr(buf) < 0
+    execute 'edit' a:fname
+  else
+    execute bufwinnr(buf) . 'wincmd w'
+  endif
+endfunction
+
+command! -nargs=1 -complete=file JumpOrSplit call wincmds#jumporsplit(<q-args>)
+command! -nargs=1 -complete=file JumpOrEdit call wincmds#jumporedit(<q-args>)
