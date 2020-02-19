@@ -1,7 +1,7 @@
 function! s:setup_autosource() abort " {{{1
   augroup vimrc_autosource
     autocmd!
-    autocmd BufWritePost */autoload/*.vim source % | echo 'Sourced ' . expand('%')
+    autocmd BufWritePost autoload/*.vim source % | echo 'Sourced ' . expand('%')
   augroup END
 endfunction
 
