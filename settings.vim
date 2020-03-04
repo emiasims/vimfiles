@@ -239,6 +239,7 @@ augroup END
 nnoremap zE zMzO
 nnoremap zO zCzO
 nnoremap zV zMzv
+nnoremap ZV zMzv
 
 if !exists('g:loaded_tmux_navigator')
   nnoremap <C-h> <C-w>h
@@ -422,7 +423,7 @@ nnoremap <silent> gR        :<C-u>set opfunc=refactor#name_in_project<CR>g@
 xnoremap <silent> gR        :<C-u>call refactor#name_in_project(visualmode(), 1)<CR>
 
 nnoremap <silent> <F2> :call util#openf(expand("<cfile>"))<CR>
-xnoremap <silent> <F2> :call util#openf(util#get_visual_selection())<CR>
+xnoremap <silent> <F2> :<C-u>call util#openf(util#get_visual_selection())<CR>
 
 nnoremap ]z zj:call fold#goto_open(1)<Cr>
 nnoremap [z zk:call fold#goto_open(-1)<Cr>
@@ -432,6 +433,8 @@ xnoremap il ^og_
 xnoremap al 0o$
 onoremap il :<C-u>normal! ^vg_<CR>
 onoremap al :<C-u>normal! 0v$<CR>
+onoremap ar a]
+onoremap ir i]
 " }}}
 " Commands: {{{
 command! Clearqflist call setqflist([])
