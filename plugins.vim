@@ -81,14 +81,15 @@ nnoremap <silent> <leader>gst :FZ 140 40 \| GFiles?<CR>
 nnoremap <silent> <leader>b   :Lines<CR>
 nnoremap <silent> <leader>l   :<C-u>call fzfr#buffers()<Cr>
 nnoremap <silent> <leader>/   :BLines<CR>
-nnoremap <silent> <leader>t   :Tags<CR>
+" nnoremap <silent> <leader>t   :<C-u>call fzfr#tags()<CR>
+nnoremap <silent> <leader>t   :FZ 80 20 \| Tags<CR>
 nnoremap <silent> <leader>mr  :History<CR>
 nnoremap <silent> <leader>A   :Ag<CR>
 nnoremap <silent> <leader>h   :FZ 80 20 \| Helptags<CR>
 nnoremap <silent> <leader>gal :Commits<CR>
 nnoremap <silent> <leader>gl  :BCommits<CR>
 
-nnoremap <leader>ev :Files $CFGDIR<CR>
+nnoremap <leader>ev :FZ 40 20 \| Files $CFGDIR<CR>
 if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
