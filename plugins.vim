@@ -149,11 +149,9 @@ let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
 " }}}
 " vim-org {{{
-let g:org_bibtex_dirlist = ['~/org/literature']
 
 let g:org#capture#templates = {}
 let t = g:org#capture#templates
-
 let t.n = {'type': 'entry', 'description': 'Note', 'target': 'inbox.org/Notes'}
 let t.e = {'type': 'entry', 'description': 'Event', 'target': 'events.org'}
 let t.t = {'type': 'entry', 'description': 'TODO item'}

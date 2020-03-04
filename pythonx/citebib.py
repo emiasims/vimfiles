@@ -9,17 +9,17 @@ def parse_bibtex(fname):
         bd = bibtexparser.load(bf, parser=parser)
 
     bib = []
-    for e in bd.entries:
+    for entry in bd.entries:
         nodes = ['ENTRYTYPE', 'journal', 'year', 'title', 'ID']
         d = {}
         for n in nodes:
-            d[n.lower()] = e.get(n, None)
+            d[n.lower()] = entry.get(n, None)
         if d['title'] is None or d['id'] is None:
             continue
         d['title'] = re.sub("[}'\\\{]", '', d['title']).strip()
         d['id'] = '[{}]'.format(d['id'])
 
-        author = e.get('author', '').split(' and ')
+        author = entry.get('author', '').split(' and ')
         d['author'] = []
         for au in author:
             if au:
