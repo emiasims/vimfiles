@@ -35,11 +35,7 @@ function! repl#opfunc(type) abort
   call s:send_lines(l:lines)
 endfunction
 
-function! repl#goto_expr() abort " {{{1
+function! repl#winnr() abort " {{{1
   let winid = win_findbuf(g:repl#bufid)[0]
-  if empty(winid)
-    return ''
-  endif
-  echom '<C-w>' . win_id2win(winid) . 'w'
-  return '<C-w>' . win_id2win(winid) . 'w'
+  return empty(winid) ? 0 : win_id2win(winid)
 endfunction

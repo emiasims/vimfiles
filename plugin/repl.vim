@@ -10,7 +10,7 @@ nnoremap <silent> gx<CR> :<C-u>call repl#send("\<lt>CR>")<CR>
 nnoremap <silent> gx     :<C-u>set opfunc=repl#opfunc<CR>g@
 xnoremap <silent> gx     :call repl#send()<CR>
 
-nnoremap <expr> gr repl#goto_expr()
+nnoremap <expr> gr empty(repl#winnr()) ? '' : (repl#winnr() . '<C-w>w')
 
 command! TermRepl terminal | let [repl#termid, repl#bufid] = [b:terminal_job_id, bufnr()]
 command! SetRepl let [repl#termid, repl#bufid] = [b:terminal_job_id, bufnr()]
