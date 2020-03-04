@@ -48,13 +48,14 @@ function! s:diff_and_set_bindings() abort
 endfunction
 
 function! difference#gitlog() abort
+  " Not working
   if !exists('g:loaded_fugitive')
     echom 'Fugitive not loaded.'
     return
   endif
   diffoff! | diffthis
   vsplit
-  silent Glog
+  silent Gdiff
   call s:diff_and_set_bindings()
   wincmd p
 endfunction
