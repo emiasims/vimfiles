@@ -11,6 +11,44 @@ function! fzfr#buffers() abort " {{{1
   Buffers
 endfunction
 
+function! fzfr#tags(...) abort " {{{1
+  let s:tags = taglist(get(a:, 1, '.'))
+  if len(s:tags) == 1
+    execute 'JumpSplitOrEdit' s:tags[0].filename
+    silent execute s:tags[0].cmd
+  elseif len(s:tags) > 1
+    let l:tags = s:pretty(s:tags)
+    call fzfr#setsize(max(map(deepcopy(l:tags), 'strdisplaywidth(v:val)')) + 5, min([len(l:tags), 20]))
+    call fzf#run(fzf#wrap({'source': l:tags, 'sink': funcref('s:tag_sink')}))
+  else
+    echoerr 'No tags found'
+  endif
+endfunction
+
+function! s:pretty(tags) abort " {{{2
+  let tags = map(copy(a:tags), {i, t -> [t.name, has_key(a:tags[i], 'class') ? 'Class:' . t.class : '', fnamemodify(t.filename, ':~:.')]})
+  let widths = map(deepcopy(tags), {i, t -> map(t, 'strdisplaywidth(v:val)')})
+  let strwid = widths[0]
+  for ws in widths[1:]
+    call map(strwid, {col, mw -> (ws[col] > mw) ? ws[col] : mw})
+  endfor
+  let cols = range(len(strwid))
+  for ix in range(len(tags))
+    let text = (ix + 1) . ': '
+    for col in cols[:-2]
+      let text .= tags[ix][col] . repeat(' ', strwid[col] - strdisplaywidth(tags[ix][col])) . "\t"
+    endfor
+    let tags[ix] = text . tags[ix][-1]
+  endfor
+  return tags
+endfunction
+
+function! s:tag_sink(selection) abort " {{{2
+  let tag = s:tags[split(a:selection, ':')[0] - 1]
+  execute 'JumpSplitOrEdit' tag.filename
+  silent execute tag.cmd
+  unlet s:tags
+endfunction
 function! fzfr#setsize(width, height) abort " {{{1
   let g:fzf#size = [str2nr(a:width), str2nr(a:height)]
 endfunction

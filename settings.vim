@@ -428,6 +428,8 @@ xnoremap <silent> <F2> :<C-u>call util#openf(util#get_visual_selection())<CR>
 nnoremap ]z zj:call fold#goto_open(1)<Cr>
 nnoremap [z zk:call fold#goto_open(-1)<Cr>
 
+nnoremap <C-]> :<C-u>call fzfr#tags(expand('<cword>'))<Cr>
+
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
 xnoremap al 0o$
