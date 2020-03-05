@@ -86,14 +86,14 @@ function! statusline#errors() abort
   endif
 
   let l:statuslinetext = ''
-  " TODO: Currently, message goes away if modified. If we remove the check, we get spammed by
-  " the message. Sovled via caching?
-  if !&modified && &modifiable && !exists('b:stl_skip_trailing_whitespace') && search('\s$', 'nw')
-    let l:statuslinetext .= ' TRAILING WHITESPACE '
-  endif
+  if !has('vim_starting')
+    if !&modified && &modifiable && !exists('b:stl_skip_trailing_whitespace') && search('\s$', 'nw')
+      let l:statuslinetext .= ' TRAILING WHITESPACE '
+    endif
 
-  if &modifiable && search('^\t', 'nw') && search('^  [^\s]', 'nw')
-    let l:statuslinetext .= ' MIXED INDENT '
+    if &modifiable && search('^\t', 'nw', line('.') + 1) && search('^  [^\s]', 'nw')
+      let l:statuslinetext .= ' MIXED INDENT '
+    endif
   endif
 
   " TODO: Once added to neovim, add idx for which element we're on of the list
