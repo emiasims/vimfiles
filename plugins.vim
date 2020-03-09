@@ -44,6 +44,7 @@ nmap S <Plug>Sneak_S
 
 let g:sneak#label = 1
 let g:sneak#absolute_dir = 1
+let g:sneak#use_ic_scs = 1
 
 " }}}
 " vim-tmux-navigator {{{
@@ -69,8 +70,7 @@ nmap cgc <Plug>ChangeCommentary
 nmap gcu <Plug>Commentary<Plug>Commentary
 " }}}
 " vim-fugitive {{{
-" Not working.
-" command! GitDiff call difference#gitlog()
+cnoremap gcim Gcommit \| startinsert<Cr>
 " }}}
 " fzf {{{
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
@@ -224,9 +224,13 @@ endif
 let g:UltiSnipsEditSplit = 'tabdo'
 let g:UltiSnipsSnippetDirectories = ['snips']
 let g:UltiSnipsRemoveSelectModeMappings = 0
-let g:UltiSnipsExpandTrigger = '<Tab>'
-let g:UltiSnipsJumpForwardTrigger = '<Tab>'
-let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+" let g:UltiSnipsExpandTrigger = '<Tab>'
+" let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+" let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
+" let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
+" let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
+imap <Tab> <Plug>(myUltiSnipsExpand)
 " }}}
 
 " }}}
