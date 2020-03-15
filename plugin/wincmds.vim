@@ -1,7 +1,7 @@
 function! wincmds#smartsplit(fname, ...) abort " {{{1
   let cmdifnovert = get(a:, 1, 'split')
   let buf = bufnr(resolve(fnamemodify(a:fname, ':p')))
-  execute 'topleft vertical split' a:fname
+  execute 'vertical split' a:fname
   if winwidth(0) < &colorcolumn + &foldcolumn + &number * &numberwidth
     quit
     execute cmdifnovert a:fname
