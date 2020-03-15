@@ -1,3 +1,4 @@
+nnoremap <buffer> <C-]> <C-]>
 if exists(':helpclose')
   nnoremap <buffer> q :helpclose<CR>
 else
