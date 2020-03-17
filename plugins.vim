@@ -121,20 +121,23 @@ let undotree_HighlightChangedText = 0
 let g:org#capture#templates = {}
 let t = g:org#capture#templates
 let t.n = {'type': 'entry', 'description': 'Note', 'target': 'inbox.org/Notes'}
+let t.i = {'type': 'entry', 'description': 'Idea', 'target': 'box.org'}
 let t.e = {'type': 'entry', 'description': 'Event', 'target': 'events.org'}
 let t.t = {'type': 'entry', 'description': 'TODO item'}
 let t.b = {'type': 'entry', 'description': 'Shopping item', 'target': 'shopping.org/Capture'}
 
-let t.w = {'type': 'entry', 'description': 'Work TODO'}
+let t.wt = {'type': 'entry', 'description': 'Work TODO'}
 let t.wp = {'type': 'checkitem', 'description': 'Work TODO: Paper'}
 let t.wp.target = 'literature.org/Papers to Lookup'
 let t.wp.opts = {'quit': 1}
 let t.ws = {'type': 'entry', 'description': 'Work TODO: Simulations', 'target': 'work.org/Project Ideas'}
 let t.wi = {'type': 'entry', 'description': 'Work project idea', 'target': 'work.org/Project Ideas'}
 
-let t.pv = {'type': 'entry', 'description': 'Project TODO: vim', 'target': 'vim.org'}
-let t.po = {'type': 'entry', 'description': 'Project TODO: vim-org', 'target': 'vim.org/vim-org/Capture'}
-let t.ps = {'type': 'entry', 'description': 'Project TODO: simbiofilm', 'target': 'work.vim/simbiofilm'}
+let t.v = {'type': 'entry', 'description': 'vim TODO', 'target': 'vim.org'}
+let t.o = {'type': 'entry', 'description': 'vim-org TODO', 'target': 'vim.org/vim-org/Capture'}
+
+
+" TODO code item, automatically grab project if possible, line/function
 
 let projecttemplate =<< ENDTMPL
 ${1:Description}
@@ -145,13 +148,20 @@ $0
 ENDTMPL
 let t.b.snippet = 1
 
+function! s:pname() abort
+  return matchstr(fnamemodify(expand('%'), ':p:~'), '^\~/Projects/\zs[^/]\+')
+endfunction
+let t.s = {
+      \ 'type': 'entry',
+      \ 'description': {-> 'Simbiofilm TODO: ' . s:pname()},
+      \ 'context': {-> !empty(s:pname())},
+      \ 'target': {-> 'work.org/Capture/' . s:pname()},
+      \ }
+let t.s.template = deepcopy(projecttemplate)
+
 let t.wi.template = deepcopy(projecttemplate)
 let t.wi.template[0] = '${1:Idea title}'
 let t.wi.snippet = 1
-
-let t.po.template = deepcopy(projecttemplate)
-let t.po.template[0] = 'TODO ${1:A thing}'
-let t.po.snippet = 1
 
 let t.e.template =<< ENDTMPL
 * `input("Name> ")`
@@ -172,6 +182,7 @@ let t.b.snippet = 1
 
 nmap <leader>c <Plug>(org-capture)
 xmap <leader>c <Plug>(org-capture)
+unlet t
 
 let g:org#capture#opts = {'editcmd': 'SmartSplit'}
 
