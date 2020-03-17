@@ -2,7 +2,7 @@ if !has('packages') || exists('$SUDO_USER')
   finish
 endif
 
-" minpac {{{
+" minpac {{{1
 if has('nvim')
   if !exists('g:started_by_firenvim')
     silent! packadd! vim-signify
@@ -17,9 +17,8 @@ command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
 command! PackStatus call pack#status()
 
-" }}}
 
-" vim-sneak {{{
+" vim-sneak {{{1
 nmap f <Plug>Sneak_f
 nmap F <Plug>Sneak_F
 xmap f <Plug>Sneak_f
@@ -46,30 +45,24 @@ let g:sneak#label = 1
 let g:sneak#absolute_dir = 1
 let g:sneak#use_ic_scs = 1
 
-" }}}
-" vim-tmux-navigator {{{
+" vim-tmux-navigator {{{1
 let g:tmux_navigator_disable_when_zoomed = 1
-" }}}
-" targets {{{
+" targets {{{1
 let g:targets_aiAI = 'aIAi'
-" }}}
-" vim-filebeagle {{{
+" vim-filebeagle {{{1
 let g:filebeagle_suppress_keymaps = 1
 nmap <silent> <leader>- <Plug>FileBeagleOpenCurrentBufferDir
 let g:loaded_netrwPlugin = 'v9999'
-" }}}
-" vim-matchup {{{
+" vim-matchup {{{1
 let g:matchup_matchparen_offscreen = {}
-" }}}
-" vim-commentary {{{
+" vim-commentary {{{1
 xmap gc  <Plug>Commentary
 nmap gc  <Plug>Commentary
 omap gc  <Plug>Commentary
 nmap gcc <Plug>CommentaryLine
 nmap cgc <Plug>ChangeCommentary
 nmap gcu <Plug>Commentary<Plug>Commentary
-" }}}
-" fzf {{{
+" fzf {{{1
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 nnoremap <silent> <leader>af  :FZ 60 20 \| Files<CR>
 nnoremap <silent> <leader>f   :FZ 60 20 \| GFiles<CR>
@@ -90,8 +83,7 @@ nnoremap <leader>ev :FZ 40 20 \| Files $CFGDIR<CR>
 if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
-" }}}
-" vim-signify {{{
+" vim-signify {{{1
 augroup vimrc_signify
   autocmd!
   autocmd ColorScheme * highlight link SignifyLineAdd             String
@@ -110,8 +102,7 @@ let g:signify_vcs_list = ['git']
 let g:signify_sign_delete = '-'
 let g:signify_sign_change = '~'
 let g:signify_skip_filetype = { 'markdown': 1 }
-" }}}
-" statusline {{{
+" statusline {{{1
 hi link User1 TabLine
 hi link User2 IncSearch
 hi link User3 StatusLineTermNC
@@ -121,13 +112,11 @@ hi link User6 WildMenu
 hi link User7 DiffAdd
 hi link User8 StatusLineTerm
 hi link User9 StatusLineTerm
-" }}}
-" undotree {{{
+" undotree {{{1
 nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
-" }}}
-" vim-org {{{
+" vim-org {{{1
 
 let g:org#capture#templates = {}
 let t = g:org#capture#templates
@@ -186,8 +175,7 @@ xmap <leader>c <Plug>(org-capture)
 
 let g:org#capture#opts = {'editcmd': 'SmartSplit'}
 
-" }}}
-" coc.nvim {{{
+" coc.nvim {{{1
 if has('nvim')
   nmap <silent> ]e <Plug>(coc-diagnostic-next)
   nmap <silent> [e <Plug>(coc-diagnostic-prev)
@@ -195,8 +183,7 @@ if has('nvim')
 imap <expr> <C-e> getline('.') =~# '=\s*$' ? "\<C-o>\<Plug>(coc-calc-result-append)" : "\<C-o>\<Plug>(coc-calc-result-replace)"
 
 endif
-" }}}
-" Ultisnips {{{
+" Ultisnips {{{1
 let g:UltiSnipsEditSplit = 'tabdo'
 let g:UltiSnipsSnippetDirectories = ['snips']
 let g:UltiSnipsRemoveSelectModeMappings = 0
@@ -207,8 +194,7 @@ let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
 let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
 let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
 imap <Tab> <Plug>(myUltiSnipsExpand)
-" }}}
-" Contextualize {{{
+" Contextualize {{{1
 packadd contextualize.vim
 
 autocmd! User UltiSnipsEnterFirstSnippet
@@ -235,14 +221,11 @@ Contextualize cmdpos1 cnoremap sr SetRepl<Cr>
 Contextualize cmdpos1 cnoremap tr TermRepl<Cr>
 Contextualize cmdpos1 cnoremap <expr> vga 'vimgrep // **/*.' . &ft . "\<C-Left><Left><Left>" : 'vga'
 
-" }}}
-" vim-fugitive {{{
+" vim-fugitive {{{1
 Contextualize cmdpos1 cnoremap gcim Gcommit \| startinsert<Cr>
-" }}}
-" vim-gutentags {{{
+" vim-gutentags {{{1
 let g:gutentags_cache_dir = $DATADIR.'/tags'
-" }}}
-" firenvim {{{
+" firenvim {{{1
 if exists('g:started_by_firenvim')
   let g:firenvim_config = {'localSettings': {'.*': { 'selector': '', 'priority': 0, },
         \ 'mail\.google\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
@@ -269,13 +252,11 @@ if exists('g:started_by_firenvim')
   set colorcolumn=100
   setlocal spell
 endif
-" }}}
 
-" Windows {{{
+" Windows {{{1
 if has('win32')
   function! s:setup_guifont() abort
     Guifont! DejaVu Sans Mono:h9
   endfunction
   call defer#onidle('call s:setup_guifont()')
 endif
-" }}}

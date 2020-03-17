@@ -1,5 +1,5 @@
-" Settings:
-" General: {{{
+" Settings: {{{1
+" General: {{{1
 set mouse=niv
 set report=0
 set hidden
@@ -18,8 +18,7 @@ set viewoptions=folds,cursor,slash,unix
 set timeout ttimeout
 set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
-" }}}
-" Backup, Swap, Undo, History: {{{
+" Backup, Swap, Undo, History: {{{1
 if exists('$SUDO_USER')
   set nowritebackup
 else
@@ -44,24 +43,21 @@ if has('nvim')
 else
   set viminfo='300,<10,@50,h,n$DATADIR/viminfo
 endif
-" }}}
-" Tabs and Indents: {{{
+" Tabs and Indents: {{{1
 set textwidth=99
 set softtabstop=2
 set shiftwidth=2
 set smarttab
 set autoindent
 set shiftround
-" }}}
-" Searching: {{{
+" Searching: {{{1
 set ignorecase
 set smartcase
 set infercase
 set incsearch
 set showmatch
 set matchtime=3
-" }}}
-" Behavior: {{{
+" Behavior: {{{1
 set nowrap
 set linebreak
 set breakat=\ \	;:,!?
@@ -94,8 +90,7 @@ endif
 if exists('+inccommand')
   set inccommand=nosplit
 endif
-" }}}
-" UI: {{{
+" UI: {{{1
 set shortmess=aAoOTI
 set scrolloff=4
 set sidescrolloff=2
@@ -139,25 +134,22 @@ endif
 if has('conceal') && v:version >= 703
   set conceallevel=2
 endif
-" }}}
-" Folds: {{{
+" Folds: {{{1
 if has('folding')
   set foldmethod=syntax
   set foldlevelstart=99
 endif
 set foldtext=fold#text()
-" }}}
-" Plugin setup: {{{
+" Plugin setup: {{{1
 if has('packages')
   set packpath+=$CFGDIR
 endif
 if has('nvim') && !empty($CONDA_PYTHON_EXE)
   let g:python3_host_prog = $CONDA_PYTHON_EXE
 endif
-" }}}
 
-" Autocommands:
-" General: {{{
+" Autocommands: {{{1
+" General: {{{1
 augroup vimrc_general
   autocmd!
   au BufWinLeave ?* if empty(&buftype) | mkview | endif
@@ -200,8 +192,7 @@ augroup END
 "   autocmd BufWritePost * if exists('b:savemarks') | call setpos("'[", b:savemarks[0]) | call setpos("']", b:savemarks[1]) | endif
 " augroup end
 
-" }}}
-" Filetype: {{{
+" Filetype: {{{1
 augroup vimrc_filetype
   autocmd!
   autocmd FileType qfreplace setlocal nofoldenable
@@ -209,17 +200,15 @@ augroup vimrc_filetype
   autocmd FileType sh let g:sh_fold_enabled=5
   autocmd BufRead * if empty(&filetype) | set commentstring=#%s | endif
 augroup END    " vimrc_filetype
-" }}}
 
-" Mappings:
+" Mappings: {{{1
 let g:mapleader=' '
 let g:maplocalleader="\\"
-" File navigation {{{
+" File navigation {{{1
 if !exists('g:loaded_fzf')
   nnoremap <leader>ev :e $CFGDIR<CR>
 endif
-" }}}
-" Cursor Navigation and Windows: {{{
+" Cursor Navigation and Windows: {{{1
 nnoremap <Space> <nop>
 xnoremap <Space> <nop>
 
@@ -291,8 +280,7 @@ nnoremap <silent> [L :lfirst<CR>
 nnoremap <silent> ]L :llast<CR>
 nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10), v:count1) \| ']+1 <CR>
 nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1) \| '[-1 <CR>
-" }}}
-" Terminal bindings: {{{
+" Terminal bindings: {{{1
 if has('nvim')
   augroup vimrc_term
     autocmd!
@@ -312,20 +300,18 @@ if has('nvim')
   tnoremap <M-n> <C-\><C-n>
 
 endif
-" }}}
-" Command: {{{
+" Command: {{{1
 " Just makes sure the abbrev only works at the start of the command
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
-" }}}
-" Searching: {{{
+
+" Searching: {{{1
 nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
 xnoremap s :s//g<Left><Left>
 xnoremap <C-s> :s/<C-r>///g<left><left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
-" }}}
-" Moving text: {{{
+" Moving text: {{{1
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
 xnoremap < <gv
@@ -337,8 +323,7 @@ nnoremap <M-j> :move .+1<CR>==
 nnoremap <M-k> :move .-2<CR>==
 inoremap <M-j> <C-c>:move .+1<CR>==gi
 inoremap <M-k> <C-c>:move .-2<CR>==gi
-" }}}
-" Editing text: {{{
+" Editing text: {{{1
 nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap}p
 nnoremap g<CR> i<CR><Esc>
@@ -362,8 +347,7 @@ xnoremap <leader>P "0P
 
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
-" }}}
-" Plugins (manual): {{{
+" Plugins (manual): {{{1
 " I want these to load even if --noplugins is used.
 " nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>do :call difference#orig()<cr>
@@ -419,9 +403,6 @@ onoremap il :<C-u>normal! ^vg_<CR>
 onoremap al :<C-u>normal! 0v$<CR>
 onoremap ar a]
 onoremap ir i]
-" }}}
-" Commands: {{{
+" Commands: {{{1
 command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
-
-" }}}
