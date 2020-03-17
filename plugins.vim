@@ -69,9 +69,6 @@ nmap gcc <Plug>CommentaryLine
 nmap cgc <Plug>ChangeCommentary
 nmap gcu <Plug>Commentary<Plug>Commentary
 " }}}
-" vim-fugitive {{{
-cnoremap gcim Gcommit \| startinsert<Cr>
-" }}}
 " fzf {{{
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 nnoremap <silent> <leader>af  :FZ 60 20 \| Files<CR>
@@ -93,25 +90,6 @@ nnoremap <leader>ev :FZ 40 20 \| Files $CFGDIR<CR>
 if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
-
-
-" function! s:build_quickfix_list(lines)
-"   call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-"   copen
-"   cc
-" endfunction
-
-" let g:fzf_action = {
-"       \ 'ctrl-q': function('s:build_quickfix_list'),
-"       \ 'ctrl-s': 'split',
-"       \ 'ctrl-v': 'vsplit' }
-
-" augroup vimrc_term_fzf
-"   autocmd!
-"   autocmd FileType python let b:fzf_defprefix = "'def | 'class "
-"   autocmd FileType python let b:fzf_fsuffix = '('
-" augroup END
-
 " }}}
 " vim-signify {{{
 augroup vimrc_signify
@@ -216,10 +194,8 @@ if has('nvim')
 " for coc-calc
 imap <expr> <C-e> getline('.') =~# '=\s*$' ? "\<C-o>\<Plug>(coc-calc-result-append)" : "\<C-o>\<Plug>(coc-calc-result-replace)"
 
-" imap <C-y> <Plug>(coc-snippets-expand)
-" xmap <Tab> <Plug>(coc-snippets-select)
 endif
-
+" }}}
 " Ultisnips {{{
 let g:UltiSnipsEditSplit = 'tabdo'
 let g:UltiSnipsSnippetDirectories = ['snips']
@@ -228,11 +204,40 @@ let g:UltiSnipsRemoveSelectModeMappings = 0
 " let g:UltiSnipsJumpForwardTrigger = '<Tab>'
 " let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
 let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
-" let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
-" let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
+let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
+let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
 imap <Tab> <Plug>(myUltiSnipsExpand)
 " }}}
+" Contextualize {{{
+packadd contextualize.vim
 
+autocmd! User UltiSnipsEnterFirstSnippet
+autocmd! User UltiSnipsExitLastSnippet
+autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
+autocmd User UltiSnipsExitLastSnippet let g:in_snippet = 0
+let g:in_snippet = 0
+ContextAdd parens {-> getline('.')[col('.') - 1 :] =~# '^[\])}''"]\{2,}'}
+ContextAdd insnippet {-> g:in_snippet}
+Contextualize parens inoremap <Tab> <C-o>/[^\])}'"]\\|$<Cr>
+Contextualize insnippet imap <Tab> <Plug>(myUltiSnipsForward)
+Contextualize insnippet imap <S-Tab> <Plug>(myUltiSnipsBackward)
+
+ContextAdd cmdpos1 {-> getcmdtype()==":" && getcmdpos()==1}
+
+Contextualize cmdpos1 cnoremap <expr> he<space> 'help '
+Contextualize cmdpos1 cnoremap e! mkview \| edit!<Cr>
+Contextualize cmdpos1 cnoremap <expr> h<space> 'vert help '
+Contextualize cmdpos1 cnoremap use UltiSnipsEdit<Cr>
+Contextualize cmdpos1 cnoremap <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
+Contextualize cmdpos1 cnoremap ase AutoSourceEnable<Cr>
+Contextualize cmdpos1 cnoremap asd AutoSourceDisable<Cr>
+Contextualize cmdpos1 cnoremap sr SetRepl<Cr>
+Contextualize cmdpos1 cnoremap tr TermRepl<Cr>
+Contextualize cmdpos1 cnoremap <expr> vga 'vimgrep // **/*.' . &ft . "\<C-Left><Left><Left>" : 'vga'
+
+" }}}
+" vim-fugitive {{{
+Contextualize cmdpos1 cnoremap gcim Gcommit \| startinsert<Cr>
 " }}}
 " vim-gutentags {{{
 let g:gutentags_cache_dir = $DATADIR.'/tags'

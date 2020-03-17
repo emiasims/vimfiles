@@ -315,31 +315,6 @@ endif
 " }}}
 " Command: {{{
 " Just makes sure the abbrev only works at the start of the command
-function! s:cnoreabbrev_at_command_start(...) abort
-  let [options, rhs] = [[], []]
-  let expr = a:000[0] =~? '^<expr>$'
-  let expr = index(a:000, '<expr>', 0, 1) >= 0
-  let buffer = index(a:000, '<buffer>', 0, 1) >= 0
-  let mods = expr + buffer
-  let lhs =  a:000[mods]
-  let rhs = substitute(join(a:000[mods + 1:]), "'", '"', 'g')
-  let truefalse = (expr ? rhs : '"' . rhs . '"') . ' : "' . lhs . '"'
-  execute 'cnoreabbrev ' . (buffer ? '<buffer> ' : '') . lhs . ' <C-r>=(getcmdtype()==":" && getcmdpos()==1 ? ' . truefalse . ')<Cr>'
-endfunction
-
-command! -nargs=+ Cnoreabbrevs call <SID>cnoreabbrev_at_command_start(<f-args>)
-
-Cnoreabbrevs e! mkview \| edit!
-Cnoreabbrevs he help
-Cnoreabbrevs h vert help
-Cnoreabbrevs use UltiSnipsEdit
-Cnoreabbrevs <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
-Cnoreabbrevs ase AutoSourceEnable
-Cnoreabbrevs asd AutoSourceDisable
-Cnoreabbrevs sr SetRepl
-Cnoreabbrevs tr TermRepl
-
-cnoremap <expr> vga getcmdtype()==":" && getcmdpos()==1 ? 'vimgrep // **/*.' . &ft . "\<C-Left><Left><Left>" : 'vga'
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
