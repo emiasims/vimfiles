@@ -15,7 +15,7 @@ function! s:setup() abort
   call minpac#add('tpope/vim-speeddating')
   call minpac#add('tpope/vim-obsession')
   call minpac#add('tpope/vim-scriptease', {'type' : 'opt'})
-  call minpac#add('andymass/vim-matchup')
+  " call minpac#add('andymass/vim-matchup')
   call minpac#add('tommcdo/vim-exchange')
 
   call minpac#add('machakann/vim-highlightedyank')
