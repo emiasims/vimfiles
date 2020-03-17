@@ -384,10 +384,17 @@ onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Esc>:call textobjects#indent(1)<CR><Esc>gv
 
-nnoremap <silent> <C-Up>    :<C-u>call winresize#up(v:count1)<CR>
-nnoremap <silent> <C-Down>  :<C-u>call winresize#down(v:count1)<CR>
-nnoremap <silent> <C-Left>  :<C-u>call winresize#left(v:count1)<CR>
-nnoremap <silent> <C-Right> :<C-u>call winresize#right(v:count1)<CR>
+if has('nvim')
+  nnoremap <silent> <C-Up>    :<C-u>call winresize#up(v:count1)<CR>
+  nnoremap <silent> <C-Down>  :<C-u>call winresize#down(v:count1)<CR>
+  nnoremap <silent> <C-Left>  :<C-u>call winresize#left(v:count1)<CR>
+  nnoremap <silent> <C-Right> :<C-u>call winresize#right(v:count1)<CR>
+else
+  nnoremap <silent> <Esc>[1;5A :<C-u>call winresize#up(v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5B :<C-u>call winresize#down(v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5D :<C-u>call winresize#left(v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5C :<C-u>call winresize#right(v:count1)<CR>
+endif
 
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
