@@ -22,6 +22,7 @@ function! s:setup() abort
   call minpac#add('itchyny/vim-cursorword')
   call minpac#add('christoomey/vim-tmux-navigator')
   call minpac#add('jeetsukumaran/vim-filebeagle')
+  call minpac#add('junegunn/fzf')  " Slow?
   call minpac#add('junegunn/fzf.vim')  " Slow?
   call minpac#add('tommcdo/vim-lion')
   call minpac#add('junegunn/vader.vim')

@@ -6,8 +6,10 @@ augroup END
 
 function! fzfr#buffers() abort " {{{1
   let bufs = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&filetype") != "qf"')
-  let bufs = map(bufs, 'len(bufname(v:val))')
-  let g:fzf#size = [max(bufs) + 24, len(bufs) + 2]
+  let maxv = max(map(bufs, 'len(bufname(v:val))')) + 24
+  let width = float2nr(maxv / 0.4)
+  let height = max([len(bufs) + 2, 15])
+  let g:fzf#size = [width, height]
   Buffers
 endfunction
 
