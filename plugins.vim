@@ -215,6 +215,7 @@ let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
 let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
 let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
 imap <Tab> <Plug>(myUltiSnipsExpand)
+xmap <Tab> <Plug>(myUltiSnipsExpand)
 " Contextualize {{{1
 packadd contextualize.vim
 
@@ -229,21 +230,21 @@ Contextualize parens inoremap <Tab> <C-o>/[^\])}'"]\\|$<Cr>
 Contextualize insnippet imap <Tab> <Plug>(myUltiSnipsForward)
 Contextualize insnippet imap <S-Tab> <Plug>(myUltiSnipsBackward)
 
-ContextAdd cmdpos1 {-> getcmdtype()==":" && getcmdpos()==1}
+ContextAdd startcmd {-> getcmdtype()==":" && getcmdline()==self.lhs}
 
-Contextualize cmdpos1 cnoremap <expr> he<space> 'help '
-Contextualize cmdpos1 cnoremap e! mkview \| edit!<Cr>
-Contextualize cmdpos1 cnoremap <expr> h<space> 'vert help '
-Contextualize cmdpos1 cnoremap use UltiSnipsEdit<Cr>
-Contextualize cmdpos1 cnoremap <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
-Contextualize cmdpos1 cnoremap ase AutoSourceEnable<Cr>
-Contextualize cmdpos1 cnoremap asd AutoSourceDisable<Cr>
-Contextualize cmdpos1 cnoremap sr SetRepl<Cr>
-Contextualize cmdpos1 cnoremap tr TermRepl<Cr>
-Contextualize cmdpos1 cnoremap <expr> vga 'vimgrep // **/*.' . &ft . "\<C-Left><Left><Left>" : 'vga'
+Contextualize startcmd cnoreabbrev he help
+Contextualize startcmd cnoreabbrev h vert help
+Contextualize startcmd cnoreabbrev <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
+Contextualize startcmd cnoreabbrev e! mkview \| edit!
+Contextualize startcmd cnoreabbrev use UltiSnipsEdit
+Contextualize startcmd cnoreabbrev ase AutoSourceEnable
+Contextualize startcmd cnoreabbrev asd AutoSourceDisable
+Contextualize startcmd cnoreabbrev sr SetRepl
+Contextualize startcmd cnoreabbrev tr TermRepl
+Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep // **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
 
 " vim-fugitive {{{1
-Contextualize cmdpos1 cnoremap gcim Gcommit \| startinsert<Cr>
+Contextualize startcmd cnoreabbrev gcim Gcommit \| startinsert
 " vim-gutentags {{{1
 let g:gutentags_cache_dir = $DATADIR.'/tags'
 " firenvim {{{1
