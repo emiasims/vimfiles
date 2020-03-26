@@ -1,50 +1,49 @@
-finish
-
 function! yankring#reset() abort
-  let s:enabled = 1
-  let s:count = 0
   let s:yankring = []
-  for l:i in range(1, 9)
-    execute 'let l:contents = @' . l:i
-    call add(s:yankring, l:contents)
+  let s:maxyanks = max([get(g:, 'yankring#maxyanks', 10), 10])
+  unlet! s:count
+  for i in range(1, 9)
+    call add(s:yankring, {'val': getreg(i), 'type': getregtype(i)})
   endfor
 endfunction
 call yankring#reset()
 
-function! yankring#yank(contents) abort
-  let l:contents = join(a:contents, "\<C-j>")
-  if len(l:contents) <= 1
+function! yankring#yank() abort
+  echo 'yanked' v:event.regcontents v:event.regtype
+  if !empty(v:event.regname) || len(join(v:event.regcontents)) <= get(g:, 'yankring#minlen', 3)
     return
   endif
-  call insert(s:yankring, l:contents)
-  while len(s:yankring) > 9
-    call remove(s:yankring, -1)
-  endwhile
+  call insert(s:yankring, {'val': v:event.regcontents, 'type': v:event.regtype})
+  if len(s:yankring) >= s:maxyanks
+    call remove(s:yankring, s:maxyanks, -1)
+  endif
   call yankring#sync()
 endfunction
 
 function! yankring#sync() abort
-  messages clear
-  for l:n in range(len(s:yankring))
-    execute 'let @' . l:n . ' = "' . escape(s:yankring[l:n], '"') . '"'
+  for n in range(max([len(s:yankring), 9]))
+    call setreg(n + 1, s:yankring[n].val, s:yankring[n].type)
   endfor
 endfunction
 
-" TODO not working with counts
+" Not sure if all of these are necessary
 function! yankring#cycle(count) abort
-  messages clear
-  normal! `[v`]
-  if a:count > 0
-    let s:count = s:count == 9 ? 0 : s:count + a:count
-  else
-    let s:count = s:count == 0 ? 9 : s:count + a:count  " already is negative
+  let s:count = exists('s:count') ? (s:count + a:count) % s:maxyanks : 1
+  if s:count < 0
+    let s:count += s:maxyanks
   endif
-  execute 'noautocmd normal! "' . s:count . 'p'
-  echo 'put from "' . s:count
+  call setreg("", s:yankring[s:count].val, s:yankring[s:count].type)
+  echo 'noautocmd normal! `[' . s:yankring[s:count].type[0] . '`]p'
+  execute 'noautocmd normal! `[' . s:yankring[s:count].type[0] . '`]p'
 endfunction
 
 augroup yankring
   autocmd!
-  autocmd TextYankPost * if empty(v:event['regname']) | call yankring#yank(v:event['regcontents']) | endif
-  autocmd InsertEnter,FocusLost,CursorHold,BufWrite * let s:count = 0
+  autocmd TextYankPost * call yankring#yank()
+  autocmd InsertEnter,BufWrite,BufLeave * unlet! s:count
 augroup END
+
+nnoremap <M-p> :<C-u>noautocmd call yankring#cycle(v:count1)<Cr>
+nnoremap <M-n> :<C-u>noautocmd call yankring#cycle(-v:count1)<Cr>
+
+command! -nargs=0 YankRingShow for i in range(len(s:yankring)) | echo i . ':' s:yankring[i].val | endfor
