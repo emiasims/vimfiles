@@ -216,6 +216,7 @@ let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
 let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
 imap <Tab> <Plug>(myUltiSnipsExpand)
 xmap <Tab> <Plug>(myUltiSnipsExpand)
+snoremap <C-e> <Esc>`>a
 " Contextualize {{{1
 packadd contextualize.vim
 
