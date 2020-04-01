@@ -73,26 +73,27 @@ endif
 unlet fzpath
 
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
-let g:fzf_preview_window = 'right:70%'
+let g:fzf_preview_window = ''
 
-nnoremap <silent> <leader>af  :FZ 120 20 \| Files<CR>
-nnoremap <silent> <leader>f   :FZ 120 20 \| GFiles<CR>
-nnoremap <silent> <leader>o   :FZ 120 20 \| Files ~/org<CR>
+nnoremap <silent> <leader>af  :FZ 50 20 \| Files<CR>
+nnoremap <silent> <leader>f   :FZ 40 20 \| GFiles<CR>
+nnoremap <silent> <leader>o   :FZ 40 20 \| Files ~/org<CR>
 nnoremap <silent> <leader>gst :FZ 120 40 \| GFiles?<CR>
 nnoremap <silent> <leader>b   :Lines<CR>
 nnoremap <silent> <leader>l   :<C-u>call fzfr#buffers()<Cr>
 nnoremap <silent> <leader>/   :BLines<CR>
 " nnoremap <silent> <leader>t   :<C-u>call fzfr#tags()<CR>
 nnoremap <silent> <leader>t   :FZ 80 20 \| Tags<CR>
-nnoremap <silent> <leader>mr  :History<CR>
+nnoremap <silent> <leader>mr  :FZ 70 20 \| History<CR>
 nnoremap <silent> <leader>A   :Ag<CR>
 nnoremap <silent> <leader>h   :FZ 80 20 \| Helptags<CR>
 nnoremap <silent> <leader>gal :FZ 160 20 \| Commits<CR>
 nnoremap <silent> <leader>gl  :FZ 160 20 \| BCommits<CR>
-nnoremap <leader>ev :FZ 120 20 \| Files $CFGDIR<CR>
+nnoremap <leader>ev           :FZ 70 20 \| Files $CFGDIR<CR>
 if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
+
 " vim-signify {{{1
 augroup vimrc_signify
   autocmd!
