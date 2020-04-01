@@ -144,8 +144,8 @@ set foldtext=fold#text()
 if has('packages')
   set packpath+=$CFGDIR
 endif
-if has('nvim') && !empty($CONDA_PYTHON_EXE)
-  let g:python3_host_prog = $CONDA_PYTHON_EXE
+if has('nvim') && !empty($CONDA_PREFIX)
+  let g:python3_host_prog = $CONDA_PREFIX . '/bin/python'
 endif
 
 " Autocommands: {{{1
