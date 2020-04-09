@@ -237,9 +237,9 @@ if !exists('g:loaded_tmux_navigator')
   nnoremap <C-l> <C-w>l
 endif
 
-nnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
-xnoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
-onoremap <expr> 0 search('^\s\+\%#', 'bn', line('.')) ? '0' : '0^'
+nnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
+xnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
+onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
 
 nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
