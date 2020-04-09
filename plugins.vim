@@ -137,65 +137,41 @@ let t.e = {'type': 'entry', 'description': 'Event', 'target': 'events.org'}
 let t.t = {'type': 'entry', 'description': 'TODO item'}
 let t.b = {'type': 'entry', 'description': 'Shopping item', 'target': 'shopping.org/Capture'}
 
-let t.wt = {'type': 'entry', 'description': 'Work TODO'}
-let t.wp = {'type': 'checkitem', 'description': 'Work TODO: Paper'}
-let t.wp.target = 'literature.org/Papers to Lookup'
-let t.wp.opts = {'quit': 1}
-let t.ws = {'type': 'entry', 'description': 'Work TODO: Simulations', 'target': 'work.org/Project Ideas'}
-let t.wi = {'type': 'entry', 'description': 'Work project idea', 'target': 'work.org/Project Ideas'}
+let t.w = {'type': 'entry', 'description': 'Work TODO'}
+let t.p = {'type': 'checkitem', 'description': 'Work TODO: Paper'}
+let t.p.target = 'literature.org/Papers to Lookup'
+let t.p.opts = {'quit': 1}
 
-let t.v = {'type': 'entry', 'description': 'vim TODO', 'target': 'vim.org'}
-let t.o = {'type': 'entry', 'description': 'vim-org TODO', 'target': 'vim.org/vim-org/Capture'}
-
-
-" TODO code item, automatically grab project if possible, line/function
-
-let projecttemplate =<< ENDTMPL
+let t.b.snippet = 1
+let projecttemplate =<< ENDORGTMPL
 ${1:Description}
 :PROPERTIES:
 :captured-at: `!v org#timestamp#date2text(localtime())`
 :END:
 $0
-ENDTMPL
-let t.b.snippet = 1
+ENDORGTMPL
 
 function! s:pname() abort
   return matchstr(fnamemodify(expand('%'), ':p:~'), '^\~/Projects/\zs[^/]\+')
 endfunction
-let t.s = {
-      \ 'type': 'entry',
-      \ 'description': {-> 'Simbiofilm TODO: ' . s:pname()},
-      \ 'context': {-> !empty(s:pname())},
-      \ 'target': {-> 'work.org/Capture/' . s:pname()},
-      \ }
-let t.s.template = deepcopy(projecttemplate)
 
-let t.wi.template = deepcopy(projecttemplate)
-let t.wi.template[0] = '${1:Idea title}'
-let t.wi.snippet = 1
+let t.e.snippet = 1
+let t.e.template = ['${1:Event}', '<${1:now}>']
 
-let t.e.template =<< ENDTMPL
-* `input("Name> ")`
-`input("Datetime> ", "", "customlist,org#timestamp#completion")`
-:PROPERTIES:
-:captured-at: `org#timestamp#date2text(localtime())`
-:END:
-ENDTMPL
-
-let t.b.template =<< ENDTMPL
+let t.b.template =<< ENDORGTMPL
 ${0:I NEEEED IT}
 :PROPERTIES:
 :captured-at: `!v org#timestamp#date2text(localtime())`
 :captured-in: `!o resolve(fnamemodify(expand('%'), ':p:~'))`
 :END:
-ENDTMPL
+ENDORGTMPL
 let t.b.snippet = 1
 
 nmap <leader>c <Plug>(org-capture)
 xmap <leader>c <Plug>(org-capture)
 unlet t
 
-let g:org#capture#opts = {'editcmd': 'SmartSplit'}
+let g:org#capture#opts = {'editcmd': 'JumpSplitOrEdit'}
 
 " coc.nvim {{{1
 if has('nvim')
@@ -244,9 +220,11 @@ Contextualize startcmd cnoreabbrev asd AutoSourceDisable
 Contextualize startcmd cnoreabbrev sr SetRepl
 Contextualize startcmd cnoreabbrev tr TermRepl
 Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep // **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
+Contextualize startcmd cnoreabbrev cqf Clearqflist
 
 " vim-fugitive {{{1
 Contextualize startcmd cnoreabbrev gcim Gcommit \| startinsert
+
 " vim-gutentags {{{1
 let g:gutentags_cache_dir = $DATADIR.'/tags'
 " firenvim {{{1
