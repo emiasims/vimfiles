@@ -307,7 +307,7 @@ cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
 
 " Searching: {{{1
-nnoremap cr /\<<C-r>"\><CR>cgn<C-r>.<ESC>
+nnoremap cr /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>.<ESC>
 xnoremap s :s//g<Left><Left>
 xnoremap <C-s> :s/<C-r>///g<left><left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
