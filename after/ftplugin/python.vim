@@ -13,7 +13,7 @@ augroup vimrc_python
   autocmd BufWritePre *.py %s/\s\+$//e
 augroup END
 
-nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| cfirst<Cr>
+nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| clast<Cr>
 
 command! -nargs=0 -buffer CocFormat call CocAction('format')
 
