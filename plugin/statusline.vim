@@ -8,11 +8,11 @@ augroup vimrc_statusline
 augroup END
 
 function! statusline#active() abort " {{{1
-  " TODO: left() middle() and right() to calc. spacing?
-  " colors should be in each object, active/inactive can be passed in.
   let statuslinetext  = statusline#mode(1)
   let statuslinetext .= statusline#dirinfo(1)
   let statuslinetext .= statusline#fileinfo(1)
+  let statuslinetext .= '%='
+  let statuslinetext .= statusline#temporary()
   let statuslinetext .= statusline#plugins(1)
   let statuslinetext .= statusline#errors(1)
   let statuslinetext .= '%#stlTypeInfo# %y '  " type info
@@ -23,7 +23,8 @@ endfunction
 function! statusline#inactive() abort " {{{1
   let statuslinetext  = '%#SignColumn# %*%3.3( %)'
   let statuslinetext .= '%{statusline#dirinfo(0)}'
-  let statuslinetext .= '%{statusline#fileinfo(0)}'
+  let statuslinetext .= statusline#fileinfo(0)
+  let statuslinetext .= '%='
   let statuslinetext .= '%y '
   let statuslinetext .= '%{statusline#encoding(0)}'
   return statuslinetext
@@ -33,6 +34,11 @@ function! statusline#plugins(active) abort " {{{1
   if exists('g:loaded_obsession')
     return ObsessionStatus()
   endif
+endfunction
+
+function! statusline#temporary() abort " {{{1
+  let expr = get(b:, 'stl#tmp', get(g:, 'stl#tmp', ''))
+  return !empty(expr) ? eval(expr) . ' ' : ''
 endfunction
 
 function! statusline#dirinfo(active) abort " {{{1
@@ -65,9 +71,11 @@ function! statusline#fileinfo(active) abort " {{{1
   " Returns: 'filename modified spacer'
   let statuslinetext = ' %t'
   " Should catch attention when unfocused
-  let statuslinetext .= &modifiable ? ' %#stlModified#%m' : ' %m'
+  if a:active
+    let statuslinetext .= &modifiable ? '%#stlModified#' : ''
+  endif
+  let statuslinetext .= ' %m'
   let statuslinetext .= '%*'
-  let statuslinetext .= '%='
   return statuslinetext
 endfunction
 
@@ -127,7 +135,7 @@ function! statusline#errors(active) abort " {{{1
   endif
 
   " TODO: Once added to neovim, add idx for which element we're on of the list
-  let statuslinetext .= len(getloclist(0)) > 0 ? ' (l' . len(getloclist(0)) . ') ' : ''
+  let statuslinetext .= len(getloclist(0)) > 0 ? ' (ll:' . len(getloclist(0)) . ') ' : ''
   let statuslinetext .= len(getqflist()) > 0 ? '(qf:' . len(getqflist()) . ')' : ''
   let statuslinetext .= '%*'
   return statuslinetext
