@@ -8,4 +8,3 @@ let $DATADIR=empty($XDG_DATA_HOME) ? $HOME.'/.local/share/vim' : $XDG_DATA_HOME.
 let &viewdir=$DATADIR.'/view'
 
 runtime settings.vim
-runtime plugins.vim

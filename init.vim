@@ -5,4 +5,3 @@ let s:defaultdir=has('win32') ? $HOME.'\AppData\Local\nvim-data' : $HOME.'/.loca
 let $DATADIR=empty($XDG_DATA_HOME) ? s:defaultdir : $XDG_DATA_HOME.'/vim'
 
 runtime settings.vim
-runtime plugins.vim
