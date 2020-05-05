@@ -78,7 +78,7 @@ if executable('ag')
 endif
 
 set splitright
-set switchbuf=useopen,usetab
+set switchbuf=useopen
 set backspace=indent,eol,start
 set diffopt=algorithm:histogram,filler
 set showfulltag
@@ -222,7 +222,7 @@ nnoremap Y y$
 
 augroup vimrc_crmap
   autocmd!
-  autocmd BufRead * if &modifiable | nnoremap <buffer> <CR> za| endif
+  autocmd BufEnter * if &modifiable | nnoremap <buffer> <Cr> za| endif
 augroup END
 
 nnoremap zE zMzO
@@ -266,7 +266,7 @@ xnoremap gk k
 nnoremap <expr> n 'Nn'[v:searchforward]
 nnoremap <expr> N 'nN'[v:searchforward]
 
-nnoremap <silent><C-w>b :vert resize<CR>:resize<CR>:normal! ze<CR>
+nnoremap <silent><C-w>z :vert resize | resize | normal! ze<CR>
 
 nnoremap <silent> [a :<C-u>execute v:count1 . 'previous'<CR>
 nnoremap <silent> ]a :<C-u>execute v:count1 . 'next'<CR>
@@ -326,7 +326,7 @@ inoremap <M-k> <C-c>:move .-2<CR>==gi
 " Editing text: {{{1
 nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap}p
-nnoremap g<CR> i<CR><Esc>
+nnoremap g<Cr> i<Cr><Esc>l
 
 nnoremap <silent> g<Space> :autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
 " TODO make repeatable?
