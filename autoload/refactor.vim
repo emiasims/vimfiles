@@ -24,18 +24,20 @@ endfunction
 " TODO rename like above in file, but not cross project.
 " TODO after that, in all visible windows.
 function! refactor#name_in_project(type, ...) abort
+  " type is for opfunc
   let [lnum_start, col_start] = getpos(a:0 > 0 ? "'<" : "'[")[1:2]
   let [lnum_end, col_end] = getpos(a:0 > 0 ? "'>" : "']")[1:2]
   let name = getline(line('.'))[col_start - 1 : col_end - 1]
   if &filetype == 'vim'
     let default = matchstr(name, '\v^([^#]+#)*\ze[^#]*$')
   endif
+
   let newname = input("Refactoring " . name . ":\n> ", default)
 
   let ssop = &sessionoptions
   set ssop=buffers,folds
   mksession refactor_restore
-  execute 'vimgrep /' . name . '/j **/*.' . &filetype
+  execute 'vimgrep /' . name . '/j **/*.' . fnamemodify(expand('%'), ':e')
   execute 'cdo s/' . name . '/' . newname . '/g'
   source refactor_restore
   let &sessionoptions = ssop
