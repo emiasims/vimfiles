@@ -34,7 +34,7 @@ function! s:setup() abort
   call minpac#add('mbbill/undotree')
   call minpac#add('chrisbra/unicode.vim')
 
-  call minpac#add('glacambre/firenvim', { 'do': function('firenvim#install') })
+  call minpac#add('glacambre/firenvim', {'type': 'opt', 'do': function('firenvim#install') })
 
   " Nvim specific:
   call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
