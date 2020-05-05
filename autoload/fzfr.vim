@@ -50,7 +50,9 @@ function! s:tag_sink(selection) abort " {{{2
   silent execute tag.cmd
   unlet s:tags
 endfunction
+
 function! fzfr#setsize(width, height) abort " {{{1
+  let g:anh#pause = 1
   let g:fzf#size = [str2nr(a:width), str2nr(a:height)]
 endfunction
 
@@ -89,7 +91,7 @@ function! fzfr#floating_win() abort " {{{1
         \ 'width': wid,
         \ 'height': hei
         \ }
-  silent! unlet g:fzf#size
-
+  unlet! g:fzf#size
   call nvim_open_win(buf, v:true, opts)
+  unlet! g:anh#pause
 endfunction
