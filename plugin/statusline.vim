@@ -37,8 +37,7 @@ function! statusline#plugins(active) abort " {{{1
 endfunction
 
 function! statusline#temporary() abort " {{{1
-  let expr = get(b:, 'stl#tmp', get(g:, 'stl#tmp', ''))
-  return !empty(expr) ? eval(expr) . ' ' : ''
+  return '%{' . "get(b:, 'stl_tmp', get(g:, 'stl_tmp', ''))" . '}'
 endfunction
 
 function! statusline#dirinfo(active) abort " {{{1
