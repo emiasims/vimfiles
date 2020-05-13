@@ -34,16 +34,19 @@ function! refactor#name_in_project(type, ...) abort
 
   let newname = input("Refactoring " . name . ":\n> ", default)
 
-  let ssop = &sessionoptions
-  set ssop=buffers,folds
-  mksession refactor_restore
-  execute 'vimgrep /' . name . '/j **/*.' . fnamemodify(expand('%'), ':e')
-  execute 'cdo s/' . name . '/' . newname . '/g'
-  source refactor_restore
-  let &sessionoptions = ssop
-  call delete('refactor_restore')
+  " TODO if vim, move function to appropriate location
+
+  " I don't use 'usetab' in 'switchbuf', so this works
+  let starttabnr = tabpagenr()
+  execute 'noautocmd $tab split'
+  try
+    execute 'vimgrep /\<' . name . '\>/j **/*.' . fnamemodify(expand('%'), ':e')
+    execute 'cdo s/\<' . name . '\>/' . newname . '/g'
+  finally
+    quit
+    execute 'noautocmd normal!' starttabnr . 'gt'
+  endtry
   cwin
-  wincmd p
 endfunction
 
 function! s:update_refactor() abort
