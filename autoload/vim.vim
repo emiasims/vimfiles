@@ -25,3 +25,17 @@ function! vim#tern2if() abort " {{{1
   call append('.', [asgn . iftrue, 'else', asgn . iffalse, 'endif'])
   normal! =4j
 endfunction
+
+function! vim#sortfunctions() abort range " {{{1
+  let start = nextnonblank(a:firstline == a:lastline ? 1 : a:firstline)
+  let end = prevnonblank(a:firstline == a:lastline ? line('$') : a:lastline)
+  let atend = getpos("'>")[1] == line('$')
+  execute 'silent! ' . start . ',' . end . 's/\n/@@@@@@/'
+  silent! s/@@@@@@\zefunction/\r/g
+  silent! '[,']sort
+  let startln = getpos("'[")[1]
+  if atend
+    silent ']s/@@@@@@$//g
+  endif
+  execute 'silent!' startln . ",']s/@@@@@@/\r/g"
+endfunction

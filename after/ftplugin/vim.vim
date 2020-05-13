@@ -34,3 +34,4 @@ nmap \t <Plug>(testing-goto)
 
 command! -buffer If2Ternary call vim#if2tern()
 command! -buffer Ternary2If call vim#tern2if()
+command! -range=% -buffer SortVimFuncs call vim#sortfunctions()
