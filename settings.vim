@@ -126,6 +126,10 @@ if has('termguicolors')
 endif
 
 colorscheme evolution
+" let g:gruvbox_sign_column = 'bg0'
+" let g:gruvbox_number_column = 'bg0'
+" let g:gruvbox_invert_selection = 0
+" colorscheme gruvbox
 
 if has('patch-7.4.1570')
   set shortmess+=c
@@ -213,6 +217,7 @@ nnoremap Y y$
 
 augroup vimrc_crmap
   autocmd!
+  " Not sure why quickfix lists are modifiable.
   autocmd BufEnter * if &modifiable | nnoremap <buffer> <Cr> za| endif
 augroup END
 
@@ -532,6 +537,8 @@ ContextAdd startcmd {-> getcmdtype()==":" && getcmdline()==self.lhs}
 
 Contextualize startcmd cnoreabbrev he help
 Contextualize startcmd cnoreabbrev h vert help
+Contextualize startcmd cnoreabbrev <expr> some 'mkview \| source % \| setfiletype ' . &filetype . ' \| loadview'
+Contextualize startcmd cnoreabbrev <expr> vre 'mkview \| runtime! settings.vim \| setfiletype ' . &filetype . ' \| loadview'
 Contextualize startcmd cnoreabbrev <expr> eft 'edit $CFGDIR/after/ftplugin/' . &filetype . '.vim'
 Contextualize startcmd cnoreabbrev e! mkview \| edit!
 Contextualize startcmd cnoreabbrev use UltiSnipsEdit
@@ -582,77 +589,75 @@ Contextualize delpair inoremap <Bs> <BS><Del>
 Contextualize startcmd cnoreabbrev gcim Gcommit \| startinsert
 
 if has('nvim') " {{{2
-" coc.nvim {{{2
-nmap <silent> ]e <Plug>(coc-diagnostic-next)
-nmap <silent> [e <Plug>(coc-diagnostic-prev)
+  " coc.nvim {{{2
+  nmap <silent> ]e <Plug>(coc-diagnostic-next)
+  nmap <silent> [e <Plug>(coc-diagnostic-prev)
 
-" Ultisnips {{{2
-let g:UltiSnipsEditSplit = 'tabdo'
-let g:UltiSnipsSnippetDirectories = ['snips']
-let g:UltiSnipsRemoveSelectModeMappings = 0
-" let g:UltiSnipsExpandTrigger = '<Tab>'
-" let g:UltiSnipsJumpForwardTrigger = '<Tab>'
-" let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
-let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
-let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
-let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
-imap <Tab> <Plug>(myUltiSnipsExpand)
-xmap <Tab> <Plug>(myUltiSnipsExpand)
-snoremap <C-e> <Esc>`>a
+  " firenvim {{{2
+  if exists('g:started_by_firenvim')
+    packadd firenvim
+    let g:firenvim_config = {'localSettings': {'.*': { 'selector': '', 'priority': 0, },
+          \ 'mail\.google\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
+          \ 'outlook\.office365\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
+          \ 'github\.com': {'selector': 'textarea', 'priority': 1, 'takeover': 'once'},
+          \ }}
+    setlocal laststatus=0
+    set showtabline=0
+    let g:loaded_statusline = 1
+    set guifont=DejaVu\ Sans\ Mono:h9
+    nnoremap ZZ :xa<Cr>
+    nnoremap ZQ :qa!<Cr>
+    nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
+    augroup vimrc_firenvim
+      autocmd!
+      " Not working
+      autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
+      autocmd BufEnter mail*,outlook* set filetype=mail
+      autocmd TextChanged * ++nested write
+      autocmd InsertEnter,InsertLeave * ++nested write
+      autocmd BufEnter github.com_*.txt set filetype=markdown
+    augroup END
+    set wrap
+    set colorcolumn=100
+    setlocal spell
+  endif
 
-" vim-gutentags {{{2
-let g:gutentags_cache_dir = $DATADIR.'/tags'
+  " vim-gutentags {{{2
+  let g:gutentags_cache_dir = $DATADIR.'/tags'
 
-" vim-signify {{{2
-augroup vimrc_signify
-  autocmd!
-  autocmd ColorScheme * highlight link SignifyLineAdd             String
-  autocmd ColorScheme * highlight link SignifyLineChange          Todo
-  autocmd ColorScheme * highlight link SignifyLineDelete          Error
-  autocmd ColorScheme * highlight link SignifyLineChangeDelete    SignifyLineChange
-  autocmd ColorScheme * highlight link SignifyLineDeleteFirstLine SignifyLineDelete
+  " vim-signify {{{2
+  augroup vimrc_signify
+    autocmd!
+    autocmd ColorScheme * highlight link SignifyLineAdd             String
+    autocmd ColorScheme * highlight link SignifyLineChange          Todo
+    autocmd ColorScheme * highlight link SignifyLineDelete          Error
+    autocmd ColorScheme * highlight link SignifyLineChangeDelete    SignifyLineChange
+    autocmd ColorScheme * highlight link SignifyLineDeleteFirstLine SignifyLineDelete
 
-  autocmd ColorScheme * highlight link SignifySignAdd             String
-  autocmd ColorScheme * highlight link SignifySignChange          Todo
-  autocmd ColorScheme * highlight link SignifySignDelete          Error
-  autocmd ColorScheme * highlight link SignifySignChangeDelete    SignifyLineChange
-  autocmd ColorScheme * highlight link SignifySignDeleteFirstLine SignifyLineDelete
-augroup END
-let g:signify_vcs_list = ['git']
-let g:signify_sign_delete = '-'
-let g:signify_sign_change = '~'
-let g:signify_skip_filetype = { 'markdown': 1 }
+    autocmd ColorScheme * highlight link SignifySignAdd             String
+    autocmd ColorScheme * highlight link SignifySignChange          Todo
+    autocmd ColorScheme * highlight link SignifySignDelete          Error
+    autocmd ColorScheme * highlight link SignifySignChangeDelete    SignifyLineChange
+    autocmd ColorScheme * highlight link SignifySignDeleteFirstLine SignifyLineDelete
+  augroup END
+  let g:signify_vcs_list = ['git']
+  let g:signify_sign_delete = '-'
+  let g:signify_sign_change = '~'
+  let g:signify_skip_filetype = { 'markdown': 1 }
+
+  " Ultisnips {{{2
+  let g:UltiSnipsEditSplit = 'tabdo'
+  let g:UltiSnipsSnippetDirectories = ['snips']
+  let g:UltiSnipsRemoveSelectModeMappings = 0
+  " let g:UltiSnipsExpandTrigger = '<Tab>'
+  " let g:UltiSnipsJumpForwardTrigger = '<Tab>'
+  " let g:UltiSnipsJumpBackwardTrigger = '<S-Tab>'
+  let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
+  let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
+  let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
+  snoremap <C-e> <Esc>`>a
 
 endif " {{{2
-" firenvim {{{2
-if exists('g:started_by_firenvim')
-  packadd firenvim
-  let g:firenvim_config = {'localSettings': {'.*': { 'selector': '', 'priority': 0, },
-        \ 'mail\.google\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
-        \ 'outlook\.office365\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
-        \ 'github\.com': {'selector': 'textarea', 'priority': 1, 'takeover': 'once'},
-        \ }}
-  setlocal laststatus=0
-  set showtabline=0
-  let g:loaded_statusline = 1
-  set guifont=DejaVu\ Sans\ Mono:h9
-  nnoremap ZZ :xa<Cr>
-  nnoremap ZQ :qa!<Cr>
-  nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
-  augroup vimrc_firenvim
-    autocmd!
-    " Not working
-    autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
-    autocmd BufEnter mail*,outlook* set filetype=mail
-    autocmd TextChanged * ++nested write
-    autocmd InsertEnter,InsertLeave * ++nested write
-    autocmd BufEnter github.com_*.txt set filetype=markdown
-  augroup END
-  set wrap
-  set colorcolumn=100
-  setlocal spell
-endif
-
 " Windows {{{2
 if has('win32')
   function! s:setup_guifont() abort
