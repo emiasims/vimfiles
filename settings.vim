@@ -333,6 +333,7 @@ xnoremap <leader>P "0P
 
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
+onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
 " Internal plugins: {{{1
 " I want these to load even if --noplugins is used.
@@ -380,8 +381,6 @@ xnoremap <silent> <F2> :<C-u>call util#openf(util#get_visual_selection())<CR>
 
 nnoremap ]z zj:call fold#goto_open(1)<Cr>
 nnoremap [z zk:call fold#goto_open(-1)<Cr>
-
-nnoremap <C-]> :<C-u>call fzfr#tags(expand('<cword>'))<Cr>
 
 " Not plugins but fits in with the text objects above
 xnoremap il ^og_
@@ -468,6 +467,9 @@ omap gc  <Plug>Commentary
 nmap gcc <Plug>CommentaryLine
 nmap cgc <Plug>ChangeCommentary
 nmap gcu <Plug>Commentary<Plug>Commentary
+
+" vim-cursorword
+let g:cursorword_delay = 250
 
 " fzf {{{2
 " add fzf path if not already in it
