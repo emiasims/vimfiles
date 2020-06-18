@@ -7,7 +7,7 @@ function! testing#goto() abort " {{{1
   let fname = matchstr(getline(flnum), '^function! \zs.*\ze(')
   let parts = split(fname, '#')
   let parts[0] = parts[0] =~# 'test$' ? parts[0][:-5] : parts[0] . 'test'
-  execute 'tjump' join(parts, '#')
+  execute 'tag' join(parts, '#')
 endfunction
 
 nnoremap <Plug>(testing-goto) :call testing#goto()<Cr>
