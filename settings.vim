@@ -521,51 +521,6 @@ nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
 
-" vim-org {{{2
-let g:org#capture#templates = {}
-let t = g:org#capture#templates
-let t.n = {'type': 'entry', 'description': 'Note', 'target': 'inbox.org/Notes'}
-let t.i = {'type': 'entry', 'description': 'Idea', 'target': 'box.org'}
-let t.e = {'type': 'entry', 'description': 'Event', 'target': 'events.org'}
-let t.t = {'type': 'entry', 'description': 'TODO item'}
-let t.b = {'type': 'entry', 'description': 'Shopping item', 'target': 'shopping.org/Capture'}
-
-let t.w = {'type': 'entry', 'description': 'Work TODO'}
-let t.p = {'type': 'checkitem', 'description': 'Work TODO: Paper'}
-let t.p.target = 'literature.org/Papers to Lookup'
-let t.p.opts = {'quit': 1}
-
-let t.b.snippet = 1
-let projecttemplate =<< ENDORGTMPL
-${1:Description}
-:PROPERTIES:
-:captured-at: `!v org#timestamp#date2text(localtime())`
-:END:
-$0
-ENDORGTMPL
-
-function! s:pname() abort
-  return matchstr(fnamemodify(expand('%'), ':p:~'), '^\~/Projects/\zs[^/]\+')
-endfunction
-
-let t.e.snippet = 1
-let t.e.template = ['${1:Event}', '<${1:now}>']
-
-let t.b.template =<< ENDORGTMPL
-${0:I NEEEED IT}
-:PROPERTIES:
-:captured-at: `!v org#timestamp#date2text(localtime())`
-:captured-in: `!o resolve(fnamemodify(expand('%'), ':p:~'))`
-:END:
-ENDORGTMPL
-let t.b.snippet = 1
-
-nmap <leader>c <Plug>(org-capture)
-xmap <leader>c <Plug>(org-capture)
-unlet t
-
-let g:org#capture#opts = {'editcmd': 'JumpSplitOrEdit'}
-
 " Contextualize {{{2
 packadd contextualize.vim
 
