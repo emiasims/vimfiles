@@ -318,11 +318,7 @@ nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap}p
 nnoremap g<Cr> i<Cr><Esc>l
 
-nnoremap <silent> g<Space> :autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
-" TODO make repeatable?
-nnoremap <silent> g2<Space> :autocmd InsertCharPre <buffer> ++once call feedkeys('lli' . v:char . '<C-v><Esc>', 'n') \| stopinsert<Cr>i
-" vim-surround:
-xmap g2<Space> S
+nnoremap <expr> <silent> g<Space> :<C-u>autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
 
 " nnoremap <silent> <C-]> g<C-]>
 " " TODO: Generalized split function that simply splits vertical or horizontal depending on how those
