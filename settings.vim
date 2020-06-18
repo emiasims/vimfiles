@@ -341,16 +341,6 @@ onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 nnoremap <silent> <leader>do :call difference#orig()<cr>
 nnoremap <silent> <leader>du :call difference#undobuf()<cr>
 
-inoremap <silent> ( <C-r>=autopairs#check_and_insert('(')<CR>
-inoremap <silent> ) <C-r>=autopairs#check_and_insert(')')<CR>
-inoremap <silent> [ <C-r>=autopairs#check_and_insert('[')<CR>
-inoremap <silent> ] <C-r>=autopairs#check_and_insert(']')<CR>
-inoremap <silent> { <C-r>=autopairs#check_and_insert('{')<CR>
-inoremap <silent> } <C-r>=autopairs#check_and_insert('}')<CR>
-inoremap <silent> " <C-r>=autopairs#check_and_insert('"')<CR>
-inoremap <silent> ' <C-r>=autopairs#check_and_insert("'")<CR>
-inoremap <silent> <BS> <C-r>=autopairs#backspace()<CR>
-
 onoremap <silent>ai :<C-u>call textobjects#indent(0)<CR>
 onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
@@ -522,16 +512,21 @@ let undotree_HighlightChangedText = 0
 " Contextualize {{{2
 packadd contextualize.vim
 
+" Defaults
+imap <Tab> <Plug>(myUltiSnipsExpand)
+xmap <Tab> <Plug>(myUltiSnipsExpand)
+
 autocmd! User UltiSnipsEnterFirstSnippet
 autocmd! User UltiSnipsExitLastSnippet
 autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
 autocmd User UltiSnipsExitLastSnippet let g:in_snippet = 0
 let g:in_snippet = 0
-ContextAdd parens {-> getline('.')[col('.') - 1 :] =~# '^[\])}''"]\{2,}'}
+
 ContextAdd insnippet {-> g:in_snippet}
-Contextualize parens inoremap <Tab> <C-o>/[^\])}'"]\\|$<Cr>
 Contextualize insnippet imap <Tab> <Plug>(myUltiSnipsForward)
 Contextualize insnippet imap <S-Tab> <Plug>(myUltiSnipsBackward)
+Contextualize insnippet smap <Tab> <Plug>(myUltiSnipsForward)
+Contextualize insnippet smap <S-Tab> <Plug>(myUltiSnipsBackward)
 
 ContextAdd startcmd {-> getcmdtype()==":" && getcmdline()==self.lhs}
 
@@ -546,6 +541,42 @@ Contextualize startcmd cnoreabbrev sr SetRepl
 Contextualize startcmd cnoreabbrev tr TermRepl
 Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep // **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
 Contextualize startcmd cnoreabbrev cqf Clearqflist
+
+" Relies on priority -- order is important when mapping (non unique conditions)
+ContextAdd surround {-> getline('.')[col('.') - 2 : col('.') - 1 ] =~ '\w\w'}
+ContextAdd pairallowed {-> getline('.')[col('.') - 2 : col('.') - 1] =~ '\v\w?[ [\](){}"'']?'}
+
+ContextAdd completepair {-> getline('.')[col('.') - 1] == self.lhs}
+ContextAdd fly {-> getline('.')[col('.') - 1 :] =~ '^[ \])}]\+' . self.lhs}
+
+ContextAdd tabout {-> getline('.')[col('.') - 1 :] =~ '^[\])}]\+'}
+ContextAdd delpair {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V()\|{}\|[]\|''''\|""\)'}
+
+function! s:sp(type)
+  let [curl, curcol] = getpos("'[")[1:2]
+  let [lnum, col] = getpos("']")[1:2]
+  call setline(lnum, getline(lnum)[:col - 1] . g:SP#pair[1] . getline(lnum)[col:])
+  call setline(curl, getline(curl)[:curcol - 2] . g:SP#pair[0] . getline(curl)[curcol - 1:])
+  call cursor([getcurpos()[1], getcurpos()[2] + 1])
+  unlet g:SP#pair
+endfunction
+
+for pair in ['()', '[]', '{}']
+  execute 'Contextualize surround inoremap <silent>' pair[0] '<C-o>:let g:SP#pair = "' . pair . '" \| set operatorfunc=<SID>sp<Cr><C-o>g@'
+  execute 'Contextualize pairallowed inoremap' pair[0] pair . '<C-g>U<Left>'
+  execute 'Contextualize pairallowed snoremap' pair[0] pair . '<C-g>U<Left>'
+  execute 'Contextualize completepair inoremap' pair[1] '<C-g>U<Right>'
+  execute 'Contextualize fly inoremap' pair[1] '<C-o>f' . pair[1] . '<Right>'
+endfor
+
+for pair in ["''", '""']
+  execute 'Contextualize pairallowed inoremap' pair[0] pair . '<C-g>U<Left>'
+  execute 'Contextualize pairallowed snoremap' pair[0] pair . '<C-g>U<Left>'
+  execute 'Contextualize completepair inoremap' pair[1] '<C-g>U<Right>'
+endfor
+
+Contextualize tabout inoremap <silent> <Tab> <C-o>/[^\]})'"]\\|$<Cr>
+Contextualize delpair inoremap <Bs> <BS><Del>
 
 " vim-fugitive {{{2
 Contextualize startcmd cnoreabbrev gcim Gcommit \| startinsert
