@@ -302,8 +302,8 @@ cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
 
-nnoremap cr /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>.<ESC>
-xnoremap s :s//g<Left><Left>
+nnoremap cr `["ryiwuyiw<C-r>/\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>r<Esc>
+nnoremap cR `["ryiWuyiW<C-r>/\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>r<Esc>
 xnoremap <C-s> :s/<C-r>///g<left><left>
 xnoremap gs y:%s/<C-r>"//g<Left><Left>
 
@@ -404,6 +404,7 @@ if has('nvim')
     silent! packadd! vim-signify
     silent! packadd! vim-gutentags
     silent! packadd! coc.nvim
+    silent! packadd! coc-fzf
     silent! packadd! jsonc.vim
   endif
   silent! packadd! ultisnips
@@ -548,9 +549,21 @@ Contextualize startcmd cnoreabbrev sr SetRepl
 Contextualize startcmd cnoreabbrev tr TermRepl
 Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep // **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
 Contextualize startcmd cnoreabbrev cqf Clearqflist
+" typo!
+Contextualize startcmd cnoreabbrev w2 w
+
+
+function! SetupSubstitute(type) abort " {{{2
+  call feedkeys(":'[,']s/\<C-r>\"//g\<Left>\<Left>")
+endfunction
+Contextualize {-> mode(1) =~# 'v'} xnoremap s y:set opfunc=SetupSubstitute<Cr>g@
+Contextualize default xnoremap s :s//g<Left><Left>
 
 " Relies on priority -- order is important when mapping (non unique conditions)
-ContextAdd surround {-> getline('.')[col('.') - 2 : col('.') - 1 ] =~ '\w\w'}
+" function! Curtext(st, end) abort " {{{1
+"   return getline('.')[]
+" endfunction
+
 ContextAdd pairallowed {-> getline('.')[col('.') - 2 : col('.') - 1] =~ '\v\w?[ [\](){}"'']?'}
 
 ContextAdd completepair {-> getline('.')[col('.') - 1] == self.lhs}
@@ -559,17 +572,7 @@ ContextAdd fly {-> getline('.')[col('.') - 1 :] =~ '^[ \])}]\+' . self.lhs}
 ContextAdd tabout {-> getline('.')[col('.') - 1 :] =~ '^[\])}]\+'}
 ContextAdd delpair {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V()\|{}\|[]\|''''\|""\)'}
 
-function! s:sp(type)
-  let [curl, curcol] = getpos("'[")[1:2]
-  let [lnum, col] = getpos("']")[1:2]
-  call setline(lnum, getline(lnum)[:col - 1] . g:SP#pair[1] . getline(lnum)[col:])
-  call setline(curl, getline(curl)[:curcol - 2] . g:SP#pair[0] . getline(curl)[curcol - 1:])
-  call cursor([getcurpos()[1], getcurpos()[2] + 1])
-  unlet g:SP#pair
-endfunction
-
 for pair in ['()', '[]', '{}']
-  execute 'Contextualize surround inoremap <silent>' pair[0] '<C-o>:let g:SP#pair = "' . pair . '" \| set operatorfunc=<SID>sp<Cr><C-o>g@'
   execute 'Contextualize pairallowed inoremap' pair[0] pair . '<C-g>U<Left>'
   execute 'Contextualize pairallowed snoremap' pair[0] pair . '<C-g>U<Left>'
   execute 'Contextualize completepair inoremap' pair[1] '<C-g>U<Right>'
@@ -581,6 +584,7 @@ for pair in ["''", '""']
   execute 'Contextualize pairallowed snoremap' pair[0] pair . '<C-g>U<Left>'
   execute 'Contextualize completepair inoremap' pair[1] '<C-g>U<Right>'
 endfor
+unlet pair
 
 Contextualize tabout inoremap <silent> <Tab> <C-o>/[^\]})'"]\\|$<Cr>
 Contextualize delpair inoremap <Bs> <BS><Del>

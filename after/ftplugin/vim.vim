@@ -31,7 +31,16 @@ nmap gO [[O<Cr><Up>fun<Tab>
 nnoremap <silent> <expr> <buffer> K ':help ' . expand('<cword>') . ((expand('<cWORD>') =~# expand('<cword>') . '(') ? "(\<Cr>" : "\<Cr>")
 
 nmap \t <Plug>(testing-goto)
+nmap \r [[Wyiw:TestOrg <C-r>"<Cr>
 
 command! -buffer If2Ternary call vim#if2tern()
 command! -buffer Ternary2If call vim#tern2if()
 command! -range=% -buffer SortVimFuncs call vim#sortfunctions()
+
+inoreabbrev <buffer> tbool v:t_bool
+inoreabbrev <buffer> tdict v:t_dict
+inoreabbrev <buffer> tflt v:t_float
+inoreabbrev <buffer> tfunc v:t_func
+inoreabbrev <buffer> tlist v:t_list
+inoreabbrev <buffer> tnum v:t_number
+inoreabbrev <buffer> tstr v:t_string

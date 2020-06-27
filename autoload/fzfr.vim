@@ -8,8 +8,16 @@ function! fzfr#buffers() abort " {{{1
   let bufs = filter(range(1, bufnr('$')), 'buflisted(v:val) && getbufvar(v:val, "&filetype") != "qf"')
   let width = max(map(bufs, 'len(bufname(v:val))')) + 16
   let height = max([len(bufs) + 2, 15])
-  let g:fzf#size = [width, height]
+  call fzfr#setsize(width, height)
   Buffers
+endfunction
+
+function! fzfr#args() abort " {{{1
+  " TODO arglocal managing files
+  let width = max(map(argv(), 'len(bufname(v:val))')) + 12
+  let height = max([len(argv()) + 2, 10])
+  call fzfr#setsize(width, height)
+  call fzf#run(fzf#wrap({'source': argv(), 'sink': 'buffer'}))
 endfunction
 
 function! fzfr#tags(...) abort " {{{1

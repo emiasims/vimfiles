@@ -38,14 +38,13 @@ function! s:setup() abort
 
   " Nvim specific:
   call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
+  call minpac#add('antoinemadec/coc-fzf', {'type': 'opt'})
   call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
   call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
   call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
 
 endfunction
-
-
 
 let s:coc_packages = [
       \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-ultisnips',

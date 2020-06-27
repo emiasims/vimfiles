@@ -17,10 +17,7 @@ function! redir#scratch(cmd, rng, start, end)
       let output = systemlist(cmd . " <<< $" . cleaned_lines)
     endif
   else
-    redir => output
-    execute a:cmd
-    redir END
-    let output = split(output, "\n")
+    let output = split(execute(a:cmd), "\n")
   endif
   vnew
   " SmartSplit new
