@@ -7,6 +7,7 @@ function! s:setup() abort
   call minpac#add('jeetsukumaran/vim-pythonsense')
   call minpac#add('Vimjas/vim-python-pep8-indent')
   call minpac#add('vim-jp/syntax-vim-ex')
+  call minpac#add('dag/vim-fish')
 
   call minpac#add('tpope/vim-repeat')
   call minpac#add('tpope/vim-fugitive')
