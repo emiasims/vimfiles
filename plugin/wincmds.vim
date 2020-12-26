@@ -35,7 +35,7 @@ function! wincmds#jumpsplitoredit(fname) abort " {{{1
   endif
 endfunction
 
-command! -nargs=1 -complete=file SmartSplit call wincmds#smartsplit(<q-args>)
-command! -nargs=1 -complete=file JumpOrSplit call wincmds#jumporsplit(<q-args>)
-command! -nargs=1 -complete=file JumpOrEdit call wincmds#jumporedit(<q-args>)
-command! -nargs=1 -complete=file JumpSplitOrEdit call wincmds#jumpsplitoredit(<q-args>)
+command! -bar -nargs=1 -complete=file SmartSplit call wincmds#smartsplit(<q-args>)
+command! -bar -nargs=1 -complete=file JumpOrSplit call wincmds#jumporsplit(<q-args>)
+command! -bar -nargs=1 -complete=file JumpOrEdit call wincmds#jumporedit(<q-args>)
+command! -bar -nargs=1 -complete=file JumpSplitOrEdit call wincmds#jumpsplitoredit(<q-args>)
