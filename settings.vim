@@ -499,17 +499,6 @@ if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
 
-" statusline {{{2
-hi link User1 TabLine
-hi link User2 IncSearch
-hi link User3 StatusLineTermNC
-hi link User4 PmenuSel
-hi link User5 IncSearch
-hi link User6 WildMenu
-hi link User7 DiffAdd
-hi link User8 StatusLineTerm
-hi link User9 StatusLineTerm
-
 " undotree {{{2
 nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0

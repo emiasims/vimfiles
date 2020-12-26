@@ -43,7 +43,7 @@ endfunction
 
 function! statusline#dirinfo(active) abort " {{{1
   " Returns: '(BRANCH)DIR/ ' or 'DIR ' or 'TERM_TITLE '
-  if &filetype ==# 'help'
+  if &filetype ==# 'help' || &buftype == 'nofile'
     return ''
   endif
   let statuslinetext = a:active ? '%#stlDirInfo#' : ''
@@ -140,3 +140,14 @@ function! statusline#errors(active) abort " {{{1
   let statuslinetext .= '%*'
   return statuslinetext
 endfunction
+
+" Colors {{{1
+hi link User1 TabLine
+hi link User2 IncSearch
+hi link User3 StatusLineTermNC
+hi link User4 PmenuSel
+hi link User5 IncSearch
+hi link User6 WildMenu
+hi link User7 DiffAdd
+hi link User8 StatusLineTerm
+hi link User9 StatusLineTerm
