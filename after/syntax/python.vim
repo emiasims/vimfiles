@@ -63,8 +63,3 @@ else
   syntax sync fromstart
 endif
 let b:current_syntax = "python"
-
-let b:syntax_python_loaded = 1
-if !exists('b:syntax_markdown_loaded')
-  call SyntaxRange#Include('markdown_text = """$', '"""$', 'markdown', 'Identifier')
-endif
