@@ -201,7 +201,7 @@ augroup END
 let g:mapleader=' '
 let g:maplocalleader="\\"
 if !exists('g:loaded_fzf')
-  nnoremap <leader>ev :e $CFGDIR<CR>
+  nnoremap <Space>ev :e $CFGDIR<CR>
 endif
 
 nnoremap <Space> <nop>
@@ -331,10 +331,10 @@ nnoremap <expr> <silent> g<Space> :<C-u>autocmd TextChangedI <buffer> ++once sto
 " nnoremap <silent> g] :vert stjump<CR>
 " nnoremap <silent> g<C-]> :stjump<CR>
 
-nnoremap <leader>p "0p
-nnoremap <leader>P "0P
-xnoremap <leader>p "0p
-xnoremap <leader>P "0P
+nnoremap <Space>p "0p
+nnoremap <Space>P "0P
+xnoremap <Space>p "0p
+xnoremap <Space>P "0P
 
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
@@ -342,9 +342,9 @@ onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
 " Internal plugins: {{{1
 " I want these to load even if --noplugins is used.
-" nnoremap <silent> <leader>do :call difference#orig()<cr>
-nnoremap <silent> <leader>do :call difference#orig()<cr>
-nnoremap <silent> <leader>du :call difference#undobuf()<cr>
+" nnoremap <silent> <Space>do :call difference#orig()<cr>
+nnoremap <silent> <Space>do :call difference#orig()<cr>
+nnoremap <silent> <Space>du :call difference#undobuf()<cr>
 
 onoremap <silent>ai :<C-u>call textobjects#indent(0)<CR>
 onoremap <silent>ii :<C-u>call textobjects#indent(1)<CR>
@@ -366,7 +366,7 @@ endif
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
 
-nnoremap <silent> <leader>R :<C-u>set opfunc=refactor#expression_to_variable<CR>g@
+nnoremap <silent> <Space>R :<C-u>set opfunc=refactor#expression_to_variable<CR>g@
 xnoremap <silent> R         :<C-u>call refactor#expression_to_variable(visualmode(), 1)<CR>
 nnoremap <silent> gR        :<C-u>set opfunc=refactor#name_in_project<CR>g@
 xnoremap <silent> gR        :<C-u>call refactor#name_in_project(visualmode(), 1)<CR>
@@ -450,7 +450,7 @@ let g:targets_aiAI = 'aIAi'
 
 " vim-filebeagle {{{2
 let g:filebeagle_suppress_keymaps = 1
-nmap <silent> <leader>- <Plug>FileBeagleOpenCurrentBufferDir
+nmap <silent> <Space>- <Plug>FileBeagleOpenCurrentBufferDir
 let g:loaded_netrwPlugin = 'v9999'
 
 " vim-matchup {{{2
@@ -480,21 +480,21 @@ unlet fzpath
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 let g:fzf_preview_window = ''
 
-nnoremap <silent> <leader>af  :FZ 50 20 \| Files<CR>
-nnoremap <silent> <leader>f   :FZ 40 20 \| GFiles<CR>
-nnoremap <silent> <leader>o   :FZ 40 20 \| Files ~/org<CR>
-nnoremap <silent> <leader>gst :FZ 120 40 \| GFiles?<CR>
-nnoremap <silent> <leader>b   :Lines<CR>
-nnoremap <silent> <leader>l   :<C-u>call fzfr#buffers()<Cr>
-nnoremap <silent> <leader>/   :BLines<CR>
-" nnoremap <silent> <leader>t   :<C-u>call fzfr#tags()<CR>
-nnoremap <silent> <leader>t   :FZ 80 20 \| Tags<CR>
-nnoremap <silent> <leader>mr  :FZ 70 20 \| History<CR>
-nnoremap <silent> <leader>A   :Ag<CR>
-nnoremap <silent> <leader>h   :FZ 80 20 \| Helptags<CR>
-nnoremap <silent> <leader>gal :FZ 160 20 \| Commits<CR>
-nnoremap <silent> <leader>gl  :FZ 160 20 \| BCommits<CR>
-nnoremap <leader>ev           :FZ 70 20 \| Files $CFGDIR<CR>
+nnoremap <silent> <Space>af  :FZ 50 20 \| Files<CR>
+nnoremap <silent> <Space>f   :FZ 40 20 \| GFiles<CR>
+nnoremap <silent> <Space>o   :FZ 40 20 \| Files ~/org<CR>
+nnoremap <silent> <Space>gst :FZ 120 40 \| GFiles?<CR>
+nnoremap <silent> <Space>b   :Lines<CR>
+nnoremap <silent> <Space>l   :<C-u>call fzfr#buffers()<Cr>
+nnoremap <silent> <Space>/   :BLines<CR>
+" nnoremap <silent> <Space>t   :<C-u>call fzfr#tags()<CR>
+nnoremap <silent> <Space>t   :FZ 80 20 \| Tags<CR>
+nnoremap <silent> <Space>mr  :FZ 70 20 \| History<CR>
+nnoremap <silent> <Space>A   :Ag<CR>
+nnoremap <silent> <Space>h   :FZ 80 20 \| Helptags<CR>
+nnoremap <silent> <Space>gal :FZ 160 20 \| Commits<CR>
+nnoremap <silent> <Space>gl  :FZ 160 20 \| BCommits<CR>
+nnoremap <Space>ev           :FZ 70 20 \| Files $CFGDIR<CR>
 if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
