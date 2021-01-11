@@ -29,7 +29,7 @@ Contextualize startcmd cnoreabbrev he help
 Contextualize startcmd cnoreabbrev h vert help
 Contextualize startcmd cnoreabbrev <expr> some 'mkview \| source % \| setfiletype ' . &filetype . ' \| loadview'
 Contextualize startcmd cnoreabbrev <expr> vre 'mkview \| runtime! settings.vim \| setfiletype ' . &filetype . ' \| loadview'
-Contextualize startcmd cnoreabbrev eft EditFtPlugin
+Contextualize startcmd cnoreabbrev eft EditFtplugin
 Contextualize startcmd cnoreabbrev e! mkview \| edit!
 Contextualize startcmd cnoreabbrev use UltiSnipsEdit
 Contextualize startcmd cnoreabbrev ase AutoSourceEnable
