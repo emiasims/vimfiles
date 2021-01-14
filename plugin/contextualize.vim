@@ -47,27 +47,22 @@ function! SetupSubstitute(type) abort
 endfunction " }}}
 xnoremap s :s//g<Left><Left>
 Contextualize {-> mode(1) =~# 'v'} xnoremap s y:set opfunc=SetupSubstitute<Cr>g@
-" Contextualize default xnoremap s :s//g<Left><Left>
 
-" end of word or a space, followed by nothing or any pair characters
-" ContextAdd pairallowed {-> getline('.')[col('.') - 2 : col('.') - 1] =~ '\v\w?[ [\](){}"'']?'}
+" Autopairs
 ContextAdd pairallowed {-> getline('.')[col('.') - 1] =~ '\W' || col('.') - 1 == len(getline('.'))}
-
+ContextAdd quoteallowed {-> getline('.')[col('.') - 2 : col('.') - 1] !~ '\w'}
 ContextAdd completepair {lhs -> getline('.')[col('.') - 1] == lhs}
-ContextAdd fly {lhs -> getline('.')[col('.') - 1 :] =~ '^[ \])}]\+' . lhs}
-
-" ContextAdd tabout {-> getline('.')[col('.') - 1 :] =~ '^[\])}]\+'}
 ContextAdd delpair {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V()\|{}\|[]\|''''\|""\)'}
+ContextAdd closingpairs {-> getline('.')[col('.') - 1 :] =~ '^[\]''")}]\+'}
 
 for pair in ['()', '[]', '{}']
   call contextualize#map('pairallowed' , 'i', 'map', pair[0], pair . '<C-g>U<Left>')
   call contextualize#map('pairallowed' , 's', 'map', pair[0], pair . '<C-g>U<Left>')
-  call contextualize#map('completepair', 'i', 'map', pair[1], '<C-g>U<Right>'               , {'args': pair[1]})
-  call contextualize#map('fly'         , 'i', 'map', pair[1], '<C-o>f' . pair[1] . '<Right>', {'args': pair[1]})
+  call contextualize#map('completepair', 'i', 'map', pair[1], '<C-g>U<Right>', {'args': pair[1]})
+  call contextualize#map('closingpairs', 'i', 'map', pair[1], '<C-o>f' . pair[1] . '<Right>')
 endfor
 
-" End of word is not allowed, space or opening characters only
-ContextAdd quoteallowed {-> getline('.')[col('.') - 2 : col('.') - 1] !~ '\w'}
+Contextualize closingpairs inoremap <Tab> <C-o>/[^\]''")}]\\|$/e<Cr>
 
 " Complete should take prescedence for quotes
 Contextualize completepair ' inoremap ' <C-g>U<Right>
@@ -77,13 +72,6 @@ Contextualize quoteallowed inoremap " ""<C-g>U<Left>
 Contextualize quoteallowed snoremap ' ''<C-g>U<Left>
 Contextualize quoteallowed snoremap " ""<C-g>U<Left>
 
-" Contextualize tabout inoremap <expr> <Tab> repeat('<Right>', match(getline('.')[col('.') - 1 :], '[\])}]\+\zs'))
-function! s:ends() abort
-  " Return the number of ending bracket pairs in a row, after the cursor
-  return match(getline('.')[col('.') - 1 :], '^[\])}]*\zs')
-endfunction
-ContextAdd tabout s:ends
-Contextualize tabout inoremap <expr> <Tab> repeat('<Right>', <SID>ends())
 Contextualize delpair inoremap <Bs> <BS><Del>
 
 
