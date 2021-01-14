@@ -386,6 +386,7 @@ onoremap ar a]
 onoremap ir i]
 
 " Commands: {{{1
+command! -complete=filetype -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/' . (empty(expand('<args>')) ? &filetype : expand('<args>')) . '.vim'
 command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 

@@ -42,8 +42,6 @@ Contextualize startcmd cnoreabbrev w2 w
 " Use this like 'eh/', the / expands and adds the dir / divider
 Contextualize startcmd cnoreabbrev eh edit <C-r>=expand('%:h')<Cr>
 
-command! -complete=filetype -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/' . (empty(expand('<args>')) ? &filetype : expand('<args>')) . '.vim'
-
 function! SetupSubstitute(type) abort
   call feedkeys(":'[,']s/\<C-r>\"//g\<Left>\<Left>")
 endfunction " }}}
