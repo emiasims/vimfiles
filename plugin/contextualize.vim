@@ -36,7 +36,7 @@ Contextualize startcmd cnoreabbrev ase AutoSourceEnable
 Contextualize startcmd cnoreabbrev asd AutoSourceDisable
 Contextualize startcmd cnoreabbrev sr SetRepl
 Contextualize startcmd cnoreabbrev tr TermRepl
-Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep // **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
+Contextualize startcmd cnoreabbrev <expr> vga 'vimgrep / **/*.' . expand('%:e') . "\<C-Left><Left><Left>"
 Contextualize startcmd cnoreabbrev cqf Clearqflist
 Contextualize startcmd cnoreabbrev w2 w
 " Use this like 'eh/', the / expands and adds the dir / divider
