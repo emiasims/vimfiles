@@ -340,6 +340,13 @@ xnoremap <Space>P "0P
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
+nnoremap <F9> :<C-u>execute 'setfiletype' &filetype\|call SynStack()<CR>
+function! SynStack()
+  let group = synIDattr(synID(line('.'), col('.'), 1), 'name')
+  echo group map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+endfunc
+
+
 " Internal plugins: {{{1
 " I want these to load even if --noplugins is used.
 " nnoremap <silent> <Space>do :call difference#orig()<cr>
