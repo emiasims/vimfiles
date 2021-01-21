@@ -6,7 +6,6 @@ augroup vimrc_org
   autocmd User OrgCapturePre call myorg#dosnippet()
   autocmd User OrgCapturePost if has_key(g:org#currentcapture, 'snippet') | call feedkeys(g:org#currentcapture.snippet, 'nx') | endif
   autocmd User OrgCapturePost call org#property#add({'created-at': org#time#dict("[now]").totext("t")})
-  autocmd User OrgCapturePost call org#property#add({'created-at': org#time#dict("[now]").totext("t")})
   autocmd User OrgRefilePre if g:org#refile#destination.filename =~# 'archive.org$' | call org#plan#add({'CLOSED': '[now]'}) | endif
   autocmd InsertLeave *.org if org#listitem#has_ordered_bullet(getline('.'))|call org#list#reorder()|endif
 
@@ -17,21 +16,15 @@ augroup END
 " Capture templates {{{1
 let g:org#capture#templates = {}
 let t = g:org#capture#templates
-let t.q = {'description': 'Quick', 'type': 'entry', 'target': 'inbox.org', 'snippet': ['${1:Idea}']}
-let t.v = {'description': 'Voice phrase', 'type': 'item', 'target': 'ongoing.org/Transition/Voice/Phrases', 'snippet': ['${1:words}']}
-let t.n = {'description': 'Note', 'type': 'entry', 'target': 'notebox.org', 'snippet': ['${1:Note}']}
-let t.op = {'description': 'Org pain point', 'type': 'entry'} " {{{2
-let t.op.target = 'ongoing.org/vim-org'
-let t.op.snippet = ['${1:It''s bothersome when...} :pain:']
 
-let t.oi = {'description': 'Org idea', 'type': 'entry'} " {{{2
-let t.oi.target = 'ongoing.org/vim-org'
-let t.oi.snippet = ['${1:It would be neat if...} :idea:']
+let t.q = {'description': 'Quick', 'snippet': ['${1:Title}', '$0']}
 
-let t.e = {'description': 'Event', 'type': 'entry', 'target': 'events.org'} " {{{2
+let t.op = {'description': 'Org note', 'target': 'vim-org.org', 'snippet': ['${1:Note}', '$0']}
+
+let t.e = {'description': 'Event', 'target': 'events.org'} " {{{2
 let t.e.snippet = ['${1:Event}', '<${2:`!v org#time#dict("today").totext("B")`}>', '$0']
 
-let t.dj = {'description': 'Journal', 'type': 'entry'} " {{{2
+let t.dj = {'description': 'Journal'} " {{{2
 let t.dj.target = {-> 'diary.org/' . strftime('%B/%A the ') . (strftime('%d')+0) . (strftime('%d')  =~ '1[123]' ? 'st' : get({1: 'st', 2: 'nd', 3: 'rd'}, strftime('%d') % 10, 'th'))}
 " The time is now - 3 hours -- allows going to bed at 3 am
 let t.dj.snippet =<< ENDORGTMPL
@@ -57,7 +50,7 @@ ${11:~~emotions~~}
 ${12:xoxo}
 ENDORGTMPL
 
-let t.ds = {'description': 'Sleep log', 'type': 'entry'} " {{{2
+let t.ds = {'description': 'Sleep log'} " {{{2
 let t.ds.target = {-> 'diary.org/' . strftime('%B/%A the ') . (strftime('%d')+0) . (strftime('%d')  =~ '1[123]' ? 'st' : get({1: 'st', 2: 'nd', 3: 'rd'}, strftime('%d') % 10, 'th'))}
 let t.ds.snippet =<< ENDORGTMPL
 Sleep log
@@ -76,7 +69,7 @@ Sleep log
 $0
 ENDORGTMPL
 
-let t.r = {'description': 'Recipe', 'type': 'entry', 'target': 'recipes.org'} " {{{2
+let t.r = {'description': 'Recipe', 'target': 'recipes.org'} " {{{2
 let t.r.snippet =<< ENDORGTMPL
 ${1:Recipe}
 :PROPERTIES:
@@ -120,42 +113,68 @@ function! s:processInbox() abort
 endfunction
 
 " Agenda {{{1
-command! OrgNext call org#agenda#toqf(<SID>getkwd('NEXT')) | copen
-command! OrgTodo call org#agenda#toqf(<SID>getkwd('TODO')) | copen
 
 let g:org#agenda#wincmd = 'SmartSplit'
-" let g:org#agenda#wincmd = 'keepalt topleft 80 vsplit'
-let g:org#agenda#filelist = map(['todo.org', 'events.org'], "fnamemodify('~/org/' . v:val, ':p')")
 
-let g:org#agenda#views = {'today': [
+function! s:block_display(hl) abort "{{{2
+  let nearest = org#plan#nearest(a:hl.plan, org#time#dict('today'), 1)
+  let plan = empty(nearest) ? '---' : keys(nearest)[0] . ':'
+  if empty(nearest)
+    let plan = '---'
+  else
+    let [name, time] = items(nearest)[0]
+    let plan = (name =~# '^T' ? '' : name[0] . ':') . time.totext('dTR')
+  endif
+  let target = matchstr(a:hl.target, '[^/]*\.org/\zs.*\ze/[^/]\{-}')
+  return [
+        \ [empty(target) ? '/' : (target . ':'), plan, a:hl.keyword, a:hl.item],
+        \ ['orgAgendaFile', 'orgAgendaPlan', 'orgAgendaKeyword', 'orgAgendaHeadline'],
+        \ ]
+endfunction
+
+function! s:stuck_gen() abort "{{{2
+  let stuck = filter(org#outline#multi(org#agenda#files()), 'index(v:val.tags, ''project'') >= 0')
+  call filter(stuck, 'len(org#agenda#filter(v:val.list, ''project-habit-DONE+NEXT'')) == 0')
+  return values(stuck)
+endfunction
+
+function! s:stuck_display(hl) abort "{{{2
+  return [[a:hl.title], ['orgAgendaDate']]
+endfunction
+
+"}}}
+
+" TODO how to do habits?
+let g:org#agenda#views = {'weekly': [
       \ {'title': 'Weekly Agenda',
-      \  'filter': 'org#plan#within(v:val.plan, "+7d") && index(v:val.tags, "habit") < 0',
-      \  'sorter': {a, b -> org#time#diff(org#plan#nearest(a.plan), org#plan#nearest(b.plan))},
+      \  'filter': "PLAN<='+7d'-habit",
       \  'display': 'datetime'},
-      \ {'title': 'Habits', 'filter': {_, hl -> index(hl.tags, 'habit') >= 0 && org#plan#within(hl.plan, 'today')}},
       \ ],
-      \ 'work': [
-      \ {'title': 'LATE', 'filter': {_, hl -> org#plan#islate(hl.plan) && org#plan#nearest(hl.plan).active}},
-      \ {'title': 'Projects', 'generator': 'myorg#project_generator', 'filter': 'myorg#project_filter(v:val)', 'separator': 'myorg#project_separator'},
-      \ {'title': 'TODO', 'generator': 'myorg#project_generator', 'filter': {_, hl -> !hl.done && !empty(hl.keyword) && !myorg#project_filter(hl) && index(hl.tags, 'habits') < 0}, 'files': ['todo.org']},
+      \ 'projects': [
+      \ {'title': 'Projects',
+      \  'filter': 'project-habit-DONE+KEYWORD',
+      \  'separator': 'myorg#project_separator',
+      \  'display': function('s:block_display')},
       \ ],
-      \ 'personal': [
-      \ {'title': 'LATE', 'filter': {_, hl -> org#plan#islate(hl.plan) && org#plan#nearest(hl.plan).active}},
-      \ {'title': 'Projects', 'generator': 'myorg#project_generator', 'filter': 'myorg#project_filter(v:val)', 'separator': 'myorg#project_separator'},
-      \ {'title': 'TODO', 'filter': {_, hl -> !hl.done && !empty(hl.keyword)}, 'files': ['todo.org']},
+      \ 'planning': [
+      \ {'title': 'Next', 'filter': 'NEXT-DONE+project'},
+      \ {'title': 'LATE', 'filter': 'LATE'},
+      \ {'title': 'Stuck', 'justify': [''],
+      \  'generator': function('s:stuck_gen'),
+      \  'display': function('s:stuck_display')},
       \ ],
       \ 'notes': [
-      \ {'title': 'Next', 'filter': {_, hl -> hl.keyword == 'NEXT'}},
-      \ {'title': 'Needs review', 'filter': {_, hl -> hl.keyword == 'REVIEW' && org#plan#within(hl.plan, '+7d')}},
+      \ {'title': 'Next', 'filter': 'NEXT'},
+      \ {'title': 'Needs review', 'filter': "REVIEW+PLAN<='+7d'"},
       \ ],
       \ }
 
 " used in after/ftplugin/agenda.vim
-nnoremap <F5> :let g:last_agenda='today'\|call org#agenda#build('today')<Cr>
-nnoremap <F6> :let g:last_agenda='work'\|call org#agenda#build('work')<Cr>
-nnoremap <F7> :let g:last_agenda='personal'\|call org#agenda#build('personal')<Cr>
+nnoremap <F5> :let g:last_agenda='projects'\|call org#agenda#build(g:last_agenda)<Cr>
+nnoremap <F6> :let g:last_agenda='planning'\|call org#agenda#build(g:last_agenda)<Cr>
+nnoremap <F7> :let g:last_agenda='weekly'\|call org#agenda#build(g:last_agenda)<Cr>
 
-let g:org#agenda#jump = 'SmartSplit'
+let g:org#agenda#jump = 'JumpOrSplit'
 
 highlight link orgAgendaTitle Statement
 highlight link orgAgendaDate Function
@@ -165,5 +184,9 @@ highlight link orgAgendaKeyword Todo
 highlight link orgAgendaHeadline Normal
 highlight link orgAgendaAttention Error
 
+let g:org#keywords = {'todo': ['TODO', 'NEXT', 'WAITING', 'MEETING'], 'done': ['CANCELLED', 'DONE']}
+
 command! Review call myorg#review()
 command! -bang -nargs=* Archive call myorg#archive(<bang>0)
+command! -bang -nargs=* Note call myorg#new(<q-args>, <bang>0)
+command! -bang -nargs=* Project call myorg#newproject(<q-args>, <bang>0)

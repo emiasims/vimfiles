@@ -86,7 +86,7 @@ function! myorg#dosnippet() abort " {{{1
 
   " The template + capture here will take care of proper header level, but will not shift
   " headlines in the snippet.
-  let g:org#currentcapture.template = g:org#currentcapture.type == 'entry' ? '* snippet' : 'snippet'
+  let g:org#currentcapture.template = get(g:org#currentcapture, 'type', 'entry') == 'entry' ? '* snippet' : 'snippet'
   let g:org#currentcapture.snippet = "A\<C-r>=UltiSnips#Anon('" . snippet . "', 'snippet')\<Cr>"
   " let g:org#currentcapture.snippet = "A\<C-r>=UltiSnips#Anon(" . '"' . snippet . '"' . ", 'snippet')\<Cr>"
 endfunction
@@ -154,58 +154,44 @@ function! myorg#processInboxItem(...) abort " {{{1
 endfunction
 
 function! myorg#process_repeats() abort " {{{1
-  let task = filter(org#outline#file('ongoing.org').list, 'org#plan#islate(v:val.plan) && org#plan#repeats(v:val.plan)')
+  let tasks = org#agenda#filter(org#agenda#items(), 'TIMESTAMP+LATE')
+  call filter(tasks, 'org#plan#repeats(v:val.plan)')
 
   let starttabnr = tabpagenr()
-  noautocmd $tab split ~/org/ongoing.org
-  try
-    for event in events
-      let plan = {'TIMESTAMP': org#time#repeat(event.plan.TIMESTAMP)}
-      call setline(event.lnum + 1, org#plan#totext(plan))
-    endfor
-    update
-  finally
-    quit
-    execute 'noautocmd normal!' starttabnr . 'gt'
-  endtry
-endfunction
-
-function! myorg#project_filter(hl) abort " {{{1
-  " if empty(a:hl.plan) || a:hl.done || empty(a:hl.keyword)
-  if a:hl.done || empty(a:hl.keyword)
-    return 0
-  endif
-  let parent = a:hl.parent
-  let inproject = index(a:hl.tags, "project") >= 0
-  while !empty(parent) && !inproject
-    let inproject = index(parent.tags, "project") >= 0
-    let parent = parent.parent
-  endwhile
-  return inproject
-endfunction
-
-function! myorg#project_generator() abort " {{{1
-  let items = org#outline#file('todo.org').list
-  let target2item = {org#util#fname('todo.org'): {}}
-  for item in items
-    let target2item[item.target] = item
+  for task in tasks
+    let plan = {'TIMESTAMP': org#time#repeat(task.plan.TIMESTAMP)}
+    " echo task.bufnr task.lnum + 1 org#plan#totext(plan)
+    call setbufline(task.bufnr, task.lnum + 1, org#plan#totext(plan))
   endfor
-  for item in items
-    let item.parent = target2item[substitute(item.target, '/[^/]*$', '', '')]
-  endfor
-  return items
+  wall
 endfunction
 
 function! myorg#project_separator(hl) abort dict " {{{1
-  if empty(self.cache)
-    let self.cache.projects = filter(org#outline#file('todo.org').list, 'index(v:val.tags, "project") >= 0')
+  if !has_key(self, 'lasttitle')
+    " Get all projects without any items, and display those first
+    let empty_projects = []
+    let agenda = org#outline#multi(org#agenda#files())
+    " Filter out the /files/ who have project as a tag
+    call filter(agenda, 'index(v:val.tags, "project") >= 0')
+    let self.titles = map(copy(agenda), 'get(v:val, "title", "NOTITLE")')
+    for [name, prj] in items(agenda)
+      if empty(org#agenda#filter(prj.list, 'project-DONE+KEYWORD'))
+        call add(empty_projects, [prj.title, 'orgAgendaDate', {'filename': name, 'lnum': 1}])
+      endif
+    endfor
+
+    let self.lasttitle = self.titles[a:hl.filename]
+    return add(empty_projects, [self.titles[a:hl.filename], 'orgAgendaDate', {'filename': a:hl.filename, 'lnum': 1}])
   endif
-  let sections = []
-  while a:hl.lnum > self.cache.projects[0].lnum
-    let pr = remove(self.cache.projects, 0)
-    call add(sections, [pr.item, 'orgAgendaDate'])
-  endwhile
-  return sections
+
+  " Otherwise, display the current file for the project
+  let title = self.titles[a:hl.filename]
+  if self.lasttitle != title
+    let self.lasttitle = title
+    return [[title, 'orgAgendaDate', {'filename': a:hl.filename, 'lnum': 1}]]
+  endif
+  return []
+
 endfunction
 
 function! myorg#review() abort " {{{1
@@ -213,13 +199,70 @@ function! myorg#review() abort " {{{1
   let today = org#time#dict('today').start
   call filter(list, '!v:val.done && !s:plan_repeats(v:val) && !empty(v:val.keyword) && !org#plan#isplanned(v:val.plan, today)')
   for item in list
-    let item.module = split(get(item.parent, "target", "/"), 'todo.org/')[-1]
+    let item.module = split(get(item.parent, "target", "/"), 'projects.org/')[-1]
   endfor
   call setqflist(list)
   tab new
   cfirst
   if empty(&filetype)
     setfiletype org
+  endif
+endfunction
+
+function! myorg#new(title, refile) abort " {{{1
+  if empty(a:title) && !a:refile
+    echoerr 'If not refiling, then the title must not be empty'
+    return
+  endif
+  let title = empty(a:title) && a:refile ? org#headline#get('.').item : a:title
+
+  if a:refile
+    " Find range of source and remove text we're filing
+    let [st, end] = org#section#range('.')
+    let text = getline(st, end)
+    execute st . ',' . end . 'd _'
+  endif
+
+  execute 'new' s:reduce(title, 1)
+  setfiletype org
+  call setline(1, '#+TITLE: ' . title)
+
+  if a:refile
+    call append('$', [''] + text)
+  endif
+endfunction
+
+function! s:reduce(text, prefix) abort " {{{2
+  let text = substitute(a:text, '&', 'and', 'g')
+  let text = substitute(text, '[^0-9A-Za-z_ \t]', '', 'g') " Non word & non space get removed
+  let text = split(tolower(text))
+  while len(text) > 0 && text[0] =~ '\v^(a|the)$'
+    call remove(text, 0)
+  endwhile
+  let name =  join(text[:2], '_') . '.org'
+  return !a:prefix ? name : sha256(strftime('%Y%m%d%H%M%S') . a:text)[:2] . '_' . name
+endfunction
+
+function! myorg#newproject(title, refile) abort range " {{{1
+  if empty(a:title) && !a:refile
+    echoerr 'If not refiling, then the title must not be empty'
+    return
+  endif
+  let title = empty(a:title) && a:refile ? org#headline#get('.').item : a:title
+
+  if a:refile
+    " Find range of source and remove text we're filing
+    let [st, end] = org#section#range('.')
+    let text = getline(st, end)
+    execute st . ',' . end . 'd _'
+  endif
+
+  execute 'new' s:reduce(title, 0)
+  setfiletype org
+  call setline(1, ['#+TITLE: ' . title, '#+FILETAGS: :project:'])
+
+  if a:refile
+    call append('$', [''] + text)
   endif
 endfunction
 
