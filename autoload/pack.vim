@@ -45,6 +45,9 @@ function! s:setup() abort
   call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
   call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
 
+  call minpac#add('git@github.com:milisims/vim-org.git', {'depth': 0})
+  call minpac#add('git@github.com:milisims/contextualize.vim.git', {'depth': 0})
+
 endfunction
 
 let s:coc_packages = [
@@ -70,4 +73,9 @@ endfunction
 function! pack#status() abort
   call s:setup()
   call minpac#status()
+endfunction
+
+function! pack#list(...) abort
+  call s:setup()
+  return join(sort(keys(minpac#getpluglist())), "\n")
 endfunction

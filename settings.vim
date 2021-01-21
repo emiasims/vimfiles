@@ -393,7 +393,8 @@ onoremap ar a]
 onoremap ir i]
 
 " Commands: {{{1
-command! -complete=filetype -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/' . (empty(expand('<args>')) ? &filetype : expand('<args>')) . '.vim'
+command! -complete=filetype -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/'
+      \ . (empty(expand('<args>')) ? &filetype : expand('<args>')) . '.vim'
 command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 
@@ -421,6 +422,9 @@ endif
 command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
 command! PackStatus call pack#status()
+command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
+command! -nargs=1 -complete=custom,pack#list PackEdit execute 'tabe' minpac#getpluginfo(<q-args>).dir
+command! -nargs=1 -complete=custom,pack#list PackOpen call util#openf(minpac#getpluginfo(<q-args>).url)
 
 
 " vim-sneak {{{2

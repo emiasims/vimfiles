@@ -14,5 +14,8 @@ endfunction
 function! util#openf(text) abort
   if filereadable(a:text) || expand(a:text) =~? '^http'
     silent execute "!xdg-open" substitute(shellescape(a:text), '[#%]', '\\&', 'g')
+  elseif expand(a:text) =~? '^git@.*\.git$'
+    let url = 'https://' . substitute(a:text[4:-5], ':', '/', '')
+    silent execute "!xdg-open" substitute(shellescape(url), '[#%]', '\\&', 'g')
   endif
 endfunction
