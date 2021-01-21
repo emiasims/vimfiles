@@ -5,6 +5,8 @@ if !&modifiable
   else
     nnoremap <buffer> q :q<CR>
   endif
+else
+  setlocal concealcursor=
 endif
 if has('nvim')
   setlocal number relativenumber signcolumn=no
