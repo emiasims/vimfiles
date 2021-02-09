@@ -302,10 +302,7 @@ cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
 
-nnoremap cr `["ryiwuyiw<C-r>/\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>r<Esc>
-nnoremap cR `["ryiWuyiW<C-r>/\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-r>r<Esc>
-xnoremap <C-s> :s/<C-r>///g<left><left>
-xnoremap gs y:%s/<C-r>"//g<Left><Left>
+nnoremap c* :<C-u>let @/ = '\<'.expand('<cword>').'\>'<Cr>0cgn
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
@@ -541,8 +538,7 @@ if has('nvim') " {{{2
       " Not working
       autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
       autocmd BufEnter mail*,outlook* set filetype=mail
-      autocmd TextChanged * ++nested write
-      autocmd InsertEnter,InsertLeave * ++nested write
+      autocmd InsertEnter,InsertLeave,TextChanged * ++nested write
       autocmd BufEnter github.com_*.txt set filetype=markdown
     augroup END
     set wrap
@@ -584,8 +580,8 @@ if has('nvim') " {{{2
   let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
   let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
   snoremap <C-e> <Esc>`>a
-
-endif " {{{2
+  " }}}
+endif
 " Windows {{{2
 if has('win32')
   function! s:setup_guifont() abort
