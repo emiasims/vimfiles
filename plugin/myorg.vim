@@ -134,7 +134,8 @@ endfunction
 
 function! s:stuck_gen() abort "{{{2
   let stuck = filter(org#outline#multi(org#agenda#files()), 'index(v:val.tags, ''project'') >= 0')
-  call filter(stuck, 'len(org#agenda#filter(v:val.list, ''project-habit-DONE+NEXT'')) == 0')
+  let filter = org#agenda#filter('project-habit-DONE+NEXT')
+  call filter(stuck, 'len(filter(v:val.list, "' . filter . '")) == 0')
   return values(stuck)
 endfunction
 
@@ -148,7 +149,8 @@ endfunction
 let g:org#agenda#views = {'weekly': [
       \ {'title': 'Weekly Agenda',
       \  'filter': "PLAN<='+7d'-habit",
-      \  'display': 'datetime'},
+      \  'display': 'datetime',
+      \  'sorter': 'PLAN'},
       \ ],
       \ 'projects': [
       \ {'title': 'Projects',

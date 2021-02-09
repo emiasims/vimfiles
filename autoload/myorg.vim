@@ -154,7 +154,7 @@ function! myorg#processInboxItem(...) abort " {{{1
 endfunction
 
 function! myorg#process_repeats() abort " {{{1
-  let tasks = org#agenda#filter(org#agenda#items(), 'TIMESTAMP+LATE')
+  let tasks = filter(org#agenda#items(), org#agenda#filter('TIMESTAMP+LATE'))
   call filter(tasks, 'org#plan#repeats(v:val.plan)')
 
   let starttabnr = tabpagenr()
@@ -174,8 +174,9 @@ function! myorg#project_separator(hl) abort dict " {{{1
     " Filter out the /files/ who have project as a tag
     call filter(agenda, 'index(v:val.tags, "project") >= 0')
     let self.titles = map(copy(agenda), 'get(v:val, "title", "NOTITLE")')
+    let flt = org#agenda#filter('project-DONE+KEYWORD')
     for [name, prj] in items(agenda)
-      if empty(org#agenda#filter(prj.list, 'project-DONE+KEYWORD'))
+      if empty(filter(prj.list, flt))
         call add(empty_projects, [prj.title, 'orgAgendaDate', {'filename': name, 'lnum': 1}])
       endif
     endfor

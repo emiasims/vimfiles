@@ -4,8 +4,6 @@ let b:cursorword = 0
 setlocal foldminlines=0
 setlocal concealcursor=n
 
-command! -buffer -nargs=0 ToNote call org#refile('notebox.org')
-
 nmap <buffer> gO <Plug>(org-headline-open-above)Headline<Esc>[ viw<C-g>
 nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
 
@@ -19,8 +17,12 @@ Contextualize startoflist inoremap <buffer> <expr> [ '[ ] '
 Contextualize default imap <buffer> <expr> [ g:contextualize.i.map['['].do()
 
 ContextAdd <buffer> linkend {-> getline('.')[: col('.') - 2] =~ '\[\[[^\[\]]*\]\[[^\[\]]*\]\]$'}
+ContextAdd <buffer> inlink {-> getline('.')[col("'>") : col("'>")+1] == ']]'}
+Contextualize inlink snoremap <buffer> <Tab> <Esc>2f]a
 Contextualize linkend inoremap <buffer> <Tab> <Esc>hhvi]<C-g>
 Contextualize default imap <buffer> <expr> <Tab> g:contextualize.i.map['<lt>tab>'].do()
 
 Contextualize inSyntax orgLink nnoremap <silent> <buffer> K :call org#note#followLink()<Cr>
 xnoremap <silent> <buffer> K :<C-u>call org#note#setupLink('', 'v')<Cr>
+
+
