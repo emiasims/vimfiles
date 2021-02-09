@@ -420,9 +420,8 @@ command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
 command! PackStatus call pack#status()
 command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
-command! -nargs=1 -complete=custom,pack#list PackEdit execute 'tabe' minpac#getpluginfo(<q-args>).dir
-command! -nargs=1 -complete=custom,pack#list PackOpen call util#openf(minpac#getpluginfo(<q-args>).url)
-
+command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | FZ 40 20 | execute 'Files' minpac#getpluginfo(<q-args>).dir
+command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
 
 " vim-sneak {{{2
 nmap f <Plug>Sneak_f
