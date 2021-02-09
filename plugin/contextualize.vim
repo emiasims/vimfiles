@@ -52,14 +52,18 @@ Contextualize {-> mode(1) =~# 'v'} xnoremap s y:set opfunc=SetupSubstitute<Cr>g@
 ContextAdd pairallowed {-> getline('.')[col('.') - 1] =~ '\W' || col('.') - 1 == len(getline('.'))}
 ContextAdd quoteallowed {-> getline('.')[col('.') - 2 : col('.') - 1] !~ '\w'}
 ContextAdd completepair {lhs -> getline('.')[col('.') - 1] == lhs}
-ContextAdd delpair {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V()\|{}\|[]\|''''\|""\)'}
-ContextAdd closingpairs {-> getline('.')[col('.') - 1 :] =~ '^[\]''")}]\+'}
+ContextAdd inpair {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V()\|{}\|[]\|''''\|""\)'}
+
+function! s:closingpairs(...) abort
+  return getline('.')[col('.') - 1 :] =~ '^' . (get(a:, 1, '') . '[\]''")}]\+')
+endfunction
+ContextAdd closingpairs s:closingpairs
 
 for pair in ['()', '[]', '{}']
   call contextualize#map('pairallowed' , 'i', 'map', pair[0], pair . '<C-g>U<Left>')
   call contextualize#map('pairallowed' , 's', 'map', pair[0], pair . '<C-g>U<Left>')
   call contextualize#map('completepair', 'i', 'map', pair[1], '<C-g>U<Right>', {'args': pair[1]})
-  call contextualize#map('closingpairs', 'i', 'map', pair[1], '<C-o>f' . pair[1] . '<Right>')
+  call contextualize#map('closingpairs ' . pair[1], 'i', 'map', pair[1], '<C-o>f' . pair[1] . '<Right>')
 endfor
 
 Contextualize closingpairs inoremap <Tab> <C-o>/[^\]''")}]\\|$/e<Cr>
@@ -72,8 +76,14 @@ Contextualize quoteallowed inoremap " ""<C-g>U<Left>
 Contextualize quoteallowed snoremap ' ''<C-g>U<Left>
 Contextualize quoteallowed snoremap " ""<C-g>U<Left>
 
-Contextualize delpair inoremap <Bs> <BS><Del>
+Contextualize inpair inoremap <Bs> <BS><Del>
+Contextualize inpair inoremap <Cr> <Cr><C-c>O
+Contextualize inpair inoremap <Space> <Space><Space><C-g>U<Left>
+" Contextualize {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V(  )\|{  }\|[  ]\|''  ''\|"  "\)'} inoremap <Bs> <BS><Del>
 
+ContextAdd pumvis pumvisible
+Contextualize pumvis inoremap <Cr> <C-y>
+Contextualize pumvis inoremap <Esc> <C-e>
 
 " vim-fugitive
 Contextualize startcmd cnoreabbrev gcim Gcommit \| startinsert
