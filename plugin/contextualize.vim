@@ -42,6 +42,18 @@ Contextualize startcmd cnoreabbrev w2 w
 " Use this like 'eh/', the / expands and adds the dir / divider
 Contextualize startcmd cnoreabbrev eh edit <C-r>=expand('%:h')<Cr>
 
+Contextualize startcmd cnoreabbrev f   FZ 50 20 \| Files
+Contextualize startcmd cnoreabbrev o   FZ 40 20 \| Files ~/org
+Contextualize startcmd cnoreabbrev l   <C-u>call fzfr#buffers()
+Contextualize startcmd cnoreabbrev t   FZ 80 20 \| Tags
+Contextualize startcmd cnoreabbrev mr  FZ 70 20 \| History
+Contextualize startcmd cnoreabbrev A   Ag
+Contextualize startcmd cnoreabbrev h   FZ 80 20 \| Helptags
+Contextualize startcmd cnoreabbrev ev  FZ 70 20 \| Files $CFGDIR
+
+" Org
+Contextualize startcmd cnoreabbrev c   Capture
+
 function! SetupSubstitute(type) abort
   call feedkeys(":'[,']s/\<C-r>\"//g\<Left>\<Left>")
 endfunction " }}}
