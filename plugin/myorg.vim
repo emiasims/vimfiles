@@ -11,25 +11,26 @@ augroup vimrc_org
 
   autocmd User OrgRefilePost silent update|buffer #
   autocmd User OrgRefilePost echo 'Refiled to' org#headline#astarget(g:org#refile#destination)
+
+  autocmd User OrgKeywordDone call myorg#completeTaskInJournal()
 augroup END
 
 " Capture templates {{{1
 let g:org#capture#templates = {}
 let t = g:org#capture#templates
 
-let t.q = {'description': 'Quick', 'snippet': ['${1:Title}', '$0']}
-
-let t.op = {'description': 'Org note', 'target': 'vim-org.org', 'snippet': ['${1:Note}', '$0']}
-
-let t.e = {'description': 'Event', 'target': 'events.org'} " {{{2
+let t.q = #{description: 'Quick', snippet: ['${1:Title}', '$0']}
+let t.c = #{description: 'Chore', target: 'chores.org', snippet: ['TODO ${1:Chore}', "`!v org#time#dict('today').totext('T')`"]}
+let t.op = #{description: 'Org note', target: 'vim-org.org', snippet: ['${1:Note}', '$0']}
+let t.M = #{description: 'Medical note', target: 'health.org/Notes for Doctor', snippet: ['${1:Note}']}
+let t.e = #{description: 'Event', target: 'events.org'} " {{{2
 let t.e.snippet = ['${1:Event}', '<${2:`!v org#time#dict("today").totext("B")`}>', '$0']
 
-let t.dj = {'description': 'Journal'} " {{{2
-let t.dj.target = {-> 'diary.org/' . strftime('%B/%A the ') . (strftime('%d')+0) . (strftime('%d')  =~ '1[123]' ? 'st' : get({1: 'st', 2: 'nd', 3: 'rd'}, strftime('%d') % 10, 'th'))}
+let t.dj = #{description: 'Journal', target: function('myorg#journaltarget')} " {{{2
 " The time is now - 3 hours -- allows going to bed at 3 am
 let t.dj.snippet =<< ENDORGTMPL
 Journal
-[`!v org#time#dict(localtime() - 3600 * 3).totext('T')`]
+[`!v org#time#dict(localtime() - 3600 * 3).totext('TB')`]
 :PROPERTIES:
 :food+: $1
 :games+: $2
@@ -50,7 +51,7 @@ ${11:~~emotions~~}
 ${12:xoxo}
 ENDORGTMPL
 
-let t.ds = {'description': 'Sleep log'} " {{{2
+let t.ds = #{description: 'Sleep log'} " {{{2
 let t.ds.target = {-> 'diary.org/' . strftime('%B/%A the ') . (strftime('%d')+0) . (strftime('%d')  =~ '1[123]' ? 'st' : get({1: 'st', 2: 'nd', 3: 'rd'}, strftime('%d') % 10, 'th'))}
 let t.ds.snippet =<< ENDORGTMPL
 Sleep log
@@ -69,7 +70,7 @@ Sleep log
 $0
 ENDORGTMPL
 
-let t.r = {'description': 'Recipe', 'target': 'recipes.org'} " {{{2
+let t.r = #{description: 'Recipe', target: 'recipes.org'} " {{{2
 let t.r.snippet =<< ENDORGTMPL
 ${1:Recipe}
 :PROPERTIES:
@@ -90,11 +91,11 @@ ${1:Recipe}
 ENDORGTMPL
 " }}}
 
-nmap <leader>c <Plug>(org-capture)
-xmap <leader>c <Plug>(org-capture)
+nmap \c <Plug>(org-capture)
+xmap \c <Plug>(org-capture)
 unlet t
 
-let g:org#capture#opts = {'editcmd': 'JumpSplitOrEdit'}
+let g:org#capture#opts = #{editcmd: 'JumpSplitOrEdit'}
 
 " Inbox {{{1
 command! ProcessInbox call s:processInbox()
@@ -146,28 +147,26 @@ endfunction
 "}}}
 
 " TODO how to do habits?
-let g:org#agenda#views = {'weekly': [
-      \ {'title': 'Weekly Agenda',
-      \  'filter': "PLAN<='+7d'-habit",
-      \  'display': 'datetime',
-      \  'sorter': 'PLAN'},
+let g:org#agenda#views = #{
+      \ projects: [
+      \ #{title: 'Projects',
+      \  filter: 'project-habit-DONE+KEYWORD',
+      \  separator: 'myorg#project_separator',
+      \  display: function('s:block_display')},
       \ ],
-      \ 'projects': [
-      \ {'title': 'Projects',
-      \  'filter': 'project-habit-DONE+KEYWORD',
-      \  'separator': 'myorg#project_separator',
-      \  'display': function('s:block_display')},
+      \ planning: [
+      \ #{title: 'Next', filter: 'NEXT-DONE+project'},
+      \ #{title: 'LATE', filter: 'LATE'},
+      \ #{title: 'Stuck', justify: [''],
+      \  generator: function('s:stuck_gen'),
+      \  display: function('s:stuck_display')},
+      \ #{title: 'All Todo', filter: 'KEYWORD-DONE-CLOSED-LATE-NEXT|PLAN-KEYWORD'},
       \ ],
-      \ 'planning': [
-      \ {'title': 'Next', 'filter': 'NEXT-DONE+project'},
-      \ {'title': 'LATE', 'filter': 'LATE'},
-      \ {'title': 'Stuck', 'justify': [''],
-      \  'generator': function('s:stuck_gen'),
-      \  'display': function('s:stuck_display')},
-      \ ],
-      \ 'notes': [
-      \ {'title': 'Next', 'filter': 'NEXT'},
-      \ {'title': 'Needs review', 'filter': "REVIEW+PLAN<='+7d'"},
+      \ weekly: [
+      \ #{title: 'Weekly Agenda',
+      \  filter: "PLAN<='+7d'",
+      \  display: 'datetime',
+      \  sorter: 'PLAN'},
       \ ],
       \ }
 
@@ -186,7 +185,7 @@ highlight link orgAgendaKeyword Todo
 highlight link orgAgendaHeadline Normal
 highlight link orgAgendaAttention Error
 
-let g:org#keywords = {'todo': ['TODO', 'NEXT', 'WAITING', 'MEETING'], 'done': ['CANCELLED', 'DONE']}
+let g:org#keywords = #{todo: ['TODO', 'NEXT', 'WAITING', 'MEETING'], done: ['CANCELLED', 'DONE']}
 
 command! Review call myorg#review()
 command! -bang -nargs=* Archive call myorg#archive(<bang>0)

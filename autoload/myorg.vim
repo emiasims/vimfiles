@@ -86,9 +86,120 @@ function! myorg#dosnippet() abort " {{{1
 
   " The template + capture here will take care of proper header level, but will not shift
   " headlines in the snippet.
-  let g:org#currentcapture.template = get(g:org#currentcapture, 'type', 'entry') == 'entry' ? '* snippet' : 'snippet'
+  let g:org#currentcapture.template = get(g:org#currentcapture, 'type', 'entry') == 'entry' ? "* snippet" : 'snippet'
   let g:org#currentcapture.snippet = "A\<C-r>=UltiSnips#Anon('" . snippet . "', 'snippet')\<Cr>"
   " let g:org#currentcapture.snippet = "A\<C-r>=UltiSnips#Anon(" . '"' . snippet . '"' . ", 'snippet')\<Cr>"
+endfunction
+
+function! myorg#updateTasks(...) abort " {{{1
+
+  let taskshl = org#headline#fromtarget(myorg#journaltarget() . '/Tasks')
+  let endl = match(getbufline(taskshl.bufnr, 1, '$'), '^\*', taskshl.lnum) + 1  " lnum is ix + 1 already
+  let text = getbufline(taskshl.bufnr, taskshl.lnum + 1, endl - 1)
+  let order = []
+  let current = {}
+  for ix in range(len(text))
+    let line = text[ix]
+    let parts = matchlist(line, '\v^\s*- \[(.)\] (\[\[[^\]]*\]\[[^\]]*\]\])\s*(\[\d{4}-\d\d-\d\d.*\])?$')
+    if len(parts) > 0
+      let current[parts[2]] = #{done: parts[1] =~? 'x', time: parts[3], lnum: taskshl.lnum + ix + 1}
+    endif
+  endfor
+
+  " we have tasks, make list, extend dict, then write dict as list
+  let myfilter = join(map(["TIMESTAMP", "SCHEDULED", "DEADLINE"], "'KEYWORD-MEETING-WAITING+'.v:val.'==''today'''"), '|')
+  let newItems = filter(org#agenda#items(), org#agenda#filter(myfilter))
+
+  " Add ids to newItems without them
+  for item in filter(copy(newItems), "!has_key(v:val.properties, 'id')")
+    let item.properties['id'] = myorg#generateid(item.item)
+    call item.update()
+  endfor
+
+  " if there's a supplied headline, add it to the list if it's not in the list.
+  if exists('a:1')
+    try
+      let ix = index(map(copy(newItems), 'v:val.properties.id'), a:1.properties.id)
+    catch /^Vim\%((\a\+)\)\=:E716/
+      echoerr "Supplied headline does not contain 'id' property."
+    endtry
+
+    echo ix
+    if ix < 0
+      call add(newItems, a:1)
+    else
+      call extend(newItems[ix], a:1)
+    endif
+  endif
+
+  " Add spacer. TODO: org#format
+  if (endl - taskshl.lnum) == 1
+    call appendbufline(taskshl.bufnr, endl-1, '')
+    let endl += 1
+  endif
+
+  " Add items that do not exist
+  call map(newItems, "extend(v:val, {'link': s:tolink(v:val)})")
+  let additions = filter(copy(newItems), '!has_key(current, v:val.link)')
+  let newtext = map(copy(additions), "printf('  - [ ] %s', v:val.link)")
+  call appendbufline(taskshl.bufnr, endl - 2, newtext)
+
+  " Update 'current' list of items
+  let time = org#time#dict('[now]').totext()
+  for ix in range(len(additions))
+    let hl = additions[ix]
+    let current[hl.link] = #{done: hl.done, time: time, lnum: endl - 1 + ix}
+  endfor
+  for hl in filter(copy(newItems), 'has_key(current, v:val.link)')
+    if !current[hl.link].done  " Keep old time if we don't update it
+      let current[hl.link].time = time
+    endif
+    let current[hl.link].done = hl.done
+  endfor
+
+  " Update checkboxes
+  for [link, info] in items(current)
+    if info.done && getbufline(taskshl.bufnr, info.lnum)[0][:6] !=? '  - [x]'
+      call setbufline(taskshl.bufnr, info.lnum, printf('  - [x] %s %s', link, info.time))
+    elseif !info.done && getbufline(taskshl.bufnr, info.lnum)[0][:6] != '  - [ ]'
+      call setbufline(taskshl.bufnr, info.lnum, printf('  - [ ] %s', link))
+    endif
+  endfor
+
+endfunction
+
+function! s:tolink(hl) abort " {{{2
+  return printf('[[file:%s::#%s][%s]]', fnamemodify(a:hl.filename, ':t'), a:hl.properties.id, a:hl.item)
+endfunction
+
+function! myorg#generateid(headline, ...) abort " {{{1
+  " Why? Because I like how it looks.
+  let id = sha256(strftime('%Y%m%d%H%M', get(a:, 1, localtime())) . a:headline)
+  let prefix = join(map(split(a:headline)[:6], 'matchstr(v:val, "[[:alnum:]]")'), '')
+  return prefix . '-' . id[: 12 - len(prefix)]
+endfunction
+
+function! myorg#completeTaskInJournal() abort " {{{1
+  let hl = org#headline#get('.')
+  if !has_key(hl.properties, 'id')
+    let hl.properties.id = myorg#generateid(hl.item)
+    call hl.update()
+  endif
+  let hl.done = 1
+  " If repeats, done is false. But for the list, it should be complete
+  update " simplify awkward caching problems
+  call myorg#updateTasks(hl)
+endfunction
+
+function! myorg#journaltarget() abort " {{{1
+  let date = str2nr(strftime('%d', localtime() - 3600 * 3))  " str2nr removes prefix 0
+  let target = 'diary.org/' . strftime('%B/%A the ') . str2nr(strftime('%d'))
+  if date  =~ '1[123]'
+    let target .= 'th'
+  else
+    let target .= get({1: 'st', 2: 'nd', 3: 'rd'}, date % 10, 'th')
+  endif
+  return target
 endfunction
 
 function! myorg#processInboxItem(...) abort " {{{1
