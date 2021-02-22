@@ -51,8 +51,8 @@ Contextualize startcmd cnoreabbrev A   Ag
 Contextualize startcmd cnoreabbrev h   FZ 80 20 \| Helptags
 Contextualize startcmd cnoreabbrev ev  FZ 70 20 \| Files $CFGDIR
 
-" Org
-Contextualize startcmd cnoreabbrev c   Capture
+" Expand with <C-]>
+Contextualize startcmd cnoreabbrev c   Capture <C-z>
 
 function! SetupSubstitute(type) abort
   call feedkeys(":'[,']s/\<C-r>\"//g\<Left>\<Left>")
