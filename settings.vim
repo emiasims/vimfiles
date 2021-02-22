@@ -17,6 +17,7 @@ set viewoptions=folds,cursor,slash,unix
 set timeout ttimeout
 set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
+set shell=bash
 
 if exists('$SUDO_USER')
   set nowritebackup
