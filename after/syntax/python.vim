@@ -1,16 +1,12 @@
 " Vim syntax file to complement the default (as of update date) with folding.
 " Language:	Python
-" Author:	Matt Simmons <matt.simmons@compbiol.org>
-" Updated:	2019 Nov 12
+" Author:	Emilia Simmons
 " Description:
 " Fold up to two lines underneath a function or class definition
 " Class methods should eat ALL whitespace to the next method, but
 " zero lines if it is the last method defined. The subsequent two
 " empty lines (or all whitespace) belong to the class fold.
 " Note that this will not work properly with multiple decorators.
-"
-" This setup lines up well with black formatting. edit foldtext
-" to show both function/class name and decoration!
 
 " Remove any of these if already defined. Statement & string are in vim runtime
 silent! syntax clear pythonString
