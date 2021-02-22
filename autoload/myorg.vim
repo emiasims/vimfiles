@@ -306,21 +306,6 @@ function! myorg#project_separator(hl) abort dict " {{{1
 
 endfunction
 
-function! myorg#review() abort " {{{1
-  let list = myorg#project_generator()
-  let today = org#time#dict('today').start
-  call filter(list, '!v:val.done && !s:plan_repeats(v:val) && !empty(v:val.keyword) && !org#plan#isplanned(v:val.plan, today)')
-  for item in list
-    let item.module = split(get(item.parent, "target", "/"), 'projects.org/')[-1]
-  endfor
-  call setqflist(list)
-  tab new
-  cfirst
-  if empty(&filetype)
-    setfiletype org
-  endif
-endfunction
-
 function! myorg#new(title, refile) abort " {{{1
   if empty(a:title) && !a:refile
     echoerr 'If not refiling, then the title must not be empty'
@@ -384,3 +369,117 @@ function! s:rebuild_agenda(name) abort " {{{1
   call org#agenda#build(a:name)
   call winrestview(view)
 endfunction
+
+function! myorg#capturewindow(templates) abort " {{{1
+  let templates = map(copy(a:templates), {_, t -> [t.key, t.description]})
+  " let templates = map(templates, {_, t -> [t[0], type(t[1]) == v:t_func ? t[1]() : t[1]]})
+  let fulltext = s:capture_text(templates)
+  let winid = has('nvim') ? s:nvimwin(fulltext) : s:vimwin(fulltext)
+  let selection = ''
+  messages clear
+
+  while 1
+    redraw
+    try
+      let capture = getchar()
+    catch /^Vim:Interrupt$/  " for <C-c>
+      call s:closewin(winid) | return {}
+    endtry
+    if capture == char2nr("\<Esc>")
+      call s:closewin(winid) | return {}
+    elseif capture == char2nr("\<Cr>") && !empty(selection)
+      break
+    endif
+    let selection = selection . nr2char(capture)
+    let reduced = filter(copy(templates), {_, t -> t[0][: len(selection) - 1] == selection})
+    if len(reduced) == 1
+      break
+    elseif len(reduced) == 0
+      call s:set_text(winid, fulltext)
+      let selection = ''
+    elseif len(reduced) > 1
+      call s:set_text(winid, s:capture_text(reduced, fulltext))
+    endif
+  endwhile
+
+  call s:closewin(winid)
+  return filter(copy(a:templates), 'v:val.key == selection')[0]
+endfunction
+
+function! s:capture_text(options, ...) abort " {{{2
+  let full = get(a:, 1, a:options)
+  let text = map(copy(a:options), {_, t -> '  ' . t[0] . repeat(' ', 5 - len(t[0])) . t[1]})
+  return text + map(range(len(full) - len(text)), '""')
+endfunction
+
+function! s:closewin(winid) abort " {{{2
+  if has('nvim') | quit | else | call popup_close(a:winid) | endif
+endfunction
+
+function! s:getlines() abort " {{{2
+  " Get 'absolute' line number. Seems easier than traversing winlayout()
+  let [start, lines] = [winnr(), winline() + 1]
+  noautocmd wincmd k
+  while winnr() != winnr('k')
+    let lines += winheight(winnr()) + 1
+    noautocmd wincmd k
+  endwhile
+  return lines
+endfunction
+
+function! s:nvimwin(text) abort " {{{2
+  let buf = nvim_create_buf(v:false, v:true)
+  let s:buf = buf
+  let above = (s:getlines() + len(a:text) + 3 > &lines)
+  let opts = {
+        \ 'relative': 'cursor',
+        \ 'row': !above,
+        \ 'col': -1,
+        \ 'width': 3 + max(map(copy(a:text), 'len(v:val)')),
+        \ 'height': len(a:text) + 1,
+        \ 'anchor': above ? "SW" : "NW",
+        \ }
+
+  let winid = nvim_open_win(buf, v:true, opts)
+  setfiletype org-capture
+  call setline(1, ' Capture:')
+  call append('$', a:text)
+  return winid
+endfunction
+
+function! s:set_text(winid, text) abort " {{{2
+  if has('nvim')
+    call setline(1, ' Capture:')
+    call setline(2, a:text)
+  else
+    call win_execute(a:winid, 'call setline(1, " Capture:")')
+    call win_execute(a:winid, 'call setline(2, a:text)')
+  endif
+endfunction
+
+function! s:vimwin(text) abort " {{{2
+  let text = [' Capture:'] + a:text
+  let above = (s:getlines() + len(a:text) + 1 > &lines)
+  let winid = popup_atcursor(text, {
+        \ 'pos': above ? 'botleft' : 'topleft',
+        \ 'col': above ? 'cursor' : 'cursor-1',
+        \ 'minwidth': 3 + max(map(copy(a:text), 'len(v:val)')),
+        \ })
+  call win_execute(winid, 'setfiletype org-capture')
+  return winid
+endfunction
+function! myorg#capture() range abort " {{{1
+  if type(g:org#capture#templates) == v:t_dict
+    let order = copy(get(g:, 'org#capture#order', sort(keys(g:org#capture#templates))))
+    let order = filter(order, 'has_key(g:org#capture#templates, v:val)')
+    let templates = map(order, {_, k -> extend(g:org#capture#templates[k], {'key': k})})
+  elseif type(g:org#capture#templates) == v:t_list
+    let templates = copy(g:org#capture#templates)
+  endif
+
+  let templates = filter(templates, {_, t -> !has_key(t, 'context') || (type(t.context) == 1 ? eval(t.context) : t.context())})
+  let capture = myorg#capturewindow(templates)
+  if empty(capture) | return | endif
+  call org#capture#do(capture)
+endfunction
+

@@ -9,8 +9,8 @@ augroup vimrc_org
   autocmd User OrgRefilePre if g:org#refile#destination.filename =~# 'archive.org$' | call org#plan#add({'CLOSED': '[now]'}) | endif
   autocmd InsertLeave *.org if org#listitem#has_ordered_bullet(getline('.'))|call org#list#reorder()|endif
 
-  autocmd User OrgRefilePost silent update|buffer #
   autocmd User OrgRefilePost echo 'Refiled to' org#headline#astarget(g:org#refile#destination)
+  autocmd User OrgRefilePost silent update|buffer #
 
   autocmd User OrgKeywordDone call myorg#completeTaskInJournal()
 augroup END
@@ -91,8 +91,8 @@ ${1:Recipe}
 ENDORGTMPL
 " }}}
 
-nmap \c <Plug>(org-capture)
-xmap \c <Plug>(org-capture)
+nmap \c :     call myorg#capture()<Cr>
+xmap \c :<C-u>call myorg#capture()<Cr>
 unlet t
 
 let g:org#capture#opts = #{editcmd: 'JumpSplitOrEdit'}
@@ -155,7 +155,7 @@ let g:org#agenda#views = #{
       \  display: function('s:block_display')},
       \ ],
       \ planning: [
-      \ #{title: 'Next', filter: 'NEXT-DONE+project'},
+      \ #{title: 'Next', filter: 'NEXT-DONE+project-LATE'},
       \ #{title: 'LATE', filter: 'LATE'},
       \ #{title: 'Stuck', justify: [''],
       \  generator: function('s:stuck_gen'),
@@ -164,7 +164,7 @@ let g:org#agenda#views = #{
       \ ],
       \ weekly: [
       \ #{title: 'Weekly Agenda',
-      \  filter: "PLAN<='+7d'",
+      \  filter: "PLAN<='+7d'-DONE",
       \  display: 'datetime',
       \  sorter: 'PLAN'},
       \ ],
@@ -187,7 +187,6 @@ highlight link orgAgendaAttention Error
 
 let g:org#keywords = #{todo: ['TODO', 'NEXT', 'WAITING', 'MEETING'], done: ['CANCELLED', 'DONE']}
 
-command! Review call myorg#review()
 command! -bang -nargs=* Archive call myorg#archive(<bang>0)
 command! -bang -nargs=* Note call myorg#new(<q-args>, <bang>0)
 command! -bang -nargs=* Project call myorg#newproject(<q-args>, <bang>0)
