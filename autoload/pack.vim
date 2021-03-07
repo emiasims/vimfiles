@@ -1,7 +1,7 @@
 packadd minpac
 
 call minpac#init()
-call minpac#add('k-takata/minpac', {'type' : 'opt'})
+call minpac#add('k-takata/minpac', #{type : 'opt'})
 
 call minpac#add('jeetsukumaran/vim-pythonsense')
 call minpac#add('Vimjas/vim-python-pep8-indent')
@@ -35,20 +35,21 @@ call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
 call minpac#add('chrisbra/unicode.vim')
 
-call minpac#add('glacambre/firenvim', {'do': function('firenvim#install') })
+call minpac#add('glacambre/firenvim', #{do: function('firenvim#install') })
 call minpac#add('tweekmonster/startuptime.vim')
 
 " Nvim specific:
-call minpac#add('neoclide/coc.nvim', {'type': 'opt', 'branch': 'release'})
-call minpac#add('antoinemadec/coc-fzf', {'type': 'opt'})
-call minpac#add('neoclide/jsonc.vim', {'type' : 'opt'})
-call minpac#add('mhinz/vim-signify', {'type' : 'opt'})  " Slow?
-call minpac#add('ludovicchabant/vim-gutentags', {'type' : 'opt'})
-call minpac#add('SirVer/ultisnips', {'type' : 'opt'})
+call minpac#add('neoclide/coc.nvim', #{type: 'opt', branch: 'release'})
+call minpac#add('antoinemadec/coc-fzf', #{type: 'opt'})
+call minpac#add('neoclide/jsonc.vim', #{type : 'opt'})
+call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
+call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
+call minpac#add('SirVer/ultisnips', #{type : 'opt'})
 
-call minpac#add('git@github.com:milisims/vim-org.git', {'depth': 0})
-call minpac#add('git@github.com:milisims/vim-org-notebox.git', {'depth': 0})
-call minpac#add('git@github.com:milisims/contextualize.vim.git', {'depth': 0})
+
+call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
+call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
+call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
 
 let s:coc_packages = [
       \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-ultisnips',
@@ -61,7 +62,7 @@ function! pack#coc_install(...) abort
 endfunction
 
 function! pack#update() abort
-  call minpac#update('', {'do' : 'call minpac#status() | call pack#coc_install()'})
+  call minpac#update('', #{do : 'call minpac#status() | call pack#coc_install()'})
 endfunction
 
 function! pack#clean() abort
