@@ -206,6 +206,7 @@ nnoremap <Space> :
 xnoremap <Space> :
 nnoremap : <Nop>
 xnoremap : <Nop>
+cnoremap <expr> <space> (getcmdtype()==":" && empty(getcmdline())) ? 'lua ' : '<C-]> '
 
 inoremap <C-c> <Esc>
 inoremap <Esc> <C-c>
@@ -337,10 +338,15 @@ xnoremap \P "0P
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
-nnoremap <F9> :<C-u>execute 'setfiletype' &filetype\|call SynStack()<CR>
+nnoremap <F9> :<C-u>call SynStack()<CR>
 function! SynStack()
   let group = synIDattr(synID(line('.'), col('.'), 1), 'name')
-  echo group map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+  let glist = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
+  " let hlgroup = synIDattr(synIDtrans(hlID(group)), 'name')
+  let hlgroup = '	Highlighting: ' . synIDattr(synID(line("."), col("."), 1), "name") . ' ➤ '
+        \ . synIDattr(synID(line("."), col("."), 0), "name") . ' ➤ '
+        \ . synIDattr(synIDtrans(synID(line("."), col("."), 1)), "name")
+  echo group glist hlgroup
 endfunc
 
 
