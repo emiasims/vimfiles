@@ -127,8 +127,9 @@ function! s:block_display(hl) abort "{{{2
     let plan = (name =~# '^T' ? '' : name[0] . ':') . time.totext('dTR')
   endif
   let target = matchstr(a:hl.target, '[^/]*\.org/\zs.*\ze/[^/]\{-}')
+  " ➤ u27a4
   return [
-        \ [empty(target) ? '/' : (target . ':'), plan, a:hl.keyword, a:hl.item],
+        \ [empty(target) ? '➤' : (target . ':'), plan, a:hl.keyword, a:hl.item],
         \ ['orgAgendaFile', 'orgAgendaPlan', 'orgAgendaKeyword', 'orgAgendaHeadline'],
         \ ]
 endfunction

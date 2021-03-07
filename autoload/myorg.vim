@@ -202,67 +202,6 @@ function! myorg#journaltarget() abort " {{{1
   return target
 endfunction
 
-function! myorg#processInboxItem(...) abort " {{{1
-  let hl = exists('a:1') ? a:1 : org#headline#get('.')
-  let hl = type(hl) == v:t_dict ? hl : org#headline#get(hl)
-  if hl.keyword ==# 'PROJECT'  " {{{2
-    if index(hl.tags, 'project') < 0
-      let headline = input('Headline> ', hl.item)
-      let tags = split(input("\n(Space separated)\nTags> ", 'project '))
-      call org#headline#addtag('project')
-    endif
-    call org#keyword#set('')
-    call org#headline#add(hl.level + 1, 'NEXT Add actionable items: ' . hl.text)
-    call org#refile('todo.org')
-  elseif hl.keyword ==# 'RECIPE'  " {{{2
-    call org#keyword#set('NEXT')
-    " Ingredients, tags, how do we want to structure the recipes?
-    call org#refile('recipes.org')
-  elseif hl.keyword ==# 'EVENT'  " {{{2
-    call org#keyword#set('')
-    if empty(org#plan#get('.'))
-      let headline = input('Headline> ', hl.item)
-      let time = input('Timestamp> ')
-      call org#headline#set(headline)
-      call org#plan#set(hl.lnum, {'TIMESTAMP': org#time#dict(time)})
-    endif
-    call org#refile('events.org')
-  elseif hl.keyword ==# 'ACTIONABLE'  " {{{2
-    " let targets = org#outline#file('todo.org')
-    let targets = org#outline#file('todo.org', 1)
-    let g:org#outline#complete#targets = filter(targets.list, 'index(v:val.tags, "project") >= 0')
-    call map(g:org#outline#complete#targets, 'v:val.target')
-    echo 'Processing:'
-    echo hl.text
-    let target = input('Refile to project> ', 'todo.org', 'customlist,org#outline#complete')
-    call org#refile(target)
-    call org#keyword#set('TODO')
-    let tags = org#headline#gettags(org#headline#find('.', 1, 'nbW'))
-    if index(tags, 'project') < 0
-      call org#headline#settag(tags + ['project'])
-    endif
-  elseif hl.keyword ==# 'INACTIONABLE'  " {{{2
-    " call s:add_actionable
-    " Remove keyword
-    " Add NEXT Add actionable items
-    let targets = org#outline#file('todo.org')
-    let g:org#outline#complete#targets = filter(targets.list, 'index(v:val.tags, "project") >= 0')
-    call map(g:org#outline#complete#targets, 'v:val.target')
-    echo 'Processing:'
-    echo hl.text
-    let target = input('Refile to project> ', 'todo.org', 'customlist,org#outline#complete')
-    call org#headline#add(hl.level + 1, 'NEXT Add actionable items: ' . hl.text)
-    call org#refile(target)
-  elseif hl.keyword ==# 'SOMEDAY' || hl.keyword ==# 'MAYBE'  " {{{2
-    call org#refile('later.org')
-  elseif hl.keyword ==# 'NOTE'  " {{{2
-    call org#refile('notebox.org')
-  elseif hl.keyword ==# 'NEXT'  " {{{2
-    call org#refile('todo.org/Do it do it do it')
-  elseif hl.done ==# 'DONE'  " {{{2
-    call org#refile('archive.org')
-  endif " }}}
-endfunction
 
 function! myorg#process_repeats() abort " {{{1
   let tasks = filter(org#agenda#items(), org#agenda#filter('TIMESTAMP+LATE'))
