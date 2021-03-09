@@ -22,5 +22,5 @@ Contextualize inlink snoremap <buffer> <Tab> <Esc>2f]a
 Contextualize linkend inoremap <buffer> <Tab> <Esc>hhvi]<C-g>
 Contextualize default imap <buffer> <expr> <Tab> g:contextualize.i.map['<lt>tab>'].do()
 
-Contextualize inSyntax orgLink nnoremap <silent> <buffer> K :execute notebox#linkatcursor()<Cr>
-xnoremap <silent> <buffer> K :<C-u>call notebox#setupLink('', 'v')<Cr>
+Contextualize inSyntax orgLink nmap <buffer> K <Plug>(org-follow-link)
+" xnoremap <silent> <buffer> K :<C-u>call notebox#setupLink('', 'v')<Cr>

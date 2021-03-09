@@ -30,8 +30,6 @@ nmap gO [[O<Cr><Up>fun<Tab>
 
 nnoremap <silent> <expr> <buffer> K ':help ' . expand('<cword>') . ((expand('<cWORD>') =~# expand('<cword>') . '(') ? "(\<Cr>" : "\<Cr>")
 
-nmap \t <Plug>(testing-goto)
-nmap \r [[Wyiw:TestOrg <C-r>"<Cr>
 
 command! -buffer If2Ternary call vim#if2tern()
 command! -buffer Ternary2If call vim#tern2if()
