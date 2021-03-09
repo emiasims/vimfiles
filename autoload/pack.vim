@@ -33,7 +33,6 @@ call minpac#add('wellle/targets.vim')
 
 call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
-call minpac#add('chrisbra/unicode.vim')
 
 call minpac#add('glacambre/firenvim', #{do: function('firenvim#install') })
 call minpac#add('tweekmonster/startuptime.vim')
