@@ -2,13 +2,11 @@ setlocal foldmethod=marker
 setlocal formatoptions=1jcr
 setlocal tabstop=2
 setlocal shiftwidth=2
-setlocal expandtab
 setlocal iskeyword+=:
 setlocal colorcolumn=100
 setlocal tabstop=2
 setlocal shiftwidth=2
 setlocal textwidth=99
-setlocal expandtab
 let b:autopairs_skip = ['"']
 
 inoremap <silent> <buffer> <C-l> <C-o>:call feedkeys('<C-o>b' . nr2char(getchar()) . ":<C-o>e\<Right<Right>>")<Cr>

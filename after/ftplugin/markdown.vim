@@ -1,5 +1,4 @@
 setlocal spell
-setlocal expandtab
 setlocal softtabstop=1  " if I have two spaces in a sentence, delete only one.
 setlocal autoindent
 setlocal textwidth=0
