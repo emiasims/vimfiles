@@ -208,6 +208,7 @@ xnoremap <Space> :
 nnoremap : <Nop>
 xnoremap : <Nop>
 cnoremap <expr> <space> (getcmdtype()==":" && empty(getcmdline())) ? 'lua ' : '<C-]> '
+nnoremap ! :!
 
 inoremap <C-c> <Esc>
 inoremap <Esc> <C-c>
