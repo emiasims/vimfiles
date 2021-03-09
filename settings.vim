@@ -417,6 +417,8 @@ if has('nvim')
     silent! packadd! jsonc.vim
   endif
   silent! packadd! ultisnips
+  silent! packadd! nvim-treesitter
+  silent! packadd! playground
 endif
 
 command! PackUpdate call pack#update()
@@ -575,4 +577,9 @@ if has('win32')
     Guifont! DejaVu Sans Mono:h9
   endfunction
   call defer#onidle('call s:setup_guifont()')
+endif
+
+" Tree sitter {{{1
+if has('nvim')
+  lua require 'ts-setup'
 endif

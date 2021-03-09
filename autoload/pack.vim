@@ -16,15 +16,14 @@ call minpac#add('tpope/vim-commentary')
 call minpac#add('tpope/vim-speeddating')
 call minpac#add('tpope/vim-obsession')
 call minpac#add('tpope/vim-scriptease')
-" call minpac#add('andymass/vim-matchup')
 call minpac#add('tommcdo/vim-exchange')
 
 call minpac#add('machakann/vim-highlightedyank')
 call minpac#add('itchyny/vim-cursorword')
 call minpac#add('christoomey/vim-tmux-navigator')
 call minpac#add('jeetsukumaran/vim-filebeagle')
-call minpac#add('junegunn/fzf')  " Slow?
-call minpac#add('junegunn/fzf.vim')  " Slow?
+call minpac#add('junegunn/fzf')
+call minpac#add('junegunn/fzf.vim')
 call minpac#add('tommcdo/vim-lion')
 call minpac#add('junegunn/vader.vim')
 
@@ -34,17 +33,18 @@ call minpac#add('wellle/targets.vim')
 call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
 
-call minpac#add('glacambre/firenvim', #{do: function('firenvim#install') })
 call minpac#add('tweekmonster/startuptime.vim')
 
 " Nvim specific:
+call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call firenvim#install()' })
 call minpac#add('neoclide/coc.nvim', #{type: 'opt', branch: 'release'})
 call minpac#add('antoinemadec/coc-fzf', #{type: 'opt'})
 call minpac#add('neoclide/jsonc.vim', #{type : 'opt'})
 call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
 call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
 call minpac#add('SirVer/ultisnips', #{type : 'opt'})
-
+call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: ':TSUpdate'})
+call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
 
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})

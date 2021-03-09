@@ -1,0 +1,81 @@
+snippet vapi "Define vim.api" b
+local api = vim.api
+endsnippet
+
+snippet leq "Local variable" b
+local ${1:var} = ${0:${VISUAL:var}}
+endsnippet
+
+snippet !fun(ction)?! "New function" br
+local function ${1:name}(${2:args})
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet forp "pair for loop" b
+for ${1:name},${2:val} in pairs(${3:table_name}) do
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet fori "ipair for foop" b
+for ${1:idx},${2:val} in ipairs(${3:table_name}) do
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet for "numeric for loop" b
+for ${1:i}=${2:first},${3:last}${4/^..*/(?0:,:)/}${4:step} do
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet do "do block"
+do
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet repeat "repeat loop" b
+repeat
+	${1:${VISUAL}}
+until $0
+endsnippet
+
+snippet while "while loop" b
+while $1 do
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet if "if statement" b
+if ${1:condition} then
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet ife "if/else statement" b
+if ${1:condition} then
+	$2
+else
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet eif "if/elseif statement" b
+if ${1:condition} then
+	$2
+elseif $3 then
+	${0:${VISUAL}}
+end
+endsnippet
+
+snippet eife "if/elseif/else statement" b
+if ${1:condition} then
+	$2
+elseif $3 then
+	$4
+else
+	${0:${VISUAL}}
+end
+endsnippet
