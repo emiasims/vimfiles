@@ -50,6 +50,8 @@ call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
 
+call minpac#add('rktjmp/lush.nvim')
+
 let s:coc_packages = [
       \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-ultisnips',
       \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json', 'coc-tsserver']

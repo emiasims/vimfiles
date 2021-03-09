@@ -127,11 +127,8 @@ if has('termguicolors')
   endif
 endif
 
-colorscheme evolution
-" let g:gruvbox_sign_column = 'bg0'
-" let g:gruvbox_number_column = 'bg0'
-" let g:gruvbox_invert_selection = 0
-" colorscheme gruvbox
+" Lush colorscheming
+call colors#fromlush('gruvbox')
 
 if has('patch-7.4.1570')
   set shortmess+=c
