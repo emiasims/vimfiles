@@ -70,6 +70,7 @@ endfunction
 
 function! fzfr#floating_win() abort " {{{1
   " See https://github.com/junegunn/fzf.vim/issues/821 for vim implementation.
+  " This is pretty ugly. Can it bcleaner/less iterative?
   let buf = nvim_create_buf(v:false, v:true)
   call setbufvar(buf, '&signcolumn', 'no')
 
@@ -102,4 +103,9 @@ function! fzfr#floating_win() abort " {{{1
   unlet! g:fzf#size
   call nvim_open_win(buf, v:true, opts)
   unlet! g:anh#pause
+endfunction
+
+function! fzfr#build_quickfix_list(lines, ...) abort " {{{1
+  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+  copen
 endfunction

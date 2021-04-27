@@ -497,6 +497,12 @@ if has('nvim')
   let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
 endif
 
+let g:fzf_action = #{
+      \ ctrl-q: function('fzfr#build_quickfix_list'),
+      \ ctrl-t: 'tab split',
+      \ ctrl-x: 'split',
+      \ ctrl-v: 'vsplit' }
+
 " undotree {{{2
 nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
