@@ -7,7 +7,7 @@ function! s:setup_autosource(...) abort " {{{1
     " execute "autocmd BufWritePost" pattern "source % | echo 'Sourced ' . expand('%')"
      autocmd BufWritePost autoload/*.vim,plugin/*.vim,indent/*.vim source % | echo 'Sourced ' . expand('%')
      if has('nvim')
-       autocmd BufWritePost lua/*.lua echo 'Sourced ' . expand('%') | luafile %
+       autocmd BufWritePost lua/*.lua echo 'Sourced ' . expand('%') | call v:lua.myutils.reload(expand('%:r:s?/?.?')[4:])
      endif
   augroup END
   echom 'Autosource set up on files matching: {autoload,plugin,indent}/*.vim, and lua/*.lua'
