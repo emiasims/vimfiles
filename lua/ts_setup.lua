@@ -1,5 +1,6 @@
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = {'bash', 'cpp', 'lua', 'python'}, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = {'bash', 'cpp', 'lua', 'python', 'c', 'javascript'},
 
   highlight = {
     enable = true,              -- false will disable the whole extension
@@ -25,8 +26,9 @@ require 'nvim-treesitter.configs'.setup {
   },
 }
 
-local ts_utils = require'nvim-treesitter.ts_utils'
-local parsers = require'nvim-treesitter.parsers'
+local ts_utils = require('nvim-treesitter.ts_utils')
+local parsers = require('nvim-treesitter.parsers')
+local fold = require('nvim-treesitter.fold')
 local identity = {}
 function identity.__index(table, key)
   return key
@@ -63,4 +65,39 @@ function ts_statusline(indicator_size, shortnames)
     end
   end
   return stl
+end
+
+-- parser = vim.treesitter.get_parser(0, 'python')
+-- tstree = parser:parse()
+
+local getline = function(lnum) return vim.api.nvim_buf_get_lines(0, lnum-1, lnum, 0)[1] end
+local emptyline = function(lnum) return getline(lnum) == '' end
+local function _nonblank(lnum, direction)
+  if lnum > vim.api.nvim_buf_line_count(0) or lnum <= 0 then
+    return 0
+  elseif not emptyline(lnum) then
+    return lnum
+  else
+    return _nonblank(lnum + direction, direction)
+  end
+end
+local nextnonblank = function(lnum) return _nonblank(lnum, 1) end
+local prevnonblank = function(lnum) return _nonblank(lnum, -1) end
+
+local fl = fold.get_fold_indic
+local function ftonumber(foldlevel)
+  local n = tonumber(foldlevel)
+  if n == nil then n = tonumber(string.sub(foldlevel, 2)) end
+  return n
+end
+
+function py_fold(lnum)
+  if emptyline(lnum) then
+    local nl, pl = fl(nextnonblank(lnum)), fl(prevnonblank(lnum))
+    if string.sub(nl, 1, 1) == '>' then
+      nl, pl = ftonumber(nl), ftonumber(nl)
+      return (nl < pl and nl or pl)
+    end
+  end
+  return fl(lnum)
 end

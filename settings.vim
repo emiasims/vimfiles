@@ -587,5 +587,5 @@ endif
 
 " Tree sitter {{{1
 if has('nvim')
-  lua require 'ts-setup'
+  lua require 'ts_setup'
 endif

@@ -4,6 +4,10 @@ setlocal foldminlines=2
 setlocal colorcolumn=100
 setlocal foldmethod=syntax
 setlocal foldtext=fold#pythontext()
+if has('nvim') && get(g:, 'loaded_nvim_treesitter', 0)
+  setlocal foldmethod=expr
+  setlocal foldexpr=v:lua.py_fold(v:lnum)
+endif
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
 
