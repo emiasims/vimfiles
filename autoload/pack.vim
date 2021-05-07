@@ -37,13 +37,11 @@ call minpac#add('tweekmonster/startuptime.vim')
 
 " Nvim specific:
 call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call firenvim#install()' })
-call minpac#add('neoclide/coc.nvim', #{type: 'opt', branch: 'release'})
-call minpac#add('antoinemadec/coc-fzf', #{type: 'opt'})
 call minpac#add('neoclide/jsonc.vim', #{type : 'opt'})
 call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
 call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
 call minpac#add('SirVer/ultisnips', #{type : 'opt'})
-call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: ':TSUpdate'})
+call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: 'TSUpdate'})
 call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
 
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
@@ -52,18 +50,8 @@ call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
 
 call minpac#add('rktjmp/lush.nvim')
 
-let s:coc_packages = [
-      \ 'coc-python', 'coc-vimlsp', 'coc-lists', 'coc-ultisnips',
-      \ 'coc-calc', 'coc-word', 'coc-sh', 'coc-json', 'coc-tsserver']
-
-function! pack#coc_install(...) abort
-  for l:cp in s:coc_packages
-    execute (a:0 > 0 ? "CocUninstall " : "CocInstall ") . l:cp
-  endfor
-endfunction
-
 function! pack#update() abort
-  call minpac#update('', #{do : 'call minpac#status() | call pack#coc_install()'})
+  call minpac#update('', #{do : 'call minpac#status()'})
 endfunction
 
 function! pack#clean() abort

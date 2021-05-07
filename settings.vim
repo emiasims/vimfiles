@@ -142,6 +142,7 @@ endif
 if has('folding')
   set foldmethod=syntax
   set foldlevelstart=99
+  set foldnestmax=3
 endif
 set foldtext=fold#text()
 
@@ -412,8 +413,6 @@ if has('nvim')
   if !exists('g:started_by_firenvim')
     silent! packadd! vim-signify
     silent! packadd! vim-gutentags
-    silent! packadd! coc.nvim
-    silent! packadd! coc-fzf
     silent! packadd! jsonc.vim
   endif
   silent! packadd! ultisnips
@@ -508,11 +507,7 @@ nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
 
-if has('nvim') " {{{2
-  " coc.nvim {{{2
-  nmap <silent> ]e <Plug>(coc-diagnostic-next)
-  nmap <silent> [e <Plug>(coc-diagnostic-prev)
-
+if has('nvim')
   " firenvim {{{2
   if exists('g:started_by_firenvim')
     packadd firenvim

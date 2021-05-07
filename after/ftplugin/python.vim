@@ -18,8 +18,6 @@ augroup END
 
 nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| clast<Cr>
 
-command! -nargs=0 -buffer CocFormat call CocAction('format')
-
 inoremap <buffer> ipdb __import__('ipdb').set_trace()<Esc>
 inoremap <buffer> pdb __import__('pdb').set_trace()<Esc>
 inoremap <buffer> iem __import__('IPython').embed()<Esc>
