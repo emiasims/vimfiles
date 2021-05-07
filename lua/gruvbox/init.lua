@@ -226,8 +226,10 @@ local groups = lush(function()
     SpecialComment { Comment },
     Debug          { fg = red },
     Underlined     { gui = 'underline' },
+    Undercurl      { gui = 'undercurl' },
     Bold           { gui = 'bold' },
     Italic         { gui = 'italic' },
+    Strikethrough  { gui = 'strikethrough' },
 
     Ignore         {},
     Error          { fg = red, gui = 'bold' },

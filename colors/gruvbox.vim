@@ -2,14 +2,26 @@ hi clear
 syntax reset
 set t_Co=256
 let g:colors_name='gruvbox'
+highlight! link orgListTag Comment
+highlight orgNodeProperty guifg=#B7808F guibg=NONE guisp=NONE gui=NONE
+highlight! link orgNodeMultiProperty orgNodeProperty
+highlight! link orgPropertyDrawerEnds Comment
+highlight! link orgPropertyName PreProc
+highlight! link orgURI Comment
+highlight! link orgLinkEnds Conceal
+highlight! link orgLinkDescription Tag
+highlight! link orgSetting Error
+highlight! link orgSettingEnds Comment
+highlight! link orgSettingName Todo
+highlight! link orgSettingArguments Comment
 highlight! link orgComment Comment
 highlight orgVerbatim guifg=#EBDBB2 guibg=NONE guisp=NONE gui=NONE
 highlight Sneak guifg=#FABD2E guibg=NONE guisp=NONE gui=bold
 highlight SneakLabel guifg=#FABD2E guibg=NONE guisp=NONE gui=bold
 highlight CursorWord0 guifg=NONE guibg=NONE guisp=NONE gui=underline
 highlight CursorWord1 guifg=NONE guibg=NONE guisp=NONE gui=underline
-highlight Comment guifg=#918273 guibg=NONE guisp=NONE gui=NONE
-highlight Function guifg=#65A838 guibg=NONE guisp=NONE gui=NONE
+highlight Conceal guifg=#4A4440 guibg=NONE guisp=NONE gui=NONE
+highlight ColorColumn guifg=NONE guibg=#363230 guisp=NONE gui=NONE
 highlight CursorLine guifg=NONE guibg=#363230 guisp=NONE gui=NONE
 highlight! link CursorColumn CursorLine
 highlight Directory guifg=#FB4632 guibg=NONE guisp=NONE gui=bold
@@ -24,8 +36,7 @@ highlight SignColumn guifg=NONE guibg=#262626 guisp=NONE gui=NONE
 highlight ErrorMsg guifg=#262626 guibg=#FB4632 guisp=NONE gui=bold
 highlight Search guifg=NONE guibg=#433F3D guisp=NONE gui=bold
 highlight IncSearch guifg=NONE guibg=#655B53 guisp=NONE gui=bold,inverse
-highlight Conceal guifg=#4A4440 guibg=NONE guisp=NONE gui=NONE
-highlight ColorColumn guifg=NONE guibg=#363230 guisp=NONE gui=NONE
+highlight LineNr guifg=#7D6F64 guibg=NONE guisp=NONE gui=NONE
 highlight CursorLineNr guifg=#FABD2E guibg=NONE guisp=NONE gui=NONE
 highlight ModeMsg guifg=#FABD2E guibg=NONE guisp=NONE gui=bold
 highlight MoreMsg guifg=#FABD2E guibg=NONE guisp=NONE gui=bold
@@ -70,6 +81,7 @@ highlight! link Number Constant
 highlight! link Boolean Constant
 highlight! link Float Constant
 highlight Identifier guifg=#83A598 guibg=NONE guisp=NONE gui=NONE
+highlight Function guifg=#65A838 guibg=NONE guisp=NONE gui=NONE
 highlight Statement guifg=#FB4632 guibg=NONE guisp=NONE gui=NONE
 highlight! link Conditional Statement
 highlight! link Repeat Statement
@@ -84,16 +96,20 @@ highlight! link Macro PreProc
 highlight! link PreCondit PreProc
 highlight Type guifg=#FABD2E guibg=NONE guisp=NONE gui=NONE
 highlight StorageClass guifg=#FE811B guibg=NONE guisp=NONE gui=NONE
+highlight Structure guifg=#8EC07C guibg=NONE guisp=NONE gui=NONE
 highlight Typedef guifg=#FABD2E guibg=NONE guisp=NONE gui=NONE
 highlight Special guifg=NONE guibg=NONE guisp=NONE gui=NONE
 highlight SpecialChar guifg=#FB4632 guibg=NONE guisp=NONE gui=NONE
 highlight Tag guifg=#8EC07C guibg=NONE guisp=NONE gui=bold
 highlight Delimiter guifg=#D4C3A0 guibg=NONE guisp=NONE gui=NONE
+highlight Comment guifg=#918273 guibg=NONE guisp=NONE gui=NONE
 highlight! link SpecialComment Comment
 highlight Debug guifg=#FB4632 guibg=NONE guisp=NONE gui=NONE
 highlight Underlined guifg=NONE guibg=NONE guisp=NONE gui=underline
+highlight Undercurl guifg=NONE guibg=NONE guisp=NONE gui=undercurl
 highlight Bold guifg=NONE guibg=NONE guisp=NONE gui=bold
 highlight Italic guifg=NONE guibg=NONE guisp=NONE gui=italic
+highlight Strikethrough guifg=NONE guibg=NONE guisp=NONE gui=strikethrough
 highlight Ignore guifg=NONE guibg=NONE guisp=NONE gui=NONE
 highlight Error guifg=#FB4632 guibg=NONE guisp=NONE gui=bold
 highlight Todo guifg=#FE811B guibg=NONE guisp=NONE gui=bold
@@ -129,17 +145,3 @@ highlight! link orgTimeDelay Comment
 highlight! link orgTimestampElements Comment
 highlight! link orgListLeader Constant
 highlight! link orgListCheck Todo
-highlight LineNr guifg=#7D6F64 guibg=NONE guisp=NONE gui=NONE
-highlight Structure guifg=#8EC07C guibg=NONE guisp=NONE gui=NONE
-highlight! link orgListTag Comment
-highlight orgNodeProperty guifg=#B7808F guibg=NONE guisp=NONE gui=NONE
-highlight! link orgNodeMultiProperty orgNodeProperty
-highlight! link orgPropertyDrawerEnds Comment
-highlight! link orgPropertyName PreProc
-highlight! link orgURI Comment
-highlight! link orgLinkEnds Conceal
-highlight! link orgLinkDescription Tag
-highlight! link orgSetting Error
-highlight! link orgSettingEnds Comment
-highlight! link orgSettingName Todo
-highlight! link orgSettingArguments Comment
