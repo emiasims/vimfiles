@@ -35,7 +35,7 @@ function! statusline#treesitter() abort " {{{1
   if !has('nvim') || !exists('g:loaded_nvim_treesitter')
     return ''
   endif
-  return v:lua.ts_statusline(winwidth(0)/2 - 5, get(g:ts#shortnames, &filetype, {}))
+  return v:lua.ts_statusline(winwidth(0)/2 - 5, {})
 endfunction
 
 function! statusline#plugins(active) abort " {{{1
