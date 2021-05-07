@@ -159,3 +159,22 @@ hi link User6 WildMenu
 hi link User7 DiffAdd
 hi link User8 StatusLineTerm
 hi link User9 StatusLineTerm
+
+
+" highlight link StatusLine        
+" highlight link StatusLineNC      
+
+" highlight link StatusLineTerm    
+" highlight link StatusLineTermNC  
+
+" highlight link stlModified       
+" highlight link stlTypeInfo       
+" highlight link stlDirInfo        
+" highlight link stlErrorInfo      
+
+" highlight link stlNormalMode     
+" highlight link stlInsertMode     
+" highlight link stlVisualMode     
+" highlight link stlReplaceMode    
+" highlight link stlSelectMode     
+" highlight link stlTerminalMode   
