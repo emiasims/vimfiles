@@ -100,37 +100,15 @@ function! myorg#updateTasks(...) abort " {{{1
   let current = {}
   for ix in range(len(text))
     let line = text[ix]
-    let parts = matchlist(line, '\v^\s*- \[(.)\] (\[\[[^\]]*\]\[[^\]]*\]\])\s*(\[\d{4}-\d\d-\d\d.*\])?$')
+    let parts = matchlist(line, '\v^\s*- \[(.)\] (\[\[[^\]]*\]\[[^\]]*\]\])')
     if len(parts) > 0
-      let current[parts[2]] = #{done: parts[1] =~? 'x', time: parts[3], lnum: taskshl.lnum + ix + 1}
+      let current[parts[2]] = #{done: parts[1] =~? 'x', lnum: taskshl.lnum + ix + 1}
     endif
   endfor
 
   " we have tasks, make list, extend dict, then write dict as list
   let myfilter = join(map(["TIMESTAMP", "SCHEDULED", "DEADLINE"], "'KEYWORD-MEETING-WAITING+'.v:val.'==''today'''"), '|')
   let newItems = filter(org#agenda#items(), org#agenda#filter(myfilter))
-
-  " Add ids to newItems without them
-  for item in filter(copy(newItems), "!has_key(v:val.properties, 'id')")
-    let item.properties['id'] = myorg#generateid(item.item)
-    call item.update()
-  endfor
-
-  " if there's a supplied headline, add it to the list if it's not in the list.
-  if exists('a:1')
-    try
-      let ix = index(map(copy(newItems), 'v:val.properties.id'), a:1.properties.id)
-    catch /^Vim\%((\a\+)\)\=:E716/
-      echoerr "Supplied headline does not contain 'id' property."
-    endtry
-
-    echo ix
-    if ix < 0
-      call add(newItems, a:1)
-    else
-      call extend(newItems[ix], a:1)
-    endif
-  endif
 
   " Add spacer. TODO: org#format
   if (endl - taskshl.lnum) == 1
@@ -142,7 +120,9 @@ function! myorg#updateTasks(...) abort " {{{1
   call map(newItems, "extend(v:val, {'link': s:tolink(v:val)})")
   let additions = filter(copy(newItems), '!has_key(current, v:val.link)')
   let newtext = map(copy(additions), "printf('  - [ ] %s', v:val.link)")
+
   call appendbufline(taskshl.bufnr, endl - 2, newtext)
+  return
 
   " Update 'current' list of items
   let time = org#time#dict('[now]').totext()
@@ -169,7 +149,7 @@ function! myorg#updateTasks(...) abort " {{{1
 endfunction
 
 function! s:tolink(hl) abort " {{{2
-  return printf('[[file:%s::#%s][%s]]', fnamemodify(a:hl.filename, ':t'), a:hl.properties.id, a:hl.item)
+  return printf('[[file:%s::*%s][%s]]', fnamemodify(a:hl.filename, ':t'), a:hl.item, a:hl.item)
 endfunction
 
 function! myorg#generateid(headline, ...) abort " {{{1
@@ -181,10 +161,10 @@ endfunction
 
 function! myorg#completeTaskInJournal() abort " {{{1
   let hl = org#headline#get('.')
-  if !has_key(hl.properties, 'id')
-    let hl.properties.id = myorg#generateid(hl.item)
-    call hl.update()
-  endif
+  " if !has_key(hl.properties, 'id')
+  "   let hl.properties.id = myorg#generateid(hl.item)
+  "   call hl.update()
+  " endif
   let hl.done = 1
   " If repeats, done is false. But for the list, it should be complete
   update " simplify awkward caching problems
@@ -407,6 +387,7 @@ function! s:vimwin(text) abort " {{{2
   call win_execute(winid, 'setfiletype org-capture')
   return winid
 endfunction
+
 function! myorg#capture() range abort " {{{1
   if type(g:org#capture#templates) == v:t_dict
     let order = copy(get(g:, 'org#capture#order', sort(keys(g:org#capture#templates))))
@@ -421,4 +402,3 @@ function! myorg#capture() range abort " {{{1
   if empty(capture) | return | endif
   call org#capture#do(capture)
 endfunction
-

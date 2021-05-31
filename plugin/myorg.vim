@@ -13,6 +13,8 @@ augroup vimrc_org
   autocmd User OrgRefilePost silent update|buffer #
 
   autocmd User OrgKeywordDone call myorg#completeTaskInJournal()
+
+  autocmd Syntax org call SyntaxRange#Include('^\s*#+BEGIN_SRC python\s*', '^\s*#+END_SRC', 'python')
 augroup END
 
 " Capture templates {{{1
@@ -91,8 +93,8 @@ ${1:Recipe}
 ENDORGTMPL
 " }}}
 
-nmap \c :     call myorg#capture()<Cr>
-xmap \c :<C-u>call myorg#capture()<Cr>
+nnoremap \c :call myorg#capture()<Cr>
+xnoremap \c :<C-u>call myorg#capture()<Cr>
 unlet t
 
 let g:org#capture#opts = #{editcmd: 'JumpSplitOrEdit'}
@@ -117,9 +119,8 @@ endfunction
 
 let g:org#agenda#wincmd = 'SmartSplit'
 
-function! s:block_display(hl) abort "{{{2
+function! s:project_display(hl) abort "{{{2
   let nearest = org#plan#nearest(a:hl.plan, org#time#dict('today'), 1)
-  let plan = empty(nearest) ? '---' : keys(nearest)[0] . ':'
   if empty(nearest)
     let plan = '---'
   else
@@ -127,10 +128,9 @@ function! s:block_display(hl) abort "{{{2
     let plan = (name =~# '^T' ? '' : name[0] . ':') . time.totext('dTR')
   endif
   let target = matchstr(a:hl.target, '[^/]*\.org/\zs.*\ze/[^/]\{-}')
-  " ➤ u27a4
   return [
-        \ [empty(target) ? '➤' : (target . ':'), plan, a:hl.keyword, a:hl.item],
-        \ ['orgAgendaFile', 'orgAgendaPlan', 'orgAgendaKeyword', 'orgAgendaHeadline'],
+        \ [plan, a:hl.keyword, a:hl.item],
+        \ ['orgAgendaPlan', 'orgAgendaKeyword', 'orgAgendaHeadline'],
         \ ]
 endfunction
 
@@ -145,23 +145,45 @@ function! s:stuck_display(hl) abort "{{{2
   return [[a:hl.title], ['orgAgendaDate']]
 endfunction
 
+function! s:block_display(hl) abort " {{{1
+  let nearest = org#plan#nearest(a:hl.plan, org#time#dict('today'), 1)
+  let plan = empty(nearest) ? '---' : keys(nearest)[0] . ':'
+  if empty(nearest)
+    let plan = '---'
+  else
+    let [name, time] = items(nearest)[0]
+    let plan = (name =~# '^T' ? '' : name[0] . ':') . time.totext('dTR')
+  endif
+  let outline = org#outline#file(a:hl.filename)
+  let title = has_key(outline, 'title') ? outline.title : a:hl.filename
+  let color = has_key(outline, 'title') ? 'orgAgendaDate' : 'orgAgendaFile'
+  let datecolor = org#plan#islate(a:hl.plan) ? 'orgAgendaTitle' : 'orgAgendaPlan'
+  return [
+        \ [title . ':', plan, a:hl.keyword, a:hl.item],
+        \ [color, datecolor, 'orgAgendaKeyword', 'orgAgendaHeadline'],
+        \ ]
+endfunction
+
+
 "}}}
 
 " TODO how to do habits?
 let g:org#agenda#views = #{
       \ projects: [
       \ #{title: 'Projects',
-      \  filter: 'project-habit-DONE+KEYWORD',
+      \  filter: 'project-habit-DONE+KEYWORD-MEETING',
       \  separator: 'myorg#project_separator',
-      \  display: function('s:block_display')},
+      \  display: function('s:project_display')},
+      \ #{title: 'TODO',
+      \  filter: '-project-habit-DONE+KEYWORD-CLOSED'},
+      \ #{title: 'Habit',
+      \  filter: 'habit'},
       \ ],
       \ planning: [
-      \ #{title: 'Next', filter: 'NEXT-DONE+project-LATE'},
-      \ #{title: 'LATE', filter: 'LATE'},
+      \ #{title: 'Next', filter: 'NEXT-DONE+project', display: function('s:block_display')},
       \ #{title: 'Stuck', justify: [''],
       \  generator: function('s:stuck_gen'),
       \  display: function('s:stuck_display')},
-      \ #{title: 'All Todo', filter: 'KEYWORD-DONE-CLOSED-LATE-NEXT|PLAN-KEYWORD'},
       \ ],
       \ weekly: [
       \ #{title: 'Weekly Agenda',
