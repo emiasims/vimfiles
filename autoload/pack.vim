@@ -37,7 +37,6 @@ call minpac#add('tweekmonster/startuptime.vim')
 
 " Nvim specific:
 call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call firenvim#install()' })
-call minpac#add('neoclide/jsonc.vim', #{type : 'opt'})
 call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
 call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
 call minpac#add('SirVer/ultisnips', #{type : 'opt'})
@@ -47,6 +46,7 @@ call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
+call minpac#add('git@github.com:milisims/nvim-luaref.git', #{depth: 0})
 
 call minpac#add('rktjmp/lush.nvim')
 
