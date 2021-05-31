@@ -580,7 +580,9 @@ if has('win32')
   call defer#onidle('call s:setup_guifont()')
 endif
 
-" Tree sitter {{{1
-if has('nvim')
-  lua require 'ts_setup'
+" Other nvim {{{1
+if !has('nvim')
+  finish
 endif
+lua require 'ts_setup'
+lua myutils = require 'myutils'
