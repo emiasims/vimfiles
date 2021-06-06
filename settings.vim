@@ -150,8 +150,8 @@ set foldtext=fold#text()
 
 augroup vimrc_general
   autocmd!
-  au BufWinLeave ?* if empty(&buftype) | mkview | endif
-  au BufWinEnter ?* if empty(&buftype) | silent! loadview | endif
+  au BufWinLeave * if empty(&buftype) && &modifiable | mkview | endif
+  au BufWinEnter * if empty(&buftype) && &modifiable | silent! loadview | endif
 
   autocmd WinEnter,FocusGained * checktime
 
