@@ -22,8 +22,6 @@ call minpac#add('machakann/vim-highlightedyank')
 call minpac#add('itchyny/vim-cursorword')
 call minpac#add('christoomey/vim-tmux-navigator')
 call minpac#add('jeetsukumaran/vim-filebeagle')
-call minpac#add('junegunn/fzf')
-call minpac#add('junegunn/fzf.vim')
 call minpac#add('tommcdo/vim-lion')
 call minpac#add('junegunn/vader.vim')
 
@@ -42,6 +40,12 @@ call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
 call minpac#add('SirVer/ultisnips', #{type : 'opt'})
 call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: 'TSUpdate'})
 call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
+
+call minpac#add('nvim-lua/popup.nvim', #{type: 'opt'})
+call minpac#add('nvim-lua/plenary.nvim', #{type: 'opt'})
+call minpac#add('nvim-telescope/telescope.nvim', #{type: 'opt'})
+
+call minpac#add('hrsh7th/nvim-compe', #{type : 'opt'})
 
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})

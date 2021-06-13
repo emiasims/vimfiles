@@ -27,6 +27,8 @@ require 'nvim-treesitter.configs'.setup {
   },
 }
 
+require 'plugin.completion'
+
 function ts_statusline(indicator_size, shortnames)
   if not require('nvim-treesitter.parsers').has_parser() then return '' end
   local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10

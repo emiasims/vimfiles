@@ -43,14 +43,14 @@ Contextualize startcmd cnoreabbrev dws mkview \| silent! %s/\s\+$// \| loadview 
 " Use this like 'eh/', the / expands and adds the dir / divider
 Contextualize startcmd cnoreabbrev eh edit <C-r>=expand('%:h')<Cr>
 
-Contextualize startcmd cnoreabbrev f   FZ 50 20 \| Files
-Contextualize startcmd cnoreabbrev o   FZ 40 20 \| Files ~/org
-Contextualize startcmd cnoreabbrev l   <C-u>call fzfr#buffers()
-Contextualize startcmd cnoreabbrev t   FZ 80 20 \| Tags
-Contextualize startcmd cnoreabbrev mr  FZ 70 20 \| History
-Contextualize startcmd cnoreabbrev A   Ag
-Contextualize startcmd cnoreabbrev h   FZ 80 20 \| Helptags
-Contextualize startcmd cnoreabbrev ev  FZ 70 20 \| Files $CFGDIR
+Contextualize startcmd cnoreabbrev f   Telescope fd
+Contextualize startcmd cnoreabbrev o   Telescope fd cwd=~/org
+Contextualize startcmd cnoreabbrev l   Telescope buffers
+Contextualize startcmd cnoreabbrev t   Telescope tags
+Contextualize startcmd cnoreabbrev mr  Telescope oldfiles
+Contextualize startcmd cnoreabbrev A   Telescope live_grep
+Contextualize startcmd cnoreabbrev h   Telescope help_tags
+Contextualize startcmd cnoreabbrev ev  Telescope fd cwd=$CFGDIR
 
 " Expand with <C-]>
 Contextualize startcmd cnoreabbrev c   Capture <C-z>

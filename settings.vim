@@ -128,7 +128,11 @@ if has('termguicolors')
 endif
 
 " Lush colorscheming
-call colors#fromlush('gruvbox')
+if has('nvim')
+  lua require('lush')(require('gruvbox'))
+else
+  colorscheme evolution
+endif
 
 if has('patch-7.4.1570')
   set shortmess+=c
@@ -156,11 +160,7 @@ augroup vimrc_general
   autocmd WinEnter,FocusGained * checktime
 
   " Update filetype on save if empty
-  autocmd BufWritePost * nested
-        \ if &filetype ==# '' || exists('b:ftdetect')
-        \ |   unlet! b:ftdetect
-        \ |   filetype detect
-        \ | endif
+  autocmd BufWritePost * nested if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif
 
   " When editing a file, always jump to the last known cursor position, if valid.
   autocmd BufReadPost *
@@ -410,14 +410,17 @@ if has('nvim') && !empty($CONDA_PREFIX)
 endif
 
 if has('nvim')
+
   if !exists('g:started_by_firenvim')
     silent! packadd! vim-signify
     silent! packadd! vim-gutentags
-    silent! packadd! jsonc.vim
   endif
   silent! packadd! ultisnips
   silent! packadd! nvim-treesitter
   silent! packadd! playground
+  silent! packadd! popup.nvim
+  silent! packadd! plenary.nvim
+  silent! packadd! telescope.nvim
 endif
 
 command! PackUpdate call pack#update()
@@ -479,29 +482,6 @@ nmap gcu <Plug>Commentary<Plug>Commentary
 " vim-cursorword
 let g:cursorword_delay = 250
 
-" fzf {{{2
-" add fzf path if not already in it
-
-let fzpath = resolve(expand('<sfile>:h')) . '/pack/minpac/start/fzf/bin'
-let fzpath .= '\|' . expand('<sfile>:h') . '/pack/minpac/start/fzf/bin'
-if $PATH !~# fzpath
-  let $PATH = expand('<sfile>:h') . '/pack/minpac/start/fzf/bin:' . $PATH
-endif
-unlet fzpath
-
-let $FZF_DEFAULT_COMMAND = 'ag -g ""'
-let g:fzf_preview_window = ''
-
-if has('nvim')
-  let g:fzf_layout = { 'window': 'call fzfr#floating_win()' }
-endif
-
-let g:fzf_action = #{
-      \ ctrl-q: function('fzfr#build_quickfix_list'),
-      \ ctrl-t: 'tab split',
-      \ ctrl-x: 'split',
-      \ ctrl-v: 'vsplit' }
-
 " undotree {{{2
 nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
@@ -558,6 +538,7 @@ if has('nvim')
   let g:signify_sign_delete = '-'
   let g:signify_sign_change = '~'
   let g:signify_skip_filetype = { 'markdown': 1 }
+  let g:signify_disable_by_default = 1
 
   " Ultisnips {{{2
   " for contextualize
