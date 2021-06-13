@@ -491,22 +491,21 @@ if has('nvim')
   " firenvim {{{2
   if exists('g:started_by_firenvim')
     packadd firenvim
-    let g:firenvim_config = {'localSettings': {'.*': { 'selector': '', 'priority': 0, },
-          \ 'mail\.google\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
-          \ 'outlook\.office365\.com': {'selector': 'div[role="textbox"]', 'priority': 1, 'takeover': 'empty'},
-          \ 'github\.com': {'selector': 'textarea', 'priority': 1, 'takeover': 'once'},
-          \ }}
-    setlocal laststatus=0
+    let g:firenvim_config = { 'localSettings': {
+          \ '.*'                     : #{selector: '', priority: 0, cmdline: 'neovim'},
+          \ 'mail\.google\.com'      : #{selector: 'div[role="textbox"]', priority: 1, takeover: 'empty'},
+          \ 'outlook\.office365\.com': #{selector: 'div[role="textbox"]', priority: 1, takeover: 'empty'},
+          \ 'github\.com'            : #{selector: 'textarea', priority: 1, takeover: 'empty'},
+          \ } }
+    setlocal laststatus=2
     set showtabline=0
-    let g:loaded_statusline = 1
     set guifont=DejaVu\ Sans\ Mono:h9
-    nnoremap ZZ :xa<Cr>
-    nnoremap ZQ :qa!<Cr>
-    nnoremap <Esc><Esc> :call firenvim#focus_page()<Cr>
+    nnoremap <buffer> ZZ :xa<Cr>
+    nnoremap <buffer> ZQ :qa!<Cr>
     augroup vimrc_firenvim
       autocmd!
       " Not working
-      autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
+      " autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
       autocmd BufEnter mail*,outlook* set filetype=mail
       autocmd InsertEnter,InsertLeave,TextChanged * ++nested write
       autocmd BufEnter github.com_*.txt set filetype=markdown
@@ -567,3 +566,4 @@ if !has('nvim')
 endif
 lua require 'ts_setup'
 lua myutils = require 'myutils'
+lua require 'mia.plugin'
