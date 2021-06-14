@@ -95,7 +95,7 @@ Contextualize inpair inoremap <Space> <Space><Space><C-g>U<Left>
 " Contextualize {-> getline('.')[col('.') - 2 : col('.')] =~ '^\%(\V(  )\|{  }\|[  ]\|''  ''\|"  "\)'} inoremap <Bs> <BS><Del>
 
 ContextAdd pumvis pumvisible
-Contextualize pumvis inoremap <Cr> <C-y>
+" Contextualize pumvis inoremap <Cr> <C-y>
 Contextualize pumvis inoremap <Esc> <C-e>
 
 " vim-fugitive
