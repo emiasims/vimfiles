@@ -128,9 +128,7 @@ if has('termguicolors')
 endif
 
 " Lush colorscheming
-if has('nvim')
-  lua require('lush')(require('gruvbox'))
-else
+if !has('nvim')
   colorscheme evolution
 endif
 
@@ -410,7 +408,6 @@ if has('nvim') && !empty($CONDA_PREFIX)
 endif
 
 if has('nvim')
-
   if !exists('g:started_by_firenvim')
     silent! packadd! vim-signify
     silent! packadd! vim-gutentags
@@ -487,34 +484,8 @@ nnoremap <F8> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
 
+" }}}
 if has('nvim')
-  " firenvim {{{2
-  if exists('g:started_by_firenvim')
-    packadd firenvim
-    let g:firenvim_config = { 'localSettings': {
-          \ '.*'                     : #{selector: '', priority: 0, cmdline: 'neovim'},
-          \ 'mail\.google\.com'      : #{selector: 'div[role="textbox"]', priority: 1, takeover: 'empty'},
-          \ 'outlook\.office365\.com': #{selector: 'div[role="textbox"]', priority: 1, takeover: 'empty'},
-          \ 'github\.com'            : #{selector: 'textarea', priority: 1, takeover: 'empty'},
-          \ } }
-    setlocal laststatus=2
-    set showtabline=0
-    set guifont=DejaVu\ Sans\ Mono:h9
-    nnoremap <buffer> ZZ :xa<Cr>
-    nnoremap <buffer> ZQ :qa!<Cr>
-    augroup vimrc_firenvim
-      autocmd!
-      " Not working
-      " autocmd BufEnter * ++once if empty(getline(1)) && line('$') == 1 | startinsert! | endif
-      autocmd BufEnter mail*,outlook* set filetype=mail
-      autocmd InsertEnter,InsertLeave,TextChanged * ++nested write
-      autocmd BufEnter github.com_*.txt set filetype=markdown
-    augroup END
-    set wrap
-    set colorcolumn=100
-    setlocal spell
-  endif
-
   " vim-gutentags {{{2
   let g:gutentags_cache_dir = $DATADIR.'/tags'
 
@@ -552,6 +523,7 @@ if has('nvim')
   snoremap <C-e> <Esc>`>a
   " }}}
 endif
+
 " Windows {{{2
 if has('win32')
   function! s:setup_guifont() abort
@@ -559,11 +531,3 @@ if has('win32')
   endfunction
   call defer#onidle('call s:setup_guifont()')
 endif
-
-" Other nvim {{{1
-if !has('nvim')
-  finish
-endif
-lua require 'ts_setup'
-lua myutils = require 'myutils'
-lua require 'mia.plugin'

@@ -13,4 +13,10 @@ function M.reload(name, filename)
   return msg
 end
 
+-- global
+function P(v)
+  print(vim.inspect(v))
+  return v
+end
+
 return M

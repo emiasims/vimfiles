@@ -1,4 +1,12 @@
-require 'nvim-treesitter.configs'.setup {
+if not pcall(require, 'nvim-treesitter') then return end
+
+local M = {}
+
+local configs = require('nvim-treesitter.configs')
+local parsers = require('nvim-treesitter.parsers')
+local fold = require('nvim-treesitter.fold')
+
+configs.setup {
   -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   ensure_installed = {'bash', 'cpp', 'lua', 'python', 'c', 'javascript'},
 
@@ -27,15 +35,29 @@ require 'nvim-treesitter.configs'.setup {
   },
 }
 
-require 'plugin.completion'
+local function node_at_curpos()
+  local root = vim.treesitter.get_parser(0):parse()[1]:root()
+  local _, ln, col, _, _ = unpack(vim.fn.getcurpos())
+  return root:named_descendant_for_range(ln-1, col-1, ln-1, col)
+end
 
-function ts_statusline(indicator_size, shortnames)
-  if not require('nvim-treesitter.parsers').has_parser() then return '' end
-  local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10
+local function atcurs()
+  local node = node_at_curpos()
+  local names = {}
+  -- local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
+  while node do
+    table.insert(names, node:type())
+    node = node:parent()
+  end
+  return names
+end
 
+function M.statusline()
+  if not parsers.has_parser() then return '' end
   local names = atcurs()
   if #names == 0 then return '' end
 
+  local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10
   local stl = names[1]
   for i=2,#names do
     if (stl:len() + 2 * #names) >= indicator_size then
@@ -47,46 +69,26 @@ function ts_statusline(indicator_size, shortnames)
   return stl
 end
 
-ts_foldlevel = require('nvim-treesitter.fold').get_fold_indic
-function py_fold(lnum)
+function M.py_fold(lnum)
   if vim.fn.getline(lnum) == '' then
-    local nl = ts_foldlevel(vim.fn.nextnonblank(lnum))
-    local pl = ts_foldlevel(vim.fn.prevnonblank(lnum))
+    local nl = fold.get_fold_indic(vim.fn.nextnonblank(lnum))
+    local pl = fold.get_fold_indic(vim.fn.prevnonblank(lnum))
     if string.sub(nl, 1, 1) == '>' then
       nl = tonumber(tonumber(nl) ~= nil and nl or string.sub(nl, 2))
       pl = tonumber(tonumber(pl) ~= nil and pl or string.sub(pl, 2))
       return (nl < pl and nl or pl)
     end
   end
-  return ts_foldlevel(lnum)
+  return fold.get_fold_indic(lnum)
 end
 
 -- simple query (section) @fold not working
-function org_fold(lnum)
+function M.org_fold(lnum)
   return py_fold(lnum)
 end
 
-local function node_at_curpos()
-  local root = vim.treesitter.get_parser(0):parse()[1]:root()
-  local _, ln, col, _, _ = unpack(vim.fn.getcurpos())
-  return root:named_descendant_for_range(ln-1, col-1, ln-1, col)
-end
-
-function atcurs()
-  local node = node_at_curpos()
-  local names = {}
-  -- local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
-  while node do
-    table.insert(names, node:type())
-    node = node:parent()
-  end
-  return names
-end
-
-function query2list()
-  local querystr = [[
-    (section) @fold
-  ]]
+function M.query2list()
+  local querystr = [[(section) @fold]]
   local root = vim.treesitter.get_parser(0):parse()[1]:root()
   local qo = vim.treesitter.parse_query(vim.bo.filetype, querystr)
   i = 0
@@ -104,3 +106,5 @@ end
 --   for id, node, metadata in foldquery:iter_captures(cnode, 0, lnum, lnum+1) do
 --   end
 -- end
+
+return M

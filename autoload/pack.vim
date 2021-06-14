@@ -17,21 +17,17 @@ call minpac#add('tpope/vim-speeddating')
 call minpac#add('tpope/vim-obsession')
 call minpac#add('tpope/vim-scriptease')
 call minpac#add('tommcdo/vim-exchange')
+call minpac#add('justinmk/vim-sneak')
+call minpac#add('wellle/targets.vim')
+call minpac#add('tommcdo/vim-lion')
 
 call minpac#add('machakann/vim-highlightedyank')
 call minpac#add('itchyny/vim-cursorword')
-call minpac#add('christoomey/vim-tmux-navigator')
+" call minpac#add('christoomey/vim-tmux-navigator')
 call minpac#add('jeetsukumaran/vim-filebeagle')
-call minpac#add('tommcdo/vim-lion')
-call minpac#add('junegunn/vader.vim')
-
-call minpac#add('justinmk/vim-sneak')
-call minpac#add('wellle/targets.vim')
 
 call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
-
-call minpac#add('tweekmonster/startuptime.vim')
 
 " Nvim specific:
 call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call firenvim#install()' })

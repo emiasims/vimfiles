@@ -7,13 +7,19 @@ augroup vimrc_statusline
   autocmd WinEnter,BufEnter * setlocal statusline=%!statusline#active()
 augroup END
 
+if has('nvim')
+  lua ts_statusline = require('mia.treesitter').statusline
+endif
+
 function! statusline#active() abort " {{{1
   let statuslinetext  = statusline#mode(1)
   let statuslinetext .= statusline#dirinfo(1)
   let statuslinetext .= statusline#fileinfo(1)
   let statuslinetext .= '%='
   let statuslinetext .= statusline#temporary()
-  let statuslinetext .= statusline#treesitter()
+  if has('nvim') && exists('g:loaded_nvim_treesitter')
+    let statuslinetext .= v:lua.ts_statusline()
+  endif
   let statuslinetext .= statusline#plugins(1)
   let statuslinetext .= statusline#errors(1)
   let statuslinetext .= '%#stlTypeInfo# %y '  " type info
@@ -29,13 +35,6 @@ function! statusline#inactive() abort " {{{1
   let statuslinetext .= '%y '
   let statuslinetext .= '%{statusline#encoding(0)}'
   return statuslinetext
-endfunction
-
-function! statusline#treesitter() abort " {{{1
-  if !has('nvim') || !exists('g:loaded_nvim_treesitter')
-    return ''
-  endif
-  return v:lua.ts_statusline(winwidth(0)/2 - 5, {})
 endfunction
 
 function! statusline#plugins(active) abort " {{{1
