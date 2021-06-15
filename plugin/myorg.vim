@@ -18,84 +18,18 @@ augroup vimrc_org
 augroup END
 
 " Capture templates {{{1
-let g:org#capture#templates = {}
-let t = g:org#capture#templates
-
-let t.q = #{description: 'Quick', snippet: ['${1:Title}', '$0']}
-let t.c = #{description: 'Chore', target: 'chores.org', snippet: ['TODO ${1:Chore}', "`!v org#time#dict('today').totext('T')`"]}
-let t.op = #{description: 'Org note', target: 'vim-org.org', snippet: ['${1:Note}', '$0']}
-let t.M = #{description: 'Medical note', target: 'health.org/Notes for Doctor', snippet: ['${1:Note}']}
-let t.e = #{description: 'Event', target: 'events.org'} " {{{2
-let t.e.snippet = ['${1:Event}', '<${2:`!v org#time#dict("today").totext("B")`}>', '$0']
-
-let t.dj = #{description: 'Journal', target: function('myorg#journaltarget')} " {{{2
-" The time is now - 3 hours -- allows going to bed at 3 am
-let t.dj.snippet =<< ENDORGTMPL
-Journal
-[`!v org#time#dict(localtime() - 3600 * 3).totext('TB')`]
-:PROPERTIES:
-:food+: $1
-:games+: $2
-:exercise: $3
-:reading: $4
-:END:
-
-  - Today I am thankful for      :: $5
-  - Today I have been dreading   :: $6
-  - Today I felt good about      :: $7
-  - Something I did well at      :: $8
-  - Something I could improve at :: $9
-
-${10:Dear} Emilia,
-
-${11:~~emotions~~}
-
-${12:xoxo}
-ENDORGTMPL
-
-let t.ds = #{description: 'Sleep log'} " {{{2
-let t.ds.target = {-> 'diary.org/' . strftime('%B/%A the ') . (strftime('%d')+0) . (strftime('%d')  =~ '1[123]' ? 'st' : get({1: 'st', 2: 'nd', 3: 'rd'}, strftime('%d') % 10, 'th'))}
-let t.ds.snippet =<< ENDORGTMPL
-Sleep log
-[`!v org#time#dict('today').totext()`]
-:PROPERTIES:
-:screen-off: ${1:10:30} pm
-:bedtime: ${2:10:30} am
-:waketime: ${3:10:30} am
-:uptime: ${4:10:30} am
-:sleep-time: 7.5 h
-:restless-time: 7.5 h
-:quality: ${6:good}
-:quantity: ${7:good}
-:END:
-
-$0
-ENDORGTMPL
-
-let t.r = #{description: 'Recipe', target: 'recipes.org'} " {{{2
-let t.r.snippet =<< ENDORGTMPL
-${1:Recipe}
-:PROPERTIES:
-:source: ${2:URL}
-:servings: ${3:nservings}
-:prep-time: ${4:30m}
-:cook-time: ${5:30m}
-:total-time: ${6:1h}
-:END:
-** Ingredients
-:PROPERTIES:
-:${8:name}: ${9:amount}
-:END:
-
-** Directions
-  1. ${0:First step}
-
-ENDORGTMPL
-" }}}
+let g:org#capture#templates = #{
+      \ q: #{description: 'Quick', snippet: ['${1:Title}', '$0']},
+      \ t: #{description: 'Todo', snippet: ['TODO ${1:Title}', '$0']},
+      \ c: #{description: 'Chore', target: 'chores.org',
+      \      snippet: ['TODO ${1:Chore}', "`!v org#time#dict('today').totext('T')`"]},
+      \ e: #{description: 'Event', target: 'events.org',
+      \      snippet: ['${1:Event}', '<${2:`!v org#time#dict("today").totext("B")`}>', '$0']},
+      \ r: #{description: 'Recipe', target: 'recipes.org', snippet: ['${1:Recipe}', '$0']},
+      \ }
 
 nnoremap \c :call myorg#capture()<Cr>
 xnoremap \c :<C-u>call myorg#capture()<Cr>
-unlet t
 
 let g:org#capture#opts = #{editcmd: 'JumpSplitOrEdit'}
 
@@ -145,7 +79,7 @@ function! s:stuck_display(hl) abort "{{{2
   return [[a:hl.title], ['orgAgendaDate']]
 endfunction
 
-function! s:block_display(hl) abort " {{{1
+function! s:block_display(hl) abort " {{{2
   let nearest = org#plan#nearest(a:hl.plan, org#time#dict('today'), 1)
   let plan = empty(nearest) ? '---' : keys(nearest)[0] . ':'
   if empty(nearest)
@@ -157,7 +91,13 @@ function! s:block_display(hl) abort " {{{1
   let outline = org#outline#file(a:hl.filename)
   let title = has_key(outline, 'title') ? outline.title : a:hl.filename
   let color = has_key(outline, 'title') ? 'orgAgendaDate' : 'orgAgendaFile'
-  let datecolor = org#plan#islate(a:hl.plan) ? 'orgAgendaTitle' : 'orgAgendaPlan'
+  if org#plan#islate(a:hl.plan)
+    let datecolor = 'Exception'
+  elseif org#plan#within(a:hl.plan, 'today')
+    let datecolor = 'Type'
+  else
+    let datecolor = 'orgAgendaPlan'
+  endif
   return [
         \ [title . ':', plan, a:hl.keyword, a:hl.item],
         \ [color, datecolor, 'orgAgendaKeyword', 'orgAgendaHeadline'],
@@ -180,6 +120,7 @@ let g:org#agenda#views = #{
       \  filter: 'habit'},
       \ ],
       \ planning: [
+      \ #{title: 'Today', filter: "PLAN<='today'-DONE", display: 'datetime', sorter: 'PLAN'},
       \ #{title: 'Next', filter: 'NEXT-DONE+project', display: function('s:block_display')},
       \ #{title: 'Stuck', justify: [''],
       \  generator: function('s:stuck_gen'),
@@ -213,3 +154,4 @@ let g:org#keywords = #{todo: ['TODO', 'NEXT', 'WAITING', 'MEETING'], done: ['CAN
 command! -bang -nargs=* Archive call myorg#archive(<bang>0)
 command! -bang -nargs=* Note call myorg#new(<q-args>, <bang>0)
 command! -bang -nargs=* Project call myorg#newproject(<q-args>, <bang>0)
+command! -nargs=? MakePlan call myorg#makeplan(<f-args>)

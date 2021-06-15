@@ -92,64 +92,55 @@ function! myorg#dosnippet() abort " {{{1
 endfunction
 
 function! myorg#updateTasks(...) abort " {{{1
+  let day = org#time#dict(get(a:, 1, localtime() - 3600 * 3))
+  let target = org#headline#fromtarget(s:journaltarget(day)..'/Tasks', 1)
+  let range = s:getrange(target)
 
-  let taskshl = org#headline#fromtarget(myorg#journaltarget() . '/Tasks')
-  let endl = match(getbufline(taskshl.bufnr, 1, '$'), '^\*', taskshl.lnum) + 1  " lnum is ix + 1 already
-  let text = getbufline(taskshl.bufnr, taskshl.lnum + 1, endl - 1)
-  let order = []
-  let current = {}
-  for ix in range(len(text))
-    let line = text[ix]
-    let parts = matchlist(line, '\v^\s*- \[(.)\] (\[\[[^\]]*\]\[[^\]]*\]\])')
-    if len(parts) > 0
-      let current[parts[2]] = #{done: parts[1] =~? 'x', lnum: taskshl.lnum + ix + 1}
-    endif
-  endfor
-
-  " we have tasks, make list, extend dict, then write dict as list
-  let myfilter = join(map(["TIMESTAMP", "SCHEDULED", "DEADLINE"], "'KEYWORD-MEETING-WAITING+'.v:val.'==''today'''"), '|')
-  let newItems = filter(org#agenda#items(), org#agenda#filter(myfilter))
-
-  " Add spacer. TODO: org#format
-  if (endl - taskshl.lnum) == 1
-    call appendbufline(taskshl.bufnr, endl-1, '')
-    let endl += 1
+  if range[1] - range[0] <= 3
+    " From #makeplan
+    let routine = readfile(org#dir() . '/daily_routine.org')[1:] + ['', '']
+    call appendbufline(target.bufnr, prevnonblank(range[1]), routine)
+    let range = s:getrange(target)
   endif
 
-  " Add items that do not exist
-  call map(newItems, "extend(v:val, {'link': s:tolink(v:val)})")
-  let additions = filter(copy(newItems), '!has_key(current, v:val.link)')
-  let newtext = map(copy(additions), "printf('  - [ ] %s', v:val.link)")
-
-  call appendbufline(taskshl.bufnr, endl - 2, newtext)
-  return
-
-  " Update 'current' list of items
-  let time = org#time#dict('[now]').totext()
-  for ix in range(len(additions))
-    let hl = additions[ix]
-    let current[hl.link] = #{done: hl.done, time: time, lnum: endl - 1 + ix}
-  endfor
-  for hl in filter(copy(newItems), 'has_key(current, v:val.link)')
-    if !current[hl.link].done  " Keep old time if we don't update it
-      let current[hl.link].time = time
-    endif
-    let current[hl.link].done = hl.done
-  endfor
-
-  " Update checkboxes
-  for [link, info] in items(current)
-    if info.done && getbufline(taskshl.bufnr, info.lnum)[0][:6] !=? '  - [x]'
-      call setbufline(taskshl.bufnr, info.lnum, printf('  - [x] %s %s', link, info.time))
-    elseif !info.done && getbufline(taskshl.bufnr, info.lnum)[0][:6] != '  - [ ]'
-      call setbufline(taskshl.bufnr, info.lnum, printf('  - [ ] %s', link))
+  " Get items that have TODO headlines attached
+  let current = {}
+  for ln in getbufline(target.bufnr, range[0] + 1, range[1])
+    let parts = matchlist(ln, '\v^\s*- \[(.)\] \[\[([^\]]*)\]\[[^\]]*\]\]')
+    if len(parts)
+      let current[parts[2]] = parts[1] =~? 'x'
     endif
   endfor
+
+  let items = filter(org#agenda#items(), org#agenda#filter('KEYWORD-MEETING-WAITING+PLAN<='..day.start))
+  call map(items, "extend(v:val, {'link': s:tolink(v:val, 0)})")
+  call filter(items, "!has_key(current, v:val.link)")
+  call map(items, "extend(v:val, {'link': s:tolink(v:val, 1)})")
+  call map(items, "printf('  - [ ] %s', v:val.link)")
+  call appendbufline(target.bufnr, range[1] - 1, items)
+
+  if !exists('a:1')
+    return
+  endif
+
+  " let range[1] += len(items)
+  " let ix = match(getbufline(target.bufnr, range[0], range[1]), '\V'..s:tolink(copy(a:1), 0))
+  " if ix >= 0
+  "   call setbufline(target.bufnr, range[0], )
+  " else
+  " endif
 
 endfunction
 
-function! s:tolink(hl) abort " {{{2
-  return printf('[[file:%s::*%s][%s]]', fnamemodify(a:hl.filename, ':t'), a:hl.item, a:hl.item)
+function! s:getrange(target) abort " {{{1
+  let lines = getbufline(a:target.bufnr, 1, '$')
+  let endl = match(lines, '^\*', a:target.lnum + 1)
+  if endl == a:target.lnum + 1
+    let endl -= 1
+  elseif endl < 0
+    let endl = len(lines)
+  endif
+  return [a:target.lnum, endl]
 endfunction
 
 function! myorg#generateid(headline, ...) abort " {{{1
@@ -161,19 +152,15 @@ endfunction
 
 function! myorg#completeTaskInJournal() abort " {{{1
   let hl = org#headline#get('.')
-  " if !has_key(hl.properties, 'id')
-  "   let hl.properties.id = myorg#generateid(hl.item)
-  "   call hl.update()
-  " endif
   let hl.done = 1
-  " If repeats, done is false. But for the list, it should be complete
   update " simplify awkward caching problems
-  call myorg#updateTasks(hl)
+  call myorg#updateTasks(localtime() - 3600 * 3, hl)
 endfunction
 
-function! myorg#journaltarget() abort " {{{1
-  let date = str2nr(strftime('%d', localtime() - 3600 * 3))  " str2nr removes prefix 0
-  let target = 'diary.org/' . strftime('%B/%A the ') . str2nr(strftime('%d'))
+function! s:journaltarget(...) abort " {{{1
+  let t = exists('a:1') ? org#time#dict(a:1).start : localtime() - 3600 * 3
+  let date = str2nr(strftime('%d', t))  " str2nr removes prefix 0
+  let target = 'diary.org/' . strftime('%B/%A the ', t) . str2nr(strftime('%d', t))
   if date  =~ '1[123]'
     let target .= 'th'
   else
@@ -401,4 +388,47 @@ function! myorg#capture() range abort " {{{1
   let capture = myorg#capturewindow(templates)
   if empty(capture) | return | endif
   call org#capture#do(capture)
+endfunction
+
+function! myorg#makeplan(...) abort " {{{1
+  let day = get(a:, 1, localtime() - 3600 * 3 + 86400)
+  let target = org#headline#fromtarget(s:journaltarget(day) .. '/Tasks', 1)
+  let range = s:getrange(target)
+  if range[1] - range[0] > 3
+    call s:displaydiary(range[0] + 2)
+    return
+  endif
+
+  let routine = readfile(org#dir() . '/daily_routine.org')[1:] + ['', '']
+  call appendbufline(target.bufnr, prevnonblank(range[1]), routine)
+  call myorg#updateTasks(day)
+  call s:displaydiary(range[0] + 2)
+
+  " let items = myorg#get_agendatasks()
+  " call map(items, "extend(v:val, {'link': s:tolink(v:val, 1)})")
+  " call map(items, "printf('  - [ ] %s', v:val.link)")
+  " let items = readfile(org#dir() . '/daily_routine.org')[1:] + [''] + items + ['']
+  " call appendbufline(target.bufnr, prevnonblank(range[1]), items)
+  " call s:displaydiary(range[0] + 2)
+
+endfunction
+
+function! s:displaydiary(lnum) abort " {{{1
+  execute 'tabe +' . a:lnum org#dir() . '/diary.org'
+  redraw!
+  " call cursor(range[0] + 2, 3)
+  normal! zMzv
+  redraw!
+  let g:last_agenda='planning'
+  call org#agenda#build('planning')
+endfunction
+
+" function! myorg#write_new(target, items) abort " {{{1
+" endfunction
+
+function! s:tolink(hl, fulltext) abort " {{{1
+  if a:fulltext
+    return printf('[[file:%s::*%s][%s]]', fnamemodify(a:hl.filename, ':t'), a:hl.item, a:hl.item)
+  endif
+  return printf('file:%s::*%s', fnamemodify(a:hl.filename, ':t'), a:hl.item)
 endfunction
