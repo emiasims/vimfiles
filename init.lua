@@ -12,5 +12,8 @@ unlet! g:defaultdir
 vim.cmd('runtime settings.vim')
 
 require 'mia.plugin'
-require 'mia.treesitter'
+require 'mia.tslib'
+require 'mia.utils'
 require ('lush')(require('gruvbox'))
+
+fold = require('mia.tslib.fold').queryexpr

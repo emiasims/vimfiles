@@ -8,7 +8,7 @@ augroup vimrc_statusline
 augroup END
 
 if has('nvim')
-  lua ts_statusline = require('mia.treesitter').statusline
+  lua ts_statusline = require('mia.tslib').statusline
 endif
 
 function! statusline#active() abort " {{{1
