@@ -70,7 +70,7 @@ local gray = colors.gray
 local sign_column = bg1
 
 -- set colors_name var
-vim.g.colors_name = "gruvbox"
+-- vim.g.colors_name = "gruvbox"
 
 -- handle light/dark contrast settings
 local bg = vim.o.background
@@ -218,12 +218,12 @@ local groups = lush(function()
     Structure      { fg = aqua },
     Typedef        { fg = yellow },
 
-    Special        {},
+    Special        { fg = orange },
     SpecialChar    { fg = red },
     Tag            { fg = aqua, gui = 'bold' },
     Delimiter      { fg = fg2 },
     Comment        { fg = gray },
-    SpecialComment { Comment },
+    SpecialComment { Type },
     Debug          { fg = red },
     Underlined     { gui = 'underline' },
     Undercurl      { gui = 'undercurl' },
