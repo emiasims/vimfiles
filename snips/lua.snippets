@@ -1,3 +1,8 @@
+
+snippet retif "Return if condition" b
+if ${0:${VISUAL}} then return${1} end
+endsnippet
+
 snippet vapi "Define vim.api" b
 local api = vim.api
 endsnippet
@@ -7,24 +12,24 @@ local ${1:var} = ${0:${VISUAL:var}}
 endsnippet
 
 snippet !fun(ction)?! "New function" br
-local function ${1:name}(${2:args})
+`!p snip.rv = '' if t[1].startswith('M.') else 'local '`function ${1:name}($2)
 	${0:${VISUAL}}
 end
 endsnippet
 
-snippet forp "pair for loop" b
-for ${1:name},${2:val} in pairs(${3:table_name}) do
+snippet for "pair for loop" b
+for ${1:k}, ${2:v} in pairs(${3:t}) do
 	${0:${VISUAL}}
 end
 endsnippet
 
 snippet fori "ipair for foop" b
-for ${1:idx},${2:val} in ipairs(${3:table_name}) do
+for ${1:_}, ${2:v} in ipairs(${3:t}) do
 	${0:${VISUAL}}
 end
 endsnippet
 
-snippet for "numeric for loop" b
+snippet forn "numeric for loop" b
 for ${1:i}=${2:first},${3:last}${4/^..*/(?0:,:)/}${4:step} do
 	${0:${VISUAL}}
 end

@@ -6,7 +6,7 @@ setlocal concealcursor=n
 setlocal foldnestmax=20
 if has('nvim') && get(g:, 'loaded_nvim_treesitter', 0)
   setlocal foldmethod=expr
-  setlocal foldexpr=v:lua.fold(v:lnum)
+  setlocal foldexpr=v:lua.tsfold(v:lnum)
 endif
 
 nmap <buffer> gO <Plug>(org-headline-open-above)Headline<Esc>[ viw<C-g>

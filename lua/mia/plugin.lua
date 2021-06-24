@@ -1,6 +1,8 @@
 -- nvim-compe
 require 'plugin.completion'
 
+require ('lush')(require('gruvbox'))
+
 -- nvim-treesitter
 if not pcall(require, 'nvim-treesitter') then return end
 require('nvim-treesitter.configs').setup {
@@ -31,4 +33,3 @@ require('nvim-treesitter.configs').setup {
     },
   },
 }
-

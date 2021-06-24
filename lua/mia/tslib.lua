@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 local api = vim.api
 local ts = vim.treesitter

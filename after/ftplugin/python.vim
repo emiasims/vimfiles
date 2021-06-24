@@ -6,7 +6,7 @@ setlocal foldmethod=syntax
 setlocal foldtext=fold#pythontext()
 if has('nvim') && get(g:, 'loaded_nvim_treesitter', 0)
   setlocal foldmethod=expr
-  setlocal foldexpr=v:lua.fold(v:lnum)
+  setlocal foldexpr=v:lua.tsfold(v:lnum)
 endif
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen

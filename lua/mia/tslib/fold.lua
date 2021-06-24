@@ -7,7 +7,10 @@ ts.set_query('python', 'fold', [[
 (function_definition (block)) @fold
 (class_definition (block)) @fold
 ]])
-ts.set_query('lua', 'fold', [[(function) @fold]])
+ts.set_query('lua', 'fold', [[
+(function) @fold
+(local_function) @fold
+]])
 
 function M.queryexpr(lnum)
   -- start = vim.fn.line(lnum)-1
