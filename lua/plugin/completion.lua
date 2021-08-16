@@ -23,11 +23,10 @@ if has_compe then
       vsnip = true,
       nvim_lsp = true,
       nvim_lua = true,
-      spell = true,
-      tags = true,
+      spell = false,
+      tags = false,
       treesitter = false,
       ultisnips = true,
-      -- snippets_nvim = true,
     },
   }
 

@@ -4,10 +4,12 @@ local api = vim.api
 local ts = vim.treesitter
 
 function M.query2list(query, bufnr, lang)
+  local lang = lang or M.ft_to_lang[vim.o.filetype] or vim.o.filetype
   local root = vim.treesitter.get_parser(bufnr or 0, lang):parse()[1]:root()
   local qo = vim.treesitter.parse_query(vim.bo.filetype, query)
   local capture = {}
-  for id, node, metadata in qo:iter_captures(root, 0, 0, vim.fn.line('$')) do
+  for id, node, metadata in qo:iter_captures(root, 0, 0, -1) do
+    P{ { node:range() }, metadata }
     table.insert(capture, node)
   end
   return capture
