@@ -20,6 +20,7 @@ call minpac#add('tommcdo/vim-exchange')
 call minpac#add('justinmk/vim-sneak')
 call minpac#add('wellle/targets.vim')
 call minpac#add('tommcdo/vim-lion')
+call minpac#add('romainl/vim-cool')
 
 call minpac#add('machakann/vim-highlightedyank')
 call minpac#add('itchyny/vim-cursorword')
