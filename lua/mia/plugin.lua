@@ -5,6 +5,16 @@ require ('lush')(require('gruvbox'))
 
 -- nvim-treesitter
 if not pcall(require, 'nvim-treesitter') then return end
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.org = {
+  install_info = {
+    url = '~/Projects/tree-sitter-org',
+    files = {'src/parser.c', 'src/scanner.cc'},
+  },
+  filetype = 'org',
+}
+
 require('nvim-treesitter.configs').setup {
   -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   ensure_installed = {'bash', 'cpp', 'lua', 'python', 'c', 'javascript'},
