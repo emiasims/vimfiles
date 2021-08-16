@@ -173,6 +173,8 @@ augroup vimrc_general
   autocmd WinEnter * setlocal cursorline
   autocmd WinLeave * setlocal nocursorline
 
+  autocmd BufWritePre * call mkdir(expand("<afile>:p:h"), "p")
+
 augroup END
 
 augroup vimrc_numbertoggle
