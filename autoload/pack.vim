@@ -44,6 +44,7 @@ call minpac#add('nvim-telescope/telescope.nvim', #{type: 'opt'})
 call minpac#add('hrsh7th/nvim-compe', #{type : 'opt'})
 
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
+call minpac#add('git@github.com:milisims/nvim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/nvim-luaref.git', #{depth: 0})
