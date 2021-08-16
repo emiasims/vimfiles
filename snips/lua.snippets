@@ -12,7 +12,7 @@ local ${1:var} = ${0:${VISUAL:var}}
 endsnippet
 
 snippet !fun(ction)?! "New function" br
-`!p snip.rv = '' if t[1].startswith('M.') else 'local '`function ${1:name}($2)
+`!p snip.rv = '' if ('.' in t[1] or ':' in t[1]) else 'local '`function ${1:name}($2)
 	${0:${VISUAL}}
 end
 endsnippet

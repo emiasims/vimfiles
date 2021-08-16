@@ -1,0 +1,14 @@
+
+snippet ;b "Begin src block" b
+#+BEGIN_${1:SRC} ${2:lua}
+${0:${VISUAL}}
+#+END_$1
+endsnippet
+
+snippet ;lk "Make link"
+[`!p snip.rv = '[' if t[1] else ''`${1:uri}`!p snip.rv = ']' if t[1] else ''`[${0:${VISUAL:Text}}]]
+endsnippet
+
+snippet [] "Make link"
+[`!p snip.rv = '[' if t[1] else ''`${1:uri}`!p snip.rv = ']' if t[1] else ''`[${0:${VISUAL:Text}}]]
+endsnippet
