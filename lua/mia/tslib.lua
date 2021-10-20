@@ -1,10 +1,10 @@
-local M = {}
+local tslib = {}
 
 local api = vim.api
 local ts = vim.treesitter
 
-function M.query2list(query, bufnr, lang)
-  local lang = lang or M.ft_to_lang[vim.o.filetype] or vim.o.filetype
+function tslib.query2list(query, bufnr, lang)
+  local lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
   local root = vim.treesitter.get_parser(bufnr or 0, lang):parse()[1]:root()
   local qo = vim.treesitter.parse_query(vim.bo.filetype, query)
   local capture = {}
@@ -15,25 +15,25 @@ function M.query2list(query, bufnr, lang)
   return capture
 end
 
-M.ft_to_lang = {
+tslib.ft_to_lang = {
   py = 'python',
   sh = 'bash',
   js = 'javascript',
 }
 
-function M.has_parser(lang)
-  local lang = lang or M.ft_to_lang[vim.o.filetype] or vim.o.filetype
+function tslib.has_parser(lang)
+  local lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
   return pcall(ts.inspect_language, lang)
 end
 
-function M.node_at_curpos()
+function tslib.node_at_curpos()
   local root = vim.treesitter.get_parser(0):parse()[1]:root()
   local _, ln, col, _, _ = unpack(vim.fn.getcurpos())
   return root:named_descendant_for_range(ln-1, col-1, ln-1, col)
 end
 
-function M.nodelist_atcurs()
-  local node = M.node_at_curpos()
+function tslib.nodelist_atcurs()
+  local node = tslib.node_at_curpos()
   local names = {}
   -- local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
   while node do
@@ -43,9 +43,9 @@ function M.nodelist_atcurs()
   return names
 end
 
-function M.statusline()
-  if not M.has_parser() then return '' end
-  local names = M.nodelist_atcurs()
+function tslib.statusline()
+  if not tslib.has_parser() then return '' end
+  local names = tslib.nodelist_atcurs()
   if #names == 0 then return '' end
 
   local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10
@@ -60,4 +60,4 @@ function M.statusline()
   return stl
 end
 
-return M
+return tslib
