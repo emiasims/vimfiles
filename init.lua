@@ -1,4 +1,4 @@
-require 'mia.utils' -- Sets up globals: requireas, reload, and P
+require 'mia.utils' -- Sets up globals: reload, P, nmodule
 
 vim.env.CFGDIR = (vim.env.XDG_CONFIG_HOME or vim.env.HOME)..'/.config/nvim'
 vim.env.DATADIR = (vim.env.XDG_DATA_HOME or vim.env.HOME)..'/.local/share/nvim'
@@ -6,6 +6,7 @@ vim.cmd('runtime settings.vim')
 
 require 'mia.plugin'
 
--- This is like the following, see lua/mia/utils.lua, sets up for reloading
--- fold = require('mia.tslib.fold').queryexpr
-requireas('tsfold', 'mia.tslib.fold', 'queryexpr')
+-- nmodule allows lazy loading of submodules:
+-- setlocal foldexpr=v:lua.mia.tslib.fold.queryexpr(v:lnum)
+-- Without all that ugly 'require' and luaeval nonsense
+mia = nmodule('mia')

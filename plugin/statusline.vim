@@ -7,10 +7,6 @@ augroup vimrc_statusline
   autocmd WinEnter,BufEnter * setlocal statusline=%!statusline#active()
 augroup END
 
-if has('nvim')
-  lua requireas('ts_statusline', 'mia.tslib', 'statusline')
-endif
-
 function! statusline#active() abort " {{{1
   let statuslinetext  = statusline#mode(1)
   let statuslinetext .= statusline#dirinfo(1)
@@ -18,7 +14,7 @@ function! statusline#active() abort " {{{1
   let statuslinetext .= '%='
   let statuslinetext .= statusline#temporary()
   if has('nvim') && exists('g:loaded_nvim_treesitter')
-    let statuslinetext .= v:lua.ts_statusline()
+    let statuslinetext .= v:lua.mia.tslib.statusline()
   endif
   let statuslinetext .= statusline#plugins(1)
   let statuslinetext .= statusline#errors(1)
@@ -147,33 +143,3 @@ function! statusline#errors(active) abort " {{{1
   let statuslinetext .= '%*'
   return statuslinetext
 endfunction
-
-" Colors {{{1
-hi link User1 TabLine
-hi link User2 IncSearch
-hi link User3 StatusLineTermNC
-hi link User4 PmenuSel
-hi link User5 IncSearch
-hi link User6 WildMenu
-hi link User7 DiffAdd
-hi link User8 StatusLineTerm
-hi link User9 StatusLineTerm
-
-
-" highlight link StatusLine        
-" highlight link StatusLineNC      
-
-" highlight link StatusLineTerm    
-" highlight link StatusLineTermNC  
-
-" highlight link stlModified       
-" highlight link stlTypeInfo       
-" highlight link stlDirInfo        
-" highlight link stlErrorInfo      
-
-" highlight link stlNormalMode     
-" highlight link stlInsertMode     
-" highlight link stlVisualMode     
-" highlight link stlReplaceMode    
-" highlight link stlSelectMode     
-" highlight link stlTerminalMode   

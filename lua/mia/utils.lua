@@ -1,44 +1,50 @@
-local M = { _required = {} }
-
-local function doglobal(global, name, suffix, printme)
-  local tmp = require(name)
-  for _,part in ipairs(vim.fn.split(suffix, '\\.')) do
-    tmp = tmp[part]
-  end
-
-  if printme and suffix == '' then
-    print(string.format('%s = require("%s")', global, name))
-  elseif printme then
-    print(string.format('%s = require("%s").%s', global, name, suffix))
-  end
-
-  _G[global] = tmp
-  end
-
--- Acts like global = require(name)[sfx1][sfx2][...]
--- Where the sfxn are just split(suffix, '\.')
--- Makes reloading globals possible
-function requireas(global, name, suffix)
-  local suffix = suffix or ''
-  doglobal(global, name, suffix)
-
-  if M._required[name] == nil then M._required[name] = {} end
-  M._required[name][global] = suffix
-end
-
 function reload(name)
-  package.loaded[name] = nil
-  require(name)
+  -- not quite done
   print(string.format('Sourced: require("%s")', name))
-  if M._required[name] == nil then return end
-  for global,suffix in pairs(M._required[name]) do
-    doglobal(global, name, suffix, true)
+  if package.loaded[name] then
+    return require(name)
   end
+
+  local orig = package.loaded[name]
+  package.loaded[name] = nil
+  -- if it's not a table, the module didn't return anything
+  if type(orig) ~= "table" then
+    return require(name)
+  end
+
+  -- If it is a table, remove all elements. Shallow copy new elements.
+  for k in pairs(orig) do orig[k] = nil end
+  for k, v in pairs(new) do orig[k] = v end
+
+  -- Not sure why require would set a metatable but here we gooo. Also clears
+  -- orig metatable
+  setmetatable(orig, getmetatable(new))
+
+  -- reinstate the original reference & return
+  package.loaded[name] = orig
+  return package.loaded[name]
 end
+
+function nmodule(name, package)
+  local required, module = pcall(require, name)
+  if not required then
+    return nil
+  end
+  local module = require(name)
+
+  if not module._NAME then
+    module._NAME = name
+    module._PACKAGE = package
+    setmetatable(module, {
+      __index = function(tbl, submodule)
+      return nmodule(name .. '.' .. submodule, name)
+    end })
+  end
+  return module
+end
+
 
 function P(v)
   print(vim.inspect(v))
   return v
 end
-
-return M

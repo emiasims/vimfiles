@@ -6,7 +6,7 @@ setlocal foldmethod=syntax
 setlocal foldtext=fold#pythontext()
 if has('nvim') && get(g:, 'loaded_nvim_treesitter', 0)
   setlocal foldmethod=expr
-  setlocal foldexpr=v:lua.tsfold(v:lnum)
+  setlocal foldexpr=v:lua.mia.tslib.fold.queryexpr(v:lnum)
 endif
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
@@ -33,3 +33,6 @@ nmap <expr> <buffer> gO (getline('.') =~# '^\s*def' ? '' : '[m') . 'yy[ kPCdef<T
 
 inoremap <buffer> """ """ """<C-g>U<Left><C-g>U<Left><C-g>U<Left>
 inoremap <buffer> """<Cr> """<Cr>"""<esc>O
+
+xnoremap <buffer> ik <Esc>?# %%.*\n\zs\\|\%^<Cr>V/\ze\n.*# %%\\|\%$<Cr>
+omap <buffer> ik :normal vik<Cr>
