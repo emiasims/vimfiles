@@ -25,7 +25,7 @@ function reload(name)
   return package.loaded[name]
 end
 
-function nmodule(name, package)
+function vim_module(name, package)
   local required, module = pcall(require, name)
   if not required then
     return nil
@@ -33,16 +33,21 @@ function nmodule(name, package)
   local module = require(name)
 
   if not module._NAME then
-    module._NAME = name
-    module._PACKAGE = package
-    setmetatable(module, {
-      __index = function(tbl, submodule)
-      return nmodule(name .. '.' .. submodule, name)
-    end })
+    return module_to_vim_module(module, name, package)
   end
   return module
 end
 
+function module_to_vim_module(module, name, package)
+  -- name required, package not
+  module._NAME = name
+  module._PACKAGE = package
+  setmetatable(module, {
+    __index = function(tbl, submodule)
+    return vim_module(name .. '.' .. submodule, name)
+  end })
+  return module
+end
 
 function P(v)
   print(vim.inspect(v))
