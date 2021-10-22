@@ -198,8 +198,8 @@ augroup vimrc_filetype
 augroup END
 
 " Mappings: {{{1
-let g:mapleader=':'
-let g:maplocalleader="\\"
+let g:mapleader='\'
+" let g:maplocalleader="\\"
 
 nnoremap <Space> :
 xnoremap <Space> :
