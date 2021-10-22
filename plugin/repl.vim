@@ -12,6 +12,8 @@ xnoremap <silent> gx     :call repl#send()<CR>
 
 nnoremap <expr> gr empty(repl#winnr()) ? '' : (repl#winnr() . '<C-w>w')
 
+let g:repl#join = "\<Cr>\<C-u>"
+
 command! -nargs=0 SetRepl let [repl#termid, repl#bufid] = [b:terminal_job_id, bufnr()]
 command! -nargs=0 TermRepl execute 'terminal' | SetRepl
 command! -nargs=0 ClearRepl let [repl#bufid, repl#termid] = [-1, -1]
