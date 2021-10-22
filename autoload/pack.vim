@@ -35,8 +35,10 @@ call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call 
 call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
 call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
 call minpac#add('SirVer/ultisnips', #{type : 'opt'})
+
 call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: 'TSUpdate'})
 call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
+call minpac#add('nvim-treesitter/nvim-treesitter-textobjects', #{type : 'opt'})
 
 call minpac#add('nvim-lua/popup.nvim', #{type: 'opt'})
 call minpac#add('nvim-lua/plenary.nvim', #{type: 'opt'})

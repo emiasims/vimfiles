@@ -416,6 +416,7 @@ if has('nvim')
   endif
   silent! packadd! ultisnips
   silent! packadd! nvim-treesitter
+  silent! packadd! nvim-treesitter-textobjects
   silent! packadd! playground
   silent! packadd! popup.nvim
   silent! packadd! plenary.nvim
