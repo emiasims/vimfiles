@@ -7,7 +7,7 @@ augroup vimrc_org
   autocmd User OrgCapturePost if has_key(g:org#currentcapture, 'snippet') | call feedkeys(g:org#currentcapture.snippet, 'nx') | endif
   autocmd User OrgCapturePost call org#property#add({'created-at': org#time#dict("[now]").totext("t")})
   autocmd User OrgRefilePre if g:org#refile#destination.filename =~# 'archive.org$' | call org#plan#add({'CLOSED': '[now]'}) | endif
-  autocmd InsertLeave *.org if org#listitem#has_ordered_bullet(getline('.'))|call org#list#reorder()|endif
+  autocmd InsertLeave *.org call v:lua.mia.org.list.reorder()
 
   autocmd User OrgRefilePost echo 'Refiled to' org#headline#astarget(g:org#refile#destination)
   autocmd User OrgRefilePost silent update|buffer #
