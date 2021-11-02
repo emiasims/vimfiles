@@ -28,7 +28,6 @@ let b:ncm2_look_enabled = 1
 let b:autopairs_skip = ["'"]
 let b:post_pumaccept = ' '
 
-imap <buffer> <c-x><c-i> <plug>(citebib-complete)
 nnoremap <buffer><silent> gO :lvimgrep /^#/ %<CR>:lopen<CR>
 nnoremap <buffer> <leader>J vipJgqip
 nnoremap <buffer> <leader>K vipJ:let store_reg = @/ \| .s/[.!?]\zs\s\+\ze\u/\r/geI \| let @/ = store_reg \| unl store_reg<CR>

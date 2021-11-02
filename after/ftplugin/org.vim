@@ -31,8 +31,6 @@ Contextualize default imap <buffer> <expr> <Bs> g:contextualize.i.map['<lt>bs>']
 Contextualize inSyntax orgLink nmap <buffer> K <Plug>(org-follow-link)
 " xnoremap <silent> <buffer> K :<C-u>call notebox#setupLink('', 'v')<Cr>
 
-imap <buffer> <C-x><C-i> <plug>(citebib-complete)
-
 " TODO make it easier to say (in checked box?) -- easy with tree-sitter
 ContextAdd <buffer> checkbox   {-> getline('.')[col('.') - 2 : col('.')] =~? '\[.]'}
 Contextualize checkbox nmap <buffer> x <Plug>(org-check-toggle)
