@@ -31,30 +31,16 @@ call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
 
 " Nvim specific:
-call minpac#add('glacambre/firenvim', #{type: 'opt', do: 'packadd firenvim|call firenvim#install()' })
-call minpac#add('mhinz/vim-signify', #{type : 'opt'})  " Slow?
-call minpac#add('ludovicchabant/vim-gutentags', #{type : 'opt'})
-call minpac#add('SirVer/ultisnips', #{type : 'opt'})
-
-call minpac#add('nvim-treesitter/nvim-treesitter', #{type : 'opt', do: 'TSUpdate'})
-call minpac#add('nvim-treesitter/playground', #{type : 'opt'})
-call minpac#add('nvim-treesitter/nvim-treesitter-textobjects', #{type : 'opt'})
-
-call minpac#add('nvim-lua/popup.nvim', #{type: 'opt'})
-call minpac#add('nvim-lua/plenary.nvim', #{type: 'opt'})
-call minpac#add('nvim-telescope/telescope.nvim', #{type: 'opt'})
-
-call minpac#add('hrsh7th/nvim-compe', #{type : 'opt'})
-
+" call minpac#add('glacambre/firenvim', #{do: 'packadd firenvim|call firenvim#install()' })
+call minpac#add('git@github.com:milisims/contextualize.nvim', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/nvim-org.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
 call minpac#add('git@github.com:milisims/nvim-luaref.git', #{depth: 0})
 
-call minpac#add('rktjmp/lush.nvim')
-
 function! pack#update() abort
+  " execute 'source' expand('<sfile>')
   call minpac#update('', #{do : 'call minpac#status()'})
 endfunction
 
