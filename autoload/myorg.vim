@@ -1,3 +1,7 @@
+if !has('nvim')
+  finish
+endif
+
 function! myorg#agenda_done() abort " {{{1
   if &filetype != 'agenda'
     throw 'Only usable in agenda filetypes'

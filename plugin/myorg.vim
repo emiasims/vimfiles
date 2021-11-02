@@ -1,3 +1,6 @@
+if !has('nvim')
+  finish
+endif
 " Hooks {{{1
 
 augroup vimrc_org
@@ -72,6 +75,7 @@ function! s:stuck_gen() abort "{{{2
   let stuck = filter(org#outline#multi(org#agenda#files()), 'index(v:val.tags, ''project'') >= 0')
   let filter = org#agenda#filter('project-habit-DONE+NEXT')
   call filter(stuck, 'len(filter(v:val.list, "' . filter . '")) == 0')
+  call map(stuck, 'extend(v:val, #{filename: v:key, lnum: 0})')
   return values(stuck)
 endfunction
 
