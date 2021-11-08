@@ -1,7 +1,7 @@
 function reload(name)
   -- not quite done
   print(string.format('Sourced: require("%s")', name))
-  if package.loaded[name] then
+  if package.loaded[name] == nil then
     return require(name)
   end
 

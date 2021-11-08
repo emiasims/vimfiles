@@ -1,15 +1,14 @@
 local tslib = {}
 
-local api = vim.api
 local ts = vim.treesitter
 
 function tslib.query2list(query, bufnr, lang)
-  local lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
+  lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
   local root = vim.treesitter.get_parser(bufnr or 0, lang):parse()[1]:root()
   local qo = vim.treesitter.parse_query(vim.bo.filetype, query)
   local capture = {}
-  for id, node, metadata in qo:iter_captures(root, 0, 0, -1) do
-    P{ { node:range() }, metadata }
+  for _, node, metadata in qo:iter_captures(root, 0, 0, -1) do
+    P { { node:range() }, metadata }
     table.insert(capture, node)
   end
   return capture
@@ -22,14 +21,14 @@ tslib.ft_to_lang = {
 }
 
 function tslib.has_parser(lang)
-  local lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
+  lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
   return pcall(ts.inspect_language, lang)
 end
 
 function tslib.node_at_curpos()
   local root = vim.treesitter.get_parser(0):parse()[1]:root()
   local _, ln, col, _, _ = unpack(vim.fn.getcurpos())
-  return root:named_descendant_for_range(ln-1, col-1, ln-1, col)
+  return root:named_descendant_for_range(ln - 1, col - 1, ln - 1, col)
 end
 
 function tslib.nodelist_atcurs()
@@ -44,15 +43,19 @@ function tslib.nodelist_atcurs()
 end
 
 function tslib.statusline()
-  if not tslib.has_parser() then return '' end
+  if not tslib.has_parser() then
+    return ''
+  end
   local names = tslib.nodelist_atcurs()
-  if #names == 0 then return '' end
+  if #names == 0 then
+    return ''
+  end
 
   local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10
   local stl = names[1]
-  for i=2,#names do
+  for i = 2, #names do
     if (stl:len() + 2 * #names) >= indicator_size then
-      stl = names[i]:sub(1,1) .. '➜' .. stl
+      stl = names[i]:sub(1, 1) .. '➜' .. stl
     else
       stl = names[i] .. '➔' .. stl
     end
