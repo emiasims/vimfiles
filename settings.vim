@@ -19,6 +19,11 @@ set timeoutlen=750  " Time out on mappings
 set ttimeoutlen=250 " for key codes
 set shell=bash
 
+call mkdir($DATADIR .. '/view', "p")
+call mkdir($DATADIR .. '/tmp/backup', "p")
+call mkdir($DATADIR .. '/tmp/swap', "p")
+call mkdir($DATADIR .. '/tmp/undo', "p")
+
 if exists('$SUDO_USER')
   set nowritebackup
 else
