@@ -1,52 +1,58 @@
-function reload(name)
-  -- not quite done
-  print(string.format('Sourced: require("%s")', name))
-  if package.loaded[name] == nil then
-    return require(name)
+-- from plenary
+function reload(module_name, starts_with_only)
+  -- TODO: Might need to handle cpath / compiled lua packages? Not sure.
+  local matcher
+  if not starts_with_only then
+    matcher = function(pack)
+      return string.find(pack, module_name, 1, true)
+    end
+  else
+    matcher = function(pack)
+      return string.find(pack, '^' .. module_name)
+    end
   end
 
-  local orig = package.loaded[name]
-  package.loaded[name] = nil
-  -- if it's not a table, the module didn't return anything
-  if type(orig) ~= "table" then
-    return require(name)
+  -- Handle impatient.nvim automatically.
+  local luacache = (_G.__luacache or {}).cache
+
+  for pack, _ in pairs(package.loaded) do
+    if matcher(pack) then
+      package.loaded[pack] = nil
+
+      if luacache then
+        luacache[pack] = nil
+      end
+      require(pack)
+      print(string.format('Sourced: require("%s")', pack))
+    end
   end
-
-  -- If it is a table, remove all elements. Shallow copy new elements.
-  for k in pairs(orig) do orig[k] = nil end
-  for k, v in pairs(new) do orig[k] = v end
-
-  -- Not sure why require would set a metatable but here we gooo. Also clears
-  -- orig metatable
-  setmetatable(orig, getmetatable(new))
-
-  -- reinstate the original reference & return
-  package.loaded[name] = orig
-  return package.loaded[name]
 end
 
-function vim_module(name, package)
-  local required, module = pcall(require, name)
-  if not required then
-    return nil
-  end
-  local module = require(name)
+function require_by_reference(module, name)
 
-  if not module._NAME then
-    return module_to_vim_module(module, name, package)
+  if name == nil and type(module) == "string" then
+    module, name = {}, module
   end
-  return module
-end
 
-function module_to_vim_module(module, name, package)
-  -- name required, package not
-  module._NAME = name
-  module._PACKAGE = package
-  setmetatable(module, {
-    __index = function(tbl, submodule)
-    return vim_module(name .. '.' .. submodule, name)
-  end })
-  return module
+  local submodule_cache = {}
+
+  return setmetatable(module, {
+    __index = function(_, key)
+      -- check if key is in the table or if it's a submodule
+      local m = require(name)
+      if m[key] then
+        return m[key]
+      end
+
+      local sm_name = name .. '.' .. key
+      local success, submodule = pcall(require, sm_name)
+      if not success then
+        return nil
+      end
+      module[key] = require_by_reference(sm_name)
+      return module[key]
+    end,
+  })
 end
 
 function P(v)
