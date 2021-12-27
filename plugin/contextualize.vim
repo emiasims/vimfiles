@@ -1,4 +1,3 @@
-" My contextualize.vim settings
 
 try
   packadd contextualize.vim
@@ -6,17 +5,13 @@ catch
   finish
 endtry
 
-augroup vimrc_contextualize
-  autocmd!
-  autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
-  autocmd User UltiSnipsExitLastSnippet unlet! g:in_snippet
-augroup END
+Contextualize {-> vsnip#expandable()} imap <Tab> <Plug>(vsnip-expand)
+Contextualize {-> vsnip#jumpable(1)} imap <Tab> <Plug>(vsnip-jump-next)
+Contextualize {-> vsnip#jumpable(1)} smap <Tab> <Plug>(vsnip-jump-next)
+Contextualize {-> vsnip#jumpable(-1)} imap <S-Tab> <Plug>(vsnip-jump-prev)
+Contextualize {-> vsnip#jumpable(-1)} smap <S-Tab> <Plug>(vsnip-jump-prev)
 
-ContextAdd insnippet {-> exists('g:in_snippet')}
-Contextualize insnippet imap <Tab> <Plug>(myUltiSnipsForward)
-Contextualize insnippet imap <S-Tab> <Plug>(myUltiSnipsBackward)
-Contextualize insnippet smap <Tab> <Plug>(myUltiSnipsForward)
-Contextualize insnippet smap <S-Tab> <Plug>(myUltiSnipsBackward)
+Contextualize {-> luaeval("require'cmp'.visible()")} imap <Cr> <Plug>(miaConfirmCmp)
 
 function! s:startcmd() abort dict
   return getcmdtype()==":" && getcmdline()==self.lhs

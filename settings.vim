@@ -513,18 +513,6 @@ if has('nvim')
   let g:signify_skip_filetype = { 'markdown': 1 }
   let g:signify_disable_by_default = 1
 
-  " Ultisnips {{{2
-  " for contextualize
-  imap <Tab> <Plug>(myUltiSnipsExpand)
-  xmap <Tab> <Plug>(myUltiSnipsExpand)
-  let g:UltiSnipsEditSplit = 'tabdo'
-  let g:UltiSnipsSnippetDirectories = ['snips']
-  let g:UltiSnipsRemoveSelectModeMappings = 0
-  let g:UltiSnipsExpandTrigger = "<Plug>(myUltiSnipsExpand)"
-  let g:UltiSnipsJumpForwardTrigger = "<Plug>(myUltiSnipsForward)"
-  let g:UltiSnipsJumpBackwardTrigger = "<Plug>(myUltiSnipsBackward)"
-  snoremap <C-e> <Esc>`>a
-  " }}}
 endif
 
 " Windows {{{2
