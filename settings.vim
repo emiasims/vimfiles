@@ -75,7 +75,7 @@ set whichwrap+=[,]
 set autowriteall
 augroup vimrc_writeall
   autocmd!
-  autocmd WinLeave * ++nested if &modifiable && &modified && filereadable(expand('%')) | write | endif
+  autocmd WinLeave,FocusLost * ++nested if &modifiable && filereadable(expand('%')) | update | endif
 augroup END
 
 if executable('ag')
@@ -280,26 +280,29 @@ nnoremap <silent> [q :<C-u>execute v:count1 . 'cprevious'<CR>
 nnoremap <silent> ]q :<C-u>execute v:count1 . 'cnext'<CR>
 nnoremap <silent> [L :lfirst<CR>
 nnoremap <silent> ]L :llast<CR>
-nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10), v:count1) \| ']+1 <CR>
-nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1) \| '[-1 <CR>
+nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10), v:count1)\|']+1\|call repeat#set("[ ")<CR>
+nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)\|'[-1\|call repeat#set("] ")<CR>
 
 if has('nvim')
+
   augroup vimrc_term
     autocmd!
-    autocmd WinEnter term://* nohlsearch
-    autocmd WinEnter term://* if !exists('b:last_mode') | let b:last_mode = 't' | endif
-    autocmd WinEnter term://* if b:last_mode == 't' | startinsert | endif
-    autocmd TermLeave term://* let b:last_mode = 'n'
+    autocmd WinEnter,BufWinEnter term://* nohlsearch
+    autocmd WinEnter,BufWinEnter term://* if !exists('b:last_mode') | let b:last_mode = 't' | endif
+    autocmd WinEnter,BufWinEnter term://* if b:last_mode == 't' | startinsert | endif
+    autocmd TermOpen * startinsert
   augroup END
 
-  tnoremap <Plug>(term2nmode) <C-\><C-n>:silent let b:last_mode = 't'<Cr>
+  tnoremap <silent> <Plug>(termLeave) <C-\><C-n>:let b:last_mode = 'n'<Cr>
+  tnoremap <silent> <Plug>(term2nmode) <C-\><C-n>:let b:last_mode = 't'<Cr>
   tmap <C-h> <Plug>(term2nmode)<C-w>h
   tmap <C-j> <Plug>(term2nmode)<C-w>j
   tmap <C-k> <Plug>(term2nmode)<C-w>k
   tmap <C-l> <Plug>(term2nmode)<C-w>l
+  tmap <C-^> <Plug>(term2nmode)<C-^>
   tmap <C-\> <Plug>(term2nmode)<C-w>p
-  tnoremap <Esc> <C-\><C-n>
-  tnoremap <M-n> <C-\><C-n>
+  tmap <Esc> <Plug>(termLeave)
+  tmap <M-n> <Plug>(termLeave)
 
 endif
 
@@ -449,14 +452,6 @@ xmap t <Plug>Sneak_t
 xmap T <Plug>Sneak_T
 omap t <Plug>Sneak_t
 omap T <Plug>Sneak_T
-
-nmap ; <Plug>Sneak_;
-xmap ; <Plug>Sneak_;
-nmap , <Plug>Sneak_,
-xmap , <Plug>Sneak_,
-
-nmap s <Plug>Sneak_s
-nmap S <Plug>Sneak_S
 
 let g:sneak#label = 1
 let g:sneak#absolute_dir = 1
