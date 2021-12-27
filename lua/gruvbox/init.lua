@@ -1,4 +1,4 @@
-local lush = require("lush")
+local lush = require 'lush'
 local hsl = lush.hsl
 
 -- Original colorscheme from: https://github.com/gruvbox-community/gruvbox
@@ -75,12 +75,12 @@ local sign_column = bg1
 -- handle light/dark contrast settings
 local bg = vim.o.background
 if bg == nil then
-  bg = "dark"
+  bg = 'dark'
   vim.o.background = bg
 end
 
 -- swap colors if light mode
-if bg == "light" then
+if bg == 'light' then
   bg0 = colors.light0
   bg1 = colors.light1
   bg2 = colors.light2
@@ -100,23 +100,22 @@ if bg == "light" then
   orange = colors.faded_orange
 end
 
--- neovim terminal mode colors
-vim.g.terminal_color_0 = tostring(bg0)
-vim.g.terminal_color_8 = tostring(gray)
-vim.g.terminal_color_1 = tostring(colors.neutral_red)
-vim.g.terminal_color_2 = tostring(red)
-vim.g.terminal_color_10 = tostring(green)
-vim.g.terminal_color_3 = tostring(colors.neutral_yellow)
-vim.g.terminal_color_11 = tostring(yellow)
-vim.g.terminal_color_4 = tostring(colors.neutral_blue)
-vim.g.terminal_color_12 = tostring(blue)
-vim.g.terminal_color_5 = tostring(colors.neutral_purple)
-vim.g.terminal_color_13 = tostring(purple)
-vim.g.terminal_color_6 = tostring(colors.neutral_aqua)
-vim.g.terminal_color_14 = tostring(aqua)
-vim.g.terminal_color_7 = tostring(fg4)
-vim.g.terminal_color_15 = tostring(fg1)
-
+-- -- neovim terminal mode colors
+-- vim.g.terminal_color_0 = tostring(bg0)
+-- vim.g.terminal_color_8 = tostring(gray)
+-- vim.g.terminal_color_1 = tostring(colors.neutral_red)
+-- vim.g.terminal_color_2 = tostring(red)
+-- vim.g.terminal_color_10 = tostring(green)
+-- vim.g.terminal_color_3 = tostring(colors.neutral_yellow)
+-- vim.g.terminal_color_11 = tostring(yellow)
+-- vim.g.terminal_color_4 = tostring(colors.neutral_blue)
+-- vim.g.terminal_color_12 = tostring(blue)
+-- vim.g.terminal_color_5 = tostring(colors.neutral_purple)
+-- vim.g.terminal_color_13 = tostring(purple)
+-- vim.g.terminal_color_6 = tostring(colors.neutral_aqua)
+-- vim.g.terminal_color_14 = tostring(aqua)
+-- vim.g.terminal_color_7 = tostring(fg4)
+-- vim.g.terminal_color_15 = tostring(fg1)
 
 local groups = lush(function()
   return {
