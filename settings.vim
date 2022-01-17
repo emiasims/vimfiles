@@ -438,6 +438,8 @@ command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
 command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | FZ 40 20 | execute 'Telescope fd cwd='..minpac#getpluginfo(<q-args>).dir
 command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
 
+command! CloseFloatingWindows call v:lua.close_all_floating_windows()
+
 " vim-sneak {{{2
 nmap f <Plug>Sneak_f
 nmap F <Plug>Sneak_F

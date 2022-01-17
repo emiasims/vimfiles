@@ -55,6 +55,16 @@ function require_by_reference(module, name)
   })
 end
 
+function close_all_floating_windows()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local config = vim.api.nvim_win_get_config(win)
+    if config.relative ~= '' then
+      vim.api.nvim_win_close(win, false)
+      print('Closing window', win)
+    end
+  end
+end
+
 function P(v)
   print(vim.inspect(v))
   return v
