@@ -1,6 +1,6 @@
 -- Not sure why this isn't working:
 -- local source = { reg = vim.regex([[^\v%(lua/)?\zs.*\ze%(/init)?\.lua$]]) }
-local source = { re = [[\v%(^|/)%(lua/)\zs.*\ze%(/init)?\.lua$]] }
+local source = { re = [[\v%(^|/)%(lua/)\zs.{-}\ze%(/init)?\.lua$]] }
 
 -- For use with SourceCmd autocmd event
 function source.fn(filename)
@@ -13,6 +13,7 @@ function source.fn(filename)
 
   module = vim.fn.substitute(module, '/', '.', 'g')
   package.loaded[module] = res or true
+  vim.notify(string.format('Reloaded %s', module))
 end
 
 return source
