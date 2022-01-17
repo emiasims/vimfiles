@@ -66,6 +66,6 @@ function close_all_floating_windows()
 end
 
 function P(v)
-  print(vim.inspect(v))
+  vim.notify(vim.inspect(v))
   return v
 end
