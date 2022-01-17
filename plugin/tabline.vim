@@ -47,6 +47,9 @@ function! s:gettext(tree, prev) abort " {{{2
   " a:tree[0] is always type, a:tree[1] is either a number or a list
   if a:tree[0] == 'leaf'
     let name = fnamemodify(bufname(winbufnr(a:tree[1])), ':t')
+    if name == 'init.lua'
+      let name = substitute(bufname(winbufnr(a:tree[1])), '\v^%(.*/)?([^/]+)/init.lua$', '\1➔init.lua', '')
+    endif
     if a:tree[1] == win_getid()
       let name = '%#TabLineWin#' . name . '%#TabLineSel#'
     endif
