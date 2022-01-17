@@ -5,7 +5,7 @@ local config = {
     settings = {
       Lua = {
         runtime = { version = 'LuaJIT' }, -- lua version for neovim
-        diagnostics = { globals = { 'vim' } }, -- recognize vim global
+        diagnostics = { globals = { 'vim', 'P', 'use', 'newproxy' } },
         -- Make the server aware of Neovim runtime files:
         -- workspace = { library = vim.api.nvim_get_runtime_file("", true) },
         telemetry = { enable = false },
@@ -21,4 +21,5 @@ require('nvim-lsp-installer').on_server_ready(function(server)
   }, config['sumneko_lua']))
 end)
 
+-- Requires separate setup, installed manually (add LanguageServer) in julia
 require('lspconfig')['julials'].setup { capabilities = capabilities }
