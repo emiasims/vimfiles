@@ -12,13 +12,21 @@ local config = {
       },
     },
   },
+  pylsp = {
+    settings = {
+      pylsp = {
+        plugins = {
+          pycodestyle = { maxLineLength = 100 },
+        }
+      }
+    }
+  }
 }
 
 require('nvim-lsp-installer').on_server_ready(function(server)
-  -- server:setup(get_options(server.name))
   server:setup(vim.tbl_deep_extend('force', {
     capabilities = capabilities,
-  }, config['sumneko_lua']))
+  }, config[server.name] or {}))
 end)
 
 -- Requires separate setup, installed manually (add LanguageServer) in julia
