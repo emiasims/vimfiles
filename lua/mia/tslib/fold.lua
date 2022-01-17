@@ -22,8 +22,8 @@ ts.set_query(
 
 function fold.queryexpr(lnum)
   -- start = vim.fn.line(lnum)-1
-  local start, stop, folds, foldlevel = lnum - 1, lnum
-  local root = ts.get_parser(bufnr or 0, lang):parse()[1]:root()
+  local start, stop = lnum - 1, lnum
+  local root = ts.get_parser(0):parse()[1]:root()
   local folds, foldlevel = {}, 0
   local r1, r2, _
   local qu = ts.get_query(vim.o.filetype, 'fold')
