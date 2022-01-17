@@ -23,7 +23,6 @@ return require('packer').startup(function()
   use 'hrsh7th/cmp-nvim-lua'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-nvim-lsp-document-symbol'
-  -- use "saadparwaiz1/cmp_luasnip"
   use 'tamago324/cmp-zsh'
 
   use 'onsails/lspkind-nvim'
@@ -35,8 +34,6 @@ return require('packer').startup(function()
 
   use 'JuliaEditorSupport/julia-vim'
 
-  use 'kristijanhusak/orgmode.nvim'
   use 'rktjmp/lush.nvim'
 
-  use 'tjdevries/astronauta.nvim'
 end)
