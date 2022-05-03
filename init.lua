@@ -4,3 +4,4 @@ vim.cmd 'runtime settings.vim'
 
 require 'mia.utils' -- reload, require_by_reference, and P
 mia = require_by_reference('mia')
+org = require_by_reference('org')

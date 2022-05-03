@@ -4,22 +4,25 @@ local ts = vim.treesitter
 
 function tslib.print_query(query, bufnr, lang)
   local qo
+  bufnr = bufnr or 0
   lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
   if vim.startswith(query, '*') then
     qo = vim.treesitter.get_query(lang, query:sub(2))
   else
     qo = vim.treesitter.parse_query(vim.bo.filetype, query)
   end
-  local root = vim.treesitter.get_parser(bufnr or 0, lang):parse()[1]:root()
+  local root = vim.treesitter.get_parser(bufnr, lang):parse()[1]:root()
   local capture = {}
   P "Captures"
-  for _, node, metadata in qo:iter_captures(root, 0, 0, -1) do
+  for _, node, metadata in qo:iter_captures(root, bufnr, 0, -1) do
     P { node:type(), { node:range() }, metadata }
     table.insert(capture, node)
   end
   P ""
-  P "Matches"
-  for pat, match, metadata in qo:iter_matches(root, 0, 0, -1) do
+  local i = 0
+  for pat, match, metadata in qo:iter_matches(root, bufnr, 0, -1) do
+    i = i + 1
+    P(string.format("Match: %s", i))
     for id, node in pairs(match) do
       P { pat, id, qo.captures[id], { node:range() }, metadata[id] }
     end
@@ -44,9 +47,9 @@ function tslib.node_at_curpos()
 end
 
 function tslib.nodelist_atcurs()
-  local node = tslib.node_at_curpos()
+  -- local node = tslib.node_at_curpos()
+  local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
   local names = {}
-  -- local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
   while node do
     table.insert(names, node:type())
     node = node:parent()

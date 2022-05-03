@@ -64,5 +64,5 @@ augroup refactor_clear " {{{1
   autocmd InsertLeave * silent! autocmd! vimrc_refactor_insert
 augroup END
 
-let g:refactor_prefix = {'vim': 'let '}
+let g:refactor_prefix = {'vim': 'let ', 'lua': 'local '}
 let g:refactor_equals = {'sh': '='}

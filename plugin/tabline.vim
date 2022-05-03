@@ -43,12 +43,14 @@ function! s:get_tab_text(tabnr) abort " {{{1
   return text
 endfunction
 
+let s:add_dir = { 'init.lua': 1, 'base.lua': 1 }
+
 function! s:gettext(tree, prev) abort " {{{2
   " a:tree[0] is always type, a:tree[1] is either a number or a list
   if a:tree[0] == 'leaf'
     let name = fnamemodify(bufname(winbufnr(a:tree[1])), ':t')
-    if name == 'init.lua'
-      let name = substitute(bufname(winbufnr(a:tree[1])), '\v^%(.*/)?([^/]+)/init.lua$', '\1➔init.lua', '')
+    if get(s:add_dir, name, 0)
+      let name = substitute(bufname(winbufnr(a:tree[1])), '\v^%(.*/)?([^/]+)/([^/]+)$', '\1➔\2', '')
     endif
     if a:tree[1] == win_getid()
       let name = '%#TabLineWin#' . name . '%#TabLineSel#'

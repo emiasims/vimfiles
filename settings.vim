@@ -71,6 +71,8 @@ set breakat=\ \	;:,!?
 set nostartofline
 set whichwrap+=[,]
 
+set spellsuggest=best,10
+
 " Save when exiting a buffer/window. Saving on idle is a bit too aggressive for me.
 set autowriteall
 augroup vimrc_writeall
@@ -270,18 +272,18 @@ nnoremap <expr> N 'nN'[v:searchforward]
 
 nnoremap <silent><C-w>z :vert resize | resize | normal! ze<CR>
 
-nnoremap <silent> [a :<C-u>execute v:count1 . 'previous'<CR>
-nnoremap <silent> ]a :<C-u>execute v:count1 . 'next'<CR>
-nnoremap <silent> [b :<C-u>execute v:count1 . 'bprevious'<CR>
-nnoremap <silent> ]b :<C-u>execute v:count1 . 'bnext'<CR>
-nnoremap <silent> [l :<C-u>execute v:count1 . 'lprevious'<CR>
-nnoremap <silent> ]l :<C-u>execute v:count1 . 'lnext'<CR>
-nnoremap <silent> [q :<C-u>execute v:count1 . 'cprevious'<CR>
-nnoremap <silent> ]q :<C-u>execute v:count1 . 'cnext'<CR>
-nnoremap <silent> [L :lfirst<CR>
-nnoremap <silent> ]L :llast<CR>
-nnoremap <silent> [<Space> :<C-u>put!=repeat(nr2char(10), v:count1)\|']+1\|call repeat#set("[ ")<CR>
-nnoremap <silent> ]<Space> :<C-u>put =repeat(nr2char(10), v:count1)\|'[-1\|call repeat#set("] ")<CR>
+nnoremap [a :<C-u>execute v:count1 . 'previous'<CR>
+nnoremap ]a :<C-u>execute v:count1 . 'next'<CR>
+nnoremap [b :<C-u>execute v:count1 . 'bprevious'<CR>
+nnoremap ]b :<C-u>execute v:count1 . 'bnext'<CR>
+nnoremap [l :<C-u>execute v:count1 . 'lprevious'<CR>
+nnoremap ]l :<C-u>execute v:count1 . 'lnext'<CR>
+nnoremap [q :<C-u>execute v:count1 . 'cprevious'<CR>
+nnoremap ]q :<C-u>execute v:count1 . 'cnext'<CR>
+nnoremap [L :lfirst<CR>
+nnoremap ]L :llast<CR>
+nnoremap [<Space> :<C-u>silent! put!=repeat(nr2char(10), v:count1)\|']+1\|call repeat#set("[ ")<CR>
+nnoremap ]<Space> :<C-u>silent! put =repeat(nr2char(10), v:count1)\|'[-1\|call repeat#set("] ")<CR>
 
 if has('nvim')
 
@@ -290,8 +292,9 @@ if has('nvim')
     autocmd WinEnter,BufWinEnter term://* nohlsearch
     autocmd WinEnter,BufWinEnter term://* if !exists('b:last_mode') | let b:last_mode = 't' | endif
     autocmd WinEnter,BufWinEnter term://* if b:last_mode == 't' | startinsert | endif
-    autocmd TermOpen * startinsert
+    " autocmd TermOpen * startinsert
   augroup END
+
 
   tnoremap <silent> <Plug>(termLeave) <C-\><C-n>:let b:last_mode = 'n'<Cr>
   tnoremap <silent> <Plug>(term2nmode) <C-\><C-n>:let b:last_mode = 't'<Cr>
@@ -304,14 +307,24 @@ if has('nvim')
   tmap <Esc> <Plug>(termLeave)
   tmap <M-n> <Plug>(termLeave)
 
+  tnoremap <C-Space> <Space>
+  tnoremap <S-Space> <Space>
+
 endif
 
-" Just makes sure the abbrev only works at the start of the command
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
 
-nnoremap c* :<C-u>let @/ = '\<'.expand('<cword>').'\>'<Cr>0cgn
+inoreabbrev -> ➜
+
+nnoremap c* :<C-u>let @/ = '\<'.expand('<cword>').'\>'<Cr>cgn
+nnoremap c. /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-a><Esc>
+nnoremap d. /\V<C-r>=escape(@", '\')<Cr><Cr>dgn
+" requires nvim-treesitter
+if has('nvim')
+  nmap dsf diavabo?[^.[:alnum:]_-]?e+1<Cr>p
+endif
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
@@ -342,6 +355,9 @@ nnoremap \P "0P
 xnoremap \p "0p
 xnoremap \P "0P
 
+xnoremap \y "*y
+xnoremap \Y "+y
+
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
@@ -368,16 +384,17 @@ xnoremap <silent>ai <Esc>:call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Esc>:call textobjects#indent(1)<CR><Esc>gv
 
 if has('nvim')
-  nnoremap <silent> <C-Up>    :<C-u>call winresize#up(v:count1)<CR>
-  nnoremap <silent> <C-Down>  :<C-u>call winresize#down(v:count1)<CR>
-  nnoremap <silent> <C-Left>  :<C-u>call winresize#left(v:count1)<CR>
-  nnoremap <silent> <C-Right> :<C-u>call winresize#right(v:count1)<CR>
+  nnoremap <silent> <C-Up>    :<C-u>call winresize#go(1, v:count1)<CR>
+  nnoremap <silent> <C-Down>  :<C-u>call winresize#go(1, -v:count1)<CR>
+  nnoremap <silent> <C-Left>  :<C-u>call winresize#go(0, v:count1)<CR>
+  nnoremap <silent> <C-Right> :<C-u>call winresize#go(0, -v:count1)<CR>
 else
-  nnoremap <silent> <Esc>[1;5A :<C-u>call winresize#up(v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5B :<C-u>call winresize#down(v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5D :<C-u>call winresize#left(v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5C :<C-u>call winresize#right(v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5A :<C-u>call winresize#go(1, v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5B :<C-u>call winresize#go(1, -v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5D :<C-u>call winresize#go(0, v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5C :<C-u>call winresize#go(0, -v:count1)<CR>
 endif
+
 
 nnoremap ]p <silent> :<C-u>call yankring#cycle(v:count1)<CR>
 nnoremap [p <silent> :<C-u>call yankring#cycle(-v:count1)<CR>
@@ -435,7 +452,7 @@ command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
 command! PackStatus call pack#status()
 command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
-command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | FZ 40 20 | execute 'Telescope fd cwd='..minpac#getpluginfo(<q-args>).dir
+command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | execute 'Telescope fd cwd='..minpac#getpluginfo(<q-args>).dir
 command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
 
 command! CloseFloatingWindows call v:lua.close_all_floating_windows()

@@ -11,9 +11,13 @@ endif
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
 
+" why is this here?
 augroup vimrc_python
   autocmd!
   autocmd BufWritePre *.py %s/\s\+$//e
+  if has('nvim')
+    autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
+  endif
 augroup END
 
 nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| clast<Cr>

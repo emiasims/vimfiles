@@ -7,18 +7,32 @@ ts.set_query(
   'python',
   'fold',
   [[
-(function_definition (block)) @fold
+(module (decorated_definition (function_definition (block))) @fold)
+(module (function_definition (block)) @fold)
 (class_definition (block)) @fold
+(class_definition (block [ (decorated_definition (function_definition (block))) (function_definition (block)) ] @fold (trimnls! @fold)))
 ]]
 )
 ts.set_query(
   'lua',
   'fold',
   [[
-(function) @fold
-(local_function) @fold
+(function_declaration) @fold
 ]]
 )
+
+function fold.trim_newlines(match, _, bufnr, pred, metadata)
+  -- TODO max newlines
+  local node = match[pred[2]]
+  local start_line, start_col, end_line, end_col = node:range()
+  while vim.api.nvim_buf_get_lines(bufnr, end_line, end_line + 1, false)[1] == '' do
+    end_line = end_line - 1
+  end
+  metadata.content = {start_line, start_col, end_line, end_col}
+  -- metadata[node:id()].content = {start_line, start_col, end_line, end_col}
+end
+-- handler(match, pattern, bufnr, predicate, metadata)
+vim.treesitter.query.add_directive('trimnls!', fold.trim_newlines, true)
 
 function fold.queryexpr(lnum)
   -- start = vim.fn.line(lnum)-1

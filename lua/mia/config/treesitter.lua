@@ -1,14 +1,13 @@
-require 'lush'(require 'gruvbox')
-
--- nvim-treesitter
 if not pcall(require, 'nvim-treesitter') then
   return
 end
 
-local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
-parser_config.org = {
+require('nvim-treesitter.parsers').get_parser_configs().org = {
   install_info = {
     url = '~/Projects/tree-sitter-org',
+    -- url = 'https://github.com/milisims/tree-sitter-org',
+    -- branch = 'main',
+    -- revision = 'v0.3.0',
     files = { 'src/parser.c', 'src/scanner.cc' },
   },
   filetype = 'org',
@@ -20,10 +19,11 @@ require('nvim-treesitter.configs').setup {
 
   highlight = {
     enable = true, -- false will disable the whole extension
-    disable = { 'org' }, -- list of language that will be disabled
+    -- disable = { 'org' }, -- list of language that will be disabled
     -- custom_captures = {
     --   -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
     --   ["foo.bar"] = "Identifier",
+    -- }
   },
 
   indent = {
@@ -84,13 +84,6 @@ require('nvim-treesitter.configs').setup {
         ['ac'] = '@class.outer',
         ['ic'] = '@class.inner',
 
-        -- Or you can define your own textobjects like this
-        ['iF'] = {
-          python = '(function_definition) @function',
-          cpp = '(function_definition) @function',
-          c = '(function_definition) @function',
-          java = '(method_declaration) @function',
-        },
       },
     },
   },

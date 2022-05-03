@@ -13,7 +13,7 @@ cmp.setup {
     ["<C-d>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ["<C-e>"] = cmp.mapping.close(),
-    ["<Tab>"] = cmp.mapping.confirm({select = true}),
+    ["<Plug>(miaConfirmCmp)"] = cmp.mapping.confirm({select = true}),
 
   },
 
@@ -50,18 +50,7 @@ cmp.setup {
 
   experimental = {
     native_menu = false,
-    ghost_text = true,
   },
+  -- ghost_text = true,
 
 }
-
--- Setup lspconfig.
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
--- Replace <YOUR_LSP_SERVER> with each lsp server you've enabled.
--- from nvim-lsp-install default dir
--- local lsp_dir =  function(lsp) vim.fn.stdpath "data" .. "lsp_servers"
--- require('lspconfig')['pyright'].setup { capabilities = capabilities }
--- require('lspconfig')['sumneko_lua'].setup { capabilities = capabilities, cmd = { '/home/elsimmons/.local/share/nvim/lsp_servers/sumneko_lua/extension/server/bin/Linux/lua-language-server' } }
--- require('lspconfig')[''].setup {
---   capabilities = capabilities
--- }

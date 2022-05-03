@@ -1,3 +1,4 @@
+" My contextualize.vim setting
 
 try
   packadd contextualize.vim
@@ -37,7 +38,10 @@ Contextualize startcmd cnoreabbrev w2 w
 Contextualize startcmd cnoreabbrev dws mkview \| silent! %s/\s\+$// \| loadview \| update
 " Use this like 'eh/', the / expands and adds the dir / divider
 Contextualize startcmd cnoreabbrev eh edit <C-r>=expand('%:h')<Cr>
-Contextualize startcmd cnoreabbrev T  term fish
+
+" Start insert after opening a terminal, but also place cursor after fish so we can edit the command
+Contextualize startcmd cnoreabbrev T  execute 'term fish'\|startinsert<C-left><Right><Right><Right><Right>
+Contextualize startcmd cnoreabbrev term term fish
 
 Contextualize startcmd cnoreabbrev f  Telescope fd
 Contextualize startcmd cnoreabbrev o  Telescope fd cwd=~/org
@@ -47,6 +51,7 @@ Contextualize startcmd cnoreabbrev mr Telescope oldfiles
 Contextualize startcmd cnoreabbrev A  Telescope live_grep
 Contextualize startcmd cnoreabbrev h  Telescope help_tags
 Contextualize startcmd cnoreabbrev ev Telescope fd cwd=$CFGDIR
+Contextualize startcmd cnoreabbrev evr Telescope fd cwd=/home/elsimmons/src/nvim-runtime/usr/share/nvim/runtime
 
 " Expand with <C-]>
 Contextualize startcmd cnoreabbrev c   Capture <C-z>

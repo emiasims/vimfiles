@@ -1,5 +1,8 @@
 require 'mia.packer' -- plugin set up
-require 'mia.plugin' -- plugin settings
-require 'mia.keymaps' -- plugin settings
+require 'lush'(require 'gruvbox')
+
+require 'mia.config.keymaps'
+require 'mia.config.treesitter'
+require 'mia.config.telescope'
 
 return {}
