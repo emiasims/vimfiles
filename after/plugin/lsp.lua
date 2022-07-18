@@ -1,15 +1,23 @@
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+local lua_globals = {
+  'vim',
+  'newproxy',                     -- builtin
+  'P',                            -- mia, print vim.inspect
+  'use',                          -- packer
+  'str', 're', 'rep', 'choice',   -- nvim-org
+  'optional', 'describe', 'it', 'before_each', 'after_each', -- plenary
+  'lhs', -- contextualize
+}
+vim.list_extend(lua_globals, vim.tbl_keys(require('contextualize.fenv')))
+
 local config = {
   sumneko_lua = {
     settings = {
       Lua = {
         runtime = { version = 'LuaJIT' }, -- lua version for neovim
         diagnostics = {
-          globals = {
-            'vim', 'P', 'use', 'newproxy', 'str', 're', 'rep', 'choice',
-            'optional', 'describe', 'it', 'before_each', 'after_each',
-          },
+          globals = lua_globals,
         },
         -- Make the server aware of Neovim runtime files:
         -- workspace = { library = vim.api.nvim_get_runtime_file("", true) },

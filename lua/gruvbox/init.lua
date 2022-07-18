@@ -100,22 +100,8 @@ if bg == 'light' then
   orange = colors.faded_orange
 end
 
--- -- neovim terminal mode colors
--- vim.g.terminal_color_0 = tostring(bg0)
--- vim.g.terminal_color_8 = tostring(gray)
--- vim.g.terminal_color_1 = tostring(colors.neutral_red)
--- vim.g.terminal_color_2 = tostring(red)
--- vim.g.terminal_color_10 = tostring(green)
--- vim.g.terminal_color_3 = tostring(colors.neutral_yellow)
--- vim.g.terminal_color_11 = tostring(yellow)
--- vim.g.terminal_color_4 = tostring(colors.neutral_blue)
--- vim.g.terminal_color_12 = tostring(blue)
--- vim.g.terminal_color_5 = tostring(colors.neutral_purple)
--- vim.g.terminal_color_13 = tostring(purple)
--- vim.g.terminal_color_6 = tostring(colors.neutral_aqua)
--- vim.g.terminal_color_14 = tostring(aqua)
--- vim.g.terminal_color_7 = tostring(fg4)
--- vim.g.terminal_color_15 = tostring(fg1)
+-- -- neovim terminal mode colors --- I prefer not modifying them
+-- vim.g.terminal_color_0 = tostring(bg0) ...
 
 local groups = lush(function()
   return {
@@ -132,7 +118,8 @@ local groups = lush(function()
     DiffText     { fg = yellow },
 
     VertSplit    { fg = bg0.li(4) },
-    Folded       { fg = gray, bg = bg1 },
+    Folded       { fg = gray },
+    -- Folded       { fg = gray, bg = bg1 },
     FoldColumn   { fg = gray, bg = bg1 },
     SignColumn   { bg = bg0 },
 

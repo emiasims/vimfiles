@@ -3,7 +3,7 @@ local list = {}
 
 function list.reorder()
   -- get list
-  local list_node = mia.tslib.node_at_curpos()
+  local list_node = require('mia.tslib').node_at_curpos()
   while list_node:parent() ~= nil and list_node:type() ~= 'list' do
     list_node = list_node:parent()
   end

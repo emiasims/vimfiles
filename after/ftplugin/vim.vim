@@ -42,4 +42,4 @@ inoreabbrev <buffer> tnum v:t_number
 inoreabbrev <buffer> tstr v:t_string
 
 " The only place I will consistently want a "" is if I do let something = ""
-Contextualize {-> getline('.')[:col('.') - 2] =~? '=\s*$'} inoremap <buffer> " ""<C-g>U<Left>
+" Contextualize {-> getline('.')[:col('.') - 2] =~? '=\s*$'} inoremap <buffer> " ""<C-g>U<Left>

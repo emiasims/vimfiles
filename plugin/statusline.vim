@@ -14,7 +14,7 @@ function! statusline#active() abort " {{{1
   let statuslinetext .= '%='
   let statuslinetext .= statusline#temporary()
   if has('nvim') && exists('g:loaded_nvim_treesitter')
-    let statuslinetext .= v:lua.mia.tslib.statusline()
+    let statuslinetext .= v:lua.mia.statusline()
   endif
   let statuslinetext .= statusline#plugins(1)
   let statuslinetext .= statusline#errors(1)

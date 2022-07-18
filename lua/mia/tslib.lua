@@ -2,10 +2,11 @@ local tslib = {}
 
 local ts = vim.treesitter
 
-function tslib.print_query(query, bufnr, lang)
+function tslib.print_query(query, bufnr, lang, range)
   local qo
   bufnr = bufnr or 0
   lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
+  range = range or {0, -1}
   if vim.startswith(query, '*') then
     qo = vim.treesitter.get_query(lang, query:sub(2))
   else
@@ -14,13 +15,13 @@ function tslib.print_query(query, bufnr, lang)
   local root = vim.treesitter.get_parser(bufnr, lang):parse()[1]:root()
   local capture = {}
   P "Captures"
-  for _, node, metadata in qo:iter_captures(root, bufnr, 0, -1) do
-    P { node:type(), { node:range() }, metadata }
+  for id, node, metadata in qo:iter_captures(root, bufnr, unpack(range)) do
+    P { id, node:type(), { node:range() }, metadata }
     table.insert(capture, node)
   end
   P ""
   local i = 0
-  for pat, match, metadata in qo:iter_matches(root, bufnr, 0, -1) do
+  for pat, match, metadata in qo:iter_matches(root, bufnr, unpack(range)) do
     i = i + 1
     P(string.format("Match: %s", i))
     for id, node in pairs(match) do

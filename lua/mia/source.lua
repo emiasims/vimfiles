@@ -2,17 +2,23 @@ local source = { re = [[\v%(^|/)%(lua/)\zs.{-}\ze%(/init)?\.lua$]] }
 
 -- For use with SourceCmd autocmd event
 function source.reload_module(filename)
-  local module = vim.fn.matchstr(filename, source.re)
+  local relative = vim.fn.matchstr(filename, [[\v%(^|/)%(lua/)\zs.{-}%(/init)?\.lua$]])
+  local module = vim.fn.matchstr(relative, [[\v.{-}\ze%(/init)?\.lua$]])
+  local parent = vim.split(module, '/')[1]
+  module = module:gsub('/', '.')
   if module == '' then
     dofile(filename)
+    return -- vim.notify(string.format('Reloaded %s', filename))
+  end
+  if parent == 'mia' then
+    -- package.loaded[module]
+    package.loaded[module] = dofile(filename)
+    vim.notify(string.format('Reloaded %s', relative))
     return
   end
 
-  local parent = vim.split(module, '/')[1]
-  local parent_re = '^' .. parent
   mia.last_reloaded = source.unload(parent)
   table.sort(mia.last_reloaded)
-  module = module:gsub('/', '.')
 
   package.loaded[module] = dofile(filename) or true
   for _, name in ipairs(mia.last_reloaded) do
@@ -21,7 +27,7 @@ function source.reload_module(filename)
     end
   end
 
-  vim.notify(string.format('Reloaded %s.lua and all "%s" submodules', module, parent))
+  vim.notify(string.format('Reloaded %s and all "%s" submodules', relative, parent))
 end
 
 function source.unload(name)

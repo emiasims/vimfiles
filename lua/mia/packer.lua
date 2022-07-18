@@ -14,8 +14,10 @@ return require('packer').startup(function()
   use 'nvim-lua/plenary.nvim'
   use 'nvim-telescope/telescope.nvim'
 
-  use 'hrsh7th/vim-vsnip'
-  use 'hrsh7th/cmp-vsnip'
+  -- use 'hrsh7th/vim-vsnip'
+  -- use 'hrsh7th/cmp-vsnip'
+
+  use 'L3MON4D3/LuaSnip'
 
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-buffer'

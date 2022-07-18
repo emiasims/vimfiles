@@ -3,10 +3,10 @@ setlocal shiftwidth=4
 setlocal foldminlines=2
 setlocal colorcolumn=100
 setlocal foldmethod=syntax
-setlocal foldtext=fold#pythontext()
+" setlocal foldtext=fold#pythontext()
 if has('nvim') && get(g:, 'loaded_nvim_treesitter', 0)
   setlocal foldmethod=expr
-  setlocal foldexpr=v:lua.mia.tslib.fold.queryexpr(v:lnum)
+  setlocal foldexpr=v:lua.mia.foldexpr(v:lnum)
 endif
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
@@ -22,9 +22,9 @@ augroup END
 
 nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| clast<Cr>
 
-inoremap <buffer> ipdb __import__('ipdb').set_trace()<Esc>
-inoremap <buffer> pdb __import__('pdb').set_trace()<Esc>
-inoremap <buffer> iem __import__('IPython').embed()<Esc>
+inoreabbrev <buffer> ipdb __import__('ipdb').set_trace()<Esc>
+inoreabbrev <buffer> pdb __import__('pdb').set_trace()<Esc>
+inoreabbrev <buffer> iem __import__('IPython').embed()<Esc>
 
 iabbrev <buffer> true True
 iabbrev <buffer> false False
@@ -40,3 +40,8 @@ inoremap <buffer> """<Cr> """<Cr>"""<esc>O
 
 xnoremap <buffer> ik <Esc>?# %%.*\n\zs\\|\%^<Cr>V/\ze\n.*# %%\\|\%$<Cr>
 omap <buffer> ik :normal vik<Cr>
+
+
+" the first makes a["b"] ➜ a.b, the second does the opposite
+nmap <buffer> \ga yiqva]p`[i.<Esc>e:silent! call repeat#set("\\ga")<Cr>
+nmap <buffer> \gA ysiw"ysa"]X:silent!call repeat#set("\\gA")<Cr>

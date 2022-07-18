@@ -20,6 +20,7 @@ set ttimeoutlen=250 " for key codes
 set shell=bash
 
 call mkdir($DATADIR .. '/view', "p")
+call mkdir($HOME .. '/.backup', "p")
 call mkdir($DATADIR .. '/tmp/backup', "p")
 call mkdir($DATADIR .. '/tmp/swap', "p")
 call mkdir($DATADIR .. '/tmp/undo', "p")
@@ -28,7 +29,7 @@ if exists('$SUDO_USER')
   set nowritebackup
 else
   set backupdir=$DATADIR/tmp/backup
-  set backupdir+=.
+  set backupdir+=~/.backup
   set backup
   set backupext=.bak
   set directory=$DATADIR/tmp/swap//  " // necessary
@@ -165,7 +166,7 @@ augroup vimrc_general
   autocmd WinEnter,FocusGained * checktime
 
   " Update filetype on save if empty
-  autocmd BufWritePost * nested if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif
+  autocmd BufWritePost * ++nested if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif
 
   " When editing a file, always jump to the last known cursor position, if valid.
   autocmd BufReadPost *
@@ -210,8 +211,6 @@ let g:mapleader='\'
 
 nnoremap <Space> :
 xnoremap <Space> :
-nnoremap : <Nop>
-xnoremap : <Nop>
 cnoremap <expr> <space> (getcmdtype()==":" && empty(getcmdline())) ? 'lua ' : '<C-]> '
 nnoremap ! :!
 
@@ -243,7 +242,7 @@ endif
 
 nnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
 xnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
-onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
+onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '^'
 
 nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
@@ -323,7 +322,7 @@ nnoremap c. /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-a><Esc>
 nnoremap d. /\V<C-r>=escape(@", '\')<Cr><Cr>dgn
 " requires nvim-treesitter
 if has('nvim')
-  nmap dsf diavabo?[^.[:alnum:]_-]?e+1<Cr>p
+  nmap dsf yiavabo?[^.[:alnum:]_-]?e+1<Cr>p
 endif
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
@@ -419,8 +418,8 @@ onoremap ar a]
 onoremap ir i]
 
 " Commands: {{{1
-command! -complete=filetype -nargs=? EditFtplugin execute 'tabedit $CFGDIR/after/ftplugin/'
-      \ . (empty(expand('<args>')) ? &filetype : expand('<args>')) . '.vim'
+command! -complete=filetype -bang -nargs=? EditFtplugin execute 'tabedit $CFGDIR/after/ftplugin/'
+      \ . (empty(expand('<args>')) ? &filetype : expand('<args>')) . (empty("<bang>") ? '.vim' : '.lua')
 command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
 
@@ -454,8 +453,6 @@ command! PackStatus call pack#status()
 command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
 command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | execute 'Telescope fd cwd='..minpac#getpluginfo(<q-args>).dir
 command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
-
-command! CloseFloatingWindows call v:lua.close_all_floating_windows()
 
 " vim-sneak {{{2
 nmap f <Plug>Sneak_f

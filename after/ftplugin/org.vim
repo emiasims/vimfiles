@@ -6,12 +6,20 @@ setlocal concealcursor=n
 setlocal foldnestmax=20
 
 setlocal foldmethod=expr
-setlocal foldexpr=v:lua.mia.tslib.fold.queryexpr(v:lnum)
+setlocal foldexpr=v:lua.mia.foldexpr(v:lnum)
 
 setlocal formatlistpat=^\\v\\s*%(\\a\|\\d+)[.)]\\ze%($\|\\s+\\S)
 
 nmap <buffer> gO <Plug>(org-headline-open-above)Headline<Esc>[ viw<C-g>
 nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
+
+nmap <buffer> \gO <Plug>(org-headline-open-above)TODO Headline<Esc>[ viw<C-g>
+nmap <buffer> \go <Plug>(org-headline-open-below)TODO Headline<Esc>[ viw<C-g>
+
+
+inoreabbrev <buffer> um μm
+inoreabbrev <buffer> zp Z_p
+inoreabbrev <buffer> Zp Z_p
 
 " ContextAdd <buffer> indrawer {-> org#property#isindrawer('.')}
 " Contextualize indrawer inoremap <buffer> ; property<C-r>=UltiSnips#Anon(":${1:prop}: ${0:val}", "property")<Cr>
@@ -27,7 +35,6 @@ nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
 " Contextualize inlink snoremap <buffer> <Tab> <Esc>2f]a
 " Contextualize linkend inoremap <buffer> <Tab> <Esc>hhvi]<C-g>
 " Contextualize default imap <buffer> <expr> <Tab> g:contextualize.i.map['<lt>tab>'].do()
-
 
 " ContextAdd <buffer> checkboxlist {-> getline('.')[: col('.') - 2] =~ '\v^\s*' . g:org#regex#list#bullet . '\s*\[[- xX]\]\s*$'}
 " Contextualize checkboxlist inoremap <buffer> <Bs> <Bs><Bs><Bs><Bs>
