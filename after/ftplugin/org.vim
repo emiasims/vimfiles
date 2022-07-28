@@ -5,9 +5,6 @@ setlocal foldminlines=0
 setlocal concealcursor=n
 setlocal foldnestmax=20
 
-setlocal foldmethod=expr
-setlocal foldexpr=v:lua.mia.foldexpr(v:lnum)
-
 setlocal formatlistpat=^\\v\\s*%(\\a\|\\d+)[.)]\\ze%($\|\\s+\\S)
 
 nmap <buffer> gO <Plug>(org-headline-open-above)Headline<Esc>[ viw<C-g>

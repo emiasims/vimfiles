@@ -35,9 +35,6 @@ nnoremap <buffer> <leader>K vipJ:let store_reg = @/ \| .s/[.!?]\zs\s\+\ze\u/\r/g
 nnoremap <buffer><silent> <F11> :set ft=markdown<CR>
 nnoremap <buffer><silent> <F12> :packadd vim-pandoc-syntax<CR>:setlocal filetype=pandoc<CR>:so $CFGDIR/after/ftplugin/markdown.vim<CR>
 
-setlocal foldmethod=expr
-setlocal foldexpr=fold#markdown(v:lnum)
-
 packadd thesaurus_query.vim
 inoremap <buffer><silent> <F9> <Esc>viw"ty:ThesaurusQueryReplace <C-r>t<CR>
 nnoremap <buffer><silent> <F9>      viw"ty:ThesaurusQueryReplace <C-r>t<CR>

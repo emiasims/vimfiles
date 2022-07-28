@@ -1,6 +1,7 @@
 setlocal lisp
 setlocal foldexpr=TstFold(v:lnum)
 setlocal foldmethod=expr
+setlocal foldtext=fold#text()
 
 function! TstFold(lnum) abort " {{{1
   if getline(a:lnum) =~ '^====\+$' && getline(a:lnum + 2) =~ '^====\+$'

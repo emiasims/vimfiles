@@ -47,4 +47,7 @@ require('mia.tslib')
 require('mia.fold')
 require('mia.fold.text').enable()
 
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.mia.foldexpr(v:lnum)'
+
 return mia
