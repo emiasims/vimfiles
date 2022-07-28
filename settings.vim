@@ -160,8 +160,8 @@ set foldtext=fold#text()
 
 augroup vimrc_general
   autocmd!
-  au BufWinLeave * if empty(&buftype) && &modifiable | mkview | endif
-  au BufWinEnter * if empty(&buftype) && &modifiable | silent! loadview | endif
+  au BufWinLeave * if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif
+  au BufWinEnter * if empty(&buftype) && &modifiable && !empty(expand('%')) | silent! loadview | endif
 
   autocmd WinEnter,FocusGained * checktime
 
@@ -247,8 +247,6 @@ onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '^'
 nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
 onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
-
-nnoremap Q q
 
 inoremap <C-f> <C-g>U<Right>
 inoremap <C-b> <C-g>U<Left>
@@ -418,7 +416,7 @@ onoremap ar a]
 onoremap ir i]
 
 " Commands: {{{1
-command! -complete=filetype -bang -nargs=? EditFtplugin execute 'tabedit $CFGDIR/after/ftplugin/'
+command! -complete=filetype -bang -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/'
       \ . (empty(expand('<args>')) ? &filetype : expand('<args>')) . (empty("<bang>") ? '.vim' : '.lua')
 command! Clearqflist call setqflist([])
 command! -nargs=? -complete=buffer Clearloclist call setloclist(empty(<q-args>) ? 0 : bufnr(<q-args>), [])
