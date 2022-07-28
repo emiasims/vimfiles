@@ -1,88 +1,7 @@
 local expr = { queries = {} }
 
-local ts = vim.treesitter
-
-ts.set_query('org', 'fold', [[
-(document  (section) @fold (#offset! @fold 0 0 -1 0))
-((section (section) @fold (section) . ) (#offset! @fold 0 0 -1 0))
-((section (section) @fold . ) (#offset! @fold 0 0 -1 0) (#trim-nls! @fold))
-(property_drawer . (property)) @fold]])
-
-ts.set_query(
-  'python',
-  'fold',
-  [[
-(module (decorated_definition (function_definition (block))) @fold (#eat-nls! @fold 1))
-(module (function_definition (block)) @fold (#eat-nls! @fold 1))
-((class_definition (block)) @fold (#eat-nls! @fold 1))
-(class_definition (block [ (decorated_definition (function_definition (block))) (function_definition (block)) ] @fold (eat-nls! @fold) [ (decorated_definition (function_definition (block))) (function_definition (block)) ] .))
-(class_definition (block [ (decorated_definition (function_definition (block))) (function_definition (block)) ] @fold .))
-]]
-)
-ts.set_query(
-  'lua',
-  'fold',
-  [[
-(function_declaration) @fold
-(table_constructor (field (function_definition) @fold))
-]]
-)
-
-function expr.eat_newlines(match, _, bufnr, pred, metadata)
-  -- handler(match, pattern, bufnr, predicate, metadata)
-  local capture_id = pred[2]
-  local max = pred[3] and tonumber(pred[3])
-  local node = match[capture_id]
-  local start_line, start_col, end_line, end_col = node:range()
-
-  if not metadata[capture_id] then
-    metadata[capture_id] = {}
-  end
-  metadata = metadata[capture_id]
-
-  if metadata.range then
-    start_line, start_col, end_line, end_col = unpack(metadata.range)
-  end
-
-  local eaten = 0
-  while vim.api.nvim_buf_get_lines(bufnr, end_line+1, end_line + 2, false)[1] == '' do
-    eaten = eaten + 1
-    if max and eaten > max then
-      break
-    end
-    end_line = end_line + 1
-  end
-
-  metadata.range = { start_line, start_col, end_line, end_col }
-  -- metadata[node:id()].content = {start_line, start_col, end_line, end_col}
-end
-
-function expr.trim_newlines(match, _, bufnr, pred, metadata)
-  -- handler(match, pattern, bufnr, predicate, metadata)
-  local capture_id = pred[2]
-  local node = match[capture_id]
-  local start_line, start_col, end_line, end_col = node:range()
-
-  if not metadata[capture_id] then
-    metadata[capture_id] = {}
-  end
-  metadata = metadata[capture_id]
-
-  if metadata.range then
-    start_line, start_col, end_line, end_col = unpack(metadata.range)
-  end
-
-  while vim.api.nvim_buf_get_lines(bufnr, end_line, end_line + 1, false)[1] == '' do
-    end_line = end_line - 1
-  end
-
-  metadata.range = { start_line, start_col, end_line, end_col }
-  -- metadata[node:id()].content = {start_line, start_col, end_line, end_col}
-end
-vim.treesitter.query.add_directive('trim-nls!', expr.trim_newlines, true)
-vim.treesitter.query.add_directive('eat-nls!', expr.eat_newlines, true)
-
 local fold_cache = {}
+local ts = vim.treesitter
 
 local function fold_cmp(a, b)
   if (a.range[1] >= b.range[1] and a.range[2] <= b.range[2]) then
@@ -98,15 +17,13 @@ end
 
 function expr.calculate_manual(start, stop)
   local root = ts.get_parser(0):parse()[1]:root()
-  local qu = ts.get_query(vim.o.filetype, 'fold')
+  local qu = ts.get_query(vim.o.filetype, 'folds')
   if not start then
     start, stop = 0, -1
   elseif not stop then
     start, stop = 0, start
   end
   local open, close
-  -- local cmds = { 'normal! %s' } -- TODO zD range? update on_treechanged
-  -- local foldcmd = '%s,%sfold'
   local cmds = {}
   for id, node, md in qu:iter_captures(root, 0, start, stop) do
     if md[id] and md[id].range then
@@ -116,8 +33,6 @@ function expr.calculate_manual(start, stop)
     end
 
     cmds[#cmds + 1] = { cmd = 'fold', range = { open + 1, close + 1 } }
-    -- cmds[#cmds + 1] = { cmd = 'fold', range = { open + 1, close } }
-    -- cmds[#cmds + 1] = foldcmd:format(open + 1, close)
   end
 
   table.sort(cmds, fold_cmp)
@@ -128,39 +43,79 @@ function expr.calculate_manual(start, stop)
   return cmds
 end
 
+local Folds = {
+  __index = function(tbl, lnum)
+    tbl[lnum] = { opens = 0, closes = 0 }
+    return tbl[lnum]
+  end,
+}
+
+local FoldVals = {
+  __index = function(self, lnum)
+    local foldlevel, folds = self._foldlevel, self._folds
+    for ln = self._last_lnum, lnum do
+      if not folds[ln - 1] then
+        self[ln] = foldlevel
+      else
+        foldlevel = foldlevel + folds[ln - 1].opens
+        if folds[ln - 1].opens > 0 then
+          self[ln] = '>' .. foldlevel
+        else
+          self[ln] = foldlevel
+        end
+        foldlevel = foldlevel - folds[ln - 1].closes
+      end
+      self._last_lnum = ln
+    end
+    self._foldlevel = foldlevel
+    return self[lnum]
+  end
+}
+
 function expr.calculate_foldexpr(root)
   -- local sub1 = vim.o.filetype == 'org'
-  local folds = {}
-  local qu = ts.get_query(vim.o.filetype, 'fold')
+  local folds = setmetatable({}, Folds)
+  local qu = ts.get_query(vim.o.filetype, 'folds')
   local open, close
-  for id, node, md in qu:iter_captures(root, 0, 0, -1) do
-    if md[id] and md[id].range then
-      open, _, close, _ = unpack(md[id].range)
-    else
-      open, _, close, _ = node:range()
+  local allow_zero = vim.b.allow_zero_length_folds
+
+  for _, match, md in qu:iter_matches(root, 0, 0, -1) do
+    for id, node in pairs(match) do
+      if vim.endswith(qu.captures[id], 'fold') then
+        if md[id] and md[id].range then
+          open, _, close, _ = unpack(md[id].range)
+        else
+          open, _, close, _ = node:range()
+        end
+        if close ~= open or allow_zero then
+          folds[open].opens = folds[open].opens + 1
+          folds[close].closes = folds[close].closes + 1
+        end
+      end
     end
-    folds[open] = folds[open] or { opens = 0, closes = 0 }
-    folds[close] = folds[close] or { opens = 0, closes = 0 }
-    folds[open].opens = folds[open].opens + 1
-    folds[close].closes = folds[close].closes + 1
   end
 
+  setmetatable(folds, {})
+
+  -- return setmetatable({ _last_lnum = 1, _folds = folds, _foldlevel = 0 }, FoldVals)
+
   -- using tbl_keys creates a table so I can modify folds
-  local lines = vim.tbl_keys(folds)
-  table.sort(lines) -- necessary!
-  local foldlevel = 0
-  local closes
-  for _, ln in ipairs(lines) do
-    foldlevel = foldlevel + folds[ln].opens
-    closes = folds[ln].closes
-    if folds[ln].opens > 0 then
-      folds[ln] = '>' .. foldlevel
+  local foldvals, foldlevel = {}, 0
+  for lnum = 1, vim.fn.line('$') do
+    if not folds[lnum - 1] then
+      foldvals[lnum] = foldlevel
     else
-      folds[ln] = '<' .. (foldlevel - closes + 1)
+      foldlevel = foldlevel + folds[lnum - 1].opens
+      if folds[lnum - 1].opens > 0 then
+        foldvals[lnum] = '>' .. foldlevel
+      else
+        foldvals[lnum] = foldlevel
+      end
+      foldlevel = foldlevel - folds[lnum - 1].closes
     end
-    foldlevel = foldlevel - closes
   end
-  return folds
+  return foldvals
+
 end
 
 function expr.queryexpr(lnum)
@@ -172,7 +127,7 @@ function expr.queryexpr(lnum)
       fold_cache[buf].folds = expr.calculate_foldexpr(root)
     end
   end
-  return fold_cache[buf].folds[lnum - 1] or '='
+  return fold_cache[buf].folds[lnum]
 end
 
 function expr.update_manual(start, stop)

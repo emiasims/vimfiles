@@ -1,4 +1,11 @@
 local mia = {}
+-- do before loading nvim-treesitter
+require('mia.queries')
+
+if not package.loaded['gruvbox'] then
+  -- colors get wonky if I redo this
+  require 'lush'(require 'gruvbox')
+end
 
 function mia.P(...)
   local v = select(2, ...) and { ... } or ...
@@ -19,7 +26,7 @@ vim.api.nvim_create_user_command('CloseFloatingWindows', function()
   print('Windows closed: ', table.concat(closed, ' '))
 end, {})
 
-require 'mia.packer' -- plugin set up
+require('mia.packer') -- plugin set up
 
 require('mia.config.keymaps')
 require('mia.config.treesitter')
@@ -36,11 +43,8 @@ setmetatable(mia, { __index = function(_, k)
   return success and ret
 end })
 
-if not package.loaded['gruvbox'] then
-  -- colors get wonky if I redo this
-  require 'lush'(require 'gruvbox')
-end
-
+require('mia.tslib')
+require('mia.fold')
 require('mia.fold.text').enable()
 
 return mia

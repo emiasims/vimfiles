@@ -2,27 +2,29 @@ local a = vim.api
 local ts = vim.treesitter
 local ns = vim.api.nvim_create_namespace('mia-foldtext')
 
-local foldtext = { _default_group = 'Folded', lang = {}}
+local foldtext = { _default_group = 'Folded' }
+local langs
 
-local winfolds
-local current_win
+
+local is_foldclosed = {}
+setmetatable(is_foldclosed, {
+  __call = function()
+    return vim.fn.foldclosed(is_foldclosed.lnum) == is_foldclosed.lnum
+  end,
+})
 
 local function on_win(_, winid, bufnr, top, bot)
   local ft = a.nvim_buf_get_option(bufnr, 'filetype')
   local has_parser, parser = pcall(ts.get_parser, bufnr)
-  if not has_parser or not ft or not foldtext.lang[ft] then
+  if not has_parser or not ft or not langs[ft] then
     return
   end
   local root = parser:parse()[1]:root()
   for lnum = top, bot do
-    if
-      (current_win == winid and vim.fn.foldclosed(lnum + 1) == lnum + 1)
-      or (current_win ~= winid and winfolds[winid] and winfolds[winid][lnum + 1])
-    then
-      local success, text = pcall(foldtext.lang[ft], bufnr, lnum, root)
-      -- local text = foldtext.lang[ft](bufnr, lnum, root)
+    is_foldclosed.lnum = lnum + 1
+    if a.nvim_win_call(winid, is_foldclosed) then
+      local success, text = pcall(langs[ft], bufnr, lnum, root)
       if success and text then
-        -- sometimes the
         pcall(
           a.nvim_buf_set_extmark,
           bufnr,
@@ -43,10 +45,12 @@ setmetatable(faded, {
   __index = function(self, name)
     local exists, hl = pcall(a.nvim_get_hl_by_name, name, true)
     if not exists or hl[true] then
-      -- seems to be hl[true] when the group is cleared
+      -- seems to be hl[true] when the group is ':hi-clear'ed
       return faded[foldtext._default_group]
     end
 
+    -- For hsl2rgb and back
+    -- https://github.com/rktjmp/lush.nvim/blob/main/lua/lush/vivid/hsl/convert.lua
     hl.foreground = require('lush').hsl(string.format('#%0X', hl.foreground)).de(33).da(33) .. ''
     self[name] = 'Folded' .. name
     a.nvim_set_hl(0, self[name], hl)
@@ -133,74 +137,29 @@ function foldtext.from_query(buf, lnum, root)
   return text
 end
 
-function foldtext.lang.python(buf, lnum, root)
-  if root:named_descendant_for_range(lnum, 0, lnum, 1):type() == 'decorator' then
-    lnum = lnum + 1
-  end
-  return foldtext.from_query(buf, lnum, root)
-end
-
 function foldtext.optfunc()
-  local line = a.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1] .. ' ... '
-  local suffix = (vim.v.foldend - vim.v.foldstart) .. ' lines ' .. string.rep('|', vim.v.foldlevel)
-  local pad = a.nvim_win_get_width(0) - vim.o.foldcolumn - 3  -- foldcolumn width
-  pad = pad - (vim.o.number and 1 or 0) * vim.o.numberwidth - #line - #suffix
-  return line .. string.rep(' ', pad) .. suffix .. '    '
-end
-
-function foldtext.lang.org(buf, lnum, root)
-  local groups = foldtext.from_query(buf, lnum, root)
-  return groups
-end
-
-function foldtext.lang.lua(buf, lnum, root)
-  local groups = foldtext.from_query(buf, lnum, root)
-  groups[#groups+1] = { ' ', 'Folded' }
-  groups[#groups+1] = { '{...}', 'Folded' }
-  return groups
+  local line = a.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
+  local suffix = ('%s lines %s'):format(vim.v.foldend - vim.v.foldstart, string.rep('|', vim.v.foldlevel))
+  local pad = a.nvim_win_get_width(0)
+    - vim.o.foldcolumn
+    - (vim.o.number and 1 or 0) * vim.o.numberwidth
+    - #line
+    - #suffix
+    - 9 -- ' ... ' and some other correction
+  return ('%s ... %s %s '):format(line, string.rep(' ', pad), suffix)
 end
 
 function foldtext.enable()
   if foldtext._enabled then
     return
   end
-  a.nvim_create_augroup('mia-foldtext', { clear = true })
-  a.nvim_create_autocmd('WinEnter', {
-    group = 'mia-foldtext',
-    callback = function() current_win = a.nvim_get_current_win() end,
-  })
-
-  winfolds = {}
-  a.nvim_create_autocmd('WinLeave', {
-    group = 'mia-foldtext',
-    callback = function()
-      local winid = a.nvim_get_current_win()
-      winfolds[winid] = {}
-      for lnum = vim.fn.line 'w0', vim.fn.line 'w$' do
-        if vim.fn.foldclosed(lnum) == lnum then
-          winfolds[winid][lnum] = true
-        end
-      end
-    end,
-  })
-
-  a.nvim_create_autocmd('WinClosed', {
-    group = 'mia-foldtext',
-    callback = function()
-      winfolds[tonumber(vim.fn.expand '<amatch>')] = nil
-    end,
-  })
-
-  current_win = a.nvim_get_current_win()
+  langs = langs or require('mia.fold.langs')
   a.nvim_set_decoration_provider(ns, { on_win = on_win })
   foldtext._enabled = true
 end
 
 function foldtext.disable()
-  a.nvim_del_augroup_by_name('mia-foldtext')
   a.nvim_set_decoration_provider(ns, {})
-  winfolds = nil
-  current_win = nil
   foldtext._enabled = nil
 end
 
@@ -212,9 +171,9 @@ function foldtext.toggle()
   end
 end
 
-vim.api.nvim_create_user_command('FancyFoldEnable', foldtext.enable, {})
-vim.api.nvim_create_user_command('FancyFoldDisable', foldtext.disable, {})
-vim.api.nvim_create_user_command('FancyFoldToggle', foldtext.toggle, {})
+vim.api.nvim_create_user_command('FoldHlEnable', foldtext.enable, {})
+vim.api.nvim_create_user_command('FoldHlDisable', foldtext.disable, {})
+vim.api.nvim_create_user_command('FoldHlToggle', foldtext.toggle, {})
 
 -- TODO set_buf for use in ftplugins
 -- Use one global and otherwise buffer local things it
