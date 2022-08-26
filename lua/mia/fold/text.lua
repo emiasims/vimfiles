@@ -2,7 +2,7 @@ local a = vim.api
 local ts = vim.treesitter
 local ns = vim.api.nvim_create_namespace('mia-foldtext')
 
-local foldtext = { _default_group = 'Folded' }
+local foldtext = { _default_group = 'Folded', _enable_default = true }
 local langs
 
 
@@ -13,31 +13,44 @@ setmetatable(is_foldclosed, {
   end,
 })
 
-local function on_win(_, winid, bufnr, top, bot)
+local function mark_window(winid, bufnr, top, bot, opts)
   local ft = a.nvim_buf_get_option(bufnr, 'filetype')
   local has_parser, parser = pcall(ts.get_parser, bufnr)
-  if not has_parser or not ft or not langs[ft] then
+  if not has_parser or not ft or (not langs[ft] and not foldtext._enable_default) then
     return
   end
   local root = parser:parse()[1]:root()
   for lnum = top, bot do
     is_foldclosed.lnum = lnum + 1
     if a.nvim_win_call(winid, is_foldclosed) then
-      local success, text = pcall(langs[ft], bufnr, lnum, root)
+      local success, text = pcall(langs[ft] or foldtext.from_query, bufnr, lnum, root)
       if success and text then
-        pcall(
-          a.nvim_buf_set_extmark,
-          bufnr,
-          ns,
-          lnum,
-          0,
-          { ephemeral = true, virt_text_pos = 'overlay', virt_text = text, hl_mode = 'combine' }
-        )
+        opts.virt_text = text
+        pcall(a.nvim_buf_set_extmark, bufnr, ns, lnum, 0, opts)
       elseif not success then
         vim.notify_once(('Foldtext calculation for buf:%s, ft:"%s" failed.'):format(bufnr, ft))
       end
     end
   end
+end
+
+local function on_win(_, winid, bufnr, top, bot)
+  local opts = { ephemeral = true, virt_text_pos = 'overlay', hl_mode = 'combine' }
+  mark_window(winid, bufnr, top, bot, opts)
+end
+
+local bufs = {}
+local function focus_lost()
+  local opts = { virt_text_pos = 'overlay', hl_mode = 'combine' }
+  mark_window(vim.fn.win_getid(), 0, vim.fn.line 'w0', vim.fn.line 'w$', opts)
+  bufs[#bufs+1] = a.nvim_get_current_buf()
+end
+
+local function focus_gained()
+  for _, b in ipairs(bufs) do
+    a.nvim_buf_clear_namespace(b, ns, 0, -1)
+  end
+  bufs = {}
 end
 
 local faded = { Folded = 'Folded' }
@@ -156,11 +169,27 @@ function foldtext.enable()
   langs = langs or require('mia.fold.langs')
   a.nvim_set_decoration_provider(ns, { on_win = on_win })
   foldtext._enabled = true
+
+  a.nvim_create_augroup('mia-foldtext', { clear = true })
+  a.nvim_create_autocmd('FocusLost', {
+    pattern = '*',
+    group = 'mia-foldtext',
+    desc = 'Persistent highlights',
+    callback = focus_lost
+  })
+  a.nvim_create_autocmd({ 'FocusGained', 'BufLeave' }, {
+    pattern = '*',
+    group = 'mia-foldtext',
+    desc = 'Remove persistent highlights',
+    callback = focus_gained
+  })
 end
 
 function foldtext.disable()
   a.nvim_set_decoration_provider(ns, {})
   foldtext._enabled = nil
+  a.nvim_del_augroup_by_name('mia-foldtext')
+  focus_gained()
 end
 
 function foldtext.toggle()
