@@ -1,11 +1,6 @@
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.mia.foldexpr(v:lnum)'
+vim.o.foldtext = 'v:lua.mia.foldtext()'
 
-_G.foldtext = function() return require('mia.fold.text').optfunc() end
-vim.o.foldtext = "v:lua.foldtext()"
-
-return setmetatable({}, { __index = function(_, k)
-  if k == 'expr' then
-    return require('mia.fold.expr').queryexpr
-  elseif k == 'text' then
-    return  require('mia.fold.text').queryexpr
-  end
-end })
+require 'mia.fold.hue'
+require('foldhue').enable()

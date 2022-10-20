@@ -10,6 +10,7 @@ function source.reload_lua_module(filename)
     dofile(filename)
     return -- vim.notify(string.format('Reloaded %s', filename))
   end
+
   if parent == 'mia' then
     -- package.loaded[module]
     package.loaded[module] = dofile(filename)
@@ -17,11 +18,11 @@ function source.reload_lua_module(filename)
     return
   end
 
-  mia.last_reloaded = source.unload(parent)
-  table.sort(mia.last_reloaded)
+  _G._last_reloaded = source.unload(parent)
+  table.sort(_G._last_reloaded)
 
   package.loaded[module] = dofile(filename) or true
-  for _, name in ipairs(mia.last_reloaded) do
+  for _, name in ipairs(_G._last_reloaded) do
     if name ~= module then
       require(name)
     end
@@ -30,12 +31,28 @@ function source.reload_lua_module(filename)
   vim.notify(string.format('Reloaded %s and all "%s" submodules', relative, parent))
 end
 
+function source.unload(name)
+  local _re = '^' .. name
+  _G._last_reloaded = {}
+  local unloaded = {}
+  for submod, _ in pairs(package.loaded) do
+    if submod:match(_re) then
+      package.loaded[submod] = nil
+      unloaded[#unloaded+1] = submod
+    end
+  end
+  return unloaded
+end
+
 function source.set_query(filename, notify)
+  -- Get query files
+  -- re-source in order, simple now
   local match = vim.fn.matchlist(filename, [[\v%(^|/)queries/([^/]+)/([^/]+).scm$]])
   if #match == 0 then
     error 'what happened'
   end
   local lang, name = match[2], match[3]
+  local files = vim.treesitter.get_query_files(lang, name)
   local f = io.open(filename)
   if f then
     local qstr = f:read("*all")
@@ -46,19 +63,6 @@ function source.set_query(filename, notify)
     local relative = vim.fn.matchstr(filename, [[\v%(^|/)\zsqueries/[^/]+/[^/]+.scm$]])
     vim.notify(('Set query "%s" for lang "%s" from %s'):format(name, lang, relative))
   end
-end
-
-function source.unload(name)
-  local _re = '^' .. name
-  mia.last_reloaded = {}
-  local unloaded = {}
-  for submod, _ in pairs(package.loaded) do
-    if submod:match(_re) then
-      package.loaded[submod] = nil
-      unloaded[#unloaded+1] = submod
-    end
-  end
-  return unloaded
 end
 
 return source

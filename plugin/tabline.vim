@@ -1,26 +1,6 @@
-" 1. make secondary tabline -- float/popup window
-" 2. Get window names, and alternates
-" 3. update on changing buffers, windows, or tabs.
-" 4. Highlight group for current window in the current tab
-" 3. autocmd when buffer dies, it echos a message for how to open it back up
-" Delimiter specification options
-
-" ╟╴1 filenamew1.ext | filenamew2.ext ╟╴2 filename w1 ║
-" ║    altnamew1.ext |  altnamew2.ext ║    altname w1 ║
-
-" ╟╴1 filenamew1.ext # alt.ext | filenamew2.ext # altname ╟╴2 filename w1 ║
-
-" See: winlayout, use that + alt of that one lines 1 and 2 for formatting
-
-" ['row', [['leaf', 1000], ['col', [['leaf', 1021], ['row', [['leaf', 1020], ['leaf', 1022]]]]]]]
-" reduce to
-
-
-" 1: win| win/ win|win ║
-
-" ['row', [['leaf', 1000], ['col', [['leaf', 1073], ['leaf', 1072]]], ['col', [['leaf', 1021], ['row', [['leaf', 1020], ['leaf', 1022]]]]]]]
-
-" tabline.vim│ tabline.vim╱tabline.vim│ tabline.vim╱ tabline.vim│tabline.vim
+if has('nvim')
+  finish
+endif
 
 function! Tabline() abort " {{{1
   let tabline = []
@@ -51,6 +31,9 @@ function! s:gettext(tree, prev, bg) abort " {{{2
   " a:tree[0] is always type, a:tree[1] is either a number or a list
   if a:tree[0] == 'leaf'
     let name = fnamemodify(bufname(winbufnr(a:tree[1])), ':t')
+    if empty(name)
+      let name = "[Scratch]"
+    endif
     if get(s:add_dir, name, 0)
       let name = substitute(bufname(winbufnr(a:tree[1])), '\v^%(.*/)?([^/]+)/([^/]+)$', '\1➔\2', '')
     endif

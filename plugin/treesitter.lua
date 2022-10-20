@@ -19,7 +19,7 @@ require('nvim-treesitter.configs').setup {
 
   highlight = {
     enable = true, -- false will disable the whole extension
-    -- disable = { 'org' }, -- list of language that will be disabled
+    disable = { 'help' }, -- list of language that will be disabled
     -- custom_captures = {
     --   -- Highlight the @foo.bar capture group with the "Identifier" highlight group.
     --   ["foo.bar"] = "Identifier",
@@ -34,10 +34,10 @@ require('nvim-treesitter.configs').setup {
   incremental_selection = {
     enable = true,
     keymaps = {
-      init_selection = 'gnn',
-      node_incremental = 'grn',
-      scope_incremental = 'grc',
-      node_decremental = 'grm',
+      init_selection = '<Tab>',
+      node_incremental = '<Tab>',
+      node_decremental = '<S-Tab>',
+      scope_incremental = 'g<Tab>',
     },
   },
 }

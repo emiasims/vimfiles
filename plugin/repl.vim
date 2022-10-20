@@ -22,5 +22,5 @@ ClearRepl
 augroup repl
   autocmd!
   autocmd TermOpen term://* if repl#termid == -1 | execute 'SetRepl' | endif
-  autocmd TermClose term://* if b:terminal_job_id == g:repl#termid | execute 'ClearRepl' | endif
+  autocmd TermClose term://* if get(b:, 'terminal_job_id', -1) == g:repl#termid | execute 'ClearRepl' | endif
 augroup END

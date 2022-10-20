@@ -16,12 +16,4 @@ inoremap <buffer> <C-v><Esc> <lt>Esc>
 inoremap <buffer> <C-v><Tab> <lt>Tab>
 inoremap <buffer> <C-v><Cr> <lt>Cr>
 
-" why is this here?
-augroup vimrc_lua
-  autocmd!
-  if has('nvim')
-    autocmd BufWritePre *.py lua vim.lsp.buf.formatting_sync()
-  endif
-augroup END
-
 let b:refactor_prefix = 'local'

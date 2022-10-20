@@ -1,5 +1,5 @@
 setlocal colorcolumn=100
-setlocal spell
+" setlocal spell
 let b:cursorword = 0
 setlocal foldminlines=0
 setlocal concealcursor=n
@@ -13,10 +13,7 @@ nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
 nmap <buffer> \gO <Plug>(org-headline-open-above)TODO Headline<Esc>[ viw<C-g>
 nmap <buffer> \go <Plug>(org-headline-open-below)TODO Headline<Esc>[ viw<C-g>
 
-
-inoreabbrev <buffer> um μm
-inoreabbrev <buffer> zp Z_p
-inoreabbrev <buffer> Zp Z_p
+inoreabbrev <buffer> ;c <cmd>lua require("mia.zotfun").cite()<Cr>
 
 " ContextAdd <buffer> indrawer {-> org#property#isindrawer('.')}
 " Contextualize indrawer inoremap <buffer> ; property<C-r>=UltiSnips#Anon(":${1:prop}: ${0:val}", "property")<Cr>

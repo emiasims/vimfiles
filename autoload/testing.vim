@@ -20,6 +20,7 @@ endfunction
 function! testing#prompt()
   " assuming cwd is project dir (see autochdir)
   let alt = testing#get_alt()
+  " TODO see https://github.com/nvim-treesitter/nvim-treesitter/blob/36830c4ce838f4e7b19d95d6099af1311f618c26/lua/nvim-treesitter/configs.lua#L263-L277
   if filereadable(alt) || input(printf('File "%s" does not exist. Create it? ', alt), 'y') =~? '^y'
     exe 'edit ' .. alt
   endif

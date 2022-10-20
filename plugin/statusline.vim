@@ -129,10 +129,10 @@ function! statusline#errors(active) abort " {{{1
   let statuslinetext = '%#stlErrorInfo#'
   if !has('vim_starting')
     if !&modified && &modifiable && !exists('b:stl_skip_trailing_whitespace') && search('\s$', 'nw')
-      let statuslinetext .= ' TRAILING WHITESPACE '
+      let statuslinetext .= ' •⏎ '
     endif
 
-    if &modifiable && search('^\t', 'nw', line('.') + 1) && search('^  [^\s]', 'nw')
+    if &modifiable && search('^\v%(\t+\s+|\s+\t+)', 'nw')
       let statuslinetext .= ' MIXED INDENT '
     endif
   endif

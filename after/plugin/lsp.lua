@@ -1,11 +1,14 @@
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+-- local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
 local lua_globals = {
   'vim',
-  'newproxy',                     -- builtin
-  'P',                            -- mia, print vim.inspect
-  'use',                          -- packer
-  'str', 're', 'rep', 'choice',   -- nvim-org
+  'mia',
+  'newproxy', -- builtin
+  'P', -- mia, print vim.inspect
+  'use', -- packer
+  'eq', 're', 'pat', 'rep', 'rep1', 'choice', -- nvim-org
   'optional', 'describe', 'it', 'before_each', 'after_each', -- plenary
   'lhs', -- contextualize
 }
@@ -45,7 +48,12 @@ end)
 -- Requires separate setup, installed manually (add LanguageServer) in julia
 require('lspconfig')['julials'].setup { capabilities = capabilities }
 
--- local function setup_format()
---   local g = vim.api.nvim_create_augroup('mia-lsp', { clear=true })
---   vim.api.nvim_create_autocmd('BufWritePre', { callback = function() vim.lsp.buf.formatting_sync() end, buffer = ? })
--- end
+vim.api.nvim_create_augroup('mia-lsp', { clear = true })
+
+-- vim.api.nvim_create_autocmd('BufWritePre', {
+--   pattern = { '*.py', '*.lua' },
+--   group = 'mia-lsp',
+--   desc = 'Format on save',
+--   callback = function() vim.lsp.buf.format() end,
+-- })
+

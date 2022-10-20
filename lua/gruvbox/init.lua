@@ -4,47 +4,7 @@ local hsl = lush.hsl
 -- Original colorscheme from: https://github.com/gruvbox-community/gruvbox
 -- Lush variant from:         https://github.com/npxbr/gruvbox.nvim
 
-local colors = {
-  dark0_hard     = hsl(195, 6, 12),
-  dark0          = hsl(0, 0, 15),
-  dark0_soft     = hsl(20, 3, 19),
-  dark1          = hsl(20, 5, 20),
-  dark2          = hsl(22, 7, 27),
-  dark3          = hsl(27, 10, 36),
-  dark4          = hsl(28, 11, 44),
-  light0_hard    = hsl(53, 74, 91),
-  light0         = hsl(48, 87, 87),
-  light0_soft    = hsl(46, 67, 84),
-  light1         = hsl(43, 59, 81),
-  light2         = hsl(40, 38, 73),
-  light3         = hsl(39, 24, 66),
-  light4         = hsl(35, 17, 59),
-  bright_orange  = hsl(27, 99, 55),
-  neutral_orange = hsl(24, 88, 45),
-  faded_orange   = hsl(19, 97, 35),
-  bright_red     = hsl(6, 96, 59),
-  neutral_red    = hsl(2, 75, 46),
-  faded_red      = hsl(358, 100, 31),
-  -- bright_green   = hsl(61, 66, 44),
-  -- neutral_green  = hsl(60, 71, 35),
-  -- faded_green    = hsl(57, 79, 26),
-  bright_green   = hsl(96, 50, 44),
-  neutral_green  = hsl(95, 71, 35),
-  faded_green    = hsl(92, 79, 26),
-  bright_purple  = hsl(344, 47, 68),
-  neutral_purple = hsl(333, 34, 54),
-  faded_purple   = hsl(323, 39, 40),
-  bright_yellow  = hsl(42, 95, 58),
-  neutral_yellow = hsl(40, 73, 49),
-  faded_yellow   = hsl(37, 80, 39),
-  bright_blue    = hsl(157, 16, 58),
-  neutral_blue   = hsl(183, 33, 40),
-  faded_blue     = hsl(190, 89, 25),
-  bright_aqua    = hsl(104, 35, 62),
-  neutral_aqua   = hsl(122, 21, 51),
-  faded_aqua     = hsl(143, 30, 37),
-  gray           = hsl(30, 12, 51),
-}
+local colors = require('gruvbox.palette')
 
 -- options (dark mode by default)
 local bg0 = colors.dark0
@@ -63,6 +23,7 @@ local red = colors.bright_red
 local green = colors.bright_green
 local yellow = colors.bright_yellow
 local blue = colors.bright_blue
+local pear = colors.neutral_pear
 local purple = colors.bright_purple
 local aqua = colors.bright_aqua
 local orange = colors.bright_orange
@@ -103,7 +64,8 @@ end
 -- -- neovim terminal mode colors --- I prefer not modifying them
 -- vim.g.terminal_color_0 = tostring(bg0) ...
 
-local groups = lush(function()
+local groups = lush(function(injections)
+  local sym = injections.sym
   return {
 
     Conceal      { fg = bg2 },
@@ -158,16 +120,16 @@ local groups = lush(function()
     TabLineNumber    { fg = green, bg = StatusLine.bg },
     TabLineSelNumber { fg = red  , bg = StatusLine.bg  , gui = 'bold' },
 
-    stlModified  { fg = red  , bg = StatusLine.bg },
-    stlTypeInfo  { fg = aqua , bg = StatusLine.bg },
-    stlDirInfo   { fg = blue , bg = StatusLine.bg.li(5) },
-    stlErrorInfo { fg = red  , bg = StatusLine.bg },
+    -- stlModified  { fg = red  , bg = StatusLine.bg },
+    -- stlTypeInfo  { fg = aqua , bg = StatusLine.bg },
+    -- stlDirInfo   { fg = blue , bg = StatusLine.bg.li(5) },
+    -- stlErrorInfo { fg = red  , bg = StatusLine.bg, gui = 'bold' },
 
-    stlNormalMode   { fg = orange, bg = stlDirInfo.bg.li(5), gui = 'bold' },
-    stlInsertMode   { bg = aqua  , fg = StatusLine.bg      , gui = 'bold' },
-    stlVisualMode   { bg = yellow, fg = StatusLine.bg      , gui = 'bold' },
-    stlReplaceMode  { bg = blue  , fg = StatusLine.bg      , gui = 'bold' },
-    stlTerminalMode { fg = purple, bg = stlNormalMode.bg   , gui = 'bold' },
+    -- stlNormalMode   { fg = orange, bg = stlDirInfo.bg.li(5), gui = 'bold' },
+    -- stlInsertMode   { bg = aqua  , fg = StatusLine.bg      , gui = 'bold' },
+    -- stlVisualMode   { bg = yellow, fg = StatusLine.bg      , gui = 'bold' },
+    -- stlReplaceMode  { bg = blue  , fg = StatusLine.bg      , gui = 'bold' },
+    -- stlTerminalMode { fg = purple, bg = stlNormalMode.bg   , gui = 'bold' },
 
     Visual         { bg = bg1.li(3) },
     VisualNOS      { Visual },
@@ -175,7 +137,7 @@ local groups = lush(function()
     WildMenu       { fg = blue, bg = bg2, gui = 'bold' },
 
     Constant       { fg = purple },
-    String         { fg = green },
+    String         { fg = colors.neutral_aqua },
     Character      { Constant },
     Number         { Constant },
     Boolean        { Constant },
@@ -211,6 +173,9 @@ local groups = lush(function()
     Comment        { fg = gray },
     SpecialComment { Type },
     Debug          { fg = red },
+    Verbatim       { Comment },
+    Code           { fg = fg4, bg = bg1, gui = 'bold' },
+    Underline      { gui = 'underline' },
     Underlined     { gui = 'underline' },
     Undercurl      { gui = 'undercurl' },
     Bold           { gui = 'bold' },
@@ -224,11 +189,6 @@ local groups = lush(function()
     Title          { Identifier },
 
     -- My settings
-    -- vim-signify
-    SignifySignAdd    { fg = green },
-    SignifySignChange { fg = aqua },
-    SignifySignDelete { fg = red },
-
     orgHeadline1 { fg = blue, gui = 'bold' },
     orgHeadline2 { fg = aqua },
     orgHeadline3 { fg = purple.ro(-40).de(20) },
@@ -274,6 +234,8 @@ local groups = lush(function()
     orgSettingArguments   { Comment },
     orgComment            { Comment },
     orgVerbatim           { fg = Normal.fg },
+
+    sym('@variable')      { Identifier },
 
     Sneak      { fg = yellow, gui = 'bold' },
     SneakLabel { fg = yellow, gui = 'bold' },

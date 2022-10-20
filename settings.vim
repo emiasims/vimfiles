@@ -415,6 +415,9 @@ onoremap al :<C-u>normal! 0v$<CR>
 onoremap ar a]
 onoremap ir i]
 
+nnoremap ]s m`]s
+nnoremap [s m`[s
+
 " Commands: {{{1
 command! -complete=filetype -bang -nargs=? EditFtplugin execute 'edit $CFGDIR/after/ftplugin/'
       \ . (empty(expand('<args>')) ? &filetype : expand('<args>')) . (empty("<bang>") ? '.vim' : '.lua')

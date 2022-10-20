@@ -1,35 +1,45 @@
 vim.keymap.set('n', '<F5>', '<Cmd>update|mkview|edit|TSBufEnable highlight<Cr>')
 vim.keymap.set('x', 's', ':s//g<Left><Left>')
+vim.keymap.set('c', '!', '<C-]>!')
 
+vim.keymap.set('o', '<Tab>', require'nvim-treesitter.incremental_selection'.init_selection)
 
-local contextualize = require('contextualize')
+vim.keymap.set('n', '<F9>', function()
+  if #vim.treesitter.get_captures_at_cursor() > 0 then
+    P(vim.treesitter.get_captures_at_cursor())
+  else
+    vim.fn.SynStack()
+  end
+end)
+
+local ctx = require('contextualize')
 -- local c = require('contextualize.contexts')
 local fenv = require('contextualize.fenv')
 
-local function cmdline_is(str, type)
-  type = type or ':'
+local function cmdline_is(str)
   return {
     function()
-      return vim.fn.getcmdtype() == type and vim.fn.getcmdline() == str
+      local cmdline = vim.split(vim.fn.getcmdline(), ' ')
+      return vim.fn.getcmdcompltype() == 'command' and cmdline[#cmdline] == str
     end,
-    name = ('Cmdline = "%s%s"'):format(type, str),
+    name = ('command = "%s"'):format(str),
   }
 end
 
-contextualize.keymap('c', ' ', {
+ctx.keymap('c', ' ', {
   { rhs = 'lua ', context = cmdline_is '' },
   { rhs = '<C-]>', context = cmdline_is 'eh' },
   { rhs = '<C-]>', context = cmdline_is 'vga' },
 }, { default = '<C-]> ' })
 
-
 -- Many keymaps in a specific context
 -- Result will be cnoreabbrev <expr> lhs <Plug>(map)
-contextualize.abbrev(
+ctx.multi_abbrev(
   'c',
   {
     he = 'help',
     eft = 'EditFtplugin',
+    eq = 'EditQuery',  -- mia.tslib
     ['e!'] = 'mkview | edit!',
     use = 'UltiSnipsEdit',
     ase = 'AutoSourceEnable',
@@ -52,10 +62,10 @@ contextualize.abbrev(
     h = 'Telescope help_tags',
     ev = 'Telescope fd cwd=' .. vim.fn.stdpath 'config',
     evr = 'Telescope fd cwd=' .. os.getenv 'VIMRUNTIME',
+    zo = 'lua require("mia.zotfun").pick()',
+    zc = 'lua require("mia.zotfun").cite()',
   },
-  fenv(function()
-    return vim.fn.getcmdtype() == ':' and lhs == vim.fn.getcmdline()
-  end, 'Start of cmdline')
+  function() return vim.fn.getcmdcompltype() == 'command' end
 )
 -- internally, the above is done like
 -- context = function() lhs = tbl.lhs return cmd_start() end
@@ -97,33 +107,38 @@ end, 'Inside pair')
 local left, right = '<C-g>U<Left>', '<C-g>U<Right>'
 
 -- Set the keybinds to insert the pairs
-contextualize.keymap({ 'i', 's' }, {
+ctx.multi_keymap({ 'i', 's' }, {
   ['('] = '()' .. left,
   ['['] = '[]' .. left,
   ['{'] = '{}' .. left,
 }, { pair_allowed, name = 'Nextchar != word char' })
 
+-- ctx.multi_keymap({ 'i', 's' }, {
+--   ['"'] = '""' .. left,
+--   ["'"] = "''" .. left,
+-- }, quote_allowed)
+
 -- Completing a pair is just tapping the <Right> key.
-contextualize.keymap({ 'i', 's' }, {
+ctx.multi_keymap({ 'i', 's' }, {
   [')'] = right,
   [']'] = right,
   ['}'] = right,
+  -- ['"'] = right,
+  -- ["'"] = right,
 }, completing_pair)
 
 local contexts = { completing_pair, quote_allowed }
-contextualize.keymap({ 'i', 's' }, "'",   { right, "''" .. left }, contexts)
-contextualize.keymap({ 'i', 's' }, '"', { right, '""' .. left }, contexts)
+ctx.keymap({ 'i', 's' }, "'",   { right, "''" .. left }, contexts)
+ctx.keymap({ 'i', 's' }, '"', { right, '""' .. left }, contexts)
 
 -- If we're inside a pair, <BS> to delete both, <Cr> to insert an
 -- additional newline, and <Space> to insert two spaces.
-contextualize.keymap({ 'i', 's' }, {
-  ['<BS>'] = { '<BS><Del>', desc = "Delete pair" },
-  ['<Space>'] = '  ' .. left,
-}, within_pair)
+ctx.keymap({ 'i', 's' }, '<BS>', { '<BS><Del>', desc = "Delete pair" }, within_pair)
+ctx.keymap({ 'i', 's' }, '<Space>', '  ' .. left, within_pair, { default = '<C-]> ' })
 
 local pumvisible = { function() return vim.fn.pumvisible() ~= 0 end, name = 'pumvisible' }
 -- see completion.lua for <Plug>(miaConfirmCmp) definition
-contextualize.keymap('i', '<Cr>', {
+ctx.keymap('i', '<Cr>', {
   { rhs = '<Plug>(miaConfirmCmp)', context = require('cmp').visible },
   { rhs = '<C-y>', context = pumvisible},
   { rhs = '<Cr><C-c>O', context = within_pair },
@@ -132,9 +147,9 @@ contextualize.keymap('i', '<Cr>', {
 local ls = require('luasnip')
 
 -- stylua: ignore
-contextualize.keymap({ 'i', 's' }, {
+ctx.multi_keymap({ 'i', 's' }, {
   ['<Tab>'] = { function() ls.jump(1) end, desc = 'Jump to next node', },
   ['<S-Tab>'] = { function() ls.jump(-1) end, desc = 'Jump to previous node', },
 }, ls.in_snippet, { name = 'in luasnip' })
 
-contextualize.keymap('i', '<Esc>', '<C-e>', pumvisible)
+ctx.keymap('i', '<Esc>', '<C-e>', pumvisible)
