@@ -64,8 +64,8 @@ endfunction
 function! s:gitinfo() abort " {{{2
   " Returns: ' (BRANCH)' or ' '
   let statuslinetext = ' '
-  if exists('g:loaded_fugitive') && &modifiable
-    let statuslinetext .= '(' . fugitive#head() . ')'
+  if exists('*fugitive#Head') && &modifiable
+    let statuslinetext .= '(' . fugitive#Head() . ')'
   endif
   return statuslinetext !=# ' ()' ? statuslinetext : ' '
 endfunction
