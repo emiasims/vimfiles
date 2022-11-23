@@ -3,6 +3,9 @@ vim.keymap.set('x', 's', ':s//g<Left><Left>')
 vim.keymap.set('c', '!', '<C-]>!')
 
 vim.keymap.set('o', '<Tab>', require'nvim-treesitter.incremental_selection'.init_selection)
+-- <Tab> is mapped in nvim-treesitter config, so to maintain original behavior
+-- for <C-i> (using terminals that support it), this is required
+vim.keymap.set('n', '<C-i>', '<C-i>')
 
 vim.keymap.set('n', '<F9>', function()
   if #vim.treesitter.get_captures_at_cursor() > 0 then
