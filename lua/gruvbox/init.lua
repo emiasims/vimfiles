@@ -120,17 +120,6 @@ local groups = lush(function(injections)
     TabLineNumber    { fg = green, bg = StatusLine.bg },
     TabLineSelNumber { fg = red  , bg = StatusLine.bg  , gui = 'bold' },
 
-    -- stlModified  { fg = red  , bg = StatusLine.bg },
-    -- stlTypeInfo  { fg = aqua , bg = StatusLine.bg },
-    -- stlDirInfo   { fg = blue , bg = StatusLine.bg.li(5) },
-    -- stlErrorInfo { fg = red  , bg = StatusLine.bg, gui = 'bold' },
-
-    -- stlNormalMode   { fg = orange, bg = stlDirInfo.bg.li(5), gui = 'bold' },
-    -- stlInsertMode   { bg = aqua  , fg = StatusLine.bg      , gui = 'bold' },
-    -- stlVisualMode   { bg = yellow, fg = StatusLine.bg      , gui = 'bold' },
-    -- stlReplaceMode  { bg = blue  , fg = StatusLine.bg      , gui = 'bold' },
-    -- stlTerminalMode { fg = purple, bg = stlNormalMode.bg   , gui = 'bold' },
-
     Visual         { bg = bg1.li(3) },
     VisualNOS      { Visual },
     WarningMsg     { fg = red, gui = 'bold' },
@@ -187,61 +176,6 @@ local groups = lush(function(injections)
     Todo           { fg = orange, gui = 'bold' },
 
     Title          { Identifier },
-
-    -- My settings
-    orgHeadline1 { fg = blue, gui = 'bold' },
-    orgHeadline2 { fg = aqua },
-    orgHeadline3 { fg = purple.ro(-40).de(20) },
-    orgHeadline4 { fg = green },
-    orgHeadline5 { orgHeadline2 },
-    orgHeadline6 { orgHeadline3 },
-    orgHeadline7 { orgHeadline4 },
-    orgHeadline8 { orgHeadline2 },
-    orgHeadline9 { orgHeadline3 },
-    orgHeadlineN { orgHeadline4 },
-
-    orgHeadlineInnerStar { Comment },
-    orgHeadlineLastStar  { Constant },
-    orgTodo              { Todo },
-    orgDone              { fg = blue.da(20) },
-    orgHeadlinePriority  { Error },
-    orgHeadlineTags      { fg=Normal.fg },
-
-    orgPlanDeadline      { Comment },
-    orgPlanScheduled     { Comment },
-    orgPlanClosed        { Comment },
-    orgPlanTime          { Comment },
-    orgPlanning          { Comment },
-    orgDate              { Comment },
-    orgTime              { Comment },
-    orgTimeRepeat        { Comment },
-    orgTimeDelay         { Comment },
-    orgTimestampElements { Comment },
-    orgListLeader        { Constant },
-    orgListCheck         { Todo },
-    orgListTag           { Comment },
-
-    orgNodeProperty       { fg = Constant.fg.de(40).da(10) },
-    orgNodeMultiProperty  { orgNodeProperty },
-    orgPropertyDrawerEnds { Comment },
-    orgPropertyName       { PreProc },
-    orgURI                { Comment },
-    orgLinkEnds           { Conceal },
-    orgLinkDescription    { Tag },
-    orgSetting            { Error },
-    orgSettingEnds        { Comment },
-    orgSettingName        { Todo },
-    orgSettingArguments   { Comment },
-    orgComment            { Comment },
-    orgVerbatim           { fg = Normal.fg },
-
-    sym('@variable')      { Identifier },
-
-    Sneak      { fg = yellow, gui = 'bold' },
-    SneakLabel { fg = yellow, gui = 'bold' },
-
-    CursorWord0 { gui = 'underline' },
-    CursorWord1 { gui = 'underline' },
 
   }
 end)
