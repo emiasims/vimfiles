@@ -3,11 +3,7 @@ packadd minpac
 call minpac#init()
 call minpac#add('k-takata/minpac', #{type : 'opt'})
 
-call minpac#add('jeetsukumaran/vim-pythonsense')
-call minpac#add('Vimjas/vim-python-pep8-indent')
-call minpac#add('vim-jp/syntax-vim-ex')
 call minpac#add('dag/vim-fish')
-call minpac#add('jelera/vim-javascript-syntax')
 
 call minpac#add('tpope/vim-repeat')
 call minpac#add('tpope/vim-fugitive')
@@ -20,7 +16,7 @@ call minpac#add('tommcdo/vim-exchange')
 call minpac#add('justinmk/vim-sneak')
 call minpac#add('wellle/targets.vim')
 call minpac#add('tommcdo/vim-lion')
-call minpac#add('romainl/vim-cool')
+" call minpac#add('romainl/vim-cool')
 
 call minpac#add('machakann/vim-highlightedyank')
 call minpac#add('itchyny/vim-cursorword')
@@ -29,15 +25,6 @@ call minpac#add('jeetsukumaran/vim-filebeagle')
 
 call minpac#add('inkarkat/vim-SyntaxRange')
 call minpac#add('mbbill/undotree')
-
-" Nvim specific:
-" call minpac#add('glacambre/firenvim', #{do: 'packadd firenvim|call firenvim#install()' })
-call minpac#add('git@github.com:milisims/contextualize.nvim', #{depth: 0})
-call minpac#add('git@github.com:milisims/vim-org.git', #{depth: 0})
-call minpac#add('git@github.com:milisims/nvim-org.git', #{depth: 0})
-call minpac#add('git@github.com:milisims/vim-org-notebox.git', #{depth: 0})
-call minpac#add('git@github.com:milisims/contextualize.vim.git', #{depth: 0})
-call minpac#add('git@github.com:milisims/nvim-luaref.git', #{depth: 0})
 
 function! pack#update() abort
   " execute 'source' expand('<sfile>')

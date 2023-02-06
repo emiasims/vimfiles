@@ -1,6 +1,6 @@
 return function()
-  -- local line = vim.api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
-  local line = require('foldhue').foldtext()
+  local line = vim.api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
+  -- local line = require('foldhue').foldtext()
   local suffix = ('%s lines %s'):format(vim.v.foldend - vim.v.foldstart, string.rep('|', vim.v.foldlevel))
   local pad = vim.api.nvim_win_get_width(0)
     - vim.o.foldcolumn

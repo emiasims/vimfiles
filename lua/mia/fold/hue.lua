@@ -78,7 +78,7 @@ function langs.lua(buf, lnum)
   local groups = foldhue.from_captures(buf, lnum)
   groups[#groups+1] = { ' ... ', 'Folded' }
   local col = #vim.api.nvim_buf_get_lines(buf, lnum, lnum+1, false)[1]
-  local node = vim.treesitter.get_node_at_pos(buf, lnum, col)
+  local node = vim.treesitter.get_node_at_pos(buf, lnum, col, { ignore_injections = false })
   vim.list_extend(groups, foldhue.from_captures(buf, node:end_(), {}))
   return groups
 end

@@ -191,12 +191,6 @@ augroup vimrc_numbertoggle
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
 augroup END
 
-" augroup vimrc_savemarks
-"   autocmd!
-"   autocmd TextChanged,InsertLeave,TextYankPost * let b:savemarks = [getpos("'["), getpos("']")]
-"   autocmd BufWritePost * if exists('b:savemarks') | call setpos("'[", b:savemarks[0]) | call setpos("']", b:savemarks[1]) | endif
-" augroup end
-
 augroup vimrc_filetype
   autocmd!
   autocmd FileType qfreplace setlocal nofoldenable
@@ -213,6 +207,12 @@ nnoremap <Space> :
 xnoremap <Space> :
 cnoremap <expr> <space> (getcmdtype()==":" && empty(getcmdline())) ? 'lua ' : '<C-]> '
 nnoremap ! :!
+
+if !has('nvim')
+  " C-space in kitty with my settings
+  nnoremap [32;5u <Space>
+  inoremap [32;5u <Space>
+endif
 
 inoremap <C-c> <Esc>
 inoremap <Esc> <C-c>
@@ -282,33 +282,6 @@ nnoremap ]L :llast<CR>
 nnoremap [<Space> :<C-u>silent! put!=repeat(nr2char(10), v:count1)\|']+1\|call repeat#set("[ ")<CR>
 nnoremap ]<Space> :<C-u>silent! put =repeat(nr2char(10), v:count1)\|'[-1\|call repeat#set("] ")<CR>
 
-if has('nvim')
-
-  augroup vimrc_term
-    autocmd!
-    autocmd WinEnter,BufWinEnter term://* nohlsearch
-    autocmd WinEnter,BufWinEnter term://* if !exists('b:last_mode') | let b:last_mode = 't' | endif
-    autocmd WinEnter,BufWinEnter term://* if b:last_mode == 't' | startinsert | endif
-    " autocmd TermOpen * startinsert
-  augroup END
-
-
-  tnoremap <silent> <Plug>(termLeave) <C-\><C-n>:let b:last_mode = 'n'<Cr>
-  tnoremap <silent> <Plug>(term2nmode) <C-\><C-n>:let b:last_mode = 't'<Cr>
-  tmap <C-h> <Plug>(term2nmode)<C-w>h
-  tmap <C-j> <Plug>(term2nmode)<C-w>j
-  tmap <C-k> <Plug>(term2nmode)<C-w>k
-  tmap <C-l> <Plug>(term2nmode)<C-w>l
-  tmap <C-^> <Plug>(term2nmode)<C-^>
-  tmap <C-\> <Plug>(term2nmode)<C-w>p
-  tmap <Esc> <Plug>(termLeave)
-  tmap <M-n> <Plug>(termLeave)
-
-  tnoremap <C-Space> <Space>
-  tnoremap <S-Space> <Space>
-
-endif
-
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <C-x> <C-a>
@@ -318,10 +291,6 @@ inoreabbrev -> ➜
 nnoremap c* :<C-u>let @/ = '\<'.expand('<cword>').'\>'<Cr>cgn
 nnoremap c. /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-a><Esc>
 nnoremap d. /\V<C-r>=escape(@", '\')<Cr><Cr>dgn
-" requires nvim-treesitter
-if has('nvim')
-  nmap dsf yiavabo?[^.[:alnum:]_-]?e+1<Cr>p
-endif
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
@@ -434,26 +403,18 @@ if has('nvim') && !empty($CONDA_PREFIX)
   let g:python3_host_prog = $CONDA_PREFIX . '/bin/python'
 endif
 
-if has('nvim')
-  if !exists('g:started_by_firenvim')
-    silent! packadd! vim-signify
-    silent! packadd! vim-gutentags
-  endif
-  silent! packadd! ultisnips
-  silent! packadd! nvim-treesitter
-  silent! packadd! nvim-treesitter-textobjects
-  silent! packadd! playground
-  silent! packadd! popup.nvim
-  silent! packadd! plenary.nvim
-  silent! packadd! telescope.nvim
-endif
-
 command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
 command! PackStatus call pack#status()
 command! PackList JumpSplitOrEdit $CFGDIR/autoload/pack.vim
 command! -nargs=1 -complete=custom,pack#list PackEdit packadd minpac | execute 'Telescope fd cwd='..minpac#getpluginfo(<q-args>).dir
 command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
+
+" function! s:move(name) abort
+"   execute 'write' a:name
+" endfunction
+
+" command! -nargs=1 -complete=file Move write <q-args>|buf #
 
 " vim-sneak {{{2
 nmap f <Plug>Sneak_f
@@ -500,7 +461,7 @@ nmap gcu <Plug>Commentary<Plug>Commentary
 let g:cursorword_delay = 250
 
 " undotree {{{2
-nnoremap <F8> :UndotreeToggle<CR>
+nnoremap <F6> :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 0
 let undotree_HighlightChangedText = 0
 
