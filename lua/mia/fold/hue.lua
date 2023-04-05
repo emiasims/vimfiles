@@ -23,7 +23,8 @@ function langs.python(buf, lnum)
 -- function Python(buf, lnum)
   -- local descendant = root:named_descendant_for_range(lnum, 0, lnum, 1)
   -- if it's decorated, get the function_definition
-  local node = vim.treesitter.get_node_at_pos(buf, lnum, 0)
+  -- local node = vim.treesitter.get_node_at_pos(buf, lnum, 0)
+  local node = vim.treesitter.get_node { bufnr = buf, pos = { lnum, 0 }, ignore_injections = true }
   -- local node = vim.treesitter.get_parser(buf):parse()[1]:root():named_descendant_for_range(lnum, 0, lnum, 1)
   local decorators, func = get_decorators(buf, node)
   if decorators then
@@ -78,7 +79,7 @@ function langs.lua(buf, lnum)
   local groups = foldhue.from_captures(buf, lnum)
   groups[#groups+1] = { ' ... ', 'Folded' }
   local col = #vim.api.nvim_buf_get_lines(buf, lnum, lnum+1, false)[1]
-  local node = vim.treesitter.get_node_at_pos(buf, lnum, col, { ignore_injections = false })
+  local node = vim.treesitter.get_node { bufnr = buf, pos = { lnum, col }, { ignore_injections = false } }
   vim.list_extend(groups, foldhue.from_captures(buf, node:end_(), {}))
   return groups
 end
