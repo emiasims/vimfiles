@@ -61,13 +61,42 @@ xmap('gx', require('mia.repl').send_visual)
 nmap('gxl', dotrepeat(require('mia.repl').send_line, 'gxl'))
 
 -- Delete surrounding function, retains arg the cursor is on.
--- uses 'ia' as inner argument. Could probably be better.
--- nmap("dsf", "yiavabo?[^.[:alnum:]_-]?e+1<Cr>p", remap)
+nmap("dsf", function()
+  local query = vim.treesitter.get_query(vim.o.filetype, 'textobjects')
+  -- local cursor_node = vim.treesitter.get_node()
+  local root = vim.treesitter.get_parser():parse()[1]:root()
+  local _, lnum, col = unpack(vim.fn.getcurpos())
+  lnum, col = lnum - 1, col - 1
 
--- Better version? via<Tab> uses <Tab> from below to select the arg (and
--- correct) for commas, hopefully). Then vab selects around (),
--- <Tab> inits incremental, <Tab> selects the next node: function
-nmap("dsf", "via<Tab>yvab<Tab><Tab>p", remap)
+  -- Get all the calls and smallest param here
+  local calls, param = {}, {}
+  for id, node, _ in query:iter_captures(root, 0, lnum, lnum + 1) do
+    if query.captures[id]:match('param') and vim.treesitter.is_in_node_range(node, lnum, col) then
+      param = node
+    elseif query.captures[id]:match('call.outer') and vim.treesitter.is_in_node_range(node, lnum, col) then
+      calls[#calls+1] = node
+    end
+  end
+
+  -- Get the first call that isn't the parameter.  This can't necessarily be
+  -- done in the query loop, because we might match calls first.
+  local call
+  for i = #calls, 1, -1 do
+    if calls[i] ~= param then
+      call = calls[i]
+      break
+    end
+  end
+
+  if param and call then
+    require('nvim-treesitter.ts_utils').update_selection(0, param)
+    vim.api.nvim_feedkeys('y', 'nx', true)
+    require('nvim-treesitter.ts_utils').update_selection(0, call)
+    vim.api.nvim_feedkeys('p', 'nx', true)
+  else
+    vim.api.nvim_echo({ { 'param or call not found', 'WarningMsg' } }, true, {})
+  end
+end)
 
 -- <Tab> is mapped in nvim-treesitter config, so to maintain original behavior
 -- for <C-i> (using terminals that support it), this is required
