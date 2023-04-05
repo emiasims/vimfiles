@@ -399,9 +399,15 @@ if !has('packages') || exists('$SUDO_USER')
 endif
 
 set packpath+=$CFGDIR
-if has('nvim') && !empty($CONDA_PREFIX)
-  let g:python3_host_prog = $CONDA_PREFIX . '/bin/python'
-endif
+
+" if has('nvim') && !empty($CONDA_PREFIX_1)
+"   let g:python3_host_prog = $CONDA_PREFIX_1 . '/envs/nvim-base/bin/python'
+"   if !filereadable(g:python3_host_prog)
+"     echohl Error
+"     echo "conda env 'nvim-base' not found"
+"     echohl None
+"   endif
+" endif
 
 command! PackUpdate call pack#update()
 command! PackClean  call pack#clean()
