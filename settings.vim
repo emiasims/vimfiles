@@ -475,6 +475,7 @@ let undotree_HighlightChangedText = 0
 if has('nvim')
   " vim-gutentags {{{2
   let g:gutentags_cache_dir = $DATADIR.'/tags'
+  let g:gutentags_ctags_exclude = ['data']
 
   " vim-signify {{{2
   augroup vimrc_signify
