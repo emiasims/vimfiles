@@ -11,6 +11,13 @@ local silent = { silent = true }
 -- local cmd = function(a) end
 local cmd = function(c) return ('<Cmd>%s<Cr>'):format(c) end
 
+local dotrepeat = function(func, keymap)
+  return function()
+    vim.fn['repeat#set'](keymap)
+    return func()
+  end
+end
+
 nmap('<F5>', cmd('update|mkview|edit|TSBufEnable highlight'))
 nmap('<F8>', cmd('w|so%'))
 xmap('s', ':s//g<Left><Left>')
@@ -46,6 +53,12 @@ nmap('[d', open_float_after(vim.diagnostic.goto_prev))
 nmap(']d', open_float_after(vim.diagnostic.goto_next))
 
 imap('<C-h>', function() vim.lsp.buf.signature_help { focusable = false } end)
+
+
+-- lua/mia/repl.lua
+nmap('gx', require('mia.repl').send_motion, { expr = true })
+xmap('gx', require('mia.repl').send_visual)
+nmap('gxl', dotrepeat(require('mia.repl').send_line, 'gxl'))
 
 -- Delete surrounding function, retains arg the cursor is on.
 -- uses 'ia' as inner argument. Could probably be better.
