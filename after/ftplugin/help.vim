@@ -1,4 +1,3 @@
-nnoremap <buffer> <C-]> <C-]>
 if !&modifiable
   if exists(':helpclose')
     nnoremap <buffer> q :helpclose<CR>
@@ -12,4 +11,3 @@ if has('nvim')
   setlocal number relativenumber signcolumn=no
 endif
 setlocal colorcolumn=80
-setlocal iskeyword=`,,,^{,^},^.,(,),\|,48-57,_,192-255
