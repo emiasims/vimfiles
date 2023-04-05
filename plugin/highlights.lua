@@ -20,6 +20,7 @@ lush(lush.extends({ gruvbox }).with(function(injections)
     sym('@variable')         { gruvbox.Identifier },
     sym('@pyKeyString')      { fg = blue.da(20) },
     sym('@variable.builtin') { gruvbox.Special },
+    sym('@boldspecial')      { gruvbox.Special, gui = 'bold' },
 
     Sneak      { fg = yellow, gui = 'bold' },
     SneakLabel { fg = yellow, gui = 'bold' },
