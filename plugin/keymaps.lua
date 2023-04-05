@@ -5,6 +5,7 @@ local nmap = function(...) vim.keymap.set('n', ...) end
 local tmap = function(...) vim.keymap.set('t', ...) end
 local omap = function(...) vim.keymap.set('o', ...) end
 local imap = function(...) vim.keymap.set({ 'i', 's' }, ...) end
+local map = function(...) vim.keymap.set({ 'n', 'x', 'o' }, ...) end
 
 local remap = { remap = true }
 local silent = { silent = true }
@@ -119,10 +120,26 @@ local keymap = ctx.keymap
 local abbrev = ctx.abbrev
 -- local c = require('contextualize.contexts')
 local text = require 'contextualize.text'
--- require('contextualize').setfenv sets
--- 1. lhs : the lhs of currently evaluated context
--- 2. prevchar / nextchar: previous character and next character
--- 3. around_cursor : get text around the cursor, in bytes away from the cursor
+
+keymap.list({ 'n', 'x', 'o' }, '0', {
+  {
+    rhs = '0',
+    context = function() return (text.around_cursor('^', -1) or ''):match('^%s+$') end,
+    name = 'Only whitespace before cursor',
+    -- desc = 'Go to col 0', -- doesn't work correctly
+  },
+  {
+    rhs = 'g^',
+    context = function() return vim.o.wrap end,
+    name = "'wrap' is set",
+    desc = 'Go to start of wrapped line',
+  },
+}, { default = '0^' }) -- '0' scrolls to the far left, '^' goes to the first bit of text.
+map('g0', '0')
+
+keymap.set({ 'n', 'o' }, '$', 'g$', function() return vim.o.wrap end)
+keymap.set('x', '$', 'g$h', function() return vim.o.wrap end, { default = "$h" })
+map('g$', '$')
 
 -- Many keymaps in a specific context
 -- Result will be cnoreabbrev <expr> lhs <Plug>(map)
@@ -154,6 +171,7 @@ abbrev.multi(
     h = 'Telescope help_tags',
     ev = 'Telescope fd cwd=' .. vim.fn.stdpath 'config',
     evr = 'Telescope fd cwd=' .. os.getenv 'VIMRUNTIME',
+    evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/site/pack/packer',
     zo = 'lua require("mia.zotfun").pick()',
     zc = 'lua require("mia.zotfun").cite()',
   },
@@ -190,14 +208,14 @@ keymap.list('c', ' ', {
 -- (in other words the cursor is at the end of the line) or the next character
 -- is a non word character.
 local pair_allowed = function()
-  return not text.next() or text.next():match '%W'
+  return (text.next() or ' '):match '%W'
 end
 
 -- Double quotes have an additional requirement: the previous character
 -- must not be a word character. So we'll still be able to use single quotes
 -- in comments, for example.
 local quote_allowed = function ()
-  return (not text.prev() or text.prev():match '%W') and pair_allowed()
+  return (text.prev() or ' '):match '%W' and pair_allowed()
 end
 
 -- 'lhs' is provided in the environment of the function, makes reusing
@@ -239,19 +257,10 @@ keymap.multi({ 'i', 's' }, {
   -- ["'"] = right,
 }, completing_pair)
 
--- local contexts = { complete = completing_pair, insert = quote_allowed }
--- keymap.associated({ 'i', 's' }, "'",   { complete = right, insert = "''" .. left }, contexts)
--- keymap.associated({ 'i', 's' }, '"', { complete = right, insert = '""' .. left }, contexts)
-
 keymap.list({ 'i', 's' }, "'", {
   { right, completing_pair },
   { "''" .. left, quote_allowed }
 })
-
--- keymap.list({ 'i', 's' }, "'", {
---   { rhs = right, context = completing_pair },
---   { rhs = "''" .. left, context = quote_allowed }
--- })
 
 keymap.list({ 'i', 's' }, '"', {
   { rhs = right, context = completing_pair },
