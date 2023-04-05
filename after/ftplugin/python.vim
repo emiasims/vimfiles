@@ -13,11 +13,9 @@ augroup vimrc_python
   autocmd BufWritePre *.py %s/\s\+$//e
 augroup END
 
-nnoremap <silent> <buffer> \rq :call python#text_to_qf(python#get_repl_errortext()) \| cwin \| clast<Cr>
-
-inoreabbrev <buffer> ipdb __import__('ipdb').set_trace()<Esc>
-inoreabbrev <buffer> pdb __import__('pdb').set_trace()<Esc>
-inoreabbrev <buffer> iem __import__('IPython').embed()<Esc>
+inoreabbrev <buffer> ipdb __import__('ipdb').set_trace()<Left><Esc>
+inoreabbrev <buffer> pdb __import__('pdb').set_trace()<Left><Esc>
+inoreabbrev <buffer> iem __import__('IPython').embed()<Left><Esc>
 
 iabbrev <buffer> true True
 iabbrev <buffer> false False
