@@ -39,6 +39,8 @@ return require('packer').startup(function()
   use 'hrsh7th/cmp-nvim-lsp-document-symbol'
   use 'tamago324/cmp-zsh'
 
+  use {'kevinhwang91/nvim-ufo', requires = 'kevinhwang91/promise-async'}
+
   use 'onsails/lspkind-nvim'
   use 'williamboman/mason.nvim'
   use 'williamboman/mason-lspconfig.nvim'
@@ -52,7 +54,6 @@ return require('packer').startup(function()
   use 'echasnovski/mini.doc'
 
   use_local 'contextualize.nvim'
-  use_local 'foldhue.nvim'
   use_local 'nvim-org'
 
 end)
