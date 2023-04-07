@@ -1,0 +1,18 @@
+return {
+  'tpope/vim-repeat',
+  { 'tpope/vim-fugitive', event = "VeryLazy" },
+  { 'tpope/vim-surround', event = "VeryLazy" },
+  { 'tpope/vim-speeddating', event = "VeryLazy" },
+  'tpope/vim-commentary',
+  'tpope/vim-obsession',
+  'tpope/vim-scriptease',
+  'tommcdo/vim-exchange',
+  { 'justinmk/vim-sneak', event = "VeryLazy" },
+  'wellle/targets.vim',
+  'tommcdo/vim-lion',
+  'machakann/vim-highlightedyank',
+  'itchyny/vim-cursorword',
+  'jeetsukumaran/vim-filebeagle',
+  'inkarkat/vim-SyntaxRange',
+  'mbbill/undotree',
+}

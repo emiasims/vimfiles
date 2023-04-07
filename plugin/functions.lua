@@ -1,11 +1,11 @@
-function mia.P(...)
+function _G.P(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify(vim.inspect(v))
   return v
 end
 
 
-mia.T = setmetatable({}, {
+_G.T = setmetatable({}, {
   __call = function(self, ...)
     self[1](...)
   end,
@@ -30,12 +30,8 @@ mia.T = setmetatable({}, {
 })
 
 
-function mia.P1(...)
+function _G.P1(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify_once(vim.inspect(v))
   return v
 end
-
-_G.P = mia.P
-_G.T = mia.T
-_G.P1 = mia.P1

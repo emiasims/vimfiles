@@ -8,8 +8,8 @@ endfunction
 
 augroup vimrc_srclua
   autocmd!
-  autocmd SourceCmd *.lua call v:lua.mia.source.reload_lua_module(expand('<amatch>'))
-  autocmd SourceCmd *queries/*.scm call v:lua.mia.source.set_query(expand('<amatch>'), v:true)
+  autocmd SourceCmd *.lua call v:lua.require'mia.source'.reload_lua_module(expand('<amatch>'))
+  " autocmd SourceCmd *queries/*.scm call v:lua.mia.source.set_query(expand('<amatch>'), v:true)
 augroup END
 
 command! AutoSourceEnable call s:setup_autosource()

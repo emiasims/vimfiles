@@ -18,6 +18,14 @@ function source.reload_lua_module(filename)
     return
   end
 
+  if parent == 'plugins' and package.loaded['lazy'] then
+    -- might be a bit hacky. But that's okay with me.
+    package.loaded[module] = vim.tbl_extend('force', package.loaded[module], dofile(filename))
+    require('lazy.core.loader').reload(package.loaded[module])
+    vim.notify(string.format('Reloaded package %s', relative))
+    return
+  end
+
   _G._last_reloaded = source.unload(parent)
   table.sort(_G._last_reloaded)
 
@@ -52,12 +60,12 @@ function source.set_query(filename, notify)
     error 'what happened'
   end
   local lang, name = match[2], match[3]
-  local files = vim.treesitter.get_query_files(lang, name)
+  -- local files = vim.treesitter.query.get_files(lang, name)
   local f = io.open(filename)
   if f then
     local qstr = f:read("*all")
     f:close()
-    vim.treesitter.set_query(lang, name, qstr)
+    vim.treesitter.query.set(lang, name, qstr)
   end
   if notify then
     local relative = vim.fn.matchstr(filename, [[\v%(^|/)\zsqueries/[^/]+/[^/]+.scm$]])

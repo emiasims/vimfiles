@@ -63,7 +63,7 @@ nmap('gxl', dotrepeat(require('mia.repl').send_line, 'gxl'))
 
 -- Delete surrounding function, retains arg the cursor is on.
 nmap("dsf", function()
-  local query = vim.treesitter.get_query(vim.o.filetype, 'textobjects')
+  local query = vim.treesitter.query.get(vim.o.filetype, 'textobjects')
   -- local cursor_node = vim.treesitter.get_node()
   local root = vim.treesitter.get_parser():parse()[1]:root()
   local _, lnum, col = unpack(vim.fn.getcurpos())
@@ -101,7 +101,8 @@ end)
 
 -- <Tab> is mapped in nvim-treesitter config, so to maintain original behavior
 -- for <C-i> (using terminals that support it), this is required
-omap('<Tab>', require'nvim-treesitter.incremental_selection'.init_selection)
+--
+-- omap('<Tab>', function() require'nvim-treesitter.incremental_selection'.init_selection() end)
 nmap('<C-i>', '<C-i>')
 
 nmap('<F9>', function()
@@ -164,6 +165,7 @@ abbrev.multi(
     term = 'term fish',
     f = 'Telescope fd',
     o = 'Telescope fd cwd=~/org',
+    u = 'Telescope undo',
     l = 'Telescope buffers',
     t = 'Telescope tags',
     mr = 'Telescope oldfiles',

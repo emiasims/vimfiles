@@ -14,7 +14,7 @@ function! statusline#active() abort " {{{1
   let statuslinetext .= '%='
   let statuslinetext .= statusline#temporary()
   if has('nvim') && exists('g:loaded_nvim_treesitter')
-    let statuslinetext .= v:lua.mia.statusline()
+    let statuslinetext .= v:lua.require'mia.tslib'.statusline()
   endif
   let statuslinetext .= statusline#plugins(1)
   let statuslinetext .= statusline#errors(1)
@@ -37,6 +37,7 @@ function! statusline#plugins(active) abort " {{{1
   if exists('g:loaded_obsession')
     return ObsessionStatus()
   endif
+  return ''
 endfunction
 
 function! statusline#temporary() abort " {{{1

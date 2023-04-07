@@ -9,11 +9,6 @@ else
           .. '/envs/nvim-base/bin/python')
 end
 
-
 vim.cmd 'runtime settings.vim'
 
 require 'mia'
-
-require 'mia.tslib'
-require 'mia.fold'
-
