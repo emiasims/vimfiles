@@ -9,9 +9,9 @@ local function get_query_and_opts(query, opts)
   opts.lang = opts.lang or tslib.ft_to_lang[vim.bo[opts.bufnr].filetype] or vim.bo[opts.bufnr].filetype
   opts.range = opts.range or {0, -1}
   if type(query) == 'string' and vim.startswith(query, '*') then
-    query = vim.treesitter.get_query(opts.lang, query:sub(2))
+    query = vim.treesitter.query.get(opts.lang, query:sub(2))
   elseif type(query) == 'string' then
-    query = vim.treesitter.parse_query(opts.lang, query)
+    query = vim.treesitter.query.parse(opts.lang, query)
   elseif not (type(query) == 'table' and query.captures and query.info) then
     error 'What is that?'
   end
@@ -55,7 +55,7 @@ tslib.ft_to_lang = {
 
 function tslib.has_parser(lang)
   lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
-  return pcall(ts.inspect_language, lang)
+  return pcall(ts.language.inspect, lang)
 end
 
 function tslib.node_at_curpos()
@@ -66,7 +66,7 @@ end
 
 function tslib.nodelist_atcurs()
   -- local node = tslib.node_at_curpos()
-  local node = require('nvim-treesitter.ts_utils').get_node_at_cursor()
+  local node = ts.get_node()
   local names = {}
   while node do
     table.insert(names, node:type())
@@ -346,12 +346,12 @@ local across = {
 }
 
 
-vim.treesitter.add_predicate('match-across?', across.match, true)
-vim.treesitter.add_predicate('lua-match-across?', across.lua_match, true)
-vim.treesitter.add_predicate('eq-across?', across.eq, true)
-vim.treesitter.add_predicate('contains-across?', across.contains, true)
-vim.treesitter.add_predicate('any-of-across?', across.any_of, true)
-vim.treesitter.add_directive('print!', P, true)
+vim.treesitter.query.add_predicate('match-across?', across.match, true)
+vim.treesitter.query.add_predicate('lua-match-across?', across.lua_match, true)
+vim.treesitter.query.add_predicate('eq-across?', across.eq, true)
+vim.treesitter.query.add_predicate('contains-across?', across.contains, true)
+vim.treesitter.query.add_predicate('any-of-across?', across.any_of, true)
+vim.treesitter.query.add_directive('print!', P, true)
 
 local function eat_newlines(match, _, bufnr, pred, metadata)
   -- handler(match, pattern, bufnr, predicate, metadata)
@@ -497,7 +497,7 @@ local function predicate(pre)
     return regex:match_str(char)
   end
 end
-vim.treesitter.add_predicate('prev-char-match?', predicate(true), true)
-vim.treesitter.add_predicate('next-char-match?', predicate(false), true)
+vim.treesitter.query.add_predicate('prev-char-match?', predicate(true), true)
+vim.treesitter.query.add_predicate('next-char-match?', predicate(false), true)
 
 return tslib
