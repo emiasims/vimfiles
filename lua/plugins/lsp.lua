@@ -1,10 +1,15 @@
 return {
-  'onsails/lspkind-nvim',
-  'williamboman/mason-lspconfig.nvim',
-  { 'neovim/nvim-lspconfig', lazy = true },
-  'wbthomason/lsp-status.nvim',
   {
     'williamboman/mason.nvim',
+    event = { 'InsertEnter', 'CursorHold' },
+    build = ':MasonUpdate',
+    dependencies = {
+      'onsails/lspkind-nvim',
+      'williamboman/mason-lspconfig.nvim',
+      'neovim/nvim-lspconfig',
+      'wbthomason/lsp-status.nvim',
+      'L3MON4D3/LuaSnip',
+    },
 
     config = function()
       -- needs to be before lspconfig
@@ -50,17 +55,17 @@ return {
 
       -- vim.api.nvim_create_augroup('mia-lsp', { clear = true })
       -- vim.api.nvim_create_autocmd('LspAttach', {
-        --   group = 'mia-lsp',
-        --   desc = 'Format on save',
-        --   callback = function() vim.lsp.buf.signature_help() end,
-        -- })
+      --   group = 'mia-lsp',
+      --   desc = 'Format on save',
+      --   callback = function() vim.lsp.buf.signature_help() end,
+      -- })
 
 
-        vim.api.nvim_create_autocmd("LspAttach", {
-          callback = function(args)
-            vim.lsp.get_client_by_id(args.data.client_id).server_capabilities.semanticTokensProvider = nil
-          end,
-        })
-      end
-    }
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          vim.lsp.get_client_by_id(args.data.client_id).server_capabilities.semanticTokensProvider = nil
+        end,
+      })
+    end
+  }
 }

@@ -1,11 +1,14 @@
 return {
-  { 'hrsh7th/nvim-cmp', lazy=true },
-  'hrsh7th/cmp-buffer',
-  'hrsh7th/cmp-path',
-  'hrsh7th/cmp-nvim-lua',
-  'hrsh7th/cmp-nvim-lsp',
-  'hrsh7th/cmp-nvim-lsp-document-symbol',
-  'tamago324/cmp-zsh',
+  'hrsh7th/nvim-cmp',
+  event = 'InsertEnter',
+  dependencies = {
+    'hrsh7th/cmp-buffer',
+    'hrsh7th/cmp-path',
+    'hrsh7th/cmp-nvim-lua',
+    'hrsh7th/cmp-nvim-lsp',
+    'hrsh7th/cmp-nvim-lsp-document-symbol',
+    'tamago324/cmp-zsh',
+  },
 
   config = function()
     vim.opt.completeopt = { "menu", "menuone", "noselect" }
@@ -16,7 +19,7 @@ return {
     local lspkind = require "lspkind"
     lspkind.init()
 
-    local cmp = require'cmp'
+    local cmp = require 'cmp'
 
     -- Global setup.
     cmp.setup({
@@ -75,6 +78,5 @@ return {
           --     { name = 'cmdline' }
           --   })
           -- })
-
-  end
-}
+        end
+      }

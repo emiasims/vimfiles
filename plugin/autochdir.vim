@@ -11,8 +11,8 @@ augroup vimrc_autochdir
     autocmd DirChanged *.* let b:autochdir = getcwd()
   endif
   autocmd BufEnter *.* call autochdir#gotodir()
+  autocmd UIEnter *.* ++once bufdo call autochdir#gotodir()
 augroup END
-call defer#onidle('call autochdir#gotodir()')
 
 let s:exceptions = ['~/org', '~/Dropbox/org']
 

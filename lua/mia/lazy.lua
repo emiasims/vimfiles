@@ -12,6 +12,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("plugins", {
-  change_detection = { notify = false },
-  dev = { path = "~/.vim/mia_plugins" }
+  change_detection = { enabled = true, notify = false },
+  dev = { path = "~/.vim/mia_plugins" },
+  ui = { border = "rounded" },
 })
