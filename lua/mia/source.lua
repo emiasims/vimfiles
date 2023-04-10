@@ -12,17 +12,16 @@ function source.reload_lua_module(filename)
   end
 
   if parent == 'mia' then
-    -- package.loaded[module]
     package.loaded[module] = dofile(filename)
     vim.notify(string.format('Reloaded %s', relative))
     return
   end
 
-  if parent == 'plugins' and package.loaded['lazy'] then
-    -- might be a bit hacky. But that's okay with me.
-    package.loaded[module] = vim.tbl_extend('force', package.loaded[module], dofile(filename))
-    require('lazy.core.loader').reload(package.loaded[module])
-    vim.notify(string.format('Reloaded package %s', relative))
+  if parent == 'plugins' then
+    package.loaded[module] = dofile(filename)
+    require('lazy.core.plugin').Spec.new():parse{ {}, package.loaded[module] }
+    require('lazy.core.loader').config(package.loaded[module])
+    vim.notify(string.format("Reloaded '%s' config from '%s'", package.loaded[module].name, relative))
     return
   end
 
