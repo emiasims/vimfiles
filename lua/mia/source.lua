@@ -18,10 +18,11 @@ function source.reload_lua_module(filename)
   end
 
   if parent == 'plugins' then
-    package.loaded[module] = dofile(filename)
-    require('lazy.core.plugin').Spec.new():parse{ {}, package.loaded[module] }
-    require('lazy.core.loader').config(package.loaded[module])
-    vim.notify(string.format("Reloaded '%s' config from '%s'", package.loaded[module].name, relative))
+    local spec = dofile(filename)
+    package.loaded[module] = spec
+    require('lazy.core.plugin').Spec.new():parse{ {}, spec }
+    require('lazy.core.loader').config(spec)
+    vim.notify(string.format("Reloaded '%s' config from '%s'", spec.name, relative))
     return
   end
 
