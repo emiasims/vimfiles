@@ -63,8 +63,8 @@ return {
         ev = 'Telescope fd cwd=' .. vim.fn.stdpath 'config',
         evr = 'Telescope fd cwd=' .. os.getenv 'VIMRUNTIME',
         evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
-        zo = 'lua require("mia.zotfun").pick()',
-        zc = 'lua require("mia.zotfun").cite()',
+        zo = 'lua require("mia.zotero").pick()',
+        zc = 'lua require("mia.zotero").cite()',
       },
       -- Basically, when a command can be completed, I want the above expansions
       function() return vim.fn.getcmdcompltype() == 'command' end

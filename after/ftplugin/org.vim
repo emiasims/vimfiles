@@ -13,7 +13,7 @@ nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
 nmap <buffer> \gO <Plug>(org-headline-open-above)TODO Headline<Esc>[ viw<C-g>
 nmap <buffer> \go <Plug>(org-headline-open-below)TODO Headline<Esc>[ viw<C-g>
 
-inoreabbrev <buffer> ;c <cmd>lua require("mia.zotfun").cite()<Cr>
+inoreabbrev <buffer> ;c <cmd>lua require("mia.zotero").cite()<Cr>
 
 " ContextAdd <buffer> indrawer {-> org#property#isindrawer('.')}
 " Contextualize indrawer inoremap <buffer> ; property<C-r>=UltiSnips#Anon(":${1:prop}: ${0:val}", "property")<Cr>
