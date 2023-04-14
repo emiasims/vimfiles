@@ -24,3 +24,24 @@ make_command('Delview', function()
     vim.api.nvim_echo({ { 'No view found: ' .. file, 'Error' } }, true, {})
   end
 end, {})
+
+-- from runtime, edited to have cursor positioning
+make_command('InspectTree', function(cmd)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local original_win = vim.api.nvim_get_current_win()
+  if cmd.mods ~= '' or cmd.count ~= 0 then
+    local count = cmd.count ~= 0 and cmd.count or ''
+    local new = cmd.mods ~= '' and 'new' or 'vnew'
+
+    vim.treesitter.inspect_tree({
+      command = ('%s %s%s'):format(cmd.mods, count, new),
+    })
+  else
+    vim.treesitter.inspect_tree()
+  end
+  vim.keymap.set('n', 'q', '<cmd>q<cr>')
+  local new_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(original_win)
+  vim.api.nvim_win_set_cursor(original_win, cursor)
+  vim.api.nvim_set_current_win(new_win)
+end, { desc = 'Inspect treesitter language tree for buffer', count = true })
