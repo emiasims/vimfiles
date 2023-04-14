@@ -11,7 +11,10 @@ return {
     require('ufo').setup({
       provider_selector = function(bufnr, filetype, buftype)
         return {'treesitter', 'indent'}
-      end
+      end,
+
+      fold_virt_text_handler = function(...) return require('mia.foldtext')(...) end
     })
+
   end
 }
