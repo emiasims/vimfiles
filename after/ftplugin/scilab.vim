@@ -1,6 +1,5 @@
 setlocal lisp
 setlocal foldexpr=TstFold(v:lnum)
-setlocal foldmethod=expr
 setlocal foldtext=fold#text()
 
 function! TstFold(lnum) abort " {{{1

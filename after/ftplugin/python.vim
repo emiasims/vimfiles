@@ -2,16 +2,8 @@ setlocal tabstop=4
 setlocal shiftwidth=4
 setlocal foldminlines=2
 setlocal colorcolumn=100
-" setlocal foldmethod=syntax
-" setlocal foldtext=fold#pythontext()
 
 command! -nargs=0 -buffer Outline lvimgrep /\v^\s*%(def |class )/ % | lopen
-
-" why is this here?
-augroup vimrc_python
-  autocmd!
-  autocmd BufWritePre *.py %s/\s\+$//e
-augroup END
 
 inoreabbrev <buffer> ipdb __import__('ipdb').set_trace()<Left><Esc>
 inoreabbrev <buffer> pdb __import__('pdb').set_trace()<Left><Esc>
