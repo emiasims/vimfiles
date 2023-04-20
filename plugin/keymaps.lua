@@ -24,6 +24,19 @@ nmap('<F8>', cmd('w|so%'))
 xmap('s', ':s//g<Left><Left>')
 cmap('!', '<C-]>!')
 
+
+vim.api.nvim_create_augroup('term-mode', { clear = true })
+vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter" }, {
+  group = 'term-mode',
+  pattern = 'term://*',
+  callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
+})
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = 'term-mode',
+  pattern = '*',
+  callback = function() vim.cmd.startinsert() end
+})
+
 tmap("<Plug>(termLeave)", "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
 tmap("<Plug>(term2nmode)", "<C-\\><C-n>:let b:last_mode = 't'<Cr>", silent)
 
@@ -75,7 +88,7 @@ nmap("dsf", function()
     if query.captures[id]:match('param') and vim.treesitter.is_in_node_range(node, lnum, col) then
       param = node
     elseif query.captures[id]:match('call.outer') and vim.treesitter.is_in_node_range(node, lnum, col) then
-      calls[#calls+1] = node
+      calls[#calls + 1] = node
     end
   end
 
