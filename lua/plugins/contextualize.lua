@@ -38,7 +38,8 @@ return {
       {
         he = 'help',
         eft = 'EditFtplugin',
-        eq = 'EditQuery', -- mia.tslib
+        eq = 'TSEditQuery ',
+        eqa = 'TSEditQueryUserAfter',
         ['e!'] = 'mkview | edit!',
         use = 'UltiSnipsEdit',
         ase = 'AutoSourceEnable',

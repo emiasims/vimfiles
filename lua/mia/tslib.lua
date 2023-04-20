@@ -54,7 +54,7 @@ tslib.ft_to_lang = {
 }
 
 function tslib.has_parser(lang)
-  lang = lang or tslib.ft_to_lang[vim.o.filetype] or vim.o.filetype
+  lang = lang or ts.language.get_lang(vim.o.filetype)
   return pcall(ts.language.inspect, lang)
 end
 
@@ -136,152 +136,6 @@ local function text_between(start_node, end_node, bufnr)
   return table.concat(lines, '\n')
 end
 
-local function make_between(name)
-  -- from neovim source, mostly
-
-  -- if name == 'match' then
-  --   local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
-  --   local function check_magic(str)
-  --     if string.len(str) < 2 or magic_prefixes[string.sub(str, 1, 2)] then
-  --       return str
-  --     end
-  --     return '\\v' .. str
-  --   end
-
-  --   local compiled_vim_regexes = setmetatable({}, {
-  --     __index = function(t, pattern)
-  --       local res = vim.regex(check_magic(pattern))
-  --       rawset(t, pattern, res)
-  --       return res
-  --     end,
-  --   })
-
-  --   return function(match, _, bufnr, pred)
-  --     local regex = compiled_vim_regexes[pred[4]]
-  --     local start_node, end_node = match[pred[2]], match[pred[3]]
-  --     local text = text_between(start_node, end_node, bufnr) or ''
-  --     return regex:match_str(text)
-  --   end
-  -- elseif name == 'lua-match' then
-  --   return function(match, _, bufnr, pred)
-  --     local start_node, end_node = match[pred[2]], match[pred[3]]
-  --     local text = text_between(start_node, end_node, bufnr) or ''
-  --     return string.find(text, pred[4])
-  --   end
-  -- elseif name == 'eq' then
-  --   return function(match, _, bufnr, pred)
-  --     local start_node, end_node = match[pred[2]], match[pred[3]]
-  --     local text = text_between(start_node, end_node, bufnr) or ''
-  --     return pred[4] and text == pred[4]
-  --   end
-  -- elseif name == 'contains' then
-  --   return function(match, _, bufnr, pred)
-  --     local start_node, end_node = match[pred[2]], match[pred[3]]
-  --     if start_node then
-  --       return false
-  --     end
-  --     local text = text_between(start_node, end_node, bufnr)
-
-  --     for i = 4, #pred do
-  --       if string.find(text, pred[i], 1, true) then
-  --         return true
-  --       end
-  --     end
-  --     return false
-  --   end
-  -- elseif name == 'any-of' then
-  --   return function(match, _, bufnr, pred)
-  --     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
-  --     local string_set = pred['string_set']
-  --     if not string_set then
-  --       string_set = {}
-  --       for i = 3, #pred do
-  --         string_set[pred[i]] = true
-  --       end
-  --       pred['string_set'] = string_set
-  --     end
-  --     return string_set[text]
-  --   end
-  -- end
-
-  local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
-  local function check_magic(str)
-    if string.len(str) < 2 or magic_prefixes[string.sub(str, 1, 2)] then
-      return str
-    end
-    return '\\v' .. str
-  end
-
-  local compiled_vim_regexes = setmetatable({}, {
-    __index = function(t, pattern)
-      local res = vim.regex(check_magic(pattern))
-      rawset(t, pattern, res)
-      return res
-    end,
-  })
-
-
-
-  -- local predicates = {}
-  -- function predicates['match'] = function ()
-  --   return 1
-  -- end
-  -- -- function predicates.match = function(text) end
-
-    -- return function(match, _, bufnr, pred)
-    --   local regex = compiled_vim_regexes[pred[4]]
-    --   local start_node, end_node = match[pred[2]], match[pred[3]]
-    --   local text = text_between(start_node, end_node, bufnr) or ''
-    --   return regex:match_str(text)
-    -- end
-  -- elseif name == 'lua-match' then
-    -- return function(match, _, bufnr, pred)
-    --   local start_node, end_node = match[pred[2]], match[pred[3]]
-    --   local text = text_between(start_node, end_node, bufnr) or ''
-    --   return string.find(text, pred[4])
-    -- end
-  -- elseif name == 'eq' then
-    -- return function(match, _, bufnr, pred)
-    --   local start_node, end_node = match[pred[2]], match[pred[3]]
-    --   local text = text_between(start_node, end_node, bufnr) or ''
-    --   return pred[4] and text == pred[4]
-    -- end
-  -- elseif name == 'contains' then
-    -- return function(match, _, bufnr, pred)
-    --   local start_node, end_node = match[pred[2]], match[pred[3]]
-    --   if start_node then
-    --     return false
-    --   end
-    --   local text = text_between(start_node, end_node, bufnr)
-
-    --   for i = 4, #pred do
-    --     if string.find(text, pred[i], 1, true) then
-    --       return true
-    --     end
-    --   end
-    --   return false
-    -- end
-  -- elseif name == 'any-of' then
-    -- return function(match, _, bufnr, pred)
-    --   local text = text_between(match[pred[2]], match[pred[3]], bufnr)
-    --   local string_set = pred['string_set']
-    --   if not string_set then
-    --     string_set = {}
-    --     for i = 3, #pred do
-    --       string_set[pred[i]] = true
-    --     end
-    --     pred['string_set'] = string_set
-    --   end
-    --   return string_set[text]
-    -- end
-  -- end
-
-  -- return function(match, _, bufnr, pred)
-  --   local text = text_between(match[pred[2]], match[pred[3]], bufnr) or ''
-  --   process
-  -- end
-
-end
 
 local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
 local function check_magic(str)
@@ -427,37 +281,6 @@ local function merge(match, _, _, pred, metadata)
 
 end
 vim.treesitter.query.add_directive('merge-across!', merge, true)
-
-function tslib.edit_query(opts)
-  local lang, query = unpack(opts.fargs)
-  if not query then
-    query = lang
-    lang = vim.o.filetype
-  end
-  local prefix = opts.bang and 'after/queries' or 'queries'
-  local file = ('%s/%s/%s/%s.scm'):format(vim.fn.stdpath 'config', prefix, lang, query)
-  vim.cmd('edit ' .. file)
-end
-
-local function query_complete(arglead, cmdline, _)
-  -- local query_types = get a list of all query types?
-  -- highlights, fold, spell
-  local nwords = #vim.split(cmdline or '', ' ')
-  if not cmdline or nwords == 2 then
-    return vim.fn.getcompletion(arglead, 'filetype', 1)
-  elseif nwords == 3 then
-    return vim.tbl_filter(function(q)
-      return q:find(arglead, 1, true)
-    end, { 'folds', 'highlights', 'indents', 'injections', 'locals', 'spell' })
-  end
-  return {}
-end
-
-vim.api.nvim_create_user_command(
-  'EditQuery',
-  tslib.edit_query,
-  { nargs = '+', complete = query_complete, bang = true, bar = true }
-)
 
 local function predicate(pre)
   local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
