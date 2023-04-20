@@ -3,7 +3,6 @@ return {
   event = { "BufReadPost", "BufNewFile" },
   build = ':TSUpdate',
   dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
-
   config = function()
     if vim.fn.isdirectory(os.getenv('HOME') .. '/Projects/tree-sitter-org') > 0 then
       require('nvim-treesitter.parsers').get_parser_configs().org = {
@@ -79,14 +78,19 @@ return {
           enable = true,
           -- Automatically jump forward to textobj, similar to targets.vim
           lookahead = true,
+          -- You can use the capture groups defined in textobjects.scm
           keymaps = {
-            -- You can use the capture groups defined in textobjects.scm
             ['af'] = '@function.outer',
             ['if'] = '@function.inner',
             ['ac'] = '@class.outer',
             ['ic'] = '@class.inner',
-
           },
+          selection_modes = {
+            ['@function.outer'] = 'V',
+            ['@function.inner'] = 'V',
+            ['@class.outer'] = 'V',
+            ['@class.inner'] = 'V',
+          }
         },
       },
     }
