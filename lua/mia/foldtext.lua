@@ -1,5 +1,8 @@
+local M = {}
+
 local default = require('ufo.decorator').defaultVirtTextHandler
-return function(virtText, lnum, endLnum, width, truncate, ctx)
+
+function M.default(virtText, lnum, endLnum, width, truncate, ctx)
   local newVirtText = default(virtText, lnum, endLnum, width, truncate, ctx)
   local suffix = ('%s lines %s'):format(endLnum - lnum, ('|'):rep(vim.fn.foldlevel(lnum)))
   local sufWidth = vim.fn.strdisplaywidth(suffix)
@@ -14,3 +17,34 @@ return function(virtText, lnum, endLnum, width, truncate, ctx)
   end
   return newVirtText
 end
+
+function M.org(virtText, lnum, endLnum, width, truncate, ctx)
+  local newVirtText = M.default(virtText, lnum, endLnum, width, truncate, ctx)
+
+  if ctx.text:match('^%*%*+$') then
+    local conceal = ('-'):rep(#newVirtText[1][1] - 1)
+    newVirtText[1][1] = '*'
+    table.insert(newVirtText, 1, { conceal, 'conceal' })
+  end
+  return newVirtText
+end
+
+function M.python(virtText, lnum, endLnum, width, truncate, ctx)
+  if ctx.text:match('^%s*@') then
+    local pos = { lnum - 1, #vim.fn.getbufline(ctx.bufnr, lnum)[1] - 1 }
+    local decorator = vim.treesitter.get_node { bufnr = ctx.bufnr, pos = pos }
+    while decorator:type() ~= 'decorated_definition' do
+      decorator = decorator:parent()
+    end
+    local line = decorator:field('definition')[1]:start()
+    local newVirtText = ctx.get_fold_virt_text(line + 1)
+    while #newVirtText > 0 and newVirtText[1][1]:match('^%s+$') do
+      table.remove(newVirtText, 1)
+    end
+    newVirtText[1][1] = ' ' .. newVirtText[1][1]
+    vim.list_extend(virtText, newVirtText)
+  end
+  return M.default(virtText, lnum, endLnum, width, truncate, ctx)
+end
+
+return M
