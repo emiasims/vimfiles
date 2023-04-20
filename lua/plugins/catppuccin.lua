@@ -23,7 +23,7 @@ return {
         Folded = { fg = colors.blue, bg = stl.crust },
         ColorColumn = { bg = stl.surface0 },
 
-        Todo = { style = { 'bold', 'reverse' } },
+        Todo = { fg = colors.yellow, bg = colors.none, bold = true },
 
         TabLine =          { fg = colors.surface2, bg = stl.mantle },
         TabLineSel =       { fg = colors.lavender, bg = stl.mantle },
