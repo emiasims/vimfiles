@@ -38,6 +38,11 @@ for _, match, _ in q:iter_matches(root, 0, 0, -1) do
   -- vim.cmd(('%s <buffer> %s'):format(cmd, args))
 end
 
+-- (item . (_) @todo (#eq? @todo "TODO"))
+-- (item . (_) @preproc (#eq? @preproc "DONE"))
+
+
+
 -- org.directive_action(directive_pattern or function (applied to everything) or query, action (function(Directive)))
 -- org.directive_action[^keymap]
 

@@ -1,7 +1,8 @@
 return {
   'kevinhwang91/nvim-ufo',
   dependencies = { 'kevinhwang91/promise-async' },
-  lazy = false,
+  event = { "BufReadPost", "BufNewFile" },
+
   config = function()
     vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
     vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
@@ -16,13 +17,12 @@ return {
     }
 
     vim.api.nvim_create_augroup('mia-ufo', { clear = true })
-    vim.api.nvim_create_autocmd('BufReadPost', {
-      pattern = '*',
+    vim.api.nvim_create_autocmd('FileType', {
       group = 'mia-ufo',
       desc = 'Set virt text handler',
       callback = function(ev)
         local foldtext = require('mia.foldtext')[vim.bo[ev.buf].filetype]
-        -- P(ev)
+        -- P(ev, foldtext)
         if foldtext then
           require('ufo').setFoldVirtTextHandler(ev.buf, foldtext)
         end

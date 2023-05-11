@@ -21,11 +21,15 @@ end
 function M.org(virtText, lnum, endLnum, width, truncate, ctx)
   local newVirtText = M.default(virtText, lnum, endLnum, width, truncate, ctx)
 
-  if ctx.text:match('^%*%*+$') then
-    local conceal = ('-'):rep(#newVirtText[1][1] - 1)
-    newVirtText[1][1] = '*'
-    table.insert(newVirtText, 1, { conceal, 'conceal' })
+  if ctx.text:match('^%*+') then
+    if newVirtText[2][1] == '*' then
+      newVirtText[1] = { newVirtText[1][1]:gsub('.', '-'), 'conceal' }
+      newVirtText[2][1] = '❥'  -- U+2765
+    else
+      newVirtText[1][1] = '❥'  -- U+2765
+    end
   end
+
   return newVirtText
 end
 

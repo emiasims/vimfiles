@@ -5,7 +5,24 @@ setlocal foldminlines=0
 setlocal concealcursor=n
 setlocal foldnestmax=20
 
-setlocal formatlistpat=^\\v\\s*%(\\a\|\\d+)[.)]\\ze%($\|\\s+\\S)
+setlocal formatoptions+=tno
+
+" setlocal formatlistpat=^\\v\\s*%(\\a\|\\d+)[.)]\\ze%($\|\\s+\\S)
+setlocal formatlistpat=^\\v\\s*
+setlocal formatlistpat+=%(
+setlocal formatlistpat+=[-+*]
+setlocal formatlistpat+=%(\ \\[[\ x]\\])?
+setlocal formatlistpat+=\\\\|
+setlocal formatlistpat+=\\d\\+[.)]
+setlocal formatlistpat+=\\a[.)]
+setlocal formatlistpat+=)\\s\\+
+
+" setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
+setlocal comments=b:-\ [\ ],b:+\ [\ ],b:-,b:#,b:+
+
+setlocal commentstring=#\ %s
+
+setlocal textwidth=99
 
 nmap <buffer> gO <Plug>(org-headline-open-above)Headline<Esc>[ viw<C-g>
 nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
@@ -15,6 +32,8 @@ nmap <buffer> \go <Plug>(org-headline-open-below)TODO Headline<Esc>[ viw<C-g>
 
 inoreabbrev <buffer> ;c <cmd>lua require("mia.zotero").cite()<Cr>
 
+nnoremap <buffer> gJ vipJgwip
+nnoremap <buffer> gK vipJ:let store_reg = @/ \| .s/[.!?]\zs\s\+\ze\u/\r/geI \| let @/ = store_reg \| unl store_reg<CR>
 " ContextAdd <buffer> indrawer {-> org#property#isindrawer('.')}
 " Contextualize indrawer inoremap <buffer> ; property<C-r>=UltiSnips#Anon(":${1:prop}: ${0:val}", "property")<Cr>
 
