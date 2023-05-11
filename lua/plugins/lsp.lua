@@ -2,7 +2,7 @@ return {
   'williamboman/mason.nvim',
   event = { 'InsertEnter', 'CursorHold' },
   build = ':MasonUpdate',
-  lazy = false,
+
   dependencies = {
     'onsails/lspkind-nvim',
     'williamboman/mason-lspconfig.nvim',
