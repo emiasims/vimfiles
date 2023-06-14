@@ -15,7 +15,7 @@ set pastetoggle=<F2>
 set viewoptions=folds,cursor,slash,unix
 
 set timeout ttimeout
-set timeoutlen=750  " Time out on mappings
+set timeoutlen=300
 set ttimeoutlen=250 " for key codes
 set shell=bash
 
@@ -90,7 +90,7 @@ endif
 set splitright
 set switchbuf=useopen
 set backspace=indent,eol,start
-set diffopt=algorithm:histogram,filler
+set diffopt=algorithm:histogram,filler,closeoff
 set showfulltag
 set completeopt=menuone
 if has('patch-7.4.784')
@@ -338,6 +338,29 @@ function! SynStack()
   echo group glist hlgroup
 endfunc
 
+function! s:closebufs() abort
+  let closed = 0
+  for bufinfo in getbufinfo(#{buflisted: v:true})
+    if bufinfo.hidden && !bufinfo.changed
+      execute 'silent bdelete' bufinfo.bufnr
+      let closed += 1
+    endif
+  endfor
+  let nmod = len(getbufinfo(#{buflisted: v:true, bufmodified: v:true}))
+  if closed
+    let msg = printf("Closed %d hidden buffer%s", closed, closed > 1 ? 's' : '')
+  else
+    let msg = printf("No hidden buffers closed")
+  endif
+  if nmod
+    let msg = printf("%s, %d modified hidden buffer%s remain%s open", msg, nmod, nmod > 1 ? 's' : '', nmod > 1 ? '' : 's')
+  endif
+  echo msg
+endfunc
+
+command -nargs=0 CloseHiddenBuffers call s:closebufs()
+
+" command! -nargs=1 -complete=file Move write <q-args>|buf #
 
 " Internal plugins: {{{1
 " I want these to load even if --noplugins is used.
@@ -420,25 +443,6 @@ command! -nargs=1 -complete=custom,pack#list PackOpen pack#open(<q-args>)
 " endfunction
 
 " command! -nargs=1 -complete=file Move write <q-args>|buf #
-
-" vim-sneak {{{2
-nmap f <Plug>Sneak_f
-nmap F <Plug>Sneak_F
-xmap f <Plug>Sneak_f
-xmap F <Plug>Sneak_F
-omap f <Plug>Sneak_f
-omap F <Plug>Sneak_F
-
-nmap t <Plug>Sneak_t
-nmap T <Plug>Sneak_T
-xmap t <Plug>Sneak_t
-xmap T <Plug>Sneak_T
-omap t <Plug>Sneak_t
-omap T <Plug>Sneak_T
-
-let g:sneak#label = 1
-let g:sneak#absolute_dir = 1
-let g:sneak#use_ic_scs = 1
 
 " vim-tmux-navigator {{{2
 let g:tmux_navigator_disable_when_zoomed = 1
