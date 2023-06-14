@@ -58,15 +58,8 @@ function tslib.has_parser(lang)
   return pcall(ts.language.inspect, lang)
 end
 
-function tslib.node_at_curpos()
-  local root = vim.treesitter.get_parser(0):parse()[1]:root()
-  local _, ln, col, _, _ = unpack(vim.fn.getcurpos())
-  return root:named_descendant_for_range(ln - 1, col - 1, ln - 1, col)
-end
-
 function tslib.nodelist_atcurs()
-  -- local node = tslib.node_at_curpos()
-  local node = ts.get_node()
+  local node = ts.get_node{ ignore_injections = false }
   local names = {}
   while node do
     table.insert(names, node:type())
@@ -136,23 +129,6 @@ local function text_between(start_node, end_node, bufnr)
   return table.concat(lines, '\n')
 end
 
-
-local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
-local function check_magic(str)
-  if string.len(str) < 2 or magic_prefixes[string.sub(str, 1, 2)] then
-    return str
-  end
-  return '\\v' .. str
-end
-
-local compiled_vim_regexes = setmetatable({}, {
-  __index = function(t, pattern)
-    local res = vim.regex(check_magic(pattern))
-    rawset(t, pattern, res)
-    return res
-  end,
-})
-
 local across = {
   match = function (match, _, bufnr, pred)
     if not match[pred[2]] then return true end
@@ -198,7 +174,6 @@ local across = {
     return pred.string_set[text]
   end,
 }
-
 
 vim.treesitter.query.add_predicate('match-across?', across.match, true)
 vim.treesitter.query.add_predicate('lua-match-across?', across.lua_match, true)
