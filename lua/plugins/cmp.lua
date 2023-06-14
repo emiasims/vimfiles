@@ -9,6 +9,7 @@ return {
     'hrsh7th/cmp-nvim-lsp',
     'hrsh7th/cmp-nvim-lsp-document-symbol',
     'tamago324/cmp-zsh',
+    'onsails/lspkind.nvim',
   },
 
   config = function()
@@ -18,7 +19,7 @@ return {
     -- vim.opt.shortmess:append "c"
 
     local lspkind = require "lspkind"
-    lspkind.init()
+    -- lspkind.init({})
 
     local cmp = require 'cmp'
 
@@ -56,9 +57,17 @@ return {
       }),
 
       formatting = {
-        -- Youtube: How to set up nice formatting for your sources.
         format = lspkind.cmp_format {
-          with_text = true,
+          mode = 'symbol_text',
+          symbol_map = {
+            -- Text = "て",
+            Method = "Ⲙ",
+            Class = "Ⲥ",
+            Module = "",
+            File = "", -- 
+            Reference = "",
+          },
+
           menu = {
             buffer = "[buf]",
             nvim_lsp = "[LSP]",
@@ -66,6 +75,7 @@ return {
             path = "[path]",
             vsnip = "[snip]",
           },
+
         },
       },
     })

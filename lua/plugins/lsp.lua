@@ -1,41 +1,39 @@
 return {
-  'williamboman/mason.nvim',
-  event = { 'InsertEnter', 'CursorHold' },
+  'neovim/nvim-lspconfig',
+  event = { 'BufNewFile', 'BufReadPost' },
   build = ':MasonUpdate',
 
   dependencies = {
-    'onsails/lspkind-nvim',
-    'williamboman/mason-lspconfig.nvim',
-    'neovim/nvim-lspconfig',
+    'mason.nvim', -- defined in mason.lua
     'wbthomason/lsp-status.nvim',
     'L3MON4D3/LuaSnip',
+    'williamboman/mason-lspconfig.nvim',
+    'jose-elias-alvarez/null-ls.nvim',
   },
   config = function()
-    -- needs to be before lspconfig
-    require('mason').setup()
     require('mason-lspconfig').setup { ensure_installed = { 'pylsp', 'clangd' } }
+
     local lspconfig = require('lspconfig')
 
     local lua_globals = {
       'vim',
-      'mia',
       'newproxy',                                                -- builtin
       'P',                                                       -- mia, print vim.inspect
-      'use',                                                     -- packer
       'eq', 're', 'pat', 'rep', 'rep1', 'choice',                -- nvim-org
       'optional', 'describe', 'it', 'before_each', 'after_each', -- plenary
-      'lhs',                                                     -- contextualize
     }
 
     lspconfig.lua_ls.setup {
       settings = {
         Lua = {
-          runtime = { version = 'LuaJIT' }, -- lua version for neovim
-          diagnostics = {
-            globals = lua_globals,
-          },
+          runtime = { version = '5.1' }, -- lua version for neovim
+          -- runtime = { version = 'LuaJIT' }, -- lua version for neovim
+          diagnostics = { globals = lua_globals },
           -- Make the server aware of Neovim runtime files:
-          workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+          workspace = {
+            -- library = vim.api.nvim_get_runtime_file("", true),
+            checkThirdParty = false,
+          },
           telemetry = { enable = false },
         },
       },
