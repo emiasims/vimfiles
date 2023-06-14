@@ -1,5 +1,3 @@
-" setlocal formatprg=stylua\ -
-setlocal formatexpr=v:lua.vim.lsp.formatexpr()
 setlocal comments=:---,:--
 
 nnoremap <silent> <expr> <buffer> K ':help ' . expand('<cword>') . ((expand('<cWORD>') =~# expand('<cword>') . '(') ? "(\<Cr>" : "\<Cr>")

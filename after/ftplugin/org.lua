@@ -27,13 +27,13 @@ for _, match, _ in q:iter_matches(root, 0, 0, -1) do
   vim.cmd(('%s <buffer> %s'):format(cmd, args))
 end
 
-q = vim.treesitter.query.parse('org', [[(directive name: (_) @name (#match? @name "^hlmatch\\[\\w+\\]"))]])
+q = vim.treesitter.query.parse('org', [[(directive name: (_) @name (#lua-match? @name "^hlmatch%[(@?[.%a]+)%]"))]])
 
 for _, match, _ in q:iter_matches(root, 0, 0, -1) do
   _, node = next(match)
   lnum = node:start()
   line = vim.api.nvim_buf_get_lines(0, lnum, lnum+1, false)[1]
-  group, regex  = line:gmatch('#%+hlmatch%[(%a+)%]: (.+)')()
+  group, regex  = line:gmatch('#%+hlmatch%[(@?[.%a]+)%]: (.+)')()
   vim.fn.matchadd(group, regex)
   -- vim.cmd(('%s <buffer> %s'):format(cmd, args))
 end
