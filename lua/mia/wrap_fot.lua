@@ -1,7 +1,7 @@
-vim.api.nvim_create_augroup('mia', { clear = true })
+vim.api.nvim_create_augroup('mia_wrap', { clear = true })
 vim.api.nvim_create_autocmd('OptionSet', {
   pattern = "wrap",
-  group = 'mia',
+  group = 'mia_wrap',
   desc = "Toggle 'formatoptions' t when wrap is toggled",
   callback = function()
     if vim.v.option_type == 'global' then
