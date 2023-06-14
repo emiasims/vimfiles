@@ -13,6 +13,8 @@ return {
   config = function()
     require('mason-lspconfig').setup { ensure_installed = { 'pylsp', 'clangd' } }
 
+    local lsp_status = require('lsp-status')
+    lsp_status.register_progress()
     local lspconfig = require('lspconfig')
 
     local lua_globals = {
