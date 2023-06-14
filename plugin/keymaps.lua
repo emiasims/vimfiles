@@ -1,15 +1,8 @@
--- STANDARD KEYMAPS
-local cmap = function(...) vim.keymap.set('c', ...) end
-local xmap = function(...) vim.keymap.set('x', ...) end
-local nmap = function(...) vim.keymap.set('n', ...) end
-local tmap = function(...) vim.keymap.set('t', ...) end
-local omap = function(...) vim.keymap.set('o', ...) end
-local imap = function(...) vim.keymap.set({ 'i', 's' }, ...) end
-local map = function(...) vim.keymap.set({ 'n', 'x', 'o' }, ...) end
+---@diagnostic disable-next-line: unused-local
+local cmap, xmap, nmap, tmap, omap, imap, map = require 'mapfun' 'cxntoim'
 
 local remap = { remap = true }
 local silent = { silent = true }
--- local cmd = function(a) end
 local cmd = function(c) return ('<Cmd>%s<Cr>'):format(c) end
 
 local dotrepeat = function(func, keymap)
@@ -21,7 +14,7 @@ end
 
 nmap('<F5>', cmd('update|mkview|edit|TSBufEnable highlight'))
 nmap('<F8>', cmd('w|so%'))
-xmap('s', ':s//g<Left><Left>')
+xmap('gs', ':s//g<Left><Left>')
 cmap('!', '<C-]>!')
 
 
@@ -47,6 +40,7 @@ tmap('<C-l>', '<Plug>(term2nmode)<C-w>l', remap)
 tmap('<C-^>', '<Plug>(term2nmode)<C-^>', remap)
 tmap('<C-\\>', '<Plug>(term2nmode)<C-w>p', remap)
 tmap('<Esc>', '<Plug>(termLeave)', remap)
+tmap('<C-[>', '<C-[>')
 tmap('<M-n>', '<Plug>(termLeave)', remap)
 
 tmap("<C-Space>", "<Space>")
@@ -54,6 +48,13 @@ tmap("<S-Space>", "<Space>")
 
 nmap('<F3>', cmd('messages clear'))
 nmap('<F4>', cmd('messages'))
+nmap('<F7>', function()
+  if vim.bo.fo:match('a') then
+    vim.opt_local.formatoptions:remove 'a'
+  else
+    vim.opt_local.formatoptions:append 'a'
+  end
+end, { desc = "Toggle paragraph autoformat" })
 
 local function open_float_after(func)
   return function()
