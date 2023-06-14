@@ -8,10 +8,6 @@ return {
     vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
     require('ufo').setup {
-      ---@diagnostic disable-next-line: unused-local
-      provider_selector = function(bufnr, filetype, buftype)
-        return { 'treesitter', 'indent' }
-      end,
       enable_get_fold_virt_text = true,
       fold_virt_text_handler = function(...) return require('mia.foldtext').default(...) end
     }
