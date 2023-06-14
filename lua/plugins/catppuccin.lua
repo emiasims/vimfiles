@@ -1,7 +1,6 @@
 return {
   "catppuccin/nvim",
   name = "catppuccin",
-  event = 'CursorHold',
   lazy = false,
   opts = {
     integrations = { vim_sneak = true },
@@ -19,6 +18,18 @@ return {
       return {
         ['@field'] = { fg = colors.lavender },
         ['@dark'] = { fg = colors.surface0 },
+        ['@boldconst'] = { fg = colors.peach, bold = true },
+
+        ['@text.note'] = { fg = colors.mauve, bg = colors.none, bold = false },
+        ['@text.todo'] = { fg = colors.yellow, bg = colors.none, bold = true },
+        ['@text.danger'] = { fg = colors.maroon, bg = colors.none, bold = true },
+        ['@text.warning'] = { fg = colors.peach, bg = colors.none, bold = true },
+
+        ['@text.strong'] = { fg = colors.none },
+        ['@text.emphasis'] = { fg = colors.none },
+        ['@text.uri'] = { style = {'italic'} },  -- underline = false didn't work?
+
+        ['@method'] = { link = '@function.builtin' },
 
         Folded = { fg = colors.blue, bg = stl.crust },
         ColorColumn = { bg = stl.surface0 },
@@ -42,6 +53,8 @@ return {
         stlInsertMode =   { bg = colors.sky,      fg = colors.base, bold = true },
         stlVisualMode =   { bg = colors.yellow,   fg = colors.base, bold = true },
         stlReplaceMode =  { bg = colors.blue,     fg = colors.base, bold = true },
+
+        Sneak = { fg = colors.base, bg = colors.mauve },
 
       }
     end
