@@ -10,8 +10,7 @@ augroup vimrc_autochdir
   if exists('##DirChanged')
     autocmd DirChanged *.* let b:autochdir = getcwd()
   endif
-  autocmd BufEnter *.* call autochdir#gotodir()
-  autocmd UIEnter *.* ++once bufdo call autochdir#gotodir()
+  autocmd BufNewFile,BufReadPost *.* call autochdir#gotodir()
 augroup END
 
 let s:exceptions = ['~/org', '~/Dropbox/org']
@@ -31,7 +30,7 @@ function! autochdir#getdir() abort
 endfunction
 
 function! autochdir#gotodir() abort
-  if !&modifiable || has('vim_starting') || expand('%') =~# '^fugitive'
+  if !&modifiable || expand('%') =~# '^fugitive\|^gitsigns'
     return
   endif
   execute 'lcd ' . get(b:, 'autochdir', autochdir#getdir())
