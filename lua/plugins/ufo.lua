@@ -4,8 +4,17 @@ return {
   event = { "BufReadPost", "BufNewFile" },
 
   config = function()
-    vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
-    vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
+    local nmap = require 'mapfun' 'n'
+    local ufo = require('ufo')
+    nmap('zR', ufo.openAllFolds)
+    nmap('zM', ufo.closeAllFolds)
+
+    nmap('<Plug>(default-zO)', 'zO') -- zO is mapped elsewhere
+    nmap('zE', 'zM<Plug>(default-zO)', { remap = true })
+    nmap('zV', 'zMzv', { remap = true })
+
+    nmap('zj', ufo.goNextClosedFold)
+    nmap('zk', ufo.goPreviousStartFold)
 
     require('ufo').setup {
       enable_get_fold_virt_text = true,

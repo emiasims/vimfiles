@@ -231,7 +231,6 @@ augroup END
 nnoremap zE zMzO
 nnoremap zO zCzO
 nnoremap zV zMzv
-nnoremap ZV zMzv
 
 if !exists('g:loaded_tmux_navigator')
   nnoremap <C-h> <C-w>h
