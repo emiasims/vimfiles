@@ -1,7 +1,19 @@
-vim.api.nvim_create_augroup('mia_wrap', { clear = true })
-vim.api.nvim_create_autocmd('OptionSet', {
+local gid = vim.api.nvim_create_augroup('mia-general', { clear = true })
+
+local autocmd = function(event, opts)
+  opts.group = opts.group or gid
+  vim.api.nvim_create_autocmd(event, opts)
+end
+
+autocmd('TextYankPost', {
+  desc = 'Highlight yanked text briefly',
+  callback = function()
+    vim.highlight.on_yank { higroup = "Visual", timeout = 400 }
+  end
+})
+
+autocmd('OptionSet', {
   pattern = "wrap",
-  group = 'mia_wrap',
   desc = "Toggle 'formatoptions' t when wrap is toggled",
   callback = function()
     if vim.v.option_type == 'global' then
@@ -15,7 +27,5 @@ vim.api.nvim_create_autocmd('OptionSet', {
       vim.b._old_fo = nil
       vim.opt_local.formatoptions:append 't'
     end
-
   end,
 })
-
