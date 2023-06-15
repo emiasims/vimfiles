@@ -16,7 +16,23 @@ return {
     nmap('zj', ufo.goNextClosedFold)
     nmap('zk', ufo.goPreviousStartFold)
 
-    require('ufo').setup {
+    local function lspCommentsThenTSFolds(bufnr)
+      -- see https://github.com/kevinhwang91/nvim-ufo/issues/125
+      return ufo.getFolds(bufnr, 'lsp'):thenCall(function(raw)
+        return vim.list_extend(
+          vim.iter(raw):filter(function(v) return v.kind == 'comment' end):totable(),
+          ufo.getFolds(bufnr, 'treesitter'))
+      end):catch(function(err)
+        if type(err) == 'string' and err:match('UfoFallbackException') then
+          return require('ufo').getFolds(bufnr, 'indent')
+        else
+          return require('promise').reject(err)
+        end
+      end)
+    end
+
+    ufo.setup {
+      provider_selector = function() return lspCommentsThenTSFolds end,
       enable_get_fold_virt_text = true,
       fold_virt_text_handler = function(...) return require('mia.foldtext').default(...) end
     }
