@@ -1,11 +1,11 @@
 return {
   'kevinhwang91/nvim-ufo',
   dependencies = { 'kevinhwang91/promise-async' },
-  event = { "BufReadPost", "BufNewFile" },
+  event = { 'BufReadPost', 'BufNewFile' },
 
   config = function()
     local nmap = require 'mapfun' 'n'
-    local ufo = require('ufo')
+    local ufo = require 'ufo'
     nmap('zR', ufo.openAllFolds)
     nmap('zM', ufo.closeAllFolds)
 
@@ -16,25 +16,17 @@ return {
     nmap('zj', ufo.goNextClosedFold)
     nmap('zk', ufo.goPreviousStartFold)
 
-    local function lspCommentsThenTSFolds(bufnr)
+    local function ts_custom(bufnr)
       -- see https://github.com/kevinhwang91/nvim-ufo/issues/125
-      return ufo.getFolds(bufnr, 'lsp'):thenCall(function(raw)
-        return vim.list_extend(
-          vim.iter(raw):filter(function(v) return v.kind == 'comment' end):totable(),
-          ufo.getFolds(bufnr, 'treesitter'))
-      end):catch(function(err)
-        if type(err) == 'string' and err:match('UfoFallbackException') then
-          return require('ufo').getFolds(bufnr, 'indent')
-        else
-          return require('promise').reject(err)
-        end
-      end)
+      return vim.list_extend(
+        ufo.getFolds(bufnr, 'treesitter'),
+        require 'mia.fold.expr'[vim.bo[bufnr].filetype](bufnr))
     end
 
     ufo.setup {
-      provider_selector = function() return lspCommentsThenTSFolds end,
+      provider_selector = function() return ts_custom end,
       enable_get_fold_virt_text = true,
-      fold_virt_text_handler = function(...) return require('mia.foldtext').default(...) end
+      fold_virt_text_handler = function(...) return require 'mia.fold.text'.default(...) end,
     }
 
     vim.api.nvim_create_augroup('mia-ufo', { clear = true })
@@ -42,12 +34,11 @@ return {
       group = 'mia-ufo',
       desc = 'Set virt text handler',
       callback = function(ev)
-        local foldtext = require('mia.foldtext')[vim.bo[ev.buf].filetype]
-        -- P(ev, foldtext)
+        local foldtext = require 'mia.fold.text'[vim.bo[ev.buf].filetype]
         if foldtext then
-          require('ufo').setFoldVirtTextHandler(ev.buf, foldtext)
+          require 'ufo'.setFoldVirtTextHandler(ev.buf, foldtext)
         end
       end,
     })
-  end
+  end,
 }
