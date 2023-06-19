@@ -28,11 +28,10 @@ return {
     lspconfig.lua_ls.setup {
       settings = {
         Lua = {
-          runtime = { version = '5.1' },  -- lua version for neovim
-          -- runtime = { version = 'LuaJIT' }, -- lua version for neovim
+          runtime = { version = 'LuaJIT' },
           diagnostics = { globals = lua_globals },
-          -- Make the server aware of Neovim runtime files:
           workspace = {
+            -- Make the server aware of Neovim runtime files:
             -- library = vim.api.nvim_get_runtime_file("", true),
             checkThirdParty = false,
           },

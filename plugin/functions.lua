@@ -4,7 +4,6 @@ function _G.P(...)
   return v
 end
 
-
 _G.T = setmetatable({}, {
   __call = function(self, ...)
     self[1](...)
@@ -23,10 +22,10 @@ _G.T = setmetatable({}, {
       local end_t = os.clock() - t1
       print(('Runtime: %fs (%d times)'):format(end_t, key))
       if key > 1 then
-        print(('         %fs / call'):format(end_t/ key))
+        print(('         %fs / call'):format(end_t / key))
       end
     end
-  end
+  end,
 })
 
 

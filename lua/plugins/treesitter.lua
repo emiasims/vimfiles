@@ -1,12 +1,12 @@
 return {
   'nvim-treesitter/nvim-treesitter',
-  event = { "BufReadPost", "BufNewFile" },
+  event = { 'BufReadPost', 'BufNewFile' },
 
   build = ':TSUpdate',
   dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
   config = function()
-    if vim.fn.isdirectory(os.getenv('HOME') .. '/Projects/tree-sitter-org') > 0 then
-      require('nvim-treesitter.parsers').get_parser_configs().org = {
+    if vim.fn.isdirectory(os.getenv 'HOME' .. '/Projects/tree-sitter-org') > 0 then
+      require 'nvim-treesitter.parsers'.get_parser_configs().org = {
         install_info = {
           url = '~/Projects/tree-sitter-org',
           files = { 'src/parser.c', 'src/scanner.cc' },
@@ -15,17 +15,17 @@ return {
       }
     end
 
-    require('nvim-treesitter.configs').setup {
+    require 'nvim-treesitter.configs'.setup {
       -- one of "all", "maintained" (parsers with maintainers), or a list of languages
       ensure_installed = { 'bash', 'cpp', 'lua', 'python', 'c', 'javascript', 'org' },
 
       highlight = {
-        enable = true, -- false will disable the whole extension
+        enable = true,  -- false will disable the whole extension
         custom_captures = {
           -- ['variable'] = 'Identifier',
           ['variable.builtin'] = 'Special',
           ['field'] = 'Field',
-        }
+        },
       },
 
       indent = {
@@ -44,7 +44,7 @@ return {
       },
     }
 
-    require('nvim-treesitter.configs').setup {
+    require 'nvim-treesitter.configs'.setup {
       textobjects = {
         swap = {
           enable = true,
@@ -57,7 +57,7 @@ return {
         },
         move = {
           enable = true,
-          set_jumps = true, -- whether to set jumps in the jumplist
+          set_jumps = true,  -- whether to set jumps in the jumplist
           goto_next_start = {
             [']m'] = '@function.outer',
             [']]'] = '@class.outer',
@@ -91,7 +91,7 @@ return {
             ['@function.inner'] = 'V',
             ['@class.outer'] = 'V',
             ['@class.inner'] = 'V',
-          }
+          },
         },
       },
     }

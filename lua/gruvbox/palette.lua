@@ -1,4 +1,4 @@
-local hsl = require('lush').hsl
+local hsl = require 'lush'.hsl
 return {
   dark0_hard     = hsl(195, 6, 12),
   dark0          = hsl(0, 0, 15),

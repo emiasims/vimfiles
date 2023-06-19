@@ -18,7 +18,7 @@ end
 function repl.send_text(text, target)
   target = target or repl.get_target()
   if not target then
-    api.nvim_echo({ { "No term displayed in current window.", 'Error' } }, true, {})
+    api.nvim_echo({ { 'No term displayed in current window.', 'Error' } }, true, {})
     return
   end
 
@@ -35,25 +35,25 @@ function repl.send_text(text, target)
 end
 
 function repl.send_visual()
-  api.nvim_feedkeys('', 'nx', false) -- this is annoying as shit.
-  local open = api.nvim_buf_get_mark(0, "<")
-  local close = api.nvim_buf_get_mark(0, ">")
-  if vim.fn.visualmode():match('V') then
-    repl.send_text(api.nvim_buf_get_lines(0, open[1]-1, close[1], true))
-  elseif vim.fn.visualmode():match('v') then
-    repl.send_text(api.nvim_buf_get_text(0, open[1]-1, open[2], close[1]-1, close[2]+1, {}))
+  api.nvim_feedkeys('', 'nx', false)  -- this is annoying as shit.
+  local open = api.nvim_buf_get_mark(0, '<')
+  local close = api.nvim_buf_get_mark(0, '>')
+  if vim.fn.visualmode():match 'V' then
+    repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
+  elseif vim.fn.visualmode():match 'v' then
+    repl.send_text(api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
   else
-    api.nvim_echo({ { "Trying to send visual text when not in visual mode", 'Error' } }, true, {})
+    api.nvim_echo({ { 'Trying to send visual text when not in visual mode', 'Error' } }, true, {})
   end
 end
 
 function repl.opfunc(type)
-  local open = api.nvim_buf_get_mark(0, "[")
-  local close = api.nvim_buf_get_mark(0, "]")
+  local open = api.nvim_buf_get_mark(0, '[')
+  local close = api.nvim_buf_get_mark(0, ']')
   if type == 'line' then
-    repl.send_text(api.nvim_buf_get_lines(0, open[1]-1, close[1], true))
+    repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
   elseif type == 'char' then
-    repl.send_text(api.nvim_buf_get_text(0, open[1]-1, open[2], close[1]-1, close[2]+1, {}))
+    repl.send_text(api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
   else
     api.nvim_echo({ { "Can't send blocks to repl", 'Error' } }, true, {})
   end
@@ -61,7 +61,7 @@ end
 
 function repl.send_motion()
   -- must use expr = true.
-  vim.o.opfunc='v:lua._repl.opfunc'
+  vim.o.opfunc = 'v:lua._repl.opfunc'
   return 'g@'
 end
 

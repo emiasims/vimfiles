@@ -1,45 +1,45 @@
-vim.iter({
+vim.iter {
   report = 0,
-  path = { ".", "**" },
-  virtualedit = "block",
-  formatoptions = "1crlj",
+  path = { '.', '**' },
+  virtualedit = 'block',
+  formatoptions = '1crlj',
   updatetime = 500,
   modeline = false,
-  winaltkeys = "no",
-  viewoptions = { "folds", "cursor", "slash", "unix" },
+  winaltkeys = 'no',
+  viewoptions = { 'folds', 'cursor', 'slash', 'unix' },
   timeoutlen = 300,
-  ttimeoutlen = 250, -- for key codes
+  ttimeoutlen = 250,  -- for key codes
 
-  fileformats = { "unix", "dos", "mac" },
+  fileformats = { 'unix', 'dos', 'mac' },
   swapfile = false,
-  shada = { "'300", "<10", "@50", "s100", "h" },
+  shada = { "'300", '<10', '@50', 's100', 'h' },
   textwidth = 99,
   softtabstop = 2,
   shiftwidth = 2,
   matchtime = 3,
-  breakat = "   ;:,!?",
-  whichwrap = "b,s,[,]",
-  spellsuggest = { "best", "10" },
-  switchbuf = "useopen",
-  diffopt = { "algorithm:histogram", "filler", "closeoff" },
-  completeopt = { "menuone", "noselect", "noinsert" },
-  shortmess = "aAoOTIcF",
+  breakat = '   ;:,!?',
+  whichwrap = 'b,s,[,]',
+  spellsuggest = { 'best', '10' },
+  switchbuf = 'useopen',
+  diffopt = { 'algorithm:histogram', 'filler', 'closeoff' },
+  completeopt = { 'menuone', 'noselect', 'noinsert' },
+  shortmess = 'aAoOTIcF',
   scrolloff = 4,
   sidescrolloff = 2,
   showtabline = 2,
   pumheight = 20,
   cmdheight = 2,
   cmdwinheight = 5,
-  colorcolumn = "80", -- must be string
-  signcolumn = "yes",
-  showbreak = "↘",
-  wildmode = { "longest:full", "full" },
+  colorcolumn = '80',  -- must be string
+  signcolumn = 'yes',
+  showbreak = '↘',
+  wildmode = { 'longest:full', 'full' },
   conceallevel = 2,
   foldlevelstart = 99,
   foldnestmax = 3,
 
-  listchars = { nbsp = "⊗", tab = "▷‒", extends = "»", precedes = "«", trail = "•" },
-  fillchars = { vert = "┃" },
+  listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
+  fillchars = { vert = '┃' },
 
   undofile = true,
   shiftround = true,
@@ -62,13 +62,13 @@ vim.iter({
 
   wrap = false,
 
-}):each(function(name, value) vim.opt[name] = value end)
+}:each(function(name, value) vim.opt[name] = value end)
 
-if vim.fn.executable('ag') then
-  vim.opt.grepprg = "ag --nogroup --nocolor"
+if vim.fn.executable 'ag' then
+  vim.opt.grepprg = 'ag --nogroup --nocolor'
 end
 
-if os.getenv("SUDO_USER") then
-  vim.opt.shada = ""
+if os.getenv 'SUDO_USER' then
+  vim.opt.shada = ''
   vim.opt.writebackup = false
 end

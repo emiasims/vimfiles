@@ -7,7 +7,7 @@ local function get_query_and_opts(query, opts)
   -- local verbose = opts.verbose
   opts.bufnr = opts.bufnr or 0
   opts.lang = opts.lang or tslib.ft_to_lang[vim.bo[opts.bufnr].filetype] or vim.bo[opts.bufnr].filetype
-  opts.range = opts.range or {0, -1}
+  opts.range = opts.range or { 0, -1 }
   if type(query) == 'string' and vim.startswith(query, '*') then
     query = vim.treesitter.query.get(opts.lang, query:sub(2))
   elseif type(query) == 'string' then
@@ -21,13 +21,13 @@ end
 
 function tslib.print_query(query, opts)
   tslib.print_captures(query, opts)
-  print("\n")
+  print '\n'
   tslib.print_matches(query, opts)
 end
 
 function tslib.print_captures(query, opts)
   query, opts = get_query_and_opts(query, opts)
-  P "Captures"
+  P 'Captures'
   for id, node, metadata in query:iter_captures(opts.node, opts.bufnr, unpack(opts.range)) do
     P { id, node:type(), { node:range() }, metadata }
   end
@@ -38,7 +38,7 @@ function tslib.print_matches(query, opts)
   local i = 0
   for pat, match, metadata in query:iter_matches(opts.node, opts.bufnr, unpack(opts.range)) do
     i = i + 1
-    P(string.format("Match: %s", i))
+    P(string.format('Match: %s', i))
     for id, node in pairs(match) do
       if opts.verbose or not vim.startswith(query.captures[id], '_') then
         P { pat, id, query.captures[id], { node:range() }, metadata[id] }
@@ -59,7 +59,7 @@ function tslib.has_parser(lang)
 end
 
 function tslib.nodelist_atcurs()
-  local node = ts.get_node{ ignore_injections = false }
+  local node = ts.get_node { ignore_injections = false }
   local names = {}
   while node do
     table.insert(names, node:type())
@@ -129,27 +129,44 @@ local function text_between(start_node, end_node, bufnr)
   return table.concat(lines, '\n')
 end
 
+local magic_prefixes = { ['\\v'] = true, ['\\m'] = true, ['\\M'] = true, ['\\V'] = true }
+
+local function check_magic(str)
+  if string.len(str) < 2 or magic_prefixes[string.sub(str, 1, 2)] then
+    return str
+  end
+  return '\\v' .. str
+end
+
+local compiled_vim_regexes = setmetatable({}, {
+  __index = function(t, pattern)
+    local res = vim.regex(check_magic(pattern))
+    rawset(t, pattern, res)
+    return res
+  end,
+})
+
 local across = {
-  match = function (match, _, bufnr, pred)
+  match = function(match, _, bufnr, pred)
     if not match[pred[2]] then return true end
     local regex = compiled_vim_regexes[pred[4]]
     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
     return regex:match_str(text)
   end,
 
-  lua_match = function (match, _, bufnr, pred)
+  lua_match = function(match, _, bufnr, pred)
     if not match[pred[2]] then return true end
     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
     return string.find(text, pred[4])
   end,
 
-  eq = function (match, _, bufnr, pred)
+  eq = function(match, _, bufnr, pred)
     if not match[pred[2]] then return true end
     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
     return string.find(text, pred[4], 1, true)
   end,
 
-  contains = function (match, _, bufnr, pred)
+  contains = function(match, _, bufnr, pred)
     if not match[pred[2]] then return true end
     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
     if text == '' then return false end
@@ -162,7 +179,7 @@ local across = {
     return false
   end,
 
-  any_of = function (match, _, bufnr, pred)
+  any_of = function(match, _, bufnr, pred)
     if not match[pred[2]] then return true end
     local text = text_between(match[pred[2]], match[pred[3]], bufnr)
     if not pred.string_set then
@@ -199,7 +216,7 @@ local function eat_newlines(match, _, bufnr, pred, metadata)
   end
 
   local eaten = 0
-  while vim.api.nvim_buf_get_lines(bufnr, end_line+1, end_line + 2, false)[1] == '' do
+  while vim.api.nvim_buf_get_lines(bufnr, end_line + 1, end_line + 2, false)[1] == '' do
     eaten = eaten + 1
     if max and eaten > max then
       break
@@ -244,7 +261,7 @@ local function merge(match, _, _, pred, metadata)
   if not pred[4] then
     metadata[pred[2]] = metadata[pred[2]] or {}
     metadata[pred[2]].range = range
-  elseif type(pred[4]) == "number" then
+  elseif type(pred[4]) == 'number' then
     if pred[4] ~= pred[2] and pred[4] ~= pred[3] then
       error 'last arg needs to one of the preivous nodes or a matadata name'
     end
@@ -253,7 +270,6 @@ local function merge(match, _, _, pred, metadata)
   else
     metadata[pred[4]] = range
   end
-
 end
 vim.treesitter.query.add_directive('merge-across!', merge, true)
 

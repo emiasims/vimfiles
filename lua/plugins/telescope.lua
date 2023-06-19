@@ -4,7 +4,7 @@ return {
   dependencies = { 'debugloop/telescope-undo.nvim' },
 
   config = function()
-    require('telescope').setup {
+    require 'telescope'.setup {
       defaults = {
         file_ignore_patterns = {
           '^data/',
@@ -25,12 +25,12 @@ return {
         undo = {
           use_delta = true,
           -- side_by_side = true,
-          layout_strategy = "vertical",
+          layout_strategy = 'vertical',
           layout_config = { preview_height = 0.8 },
         },
       },
     }
 
-    require("telescope").load_extension("undo")
-  end
+    require 'telescope'.load_extension 'undo'
+  end,
 }

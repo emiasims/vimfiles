@@ -4,7 +4,7 @@ local group_names = {
   'Operator', 'Keyword', 'Exception', 'PreProc', 'Include', 'Define', 'Macro',
   'PreCondit', 'Type', 'StorageClass', 'Structure', 'Typedef', 'Special',
   'SpecialChar', 'Tag', 'Delimiter', 'SpecialComment', 'Debug', 'Underlined',
-  'Ignore', 'Error', 'Todo'
+  'Ignore', 'Error', 'Todo',
 }
 
 -- Shouldn't this be done already? idk why it isn't

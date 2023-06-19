@@ -1,14 +1,14 @@
 local M = {}
 
-local pickers = require "telescope.pickers"
-local finders = require "telescope.finders"
-local conf = require("telescope.config").values
-local actions = require "telescope.actions"
-local action_state = require "telescope.actions.state"
+local pickers = require 'telescope.pickers'
+local finders = require 'telescope.finders'
+local conf = require 'telescope.config'.values
+local actions = require 'telescope.actions'
+local action_state = require 'telescope.actions.state'
 
 local function get_libfile()
   local libfile = vim.fn.expand '~/.zotero/library.json'
-  if vim.fn.filereadable('library.json') > 0 then
+  if vim.fn.filereadable 'library.json' > 0 then
     libfile = 'library.json'
   end
   return libfile
@@ -160,7 +160,10 @@ function M.cite(opts)
         end
         local citekey = ('[cite:%s]'):format(table.concat(citations, ';'))
 
-        vim.schedule(function() vim.api.nvim_put({ citekey }, "c", true, true) vim.fn.feedkeys('a') end)
+        vim.schedule(function()
+          vim.api.nvim_put({ citekey }, 'c', true, true)
+          vim.fn.feedkeys 'a'
+        end)
       end)
       return true
     end,
@@ -168,7 +171,7 @@ function M.cite(opts)
 end
 
 function M.zotero_open()
-  local citation = vim.fn.expand('<cword>')
+  local citation = vim.fn.expand '<cword>'
   local libfile = get_libfile()
 
   local items = vim.fn.json_decode(io.open(libfile):read '*a').items
@@ -178,7 +181,7 @@ function M.zotero_open()
       -- should be: "zotero://select/library/items/" .. item.itemKey
       local action = {
         uri = item.select,
-        msg = { { ('No pdf found. Selected "%s" in zotero'):format(citation), 'Todo' } }
+        msg = { { ('No pdf found. Selected "%s" in zotero'):format(citation), 'Todo' } },
       }
 
       -- if there's a pdf, open it in zotero
@@ -186,7 +189,7 @@ function M.zotero_open()
         if attachment.title and vim.endswith(attachment.title, 'pdf') then
           -- want to open, not select. Extract itemKey (why isn't that in attachments?)
           action = {
-            uri = "zotero://open-pdf/library/items/" .. attachment.select:match('%w+$'),
+            uri = 'zotero://open-pdf/library/items/' .. attachment.select:match '%w+$',
             msg = { { ('pdf for "%s" opened in Zotero.'):format(citation) } },
           }
           break
@@ -199,13 +202,12 @@ function M.zotero_open()
           vim.api.nvim_echo(action.msg, true, {})
         end
       end
-
     end
   end
 end
 
 function M.zotero_select()
-  local citation = vim.fn.expand('<cword>')
+  local citation = vim.fn.expand '<cword>'
   local libfile = get_libfile()
 
   local items = vim.fn.json_decode(io.open(libfile):read '*a').items
@@ -217,7 +219,6 @@ function M.zotero_select()
       vim.api.nvim_echo({ { ('Selected "%s" in zotero'):format(citation) } }, true, {})
     end
   end
-
 end
 
 return M

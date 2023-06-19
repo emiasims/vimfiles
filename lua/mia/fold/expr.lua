@@ -26,7 +26,7 @@ function expr.lua(bufnr)
   local root = ts.get_parser(bufnr, 'lua'):parse()[1]:root()
   local lines = {}
   for _, node, _ in fold_query:iter_captures(root, bufnr, 0, -1) do
-    lines[#lines + 1] = node:start() -- single line captures only
+    lines[#lines + 1] = node:start()  -- single line captures only
   end
   return group_consecutive(lines)
 end

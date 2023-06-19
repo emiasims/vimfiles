@@ -5,7 +5,7 @@ vim.g.loaded_netrwPlugin = 'v9999'
 vim.g.undotree_DiffAutoOpen = 0
 vim.g.undotree_HighlightChangedText = 0
 
-vim.g.gutentags_cache_dir = vim.fn.stdpath('data') .. '/tags'
+vim.g.gutentags_cache_dir = vim.fn.stdpath 'data' .. '/tags'
 vim.g.gutentags_ctags_exclude = { 'data' }
 
 vim.keymap.set('n', '<F6>', '<cmd>UndotreeToggle<Cr>')
@@ -16,21 +16,21 @@ return {
   {
     'tpope/vim-commentary',
     config = function()
-      local nmap, omap, xmap = require('mapfun')('nox', { remap = true })
-      xmap('gc', "<Plug>Commentary")
-      nmap('gc', "<Plug>Commentary")
-      omap('gc', "<Plug>Commentary")
-      nmap('gcc', "<Plug>CommentaryLine")
-      nmap('cgc', "<Plug>ChangeCommentary")
-      nmap('gcu', "<Plug>Commentary<Plug>Commentary")
-    end
+      local nmap, omap, xmap = require 'mapfun'('nox', { remap = true })
+      xmap('gc', '<Plug>Commentary')
+      nmap('gc', '<Plug>Commentary')
+      omap('gc', '<Plug>Commentary')
+      nmap('gcc', '<Plug>CommentaryLine')
+      nmap('cgc', '<Plug>ChangeCommentary')
+      nmap('gcu', '<Plug>Commentary<Plug>Commentary')
+    end,
   },
   'tpope/vim-obsession',
   'tpope/vim-scriptease',
   { 'tommcdo/vim-exchange', keys = { 'cx', 'cxx', 'cxc', { 'X', mode = 'x' } } },
   { 'wellle/targets.vim', event = 'ModeChanged *:*o*' },
   { 'tommcdo/vim-lion', keys = { 'gl', 'gL' } },
-  { 'echasnovski/mini.cursorword', event = "VeryLazy", config = true },
+  { 'echasnovski/mini.cursorword', event = 'VeryLazy', config = true },
   'jeetsukumaran/vim-filebeagle',
   'inkarkat/vim-SyntaxRange',
   'mbbill/undotree',

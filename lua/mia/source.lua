@@ -8,7 +8,7 @@ function source.reload_lua_module(filename)
   module = module:gsub('/', '.')
   if module == '' then
     dofile(filename)
-    return -- vim.notify(string.format('Reloaded %s', filename))
+    return  -- vim.notify(string.format('Reloaded %s', filename))
   end
 
   if parent == 'mia' then
@@ -20,8 +20,8 @@ function source.reload_lua_module(filename)
   if parent == 'plugins' then
     local spec = dofile(filename)
     package.loaded[module] = spec
-    require('lazy.core.plugin').Spec.new():parse{ {}, spec }
-    require('lazy.core.loader').config(spec)
+    require 'lazy.core.plugin'.Spec.new():parse { {}, spec }
+    require 'lazy.core.loader'.config(spec)
     vim.notify(string.format("Reloaded '%s' config from '%s'", spec.name, relative))
     return
   end
@@ -46,7 +46,7 @@ function source.unload(name)
   for submod, _ in pairs(package.loaded) do
     if submod:match(_re) then
       package.loaded[submod] = nil
-      unloaded[#unloaded+1] = submod
+      unloaded[#unloaded + 1] = submod
     end
   end
   return unloaded
@@ -63,7 +63,7 @@ function source.set_query(filename, notify)
   -- local files = vim.treesitter.query.get_files(lang, name)
   local f = io.open(filename)
   if f then
-    local qstr = f:read("*all")
+    local qstr = f:read '*all'
     f:close()
     vim.treesitter.query.set(lang, name, qstr)
   end

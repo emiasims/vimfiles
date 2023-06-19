@@ -19,35 +19,35 @@ make_command('Move', function(cmd)
   local filename = cmd.args
   local force = cmd.bang
 
-  local f = io.open(filename, "r")
+  local f = io.open(filename, 'r')
   if f ~= nil and io.close(f) and not force then
-    echo { "E13: File exists (add ! to override)", "Error" }
+    echo { 'E13: File exists (add ! to override)', 'Error' }
     return
   end
 
-  local path = vim.fn.expand('%:p')
+  local path = vim.fn.expand '%:p'
   vim.cmd.file { vim.fn.fnameescape(filename), mods = { silent = true, keepalt = true } }
   vim.cmd.write { bang = true }
-  vim.cmd.filetype("detect")
+  vim.cmd.filetype 'detect'
   vim.fn.delete(path)
-end, { nargs = 1, bang = true, complete = "file" })
+end, { nargs = 1, bang = true, complete = 'file' })
 
 make_command('Delete', function(cmd)
   if not cmd.bang then
-    echo { "Are you sure? Must :Delete!", "Error" }
+    echo { 'Are you sure? Must :Delete!', 'Error' }
     return
   end
 
-  local path = vim.fn.expand('%:p')
+  local path = vim.fn.expand '%:p'
   local bn = vim.fn.bufnr()
   vim.fn.delete(path)
   vim.cmd.bwipeout(bn)
-end, { bang = true, })
+end, { bang = true })
 
 
 make_command('Delview', function()
-  local path = vim.fn.expand('%:p'):gsub('=', '==')
-  path = path:gsub('^' .. os.getenv('HOME'), '~')
+  local path = vim.fn.expand '%:p':gsub('=', '==')
+  path = path:gsub('^' .. os.getenv 'HOME', '~')
   path = path:gsub('/', '=+')
   local file = vim.o.viewdir .. path .. '='
   local success = vim.fn.delete(file) == 0
@@ -60,11 +60,11 @@ end)
 
 make_command('EditFtplugin', function(cmd)
   vim.cmd.edit(
-    ("%s/%s/%s.%s"):format(
-      vim.fn.stdpath('config'),
-      "after/ftplugin",
-      cmd.args == "" and vim.bo.filetype or cmd.args,
-      cmd.bang and "lua" or "vim"))
+    ('%s/%s/%s.%s'):format(
+      vim.fn.stdpath 'config',
+      'after/ftplugin',
+      cmd.args == '' and vim.bo.filetype or cmd.args,
+      cmd.bang and 'lua' or 'vim'))
 end, { nargs = '?', bang = true, complete = 'filetype' })
 
 -- from runtime, edited to have cursor positioning
@@ -75,9 +75,9 @@ make_command('InspectTree', function(cmd)
     local count = cmd.count ~= 0 and cmd.count or ''
     local new = cmd.mods ~= '' and 'new' or 'vnew'
 
-    vim.treesitter.inspect_tree({
+    vim.treesitter.inspect_tree {
       command = ('%s %s%s'):format(cmd.mods, count, new),
-    })
+    }
   else
     vim.treesitter.inspect_tree()
   end
@@ -89,19 +89,19 @@ end, { desc = 'Inspect treesitter language tree for buffer', count = true })
 make_command('CloseHiddenBuffers', function()
   -- local closed = {}
   local closed, modified = 0, 0
-  vim.iter(vim.fn.getbufinfo({ buflisted = true })):each(function(info)
+  vim.iter(vim.fn.getbufinfo { buflisted = true }):each(function(info)
     modified = modified + ((info.hidden + info.changed == 2) and 1 or 0)
     if info.hidden == 1 and info.changed == 0 then
       vim.cmd.bdelete { info.bufnr, mods = { silent = true } }
       closed = closed + 1
     end
   end)
-  local msg = ("Closed %d hidden buffer%s"):format(closed, closed ~= 1 and 's' or '')
+  local msg = ('Closed %d hidden buffer%s'):format(closed, closed ~= 1 and 's' or '')
   if modified > 0 then
-    msg = msg .. (", %s modified left open"):format(modified)
+    msg = msg .. (', %s modified left open'):format(modified)
   end
   echo { msg }
 end)
 
-make_command('Clearqflist', function() vim.fn.setqflist{} end)
+make_command('Clearqflist', function() vim.fn.setqflist {} end)
 make_command('Clearloclist', function() vim.fn.setloclist(0, {}) end)

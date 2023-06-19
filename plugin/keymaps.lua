@@ -12,26 +12,26 @@ local dotrepeat = function(func, keymap)
   end
 end
 
-nmap('<F5>', cmd('update|mkview|edit|TSBufEnable highlight'))
-nmap('<F8>', cmd('w|so%'))
+nmap('<F5>', cmd 'update|mkview|edit|TSBufEnable highlight')
+nmap('<F8>', cmd 'w|so%')
 xmap('gs', ':s//g<Left><Left>')
 cmap('!', '<C-]>!')
 
 
 vim.api.nvim_create_augroup('term-mode', { clear = true })
-vim.api.nvim_create_autocmd({ "WinEnter", "BufWinEnter" }, {
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
   group = 'term-mode',
   pattern = 'term://*',
   callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
 })
-vim.api.nvim_create_autocmd("TermOpen", {
+vim.api.nvim_create_autocmd('TermOpen', {
   group = 'term-mode',
   pattern = '*',
-  callback = function() vim.cmd.startinsert() end
+  callback = function() vim.cmd.startinsert() end,
 })
 
-tmap("<Plug>(termLeave)", "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
-tmap("<Plug>(term2nmode)", "<C-\\><C-n>:let b:last_mode = 't'<Cr>", silent)
+tmap('<Plug>(termLeave)', "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
+tmap('<Plug>(term2nmode)', "<C-\\><C-n>:let b:last_mode = 't'<Cr>", silent)
 
 tmap('<C-h>', '<Plug>(term2nmode)<C-w>h', remap)
 tmap('<C-j>', '<Plug>(term2nmode)<C-w>j', remap)
@@ -43,18 +43,18 @@ tmap('<Esc>', '<Plug>(termLeave)', remap)
 tmap('<C-[>', '<C-[>')
 tmap('<M-n>', '<Plug>(termLeave)', remap)
 
-tmap("<C-Space>", "<Space>")
-tmap("<S-Space>", "<Space>")
+tmap('<C-Space>', '<Space>')
+tmap('<S-Space>', '<Space>')
 
-nmap('<F3>', cmd('messages clear'))
-nmap('<F4>', cmd('messages'))
+nmap('<F3>', cmd 'messages clear')
+nmap('<F4>', cmd 'messages')
 nmap('<F7>', function()
-  if vim.bo.fo:match('a') then
+  if vim.bo.fo:match 'a' then
     vim.opt_local.formatoptions:remove 'a'
   else
     vim.opt_local.formatoptions:append 'a'
   end
-end, { desc = "Toggle paragraph autoformat" })
+end, { desc = 'Toggle paragraph autoformat' })
 
 local function open_float_after(func)
   return function()
@@ -71,12 +71,12 @@ imap('<C-h>', function() vim.lsp.buf.signature_help { focusable = false } end)
 
 
 -- lua/mia/repl.lua
-nmap('gx', require('mia.repl').send_motion, { expr = true })
-xmap('gx', require('mia.repl').send_visual)
-nmap('gxl', dotrepeat(require('mia.repl').send_line, 'gxl'))
+nmap('gx', require 'mia.repl'.send_motion, { expr = true })
+xmap('gx', require 'mia.repl'.send_visual)
+nmap('gxl', dotrepeat(require 'mia.repl'.send_line, 'gxl'))
 
 -- Delete surrounding function, retains arg the cursor is on.
-nmap("dsf", function()
+nmap('dsf', function()
   local query = vim.treesitter.query.get(vim.o.filetype, 'textobjects')
   -- local cursor_node = vim.treesitter.get_node()
   local root = vim.treesitter.get_parser():parse()[1]:root()
@@ -86,9 +86,9 @@ nmap("dsf", function()
   -- Get all the calls and smallest param here
   local calls, param = {}, {}
   for id, node, _ in query:iter_captures(root, 0, lnum, lnum + 1) do
-    if query.captures[id]:match('param') and vim.treesitter.is_in_node_range(node, lnum, col) then
+    if query.captures[id]:match 'param' and vim.treesitter.is_in_node_range(node, lnum, col) then
       param = node
-    elseif query.captures[id]:match('call.outer') and vim.treesitter.is_in_node_range(node, lnum, col) then
+    elseif query.captures[id]:match 'call.outer' and vim.treesitter.is_in_node_range(node, lnum, col) then
       calls[#calls + 1] = node
     end
   end
@@ -104,9 +104,9 @@ nmap("dsf", function()
   end
 
   if param and call then
-    require('nvim-treesitter.ts_utils').update_selection(0, param)
+    require 'nvim-treesitter.ts_utils'.update_selection(0, param)
     vim.api.nvim_feedkeys('y', 'nx', true)
-    require('nvim-treesitter.ts_utils').update_selection(0, call)
+    require 'nvim-treesitter.ts_utils'.update_selection(0, call)
     vim.api.nvim_feedkeys('p', 'nx', true)
   else
     vim.api.nvim_echo({ { 'param or call not found', 'WarningMsg' } }, true, {})

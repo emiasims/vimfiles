@@ -81,15 +81,15 @@ new table using the matched key names:
 --
 
 local config = {
-  outputFile = 'profiler.lua', -- Name of this profiler (to remove itself from reports)
-  emptyToThis = '~', -- Rows with no time are set to this value
-  fW = 60, -- Width of the file column
-  fnW = 28, -- Width of the function name column
-  lW = 7, -- Width of the line column
-  tW = 7, -- Width of the time taken column
-  rW = 6, -- Width of the relative percentage column
-  cW = 5, -- Width of the call count column
-  reportSaved = '> Report saved to: ', -- Text for the file output confirmation
+  outputFile = 'profiler.lua',          -- Name of this profiler (to remove itself from reports)
+  emptyToThis = '~',                    -- Rows with no time are set to this value
+  fW = 60,                              -- Width of the file column
+  fnW = 28,                             -- Width of the function name column
+  lW = 7,                               -- Width of the line column
+  tW = 7,                               -- Width of the time taken column
+  rW = 6,                               -- Width of the relative percentage column
+  cW = 5,                               -- Width of the call count column
+  reportSaved = '> Report saved to: ',  -- Text for the file output confirmation
 }
 
 --[[ Locals ]]
@@ -131,7 +131,7 @@ local function charRepetition(n, character)
 end
 
 local function singleSearchReturn(inputString, search)
-  for _ in string.gmatch(inputString, search) do -- luacheck: ignore
+  for _ in string.gmatch(inputString, search) do  -- luacheck: ignore
     return true
   end
   return false
@@ -260,7 +260,7 @@ function module.report(filename)
           printThis = false
         end
       end
-      if printThis then -- Remove lines that are not needed
+      if printThis then  -- Remove lines that are not needed
         if singleSearchReturn(funcReport.title, '[[C]]') then
           printThis = false
         end

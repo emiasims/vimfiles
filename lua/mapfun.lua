@@ -11,12 +11,12 @@ local M = {
 setmetatable(M, {
   __call = function(tbl, chars, opts)
     local funcs = {}
-    for c in chars:gmatch('.') do
+    for c in chars:gmatch '.' do
       local func = tbl[c]
       if opts then
         func = function(lhs, rhs, new_opts)
-          if type(new_opts) == "table" then
-            opts = vim.tbl_extend("force", opts, new_opts)
+          if type(new_opts) == 'table' then
+            opts = vim.tbl_extend('force', opts, new_opts)
           end
           tbl[c](lhs, rhs, opts)
         end
@@ -24,7 +24,7 @@ setmetatable(M, {
       funcs[#funcs + 1] = func
     end
     return unpack(funcs)
-  end
+  end,
 })
 
 return M

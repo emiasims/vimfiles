@@ -1,5 +1,5 @@
 return {
   'folke/which-key.nvim',
-  lazy=false,
+  lazy = false,
   config = true,
 }

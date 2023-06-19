@@ -9,7 +9,7 @@ return {
     nmap('zR', ufo.openAllFolds)
     nmap('zM', ufo.closeAllFolds)
 
-    nmap('<Plug>(default-zO)', 'zO') -- zO is mapped elsewhere
+    nmap('<Plug>(default-zO)', 'zO')  -- zO is mapped elsewhere
     nmap('zE', 'zM<Plug>(default-zO)', { remap = true })
     nmap('zV', 'zMzv', { remap = true })
 

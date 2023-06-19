@@ -1,6 +1,6 @@
 local M = {}
 
-local default = require('ufo.decorator').defaultVirtTextHandler
+local default = require 'ufo.decorator'.defaultVirtTextHandler
 
 function M.default(virtText, lnum, endLnum, width, truncate, ctx)
   local newVirtText = default(virtText, lnum, endLnum, width, truncate, ctx)
@@ -21,7 +21,7 @@ end
 function M.org(virtText, lnum, endLnum, width, truncate, ctx)
   local newVirtText = M.default(virtText, lnum, endLnum, width, truncate, ctx)
 
-  if ctx.text:match('^%*+') then
+  if ctx.text:match '^%*+' then
     if newVirtText[2][1] == '*' then
       newVirtText[1] = { newVirtText[1][1]:gsub('.', '-'), 'conceal' }
       newVirtText[2][1] = '❥'  -- U+2765
@@ -34,15 +34,15 @@ function M.org(virtText, lnum, endLnum, width, truncate, ctx)
 end
 
 function M.python(virtText, lnum, endLnum, width, truncate, ctx)
-  if ctx.text:match('^%s*@') then
+  if ctx.text:match '^%s*@' then
     local pos = { lnum - 1, #vim.fn.getbufline(ctx.bufnr, lnum)[1] - 1 }
     local decorator = vim.treesitter.get_node { bufnr = ctx.bufnr, pos = pos }
     while decorator:type() ~= 'decorated_definition' do
       decorator = decorator:parent()
     end
-    local line = decorator:field('definition')[1]:start()
+    local line = decorator:field 'definition'[1]:start()
     local newVirtText = ctx.get_fold_virt_text(line + 1)
-    while #newVirtText > 0 and newVirtText[1][1]:match('^%s+$') do
+    while #newVirtText > 0 and newVirtText[1][1]:match '^%s+$' do
       table.remove(newVirtText, 1)
     end
     newVirtText[1][1] = ' ' .. newVirtText[1][1]
