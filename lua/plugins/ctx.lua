@@ -6,32 +6,31 @@ return {
   config = function()
     local map = function(...) vim.keymap.set({ 'n', 'x', 'o' }, ...) end
     local ctx = require 'ctx'
-    -- local c = require('ctx.contexts')
     local text = require 'ctx.text'
 
     ctx.set({ 'n', 'x', 'o' }, '0', {
       {
         rhs = '0',
-        context = function() return (text.around_cursor('^', -1) or ''):match('^%s+$') end,
+        context = function() return (text.around_cursor('^', -1) or ''):match '^%s+$' end,
         cdesc = 'Only whitespace before cursor',
-        rdesc = 'Go to col 0', -- doesn't work correctly
+        rdesc = 'Go to col 0',  -- doesn't work correctly
       },
       {
         rhs = 'g^',
-        context = function() return vim.o.wrap end,
+        context = ctx.opt.wrap.on,
         cdesc = "'wrap' is set",
         rdesc = 'Go to start of wrapped line',
       },
     }, { default = '0^' })
     map('g0', '0')
 
-    ctx.set({ 'n', 'o' }, '$', { 'g$', function() return vim.o.wrap end })
-    ctx.add('x', '$', { 'g$h', function() return vim.o.wrap end }, { default = "$h", clear = true })
+    ctx.set({ 'n', 'o' }, '$', { 'g$', ctx.opt.wrap.on })
+    ctx.add('x', '$', { 'g$h', ctx.opt.wrap.on }, { default = '$h', clear = true })
     map('g$', '$')
 
     -- Many keymaps in a specific context
     -- Result will be cnoreabbrev <expr> lhs <Plug>(map)
-    ctx.pairs(
+    ctx.add_each(
       'ca',
       {
         he = 'help',
@@ -61,46 +60,44 @@ return {
         h = 'Telescope help_tags',
         hi = 'Telescope highlights',
         ev = 'Telescope fd cwd=' .. vim.fn.stdpath 'config',
-        evp = 'Telescope fd cwd=' .. vim.fn.stdpath('config') .. '/mia_plugins',
+        evp = 'Telescope fd cwd=' .. vim.fn.stdpath 'config' .. '/mia_plugins',
         evr = 'Telescope fd cwd=' .. os.getenv 'VIMRUNTIME',
-        evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
+        evs = 'Telescope fd cwd=' .. vim.fn.stdpath 'data' .. '/lazy',
         zo = 'lua require("mia.zotero").pick()',
         zc = 'lua require("mia.zotero").cite()',
 
         -- For fugitive.vim, from cmdline config abbreviations
-        git  = 'Git',
-        gst  = 'Git status',
-        gpl  = 'Git pull',
-        gpu  = 'Git push',
-        gad  = 'Git add',
-        gap  = 'Git add --patch',
-        gau  = 'Git add --update',
+        git = 'Git',
+        gst = 'Git status',
+        gpl = 'Git pull',
+        gpu = 'Git push',
+        gad = 'Git add',
+        gap = 'Git add --patch',
+        gau = 'Git add --update',
         gaup = 'Git add --update --patch',
-        gd   = 'Git diff',
-        gdc  = 'Git diff --cached',
-        gwd  = 'Git diff --color-words',
-        grh  = 'Git reset HEAD --',
+        gd = 'Git diff',
+        gdc = 'Git diff --cached',
+        gwd = 'Git diff --color-words',
+        grh = 'Git reset HEAD --',
         gcim = 'Git commit -m',
-        gbr  = 'Git branch',
-        gco  = 'Git checkout',
-        glo  = 'Git log --all --oneline --graph -n 20',
+        gbr = 'Git branch',
+        gco = 'Git checkout',
+        glo = 'Git log --all --oneline --graph -n 20',
       },
       -- Basically, when a command can be completed, I want the above expansions
       function() return vim.fn.getcmdcompltype() == 'command' end,
-      { clear = true, cdesc = "At command line start" }
+      { clear = true, cdesc = 'At command line start' }
     )
 
     local function cmdline_is(opts)
-      local rhs = opts.rhs
-      local str = opts.context
       return {
-        rhs =rhs,
+        rhs = opts.rhs,
         context = function()
           local cmdline = vim.split(vim.fn.getcmdline(), ' ')
-          -- Use getcmdpos() to get where we are instead of #cmdline
-          return vim.fn.getcmdcompltype() == 'command' and cmdline[#cmdline] == str
+          -- Use getcmdpos() to get where we are instead of #cmdline?
+          return vim.fn.getcmdcompltype() == 'command' and cmdline[#cmdline] == opts.context
         end,
-        cdesc = ('command = "%s"'):format(str),
+        cdesc = ('command = "%s"'):format(opts.context),
       }
     end
 
@@ -137,12 +134,8 @@ return {
     -- 'lhs' is provided in the environment of the function, makes reusing
     -- contexts based on the keymap straightforward
     local completing_pair = function()
-      return text.next() == ctx.lhs -- if using fenv, lhs instead of context.lhs is fine.
+      return text.next() == ctx.lhs
     end
-
-    -- cdesc = function() -- lhs can also be used in names
-    --   return ('Nextchar == "%s"'):format(ctx.lhs)
-    -- end,
 
     -- context for when the two surrounding characters are one of the pairs
     local re = vim.regex [[^\%(\V()\|{}\|[]\|''\|""\)]]
@@ -165,60 +158,57 @@ return {
     local left, right = '<C-g>U<Left>', '<C-g>U<Right>'
 
     -- Set the keybinds to insert the pairs
-    ctx.pairs({ 'i', 's' }, {
+    ctx.add_each({ 'i', 's' }, {
       ['('] = '()' .. left,
       ['['] = '[]' .. left,
       ['{'] = '{}' .. left,
     }, pair_allowed, { cdesc = 'Nextchar != word char', clear = true })
 
     -- Completing a pair is just tapping the <Right> key.
-    ctx.pairs({ 'i', 's' }, {
+    ctx.add_each({ 'i', 's' }, {
       [')'] = right,
       [']'] = right,
       ['}'] = right,
-      -- ['"'] = right,
-      -- ["'"] = right,
+      ['"'] = right,
+      ["'"] = right,
     }, completing_pair, { clear = true })
 
-    ctx.set({ 'i', 's' }, "'", {
-      { rhs = right,        context = completing_pair },
-      { rhs = "''" .. left, context = quote_allowed }
-    })
-
-    ctx.set({ 'i', 's' }, '"', {
-      { rhs = right,        context = completing_pair },
-      { rhs = '""' .. left, context = quote_allowed },
-    })
+    ctx.add_each({ 'i', 's' }, {
+      ['"'] = '""' .. left,
+      ["'"] = "''" .. left,
+    }, quote_allowed)  -- appends
 
     -- If we're inside a pair, <BS> to delete both, <Cr> to insert an
     -- set newline, and <Space> to insert two spaces.
     ctx.set({ 'i', 's' }, '<BS>', {
-      { rhs = '<BS><Del>',    context = in_pair },
+      { rhs = '<BS><Del>', context = in_pair },
       { rhs = '<C-o>vwhobld', context = in_nlpair },
     })
+
     ctx.set({ 'i', 's' }, '<Space>',
       { '  ' .. left, in_pair },
       { default = '<C-]> ' })
+    -- mapping <space> removes its abbrev trigger, <C-]> forces it
 
     local pumvisible = function() return vim.fn.pumvisible() ~= 0 end
     -- I don't want cmp.nvim to modify my keybinds, so use a plug mapping and then
     -- do it myself. see completion.lua for <Plug>(miaConfirmCmp) definition
     -- Wrapping cmp.visible so it doesn't fully load here
-    local cmp_visible = function() return require'cmp'.visible() end
+    local cmp_visible = function() return require 'cmp'.visible() end
     ctx.set('i', '<Cr>', {
       { rhs = '<Plug>(miaConfirmCmp)', context = cmp_visible },
       { rhs = '<C-y>', context = pumvisible },
       { rhs = '<Cr><C-c>O', context = in_pair },
     })
 
-    local ls = require('luasnip')
+    local ls = require 'luasnip'
 
     -- stylua: ignore
-    ctx.pairs({ 'i', 's' }, {
-      ['<Tab>'] = { function() ls.jump(1) end, rdesc = 'Jump to next node', },
-      ['<S-Tab>'] = { function() ls.jump(-1) end, rdesc = 'Jump to previous node', },
+    ctx.add_each({ 'i', 's' }, {
+      ['<Tab>'] = { function() ls.jump(1) end, rdesc = 'Jump to next node' },
+      ['<S-Tab>'] = { function() ls.jump(-1) end, rdesc = 'Jump to previous node' },
     }, ls.in_snippet, { cdesc = 'in luasnip', clear = true })
 
     ctx.set('i', '<Esc>', { '<C-e>', pumvisible })
-  end
+  end,
 }
