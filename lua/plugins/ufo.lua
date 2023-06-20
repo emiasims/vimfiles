@@ -24,7 +24,13 @@ return {
     end
 
     ufo.setup {
-      provider_selector = function() return ts_custom end,
+      ---@diagnostic disable-next-line unused-local
+      provider_selector = function(bufnr, filetype, buftype)
+        if buftype == '' and vim.treesitter.language.get_lang(filetype) then
+          return ts_custom
+        end
+        return { 'lsp', 'treesitter' }
+      end,
       enable_get_fold_virt_text = true,
       fold_virt_text_handler = function(...) return require 'mia.fold.text'.default(...) end,
     }
@@ -36,7 +42,7 @@ return {
       callback = function(ev)
         local foldtext = require 'mia.fold.text'[vim.bo[ev.buf].filetype]
         if foldtext then
-          require 'ufo'.setFoldVirtTextHandler(ev.buf, foldtext)
+          ufo.setFoldVirtTextHandler(ev.buf, foldtext)
         end
       end,
     })
