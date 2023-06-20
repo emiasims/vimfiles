@@ -6,7 +6,7 @@ local function get_query_and_opts(query, opts)
   opts = vim.deepcopy(opts) or {}
   -- local verbose = opts.verbose
   opts.bufnr = opts.bufnr or 0
-  opts.lang = opts.lang or tslib.ft_to_lang[vim.bo[opts.bufnr].filetype] or vim.bo[opts.bufnr].filetype
+  opts.lang = opts.lang or ts.language.get_lang(vim.bo[opts.bufnr].filetype) or vim.bo[opts.bufnr].filetype
   opts.range = opts.range or { 0, -1 }
   if type(query) == 'string' and vim.startswith(query, '*') then
     query = vim.treesitter.query.get(opts.lang, query:sub(2))
@@ -46,12 +46,6 @@ function tslib.print_matches(query, opts)
     end
   end
 end
-
-tslib.ft_to_lang = {
-  py = 'python',
-  sh = 'bash',
-  js = 'javascript',
-}
 
 function tslib.has_parser(lang)
   lang = lang or ts.language.get_lang(vim.o.filetype)
