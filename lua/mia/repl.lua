@@ -83,11 +83,11 @@ function repl.start(filetype)
 end
 
 vim.api.nvim_create_user_command('Repl', function(cmd)
-  if cmd.args == "" then
+  if cmd.args == '' then
     cmd.args = nil
   end
   repl.start(cmd.args)
-end, { nargs = '?', complete = 'filetype' })
+end, { nargs = '?', complete = 'filetype', bar = true })
 
 _G._repl = repl
 
