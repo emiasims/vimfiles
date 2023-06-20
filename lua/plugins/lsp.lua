@@ -64,6 +64,7 @@ return {
     }
 
     lspconfig.tsserver.setup {}
+    lspconfig.clangd.setup {}
 
     vim.diagnostic.config { virtual_text = false, signs = true, underline = true }
 
