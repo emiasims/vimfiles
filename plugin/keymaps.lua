@@ -1,16 +1,10 @@
 ---@diagnostic disable-next-line: unused-local
 local cmap, xmap, nmap, tmap, omap, imap, map = require 'mapfun' 'cxntoim'
+local dotrepeat = require 'mapfun'.dotrepeat
 
 local remap = { remap = true }
 local silent = { silent = true }
 local cmd = function(c) return ('<Cmd>%s<Cr>'):format(c) end
-
-local dotrepeat = function(func, keymap)
-  return function()
-    vim.fn['repeat#set'](keymap)
-    return func()
-  end
-end
 
 nmap('<F5>', cmd 'update|mkview|edit|TSBufEnable highlight')
 nmap('<F8>', cmd 'w|so%')
@@ -71,7 +65,7 @@ imap('<C-h>', function() vim.lsp.buf.signature_help { focusable = false } end)
 
 
 -- lua/mia/repl.lua
-nmap('gx', require 'mia.repl'.send_motion, { expr = true })
+nmap('gx', require 'mia.repl'.send_motion, { expr = true, dotrepeat = true })
 xmap('gx', require 'mia.repl'.send_visual)
 nmap('gxl', dotrepeat(require 'mia.repl'.send_line, 'gxl'))
 

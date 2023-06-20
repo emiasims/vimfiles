@@ -7,7 +7,6 @@ return {
       on_attach = function(bufnr)
         local gs = require 'gitsigns'
         local ctx = require 'ctx'
-
         local opts = { buffer = bufnr }
 
         -- local vo = require 'ctx.contexts'.vimopt
@@ -16,6 +15,7 @@ return {
         ctx.set('n', ']c', { gs.next_hunk, ctx.opt.diff.off }, opts)
         ctx.set('n', '[c', { gs.prev_hunk, ctx.opt.diff.off }, opts)
 
+        opts.dotrepeat = true
         local nmap, xmap = require 'mapfun' ('nx', opts)  -- buffer normal map
         nmap('gsh', gs.stage_hunk, { desc = 'Stage hunk' })
         nmap('gsr', gs.reset_hunk, { desc = 'Reset hunk' })

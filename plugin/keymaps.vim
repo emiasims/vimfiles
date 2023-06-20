@@ -119,7 +119,7 @@ xnoremap \Y "+y
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
-nnoremap <F9> :<C-u>call SynStack()<CR>
+nnoremap <Plug>(SynStack) :<C-u>call SynStack()<CR>
 function! SynStack()
   let group = synIDattr(synID(line('.'), col('.'), 1), 'name')
   let glist = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
