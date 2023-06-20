@@ -82,7 +82,7 @@ make_command('InspectTree', function(cmd)
     vim.treesitter.inspect_tree()
   end
   -- end
-  vim.keymap.set('n', 'q', '<cmd>q<cr>')
+  vim.keymap.set('n', 'q', '<cmd>q<cr>', { buffer = true })
   vim.api.nvim_set_current_win(src_win)
 end, { desc = 'Inspect treesitter language tree for buffer', count = true })
 
