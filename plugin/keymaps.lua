@@ -11,19 +11,7 @@ nmap('<F8>', cmd 'w|so%')
 xmap('gs', ':s//g<Left><Left>')
 cmap('!', '<C-]>!')
 
-
-vim.api.nvim_create_augroup('term-mode', { clear = true })
-vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
-  group = 'term-mode',
-  pattern = 'term://*',
-  callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
-})
-vim.api.nvim_create_autocmd('TermOpen', {
-  group = 'term-mode',
-  pattern = '*',
-  callback = function() vim.cmd.startinsert() end,
-})
-
+-- associated with autocmds in lua/mia/autocmds.lua
 tmap('<Plug>(termLeave)', "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
 tmap('<Plug>(term2nmode)', "<C-\\><C-n>:let b:last_mode = 't'<Cr>", silent)
 

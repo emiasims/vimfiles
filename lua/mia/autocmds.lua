@@ -29,3 +29,23 @@ autocmd('OptionSet', {
     end
   end,
 })
+
+vim.api.nvim_create_augroup('term-mode', { clear = true })
+vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
+  group = 'term-mode',
+  pattern = 'term://*',
+  callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
+})
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = 'term-mode',
+  pattern = '*',
+  callback = function(ev)
+    vim.b[ev.buf].last_mode = 't'
+    vim.schedule_wrap(function()
+      if ev.buf == vim.fn.bufnr() then
+        vim.cmd.startinsert()
+      end
+    end)
+  end,
+})
+

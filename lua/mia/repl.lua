@@ -70,6 +70,25 @@ function repl.send_line()
   api.nvim_feedkeys('j', 'n', false)
 end
 
+function repl.start(filetype)
+  filetype = filetype or vim.bo.filetype
+  local cmd
+  if filetype == "python" then
+    -- lua/mia/conda.lua
+    cmd = vim.g.python3_host_prog:gsub('python$', 'i%1')
+  end
+  vim.cmd.vsplit()
+  vim.cmd.term(cmd)
+  vim.cmd.wincmd 'p'
+end
+
+vim.api.nvim_create_user_command('Repl', function(cmd)
+  if cmd.args == "" then
+    cmd.args = nil
+  end
+  repl.start(cmd.args)
+end, { nargs = '?', complete = 'filetype' })
+
 _G._repl = repl
 
 return repl
