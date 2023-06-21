@@ -1,17 +1,16 @@
-vim.g['sneak#label'] = 1
-vim.g['sneak#absolute_dir'] = 1
-vim.g['sneak#use_ic_scs'] = 1
-
-local keys = {}
-for c in ('fFtTsS'):gmatch '.' do
-  for m in ('nxo'):gmatch '.' do
-    keys[#keys + 1] = { c, '<Plug>Sneak_' .. c, mode = m }
-  end
-end
-
 return {
-  'justinmk/vim-sneak',
-  keys = keys,
-  config = function()
-  end
+  'folke/flash.nvim',
+  event = 'VeryLazy',
+  opts = {
+    search = { multi_window = false },
+    highlight = { label = { current = true } },
+  },
+  config = function(opts)
+    local flash = require 'flash'
+    flash.setup(opts)
+    local map = require 'mapfun' 'm'
+    map('s', flash.jump)
+    map('S', flash.treesitter)
+    map('ys', function() flash.jump { search = { mode = 'fuzzy' } } end)
+  end ,
 }

@@ -30,6 +30,8 @@ return {
 
         ['@method'] = { link = '@function.builtin' },
 
+        CommentSansItalic = { fg = colors.overlay0 },
+
         Folded = { fg = colors.blue, bg = stl.crust },
         ColorColumn = { bg = stl.surface0 },
 
@@ -53,7 +55,7 @@ return {
         stlVisualMode = { bg = colors.yellow, fg = colors.base, bold = true },
         stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
 
-        Sneak = { fg = colors.base, bg = colors.mauve },
+        FlashBackdrop = { link = 'CommentSansItalic' },
 
       }
     end,
