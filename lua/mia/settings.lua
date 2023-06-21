@@ -7,7 +7,7 @@ vim.iter {
   modeline = false,
   winaltkeys = 'no',
   viewoptions = { 'folds', 'cursor', 'slash', 'unix' },
-  timeoutlen = 300,
+  timeoutlen = 750,
   ttimeoutlen = 250,  -- for key codes
 
   fileformats = { 'unix', 'dos', 'mac' },
