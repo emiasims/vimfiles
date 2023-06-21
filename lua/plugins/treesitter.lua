@@ -9,7 +9,7 @@ return {
       require 'nvim-treesitter.parsers'.get_parser_configs().org = {
         install_info = {
           url = '~/Projects/tree-sitter-org',
-          files = { 'src/parser.c', 'src/scanner.cc' },
+          files = { 'src/parser.c', 'src/scanner.c' },
         },
         filetype = 'org',
       }
