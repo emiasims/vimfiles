@@ -73,9 +73,8 @@ end
 function repl.start(filetype)
   filetype = filetype or vim.bo.filetype
   local cmd
-  if filetype == "python" then
-    -- lua/mia/conda.lua
-    cmd = vim.g.python3_host_prog:gsub('python$', 'i%1')
+  if filetype == 'python' then
+    cmd = _G._conda.env .. '/bin/ipython'  -- lua/mia/conda.lua
   end
   vim.cmd.vsplit()
   vim.cmd.term(cmd)
