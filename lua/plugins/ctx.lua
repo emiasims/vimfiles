@@ -35,8 +35,8 @@ return {
       {
         he = 'help',
         eft = 'EditFtplugin',
-        eq = 'TSEditQuery highlights',
-        eqa = 'TSEditQueryUserAfter highlights',
+        eq = 'vsp|TSEditQuery highlights',
+        eqa = 'vsp|TSEditQueryUserAfter highlights',
         ['e!'] = 'mkview | edit!',
         use = 'UltiSnipsEdit',
         ase = 'AutoSourceEnable',
@@ -68,7 +68,7 @@ return {
 
         -- For fugitive.vim, from cmdline config abbreviations
         git = 'Git',
-        gst = 'Git status',
+        gst = 'Telescope git_status',
         gpl = 'Git pull',
         gpu = 'Git push',
         gad = 'Git add',
