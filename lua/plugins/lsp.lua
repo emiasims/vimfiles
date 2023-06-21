@@ -36,9 +36,10 @@ return {
             checkThirdParty = false,
           },
           telemetry = { enable = false },
+          hint = { enable = true },
           format = {
             enable = true,
-            defaultConfig = {
+            defaultConfig = {  -- must be strings
               indent_size = '2',
               quote_style = 'single',
               call_arg_parentheses = 'remove',
@@ -73,9 +74,13 @@ return {
       group = 'mia-lsp',
       callback = function(ev)
         local client = vim.lsp.get_client_by_id(ev.data.client_id)
-        -- client.server_capabilities.semanticTokensProvider = nil
-        if client.server_capabilities.documentFormattingProvider then
+        local capabilities = client.server_capabilities
+        if capabilities.documentFormattingProvider then
           vim.bo[ev.buf].formatexpr = 'v:lua.vim.lsp.formatexpr()'
+        end
+        if capabilities.inlayHintProvider then
+          P(("enabled on %s"):format(ev.buf))
+          vim.lsp.buf.inlay_hint(ev.buf, true)
         end
       end,
     })
