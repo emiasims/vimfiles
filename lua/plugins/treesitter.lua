@@ -32,16 +32,6 @@ return {
         enable = false,
         disable = { 'org' },
       },
-
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = '<Tab>',
-          node_incremental = '<Tab>',
-          node_decremental = '<S-Tab>',
-          scope_incremental = 'g<Tab>',
-        },
-      },
     }
 
     require 'nvim-treesitter.configs'.setup {

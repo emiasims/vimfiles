@@ -32,7 +32,7 @@ return {
           diagnostics = { globals = lua_globals },
           workspace = {
             -- Make the server aware of Neovim runtime files:
-            -- library = vim.api.nvim_get_runtime_file("", true),
+            library = vim.api.nvim_get_runtime_file("", true),
             checkThirdParty = false,
           },
           telemetry = { enable = false },
@@ -79,7 +79,6 @@ return {
           vim.bo[ev.buf].formatexpr = 'v:lua.vim.lsp.formatexpr()'
         end
         if capabilities.inlayHintProvider then
-          P(("enabled on %s"):format(ev.buf))
           vim.lsp.buf.inlay_hint(ev.buf, true)
         end
       end,
