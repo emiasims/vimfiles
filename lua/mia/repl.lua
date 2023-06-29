@@ -34,26 +34,29 @@ function repl.send_text(text, target)
   api.nvim_chan_send(target.id, text)
 end
 
+function repl.send_range(open, close, linewise)
+  open = api.nvim_buf_get_mark(0, open)
+  close = api.nvim_buf_get_mark(0, close)
+  api.nvim_buf_set_mark(0, 'x', open[1], open[2], {})
+  if linewise then
+    repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
+  else
+    repl.send_text(api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
+  end
+end
+
 function repl.send_visual()
   api.nvim_feedkeys('', 'nx', false)  -- this is annoying as shit.
-  local open = api.nvim_buf_get_mark(0, '<')
-  local close = api.nvim_buf_get_mark(0, '>')
-  if vim.fn.visualmode():match 'V' then
-    repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
-  elseif vim.fn.visualmode():match 'v' then
-    repl.send_text(api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
+  if vim.fn.visualmode():match '[vV]' then
+    repl.send_range('<', '>', vim.fn.visualmode():match 'V')
   else
     api.nvim_echo({ { 'Trying to send visual text when not in visual mode', 'Error' } }, true, {})
   end
 end
 
 function repl.opfunc(type)
-  local open = api.nvim_buf_get_mark(0, '[')
-  local close = api.nvim_buf_get_mark(0, ']')
-  if type == 'line' then
-    repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
-  elseif type == 'char' then
-    repl.send_text(api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
+  if type == 'line' or type == 'char' then
+    repl.send_range('[', ']', type == 'line')
   else
     api.nvim_echo({ { "Can't send blocks to repl", 'Error' } }, true, {})
   end
@@ -66,7 +69,10 @@ function repl.send_motion()
 end
 
 function repl.send_line()
-  repl.send_text(vim.api.nvim_get_current_line())
+  local line = api.nvim_get_current_line()
+  local ws = #line:match '^%s*'
+  api.nvim_buf_set_mark(0, 'x', vim.fn.line '.', ws, {})
+  repl.send_text(line:sub(ws + 1))
   api.nvim_feedkeys('j', 'n', false)
 end
 
@@ -79,9 +85,32 @@ function repl.start(filetype)
   vim.cmd.vsplit()
   vim.cmd.term(cmd)
   vim.cmd.wincmd 'p'
+
+  local last = vim.fn.line '$'
+  local start = last
+  local comment_pat = '%s*' .. vim.o.commentstring:gsub('%%s', '.*')
+
+  while start > 0 and vim.fn.getline(start):match(comment_pat) do
+    start = start - 1
+  end
+
+  for lnum = start + 1, last do
+    local pat = vim.o.commentstring:gsub('%%s', 'repl: (.+)')
+    local replmodeline = vim.fn.getline(lnum):match(pat)
+    if replmodeline then
+      vim.cmd(replmodeline)
+    end
+
+    -- send lines from the modeline
+    pat = vim.o.commentstring:gsub('%%s', '\\vsend%%(\\[(.+)\\])?: (.+)')
+    local matches = vim.fn.matchlist(vim.fn.getline '$', pat)
+    if #matches > 0 then
+      repl.send_text(vim.split(matches[3], matches[2] ~= '' and matches[2] or '|'))
+    end
+  end
 end
 
-vim.api.nvim_create_user_command('Repl', function(cmd)
+api.nvim_create_user_command('Repl', function(cmd)
   if cmd.args == '' then
     cmd.args = nil
   end
