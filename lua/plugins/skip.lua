@@ -2,15 +2,14 @@ return {
   'folke/flash.nvim',
   event = 'VeryLazy',
   opts = {
-    search = { multi_window = false },
-    highlight = { label = { current = true } },
+    search = { multi_window = false, mode = 'fuzzy' },
+    modes = { char = { highlight = { backdrop = false } } },
   },
-  config = function(opts)
+  config = function(cfg)
     local flash = require 'flash'
-    flash.setup(opts)
+    flash.setup(cfg.opts)
     local map = require 'mapfun' 'm'
     map('s', flash.jump)
     map('S', flash.treesitter)
-    map('ys', function() flash.jump { search = { mode = 'fuzzy' } } end)
-  end ,
+  end,
 }
