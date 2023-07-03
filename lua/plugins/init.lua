@@ -16,7 +16,7 @@ return {
   {
     'tpope/vim-commentary',
     config = function()
-      local nmap, omap, xmap = require 'mapfun'('nox', { remap = true })
+      local nmap, omap, xmap = require 'mapfun' ('nox', { remap = true })
       xmap('gc', '<Plug>Commentary')
       nmap('gc', '<Plug>Commentary')
       omap('gc', '<Plug>Commentary')

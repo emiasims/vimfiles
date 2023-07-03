@@ -24,6 +24,7 @@ return {
         xmap('gsr', function() gs.reset_hunk { vim.fn.line '.', vim.fn.line 'v' } end,
           { desc = 'Reset visually selected hunk' })
         nmap('gsS', gs.stage_buffer, { desc = 'Stage buffer' })
+        nmap('gSS', 'gsS', { remap = true })
         nmap('gsu', gs.undo_stage_hunk, { desc = 'Undo last stage' })
         nmap('gsR', gs.reset_buffer, { desc = 'Reset buffer' })
         nmap('gsp', gs.preview_hunk, { desc = 'Preview hunk' })

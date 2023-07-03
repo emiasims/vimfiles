@@ -25,7 +25,10 @@ local M = {
   n = function(...) set_with_repeat('n', ...) end,
   t = function(...) set_with_repeat('t', ...) end,
   o = function(...) set_with_repeat('o', ...) end,
-  i = function(...) set_with_repeat({ 'i', 's' }, ...) end,
+  i = function(...) set_with_repeat('i', ...) end,
+  s = function(...) set_with_repeat('s', ...) end,
+  O = function(...) set_with_repeat({ 'o', 'x' }, ...) end,
+  I = function(...) set_with_repeat({ 'i', 's' }, ...) end,
   m = function(...) set_with_repeat({ 'n', 'x', 'o' }, ...) end,
   dotrepeat = dotrepeat,
 }
