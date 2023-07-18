@@ -123,5 +123,45 @@ make_command('CloseHiddenBuffers', function()
   echo { msg }
 end)
 
+make_command('Redir', function(cmd)
+  local redir, lines = cmd.args, {}
+
+  if redir:sub(1, 1) == '!' then
+    redir = redir:sub(2):gsub(' %%', ' ' .. vim.fn.expand '%:p')
+    if cmd.range > 0 then
+      -- filter range through command, like :!
+      redir = redir .. ' <<< $' .. vim.fn.shellescape(
+        table.concat(vim.fn.getline(cmd.line1, cmd.line2), '\n')
+      ):gsub("'\\\\''", "\\\\'")
+    end
+    lines = vim.fn.systemlist(redir)
+  elseif redir:sub(1, 1) == '=' then
+    local values = { assert(loadstring('return ' .. redir:sub(2)))() }
+    vim.iter(values):map(vim.inspect):each(function(v)
+      vim.list_extend(lines, vim.split(v, '\n'))
+    end)
+  else
+    lines = vim.split(vim.fn.execute(redir), '\n')
+  end
+
+  -- open window
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.w[win].scratch then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+  vim.cmd.vnew()
+  vim.w.scratch = 1
+  vim.iter {
+    buftype = 'nofile',
+    bufhidden = 'wipe',
+    buflisted = false,
+    swapfile = false,
+  }:each(function(k, v) vim.bo[k] = v end)
+
+  -- set lines
+  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+end, { complete = 'command', nargs = '*', bar = true, range = true})
+
 make_command('Clearqflist', function() vim.fn.setqflist {} end)
 make_command('Clearloclist', function() vim.fn.setloclist(0, {}) end)
