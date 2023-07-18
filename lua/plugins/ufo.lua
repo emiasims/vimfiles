@@ -16,21 +16,23 @@ return {
     nmap('zj', ufo.goNextClosedFold)
     nmap('zk', ufo.goPreviousStartFold)
 
-    local function ts_custom(bufnr)
-      -- see https://github.com/kevinhwang91/nvim-ufo/issues/125
-      return vim.list_extend(
-        ufo.getFolds(bufnr, 'treesitter'),
-        require 'mia.fold.expr'[vim.bo[bufnr].filetype](bufnr))
-    end
-
     ufo.setup {
       ---@diagnostic disable-next-line unused-local
       provider_selector = function(bufnr, filetype, buftype)
-        if buftype == '' and vim.treesitter.language.get_lang(filetype) then
-          return ts_custom
+        -- see https://github.com/kevinhwang91/nvim-ufo/issues/125
+        local lang = vim.treesitter.language.get_lang(filetype)
+        local foldexpr = require 'mia.fold.expr'[filetype]
+
+        if buftype == '' and lang and foldexpr then
+          return function()
+            return vim.list_extend(ufo.getFolds(bufnr, 'treesitter'), foldexpr(bufnr))
+          end
+        elseif lang then
+          return { 'lsp', 'treesitter' }
         end
-        return { 'lsp', 'treesitter' }
+        return 'lsp'
       end,
+
       enable_get_fold_virt_text = true,
       fold_virt_text_handler = function(...) return require 'mia.fold.text'.default(...) end,
     }
