@@ -45,7 +45,12 @@ make_command('Delete', function(cmd)
 end, { bang = true })
 
 
-make_command('Delview', function()
+make_command('Delview', function(cmd)
+  if vim.o.modified and not cmd.bang then
+    return echo { 'Save before deleting view', 'Error' }
+  elseif vim.o.modified and cmd.bang then
+    vim.cmd.write()
+  end
   local path = vim.fn.expand '%:p':gsub('=', '==')
   path = path:gsub('^' .. vim.env.HOME, '~')
   path = path:gsub('/', '=+')
@@ -56,6 +61,19 @@ make_command('Delview', function()
   else
     echo { 'No view found: ' .. file, 'Error' }
   end
+
+  local ufo = require 'ufo'
+  ufo.openAllFolds()
+  ufo.disable()
+  ufo.enable()
+  vim.cmd.filetype 'detect'
+  vim.cmd.write()
+  vim.o.foldlevel = 99
+  vim.api.nvim_feedkeys('zx', 'nt', true)
+  vim.schedule(function()
+    ufo.closeAllFolds()
+    vim.api.nvim_feedkeys('zvzz', 'mt', true)
+  end)
 end)
 
 make_command('EditFtplugin', function(cmd)
