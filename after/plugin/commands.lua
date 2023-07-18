@@ -47,7 +47,7 @@ end, { bang = true })
 
 make_command('Delview', function()
   local path = vim.fn.expand '%:p':gsub('=', '==')
-  path = path:gsub('^' .. os.getenv 'HOME', '~')
+  path = path:gsub('^' .. vim.env.HOME, '~')
   path = path:gsub('/', '=+')
   local file = vim.o.viewdir .. path .. '='
   local success = vim.fn.delete(file) == 0

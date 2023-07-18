@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd('BufNewFile', {
   callback = function()
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     local dirname = vim.fn.expand '%:p:h'
-    local orgname = vim.fn.resolve(os.getenv 'HOME' .. '/org')
+    local orgname = vim.fn.resolve(vim.env.HOME .. '/org')
     if dirname == orgname and #lines == 1 and lines[1] == '' then
       local title = vim.fn.expand '%:p:t':lower()
       title = title:sub(1, #title - 4):gsub('_', ' ')  -- minus '.org', "_" to " "

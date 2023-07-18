@@ -68,7 +68,7 @@ if vim.fn.executable 'ag' then
   vim.opt.grepprg = 'ag --nogroup --nocolor'
 end
 
-if os.getenv 'SUDO_USER' then
+if vim.env.SUDO_USER then
   vim.opt.shada = ''
   vim.opt.writebackup = false
 end

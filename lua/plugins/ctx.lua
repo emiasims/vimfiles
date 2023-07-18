@@ -61,7 +61,7 @@ return {
         hi = 'Telescope highlights',
         ev = 'Telescope fd cwd=' .. vim.fn.stdpath 'config',
         evp = 'Telescope fd cwd=' .. vim.fn.stdpath 'config' .. '/mia_plugins',
-        evr = 'Telescope fd cwd=' .. os.getenv 'VIMRUNTIME',
+        evr = 'Telescope fd cwd=' .. vim.env.VIMRUNTIME,
         evs = 'Telescope fd cwd=' .. vim.fn.stdpath 'data' .. '/lazy',
         zo = 'lua require("mia.zotero").pick()',
         zc = 'lua require("mia.zotero").cite()',

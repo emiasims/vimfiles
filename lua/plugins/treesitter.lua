@@ -5,7 +5,7 @@ return {
   build = ':TSUpdate',
   dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
   config = function()
-    if vim.fn.isdirectory(os.getenv 'HOME' .. '/Projects/tree-sitter-org') > 0 then
+    if vim.fn.isdirectory(vim.env.HOME .. '/Projects/tree-sitter-org') > 0 then
       require 'nvim-treesitter.parsers'.get_parser_configs().org = {
         install_info = {
           url = '~/Projects/tree-sitter-org',
