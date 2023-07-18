@@ -83,6 +83,8 @@ make_command('EditFtplugin', function(cmd)
       'after/ftplugin',
       cmd.args == '' and vim.bo.filetype or cmd.args,
       cmd.bang and 'lua' or 'vim'))
+  vim.bo.bufhidden = 'wipe'
+  vim.bo.buflisted = false
 end, { nargs = '?', bang = true, complete = 'filetype' })
 
 -- from runtime, edited to have cursor positioning
