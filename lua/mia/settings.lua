@@ -61,6 +61,7 @@ vim.iter {
   termguicolors = true,
 
   wrap = false,
+  shell = 'bash'
 
 }:each(function(name, value) vim.opt[name] = value end)
 
