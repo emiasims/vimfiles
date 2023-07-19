@@ -1,9 +1,9 @@
-local make_command = function(name, cmd, opts)
+local command = function(name, cmd, opts)
   vim.api.nvim_create_user_command(name, cmd, opts or {})
 end
 local echo = function(...) vim.api.nvim_echo({ ... }, true, {}) end
 
-make_command('CloseFloatingWindows', function()
+command('CloseFloatingWindows', function()
   local closed = {}
   for _, win in ipairs(vim.api.nvim_list_wins()) do
     local config = vim.api.nvim_win_get_config(win)
@@ -15,7 +15,7 @@ make_command('CloseFloatingWindows', function()
   print('Windows closed: ', table.concat(closed, ' '))
 end)
 
-make_command('Move', function(cmd)
+command('Move', function(cmd)
   local filename = cmd.args
   local force = cmd.bang
 
@@ -32,7 +32,7 @@ make_command('Move', function(cmd)
   vim.fn.delete(path)
 end, { nargs = 1, bang = true, complete = 'file' })
 
-make_command('Delete', function(cmd)
+command('Delete', function(cmd)
   if not cmd.bang then
     echo { 'Are you sure? Must :Delete!', 'Error' }
     return
@@ -45,7 +45,7 @@ make_command('Delete', function(cmd)
 end, { bang = true })
 
 
-make_command('Delview', function(cmd)
+command('Delview', function(cmd)
   if vim.o.modified and not cmd.bang then
     return echo { 'Save before deleting view', 'Error' }
   elseif vim.o.modified and cmd.bang then
@@ -76,7 +76,7 @@ make_command('Delview', function(cmd)
   end)
 end)
 
-make_command('EditFtplugin', function(cmd)
+command('EditFtplugin', function(cmd)
   vim.cmd.edit(
     ('%s/%s/%s.%s'):format(
       vim.fn.stdpath 'config',
@@ -88,7 +88,7 @@ make_command('EditFtplugin', function(cmd)
 end, { nargs = '?', bang = true, complete = 'filetype' })
 
 -- from runtime, edited to have cursor positioning
-make_command('InspectTree', function(cmd)
+command('InspectTree', function(cmd)
   local src_win = vim.api.nvim_get_current_win()
   -- directly from $VIMRUNTIME/plugin/nvim.lua
   if cmd.mods ~= '' or cmd.count ~= 0 then
@@ -106,7 +106,7 @@ make_command('InspectTree', function(cmd)
   vim.api.nvim_set_current_win(src_win)
 end, { desc = 'Inspect treesitter language tree for buffer', count = true })
 
-make_command('CloseHiddenBuffers', function()
+command('CloseHiddenBuffers', function()
   -- local closed = {}
   local closed, modified = 0, 0
   vim.iter(vim.fn.getbufinfo { buflisted = true }):each(function(info)
@@ -123,7 +123,7 @@ make_command('CloseHiddenBuffers', function()
   echo { msg }
 end)
 
-make_command('Redir', function(cmd)
+command('Redir', function(cmd)
   local redir, lines = cmd.args, {}
 
   if redir:sub(1, 1) == '!' then
@@ -165,3 +165,5 @@ end, { complete = 'command', nargs = '*', bar = true, range = true})
 
 make_command('Clearqflist', function() vim.fn.setqflist {} end)
 make_command('Clearloclist', function() vim.fn.setloclist(0, {}) end)
+command('Clearqflist', function() vim.fn.setqflist {} end)
+command('Clearloclist', function() vim.fn.setloclist(0, {}) end)
