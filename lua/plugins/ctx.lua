@@ -37,6 +37,7 @@ return {
         eft = 'EditFtplugin',
         eq = 'vsp|TSEditQuery highlights',
         eqa = 'vsp|TSEditQueryUserAfter highlights',
+        es = 'vsp|EditSnippets',
         ['e!'] = 'mkview | edit!',
         use = 'UltiSnipsEdit',
         ase = 'AutoSourceEnable',
@@ -117,6 +118,8 @@ return {
     -- ===========================================================================
     -- Custom autopairs
 
+    local ls = require 'luasnip'
+
     -- Context for when a pair is allowed. Here, there is no next character
     -- (in other words the cursor is at the end of the line) or the next character
     -- is a non word character.
@@ -154,28 +157,34 @@ return {
     end
     -- cdesc = "Inside multiline pair"
 
-    -- Set up undo-preserving <Left> and <Right>
-    local left, right = '<C-g>U<Left>', '<C-g>U<Right>'
+    local make_pair = function(pair)
+      local open, close = unpack(vim.split(pair, ''))
+      return function() ls.lsp_expand(('%s$1%s$0'):format(open, close)) end
+    end
 
     -- Set the keybinds to insert the pairs
     ctx.add_each({ 'i', 's' }, {
-      ['('] = '()' .. left,
-      ['['] = '[]' .. left,
-      ['{'] = '{}' .. left,
+      ['('] = make_pair('()'),
+      ['['] = make_pair('[]'),
+      ['{'] = make_pair('{}'),
     }, pair_allowed, { cdesc = 'Nextchar != word char', clear = true })
 
+    local jump = function() ls.jump(1) end
+    local back =  function() ls.jump(-1) end
+
     -- Completing a pair is just tapping the <Right> key.
+    -- Or, jumping out of the snippet
     ctx.add_each({ 'i', 's' }, {
-      [')'] = right,
-      [']'] = right,
-      ['}'] = right,
-      ['"'] = right,
-      ["'"] = right,
+      [')'] = jump,
+      [']'] = jump,
+      ['}'] = jump,
+      ['"'] = jump,
+      ["'"] = jump,
     }, completing_pair, { clear = true })
 
     ctx.add_each({ 'i', 's' }, {
-      ['"'] = '""' .. left,
-      ["'"] = "''" .. left,
+      ['"'] = make_pair('""'),
+      ["'"] = make_pair("''"),
     }, quote_allowed)  -- appends
 
     -- If we're inside a pair, <BS> to delete both, <Cr> to insert an
@@ -186,7 +195,7 @@ return {
     })
 
     ctx.set({ 'i', 's' }, '<Space>',
-      { '  ' .. left, in_pair },
+      { '  <C-g>U<Left>', in_pair },
       { default = '<C-]> ' })
     -- mapping <space> removes its abbrev trigger, <C-]> forces it
 
@@ -201,12 +210,14 @@ return {
       { rhs = '<Cr><C-c>O', context = in_pair },
     })
 
-    local ls = require 'luasnip'
-
-    -- stylua: ignore
     ctx.add_each({ 'i', 's' }, {
-      ['<Tab>'] = { function() ls.jump(1) end, rdesc = 'Jump to next node' },
-      ['<S-Tab>'] = { function() ls.jump(-1) end, rdesc = 'Jump to previous node' },
+      ['<Tab>'] = { jump, rdesc = 'Jump to next node' },
+      ['<S-Tab>'] = { back, rdesc = 'Jump to previous node' },
+    }, ls.in_snippet, { cdesc = 'in luasnip', clear = true })
+
+    ctx.add_each({ 'i', 's' }, {
+      ['<C-j>'] = "<Plug>luasnip-next-choice",
+      ['<C-k>'] = "<Plug>luasnip-prev-choice",
     }, ls.in_snippet, { cdesc = 'in luasnip', clear = true })
 
     ctx.set('i', '<Esc>', { '<C-e>', pumvisible })

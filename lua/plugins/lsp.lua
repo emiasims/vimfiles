@@ -23,6 +23,7 @@ return {
       'P',                                                        -- mia, print vim.inspect
       'eq', 're', 'pat', 'rep', 'rep1', 'choice',                 -- nvim-org
       'optional', 'describe', 'it', 'before_each', 'after_each',  -- plenary
+      's', 'sn', 't', 'i', 'f', 'c', 'd', 'r',                    -- luasnip
     }
 
     lspconfig.lua_ls.setup {
@@ -78,7 +79,7 @@ return {
         if capabilities.documentFormattingProvider then
           vim.bo[ev.buf].formatexpr = 'v:lua.vim.lsp.formatexpr()'
         end
-        if capabilities.inlayHintProvider then
+        if capabilities.inlayHintProvider and not ev.file:match('snippets/.*%.lua') then
           vim.lsp.buf.inlay_hint(ev.buf, true)
         end
       end,
