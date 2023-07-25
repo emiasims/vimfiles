@@ -18,3 +18,5 @@
 
 (body (paragraph (sym ":").(nl).) . (list (listitem (bullet) @boldconst (#eq? @boldconst "-") (#set! conceal "⤷")) ))
 (listitem contents: (paragraph [(sym)(str)(num)]+ @tag . (sym ":") @special . (sym ":" prev: "sym" !next) @special))
+
+((paragraph . (sym "-")) @comment (#lua-match? @comment "^%-%-%-%-%-+$"))

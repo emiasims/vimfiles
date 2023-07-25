@@ -30,8 +30,6 @@ nmap <buffer> go <Plug>(org-headline-open-below)Headline<Esc>[ viw<C-g>
 nmap <buffer> \gO <Plug>(org-headline-open-above)TODO Headline<Esc>[ viw<C-g>
 nmap <buffer> \go <Plug>(org-headline-open-below)TODO Headline<Esc>[ viw<C-g>
 
-inoreabbrev <buffer> ;c <cmd>lua require("mia.zotero").cite()<Cr>
-
 nnoremap <buffer> gJ vipJgwip
 nnoremap <buffer> gK vipJ:let store_reg = @/ \| .s/[.!?]\zs\s\+\ze\u/\r/geI \| let @/ = store_reg \| unl store_reg<CR>
 " ContextAdd <buffer> indrawer {-> org#property#isindrawer('.')}

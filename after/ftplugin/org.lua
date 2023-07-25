@@ -49,5 +49,10 @@ end
 
 vim.b.allow_zero_length_folds = true
 
-vim.keymap.set('n', 'K', require 'mia.zotero'.zotero_open, { buffer = true })
-vim.keymap.set('n', '\\K', require 'mia.zotero'.zotero_select, { buffer = true })
+local opts = { buffer = true }
+local nmap, imap = require('mapfun')('ni', opts)
+
+nmap('K', require 'mia.zotero'.zotero_open)
+nmap('K', require 'mia.zotero'.zotero_select)
+
+imap(';c', require 'mia.zotero'.cite)
