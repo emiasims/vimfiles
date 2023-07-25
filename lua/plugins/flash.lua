@@ -16,13 +16,6 @@ return {
             [motion:lower()] = 'right',
           }
         end,
-        config = function(opts)
-          opts.autohide = vim.fn.mode(true):find 'no' and vim.v.operator == 'y'
-          if vim.v.count == 0 and vim.fn.mode(true):find 'o' then
-            opts.jump_labels = true
-            opts.highlight.backdrop = true
-          end
-        end,
       },
     },
   },
