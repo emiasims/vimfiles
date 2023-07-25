@@ -81,9 +81,6 @@ return {
         if capabilities.documentFormattingProvider then
           vim.bo[ev.buf].formatexpr = 'v:lua.vim.lsp.formatexpr()'
         end
-        if capabilities.inlayHintProvider and not ev.file:match('snippets/.*%.lua') then
-          vim.lsp.buf.inlay_hint(ev.buf, true)
-        end
       end,
     })
   end,
