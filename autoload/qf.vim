@@ -1,7 +1,7 @@
-function! qf#delitem() abort
-  let cursor = getcurpos()[1:]
+function! qf#delitem() range abort
   let qflist = getqflist()
-  call remove(qflist, line('.') - 1)
+  let cursor = getcurpos()[1:]
+  call remove(qflist, a:firstline - 1, a:lastline - 1)
   call setqflist(qflist)
   call cursor(cursor)
 endfunction
