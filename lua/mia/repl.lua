@@ -1,5 +1,36 @@
-local repl = { endline = '<Cr><C-u>' }
+local repl = {}
 local api = vim.api
+
+local function nvim_err(msg)
+  api.nvim_echo({ { msg, 'Error' } }, true, {})
+end
+
+local cfg = {
+  cmd = {
+    python = _G._conda.env .. '/bin/ipython',  -- lua/mia/conda.lua
+    julia = 'julia'
+  },
+  keys = { global = true, motion = 'gx', line = 'gxl' },
+  mark = 'x',
+  keybinds = { repl_only = false },
+  endline = { python = '<Cr><C-u>' }, -- default and filetypes
+}
+
+function repl.setup(opts)
+  -- cfg
+  -- keybinds: global or only when you open a repl?
+  -- end of line per filetype
+  -- whether or not to mark
+
+  repl._setup_keymaps(false)
+end
+
+function repl._setup_endline(bufnr, filetype)
+  if bufnr == true then
+    bufnr = api.nvim_get_current_buf()
+  end
+  vim.b.repl_endline = cfg.endline[filetype]
+end
 
 function repl.get_target()
   local winnr = vim.tbl_filter(function(x)
@@ -18,14 +49,13 @@ end
 function repl.send_text(text, target)
   target = target or repl.get_target()
   if not target then
-    api.nvim_echo({ { 'No term displayed in current window.', 'Error' } }, true, {})
-    return
+    return nvim_err 'No term displayed in current window.'
   end
 
   if type(text) == 'string' then
     text = { text }
   end
-  local endl = vim.fn.getbufvar(0, 'repl_endline', repl.endline)
+  local endl = vim.fn.getbufvar(0, 'repl_endline', '<CR>')
   text = table.concat(text, endl) .. endl
   if vim.o.filetype == 'python' then
     text = text .. endl
@@ -35,8 +65,14 @@ function repl.send_text(text, target)
 end
 
 function repl.send_range(open, close, linewise)
-  open = api.nvim_buf_get_mark(0, open)
-  close = api.nvim_buf_get_mark(0, close)
+  if type(open) == 'number' and type(close) == 'number' then
+    -- send line number range
+    open, close, linewise = { open }, { close }, true
+  else
+    -- send range over two marks
+    open = api.nvim_buf_get_mark(0, open)
+    close = api.nvim_buf_get_mark(0, close)
+  end
   api.nvim_buf_set_mark(0, 'x', open[1], open[2], {})
   if linewise then
     repl.send_text(api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
@@ -46,11 +82,12 @@ function repl.send_range(open, close, linewise)
 end
 
 function repl.send_visual()
-  api.nvim_feedkeys('', 'nx', false)  -- this is annoying as shit.
   if vim.fn.visualmode():match '[vV]' then
+    -- this is odd. Is there a better way to exit visual mode and update the marks?
+    api.nvim_feedkeys('', 'nx', false)
     repl.send_range('<', '>', vim.fn.visualmode():match 'V')
   else
-    api.nvim_echo({ { 'Trying to send visual text when not in visual mode', 'Error' } }, true, {})
+    nvim_err 'Trying to send visual text when not in visual char or line mode'
   end
 end
 
@@ -58,13 +95,12 @@ function repl.opfunc(type)
   if type == 'line' or type == 'char' then
     repl.send_range('[', ']', type == 'line')
   else
-    api.nvim_echo({ { "Can't send blocks to repl", 'Error' } }, true, {})
+    nvim_err 'Unable send blocks to repl'
   end
 end
 
 function repl.send_motion()
-  -- must use expr = true.
-  vim.o.opfunc = 'v:lua._repl.opfunc'
+  vim.o.opfunc = "v:lua.require'mia.repl'.opfunc"
   return 'g@'
 end
 
@@ -76,47 +112,59 @@ function repl.send_line()
   api.nvim_feedkeys('j', 'n', false)
 end
 
-function repl.start(filetype)
-  filetype = filetype or vim.bo.filetype
-  local cmd
-  if filetype == 'python' then
-    cmd = _G._conda.env .. '/bin/ipython'  -- lua/mia/conda.lua
-  end
-  vim.cmd.vsplit()
-  vim.cmd.term(cmd)
-  vim.cmd.wincmd 'p'
-
+function repl.send_modeline()
+  -- TODO target
   local last = vim.fn.line '$'
-  local start = last
-  local comment_pat = '%s*' .. vim.o.commentstring:gsub('%%s', '.*')
+  local lnum = last
+  local pattern = {
+    comment = '%s*' .. vim.o.commentstring:gsub('%%s', '.*'),
+    repl = vim.o.commentstring:gsub('%%s', '%%s*repl cmd: (.+)'),
+    send = vim.o.commentstring:gsub('%%s', '\\v\\s*repl send%%(\\[(.+)\\])?: (.+)'),
+  }
 
-  while start > 0 and vim.fn.getline(start):match(comment_pat) do
-    start = start - 1
+  local cmd = {}
+  local send = {}
+  while lnum > 0 and vim.fn.getline(lnum):match(pattern.comment) do
+    local vimcmd = vim.fn.getline(lnum):match(pattern.repl)
+    if vimcmd then
+      cmd[#cmd+1] = vimcmd
+    else
+      local matches = vim.fn.matchlist(vim.fn.getline(lnum), pattern.send)
+      if #matches > 0 then
+        send[#send+1] = vim.split(matches[3], matches[2] ~= '' and matches[2] or '|')
+      end
+    end
+    lnum = lnum - 1
   end
 
-  for lnum = start + 1, last do
-    local pat = vim.o.commentstring:gsub('%%s', 'repl: (.+)')
-    local replmodeline = vim.fn.getline(lnum):match(pat)
-    if replmodeline then
-      vim.cmd(replmodeline)
-    end
+  vim.iter(cmd):rev():map(vim.cmd)
+  vim.iter(send):rev():map(repl.send_text)
+end
 
-    -- send lines from the modeline
-    pat = vim.o.commentstring:gsub('%%s', '\\vsend%%(\\[(.+)\\])?: (.+)')
-    local matches = vim.fn.matchlist(vim.fn.getline '$', pat)
-    if #matches > 0 then
-      repl.send_text(vim.split(matches[3], matches[2] ~= '' and matches[2] or '|'))
+function repl.start(filetype)
+  local bufnr
+  if cfg.cmd[filetype] == 'function' then
+    bufnr = cfg.cmd[filetype]()
+    if not bufnr then
+      nvim_err(('Repl setup function for "%s" must return terminal buffer number'):format(filetype))
+      return
     end
+  else
+    vim.cmd.vsplit()
+    vim.cmd.term(cfg.cmd[filetype])
+    bufnr = api.nvim_get_current_buf()
+    vim.cmd.wincmd 'p'
+    repl.send_modeline()
   end
+  -- repl._setup_keymaps(bufnr)
+  repl._setup_endline(bufnr)
 end
 
 api.nvim_create_user_command('Repl', function(cmd)
-  if cmd.args == '' then
-    cmd.args = nil
-  end
-  repl.start(cmd.args)
+  -- set up keybinds here?
+  repl.start(cmd.args == '' and vim.bo.filetype or cmd.args)
 end, { nargs = '?', complete = 'filetype', bar = true })
 
-_G._repl = repl
+api.nvim_create_user_command('ReplModeLine', repl.send_modeline, { bar = true })
 
 return repl
