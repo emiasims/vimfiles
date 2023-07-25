@@ -36,6 +36,7 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
   pattern = 'term://*',
   callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
 })
+
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'term-mode',
   pattern = '*',
@@ -48,4 +49,3 @@ vim.api.nvim_create_autocmd('TermOpen', {
     end)
   end,
 })
-

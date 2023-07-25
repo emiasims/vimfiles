@@ -79,9 +79,9 @@ cnoremap <C-x> <C-a>
 
 inoreabbrev -> ➜
 
-nnoremap c* :<C-u>let @/ = '\<'.expand('<cword>').'\>'<Cr>cgn
-nnoremap c. /\V<C-r>=escape(@", '\')<Cr><Cr>cgn<C-a><Esc>
-nnoremap d. /\V<C-r>=escape(@", '\')<Cr><Cr>dgn
+nnoremap c* :<C-u>let @/='\<'.expand('<cword>').'\>'<Cr>m`cgn
+nnoremap c. :<C-u>let @/='\V'.escape(@", '\')<Cr>m`cgn<C-a><Esc>
+nnoremap d. :<C-u>let @/='\V'.escape(@", '\')<Cr><Cr>m`dgn
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
@@ -100,12 +100,6 @@ nnoremap cp yap}p
 nnoremap g<Cr> i<Cr><Esc>l
 
 nnoremap <expr> <silent> g<Space> :<C-u>autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
-
-" nnoremap <silent> <C-]> g<C-]>
-" " TODO: Generalized split function that simply splits vertical or horizontal depending on how those
-" " are already split. Vert first, then horizontal.
-" nnoremap <silent> g] :vert stjump<CR>
-" nnoremap <silent> g<C-]> :stjump<CR>
 
 nnoremap \p "0p
 nnoremap \P "0P

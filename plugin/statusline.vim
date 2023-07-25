@@ -133,7 +133,7 @@ function! statusline#errors(active) abort " {{{1
       let statuslinetext .= ' •⏎ '
     endif
 
-    if &modifiable && search('^\v%(\t+\s+|\s+\t+)', 'nw')
+    if &modifiable && search('^\v%(\t+ +| +\t+)', 'nw')
       let statuslinetext .= ' MIXED INDENT '
     endif
   endif

@@ -1,6 +1,5 @@
 ---@diagnostic disable-next-line: unused-local
 local cmap, xmap, nmap, tmap, omap, imap, map = require 'mapfun' 'cxntoim'
-local dotrepeat = require 'mapfun'.dotrepeat
 
 local remap = { remap = true }
 local silent = { silent = true }
@@ -54,9 +53,9 @@ imap('<C-h>', function() vim.lsp.buf.signature_help { focusable = false } end)
 
 
 -- lua/mia/repl.lua
+nmap('gxl', require 'mia.repl'.send_line, { dotrepeat = true })
 nmap('gx', require 'mia.repl'.send_motion, { expr = true, dotrepeat = true })
 xmap('gx', require 'mia.repl'.send_visual)
-nmap('gxl', dotrepeat(require 'mia.repl'.send_line, 'gxl'))
 
 -- Delete surrounding function, retains arg the cursor is on.
 nmap('dsf', function()
@@ -94,7 +93,7 @@ nmap('dsf', function()
   else
     vim.api.nvim_echo({ { 'param or call not found', 'WarningMsg' } }, true, {})
   end
-end)
+end, { dotrepeat = true })
 
 -- <Tab> is mapped in nvim-treesitter config, so to maintain original behavior
 -- for <C-i> (using terminals that support it), this is required
