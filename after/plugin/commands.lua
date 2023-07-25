@@ -1,14 +1,14 @@
 local command = function(name, cmd, opts)
-  vim.api.nvim_create_user_command(name, cmd, opts or {})
+  nvim.create_user_command(name, cmd, opts or {})
 end
-local echo = function(...) vim.api.nvim_echo({ ... }, true, {}) end
+local echo = function(...) nvim.echo({ ... }, true, {}) end
 
 command('CloseFloatingWindows', function()
   local closed = {}
-  for _, win in ipairs(vim.api.nvim_list_wins()) do
-    local config = vim.api.nvim_win_get_config(win)
+  for _, win in ipairs(nvim.list_wins()) do
+    local config = nvim.win_get_config(win)
     if config.relative ~= '' then
-      vim.api.nvim_win_close(win, false)
+      nvim.win_close(win, false)
       closed[#closed + 1] = win
     end
   end
@@ -69,10 +69,10 @@ command('Delview', function(cmd)
   vim.cmd.filetype 'detect'
   vim.cmd.write()
   vim.o.foldlevel = 99
-  vim.api.nvim_feedkeys('zx', 'nt', true)
+  nvim.feedkeys('zx', 'nt', true)
   vim.schedule(function()
     ufo.closeAllFolds()
-    vim.api.nvim_feedkeys('zvzz', 'mt', true)
+    nvim.feedkeys('zvzz', 'mt', true)
   end)
 end)
 
@@ -89,7 +89,7 @@ end, { nargs = '?', bang = true, complete = 'filetype' })
 
 -- from runtime, edited to have cursor positioning
 command('InspectTree', function(cmd)
-  local src_win = vim.api.nvim_get_current_win()
+  local src_win = nvim.get_current_win()
   -- directly from $VIMRUNTIME/plugin/nvim.lua
   if cmd.mods ~= '' or cmd.count ~= 0 then
     local count = cmd.count ~= 0 and cmd.count or ''
@@ -103,7 +103,7 @@ command('InspectTree', function(cmd)
   end
   -- end
   vim.keymap.set('n', 'q', '<cmd>q<cr>', { buffer = true })
-  vim.api.nvim_set_current_win(src_win)
+  nvim.set_current_win(src_win)
 end, { desc = 'Inspect treesitter language tree for buffer', count = true })
 
 command('CloseHiddenBuffers', function()
@@ -145,9 +145,9 @@ command('Redir', function(cmd)
   end
 
   -- open window
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+  for _, win in ipairs(nvim.tabpage_list_wins(0)) do
     if vim.w[win].scratch then
-      vim.api.nvim_win_close(win, true)
+      nvim.win_close(win, true)
     end
   end
   vim.cmd.vnew()
@@ -160,10 +160,8 @@ command('Redir', function(cmd)
   }:each(function(k, v) vim.bo[k] = v end)
 
   -- set lines
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+  nvim.buf_set_lines(0, 0, -1, false, lines)
 end, { complete = 'command', nargs = '*', bar = true, range = true})
 
-make_command('Clearqflist', function() vim.fn.setqflist {} end)
-make_command('Clearloclist', function() vim.fn.setloclist(0, {}) end)
 command('Clearqflist', function() vim.fn.setqflist {} end)
 command('Clearloclist', function() vim.fn.setloclist(0, {}) end)
