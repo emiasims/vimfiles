@@ -15,6 +15,7 @@ vim.iter {
   shada = { "'300", '<10', '@50', 's100', 'h' },
   textwidth = 99,
   softtabstop = 2,
+  tabstop = 2,
   shiftwidth = 2,
   matchtime = 3,
   breakat = '   ;:,!?',
