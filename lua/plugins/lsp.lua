@@ -18,9 +18,7 @@ return {
     local lspconfig = require 'lspconfig'
 
     local lua_globals = {
-      'vim',
-      'newproxy',                                                 -- builtin
-      'P',                                                        -- mia, print vim.inspect
+      'vim', 'nvim', 'newproxy', 'P',
       'eq', 're', 'pat', 'rep', 'rep1', 'choice',                 -- nvim-org
       'optional', 'describe', 'it', 'before_each', 'after_each',  -- plenary
       's', 'sn', 't', 'i', 'f', 'c', 'd', 'r',                    -- luasnip
@@ -33,7 +31,10 @@ return {
           diagnostics = { globals = lua_globals },
           workspace = {
             -- Make the server aware of Neovim runtime files:
-            library = vim.api.nvim_get_runtime_file("", true),
+            library = {
+              vim.fn.getenv 'VIMRUNTIME' .. '/lua',
+              vim.fn.stdpath 'config' .. '/lua',
+            },
             checkThirdParty = false,
           },
           telemetry = { enable = false },
@@ -67,6 +68,7 @@ return {
 
     lspconfig.tsserver.setup {}
     lspconfig.clangd.setup {}
+    lspconfig.jsonls.setup {}
 
     vim.diagnostic.config { virtual_text = false, signs = true, underline = true }
 
