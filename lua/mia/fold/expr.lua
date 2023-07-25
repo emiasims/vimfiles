@@ -2,6 +2,18 @@ local ts = vim.treesitter
 
 local expr = {}
 
+local query = setmetatable({
+  strings = {
+    lua = '(chunk (comment) @fold (#lua-match? @fold "^---"))',
+    vimdoc = '(block (line (h1))) @fold (block (line (h2))) @fold (block (line (tag))) @fold',
+  },
+}, {
+  __index = function(tbl, key)
+    tbl[key] = ts.query.parse(key, tbl.strings[key])
+    return tbl[key]
+  end,
+})
+
 local function group_consecutive(lines)
   local start, last, groups = lines[1], lines[1], {}
   vim.iter(lines):skip(1):each(function(lnum)
@@ -19,14 +31,15 @@ local function group_consecutive(lines)
   return groups
 end
 
-local fold_string = [[(chunk (comment) @fold (#lua-match? @fold "^---"))]]
-local fold_query
 function expr.lua(bufnr)
-  fold_query = fold_query or ts.query.parse('lua', fold_string)
   local root = ts.get_parser(bufnr, 'lua'):parse()[1]:root()
   local lines = {}
-  for _, node, _ in fold_query:iter_captures(root, bufnr, 0, -1) do
-    lines[#lines + 1] = node:start()  -- single line captures only
+  local line, col
+  for _, node, _ in query.lua:iter_captures(root, bufnr, 0, -1) do
+    line, col = node:start()
+    if col == 0 or nvim.buf_get_lines(bufnr, line, line + 1, false)[1]:sub(col):match '^%s*$' then
+      lines[#lines + 1] = line
+    end
   end
   return group_consecutive(lines)
 end
