@@ -72,8 +72,8 @@ return {
 
     vim.diagnostic.config { virtual_text = false, signs = true, underline = true }
 
-    vim.api.nvim_create_augroup('mia-lsp', { clear = true })
-    vim.api.nvim_create_autocmd('LspAttach', {
+    nvim.create_augroup('mia-lsp', { clear = true })
+    nvim.create_autocmd('LspAttach', {
       group = 'mia-lsp',
       callback = function(ev)
         local client = vim.lsp.get_client_by_id(ev.data.client_id)

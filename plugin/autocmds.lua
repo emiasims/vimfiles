@@ -1,8 +1,8 @@
-local gid = vim.api.nvim_create_augroup('mia-general', { clear = true })
+local gid = nvim.create_augroup('mia-general', { clear = true })
 
 local autocmd = function(event, opts)
   opts.group = opts.group or gid
-  vim.api.nvim_create_autocmd(event, opts)
+  nvim.create_autocmd(event, opts)
 end
 
 autocmd('TextYankPost', {
@@ -30,14 +30,14 @@ autocmd('OptionSet', {
   end,
 })
 
-vim.api.nvim_create_augroup('term-mode', { clear = true })
-vim.api.nvim_create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
+nvim.create_augroup('term-mode', { clear = true })
+nvim.create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
   group = 'term-mode',
   pattern = 'term://*',
   callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
 })
 
-vim.api.nvim_create_autocmd('TermOpen', {
+nvim.create_autocmd('TermOpen', {
   group = 'term-mode',
   pattern = '*',
   callback = function(ev)

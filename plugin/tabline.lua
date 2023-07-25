@@ -27,15 +27,15 @@ local function get_text(tree, prev, id2name)
 end
 
 function Tabline()
-  local current_tab = vim.api.nvim_get_current_tabpage()
-  local current_win = vim.api.nvim_get_current_win()
+  local current_tab = nvim.get_current_tabpage()
+  local current_win = nvim.get_current_win()
   local win_info = {}
   local id2name = {}
   local counts = { ['init.lua'] = 1 }  -- all init.lua gets modified
 
   -- setup
-  for _, tabnr in ipairs(vim.api.nvim_list_tabpages()) do
-    for _, winid in ipairs(vim.api.nvim_tabpage_list_wins(tabnr)) do
+  for _, tabnr in ipairs(nvim.list_tabpages()) do
+    for _, winid in ipairs(nvim.tabpage_list_wins(tabnr)) do
       local name = vim.split(vim.fn.fnamemodify(vim.fn.bufname(vim.fn.winbufnr(winid)), ':p'), '/')
       local short = name[#name]
       win_info[winid] = { name = short, dir = name[#name - 1] }
@@ -45,7 +45,7 @@ function Tabline()
       end
     end
   end
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+  for _, buf in ipairs(nvim.list_bufs()) do
     local name = vim.fn.fnamemodify(vim.fn.bufname(buf), ':t')
     counts[name] = counts[name] and counts[name] + 1 or 1
   end
@@ -67,7 +67,7 @@ function Tabline()
 
   -- construct tabline from layout
   local text = {}
-  for tabnr, tabid in ipairs(vim.api.nvim_list_tabpages()) do
+  for tabnr, tabid in ipairs(nvim.list_tabpages()) do
     if tabid == current_tab then
       text[#text + 1] = '%#TabLineSelNumber#%' .. tabnr .. 'T ' .. tabnr .. ' %#TabLine#'
     else
@@ -79,7 +79,7 @@ function Tabline()
   end
 
   -- return text
-  if #vim.api.nvim_list_tabpages() > 1 then
+  if #nvim.list_tabpages() > 1 then
     return table.concat(text, '') .. '%#TabLineFill#%T%=%#TabLineFill#%999XX '
   end
   return table.concat(text, '') .. '%#TabLineFill#%T'

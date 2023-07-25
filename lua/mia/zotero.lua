@@ -51,7 +51,7 @@ local function open_or_write(entry)
   text[#text + 1] = ''
   text[#text + 1] = '** Notes'
   text[#text + 1] = ''
-  vim.api.nvim_buf_set_lines(bufn, -1, -1, false, text)
+  nvim.buf_set_lines(bufn, -1, -1, false, text)
   vim.schedule(function()
     vim.cmd [[normal! G3kgqlzRGzx]]
   end)
@@ -161,7 +161,7 @@ function M.cite(opts)
         local citekey = ('[cite:%s]'):format(table.concat(citations, ';'))
 
         vim.schedule(function()
-          vim.api.nvim_put({ citekey }, 'c', true, true)
+          nvim.put({ citekey }, 'c', true, true)
           vim.fn.feedkeys 'a'
         end)
       end)
@@ -199,7 +199,7 @@ function M.zotero_open()
       if action then
         vim.fn.jobstart(('xdg-open "%s"'):format(action.uri))
         if action.msg then
-          vim.api.nvim_echo(action.msg, true, {})
+          nvim.echo(action.msg, true, {})
         end
       end
     end
@@ -216,7 +216,7 @@ function M.zotero_select()
       -- select the item in zotero by default
       -- should be: "zotero://select/library/items/" .. item.itemKey
       vim.fn.jobstart(('xdg-open "%s"'):format(item.select))
-      vim.api.nvim_echo({ { ('Selected "%s" in zotero'):format(citation) } }, true, {})
+      nvim.echo({ { ('Selected "%s" in zotero'):format(citation) } }, true, {})
     end
   end
 end

@@ -37,8 +37,8 @@ return {
       fold_virt_text_handler = function(...) return require 'mia.fold.text'.default(...) end,
     }
 
-    vim.api.nvim_create_augroup('mia-ufo', { clear = true })
-    vim.api.nvim_create_autocmd('FileType', {
+    nvim.create_augroup('mia-ufo', { clear = true })
+    nvim.create_autocmd('FileType', {
       group = 'mia-ufo',
       desc = 'Set virt text handler',
       callback = function(ev)

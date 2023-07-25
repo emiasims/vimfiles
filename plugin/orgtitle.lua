@@ -1,11 +1,11 @@
-local groupid = vim.api.nvim_create_augroup('mia-org', { clear = true })
+local groupid = nvim.create_augroup('mia-org', { clear = true })
 
-vim.api.nvim_create_autocmd('BufNewFile', {
+nvim.create_autocmd('BufNewFile', {
   pattern = '*.org',
   desc = 'Add simple title to org files by default',
   group = groupid,
   callback = function()
-    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local lines = nvim.buf_get_lines(0, 0, -1, false)
     local dirname = vim.fn.expand '%:p:h'
     local orgname = vim.fn.resolve(vim.env.HOME .. '/org')
     if dirname == orgname and #lines == 1 and lines[1] == '' then
@@ -17,7 +17,7 @@ vim.api.nvim_create_autocmd('BufNewFile', {
         end
         return first:upper() .. rest:lower()
       end)
-      vim.api.nvim_buf_set_lines(0, 0, 0, false, { '#+title: ' .. title })
+      nvim.buf_set_lines(0, 0, 0, false, { '#+title: ' .. title })
       vim.fn.cursor(2, 1)
     end
   end,

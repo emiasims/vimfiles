@@ -87,11 +87,11 @@ nmap('dsf', function()
 
   if param and call then
     require 'nvim-treesitter.ts_utils'.update_selection(0, param)
-    vim.api.nvim_feedkeys('y', 'nx', true)
+    nvim.feedkeys('y', 'nx', true)
     require 'nvim-treesitter.ts_utils'.update_selection(0, call)
-    vim.api.nvim_feedkeys('p', 'nx', true)
+    nvim.feedkeys('p', 'nx', true)
   else
-    vim.api.nvim_echo({ { 'param or call not found', 'WarningMsg' } }, true, {})
+    nvim.echo({ { 'param or call not found', 'WarningMsg' } }, true, {})
   end
 end, { dotrepeat = true })
 

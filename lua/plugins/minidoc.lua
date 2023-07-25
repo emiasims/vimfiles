@@ -3,8 +3,8 @@ return {
   lazy = true,
 
   config = function()
-    vim.api.nvim_create_augroup('mia-minidoc', { clear = true })
-    vim.api.nvim_create_autocmd('BufWritePost', {
+    nvim.create_augroup('mia-minidoc', { clear = true })
+    nvim.create_autocmd('BufWritePost', {
       pattern = '*.lua',
       group = 'mia-minidoc',
       desc = 'Write docs on save',

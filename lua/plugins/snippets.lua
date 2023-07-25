@@ -19,12 +19,12 @@ return {
     local function get_files(ft)
       return vim.iter.filter(function(f) return f:match('^' .. path.snip) end,
         vim.list_extend(
-          vim.api.nvim_get_runtime_file(('snippets/*/%s.*'):format(ft), true),
-          vim.api.nvim_get_runtime_file(('snippets/*/%s/*.*'):format(ft), true)
+          nvim.get_runtime_file(('snippets/*/%s.*'):format(ft), true),
+          nvim.get_runtime_file(('snippets/*/%s/*.*'):format(ft), true)
         ))
     end
 
-    vim.api.nvim_create_user_command('EditSnippets', function(cmd)
+    nvim.create_user_command('EditSnippets', function(cmd)
       local filetype = cmd.args == '' and vim.bo.filetype or cmd.args
       local files = get_files(filetype)
 

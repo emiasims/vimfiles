@@ -23,7 +23,7 @@ local node, lnum, line, cmd, args, group, regex
 for _, match, _ in q:iter_matches(root, 0, 0, -1) do
   _, node = next(match)
   lnum = node:start()
-  line = vim.api.nvim_buf_get_lines(0, lnum, lnum + 1, false)[1]
+  line = nvim.buf_get_lines(0, lnum, lnum + 1, false)[1]
   cmd, args = line:gmatch '#%+keymap%[(%a+)%]: (.+)'()
   vim.cmd(('%s <buffer> %s'):format(cmd, args))
 end
@@ -33,7 +33,7 @@ q = vim.treesitter.query.parse('org', [[(directive name: (_) @name (#lua-match? 
 for _, match, _ in q:iter_matches(root, 0, 0, -1) do
   _, node = next(match)
   lnum = node:start()
-  line = vim.api.nvim_buf_get_lines(0, lnum, lnum + 1, false)[1]
+  line = nvim.buf_get_lines(0, lnum, lnum + 1, false)[1]
   group, regex = line:gmatch '#%+hlmatch%[(@?[.%a]+)%]: (.+)'()
   vim.fn.matchadd(group, regex)
   -- vim.cmd(('%s <buffer> %s'):format(cmd, args))

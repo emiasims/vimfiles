@@ -71,7 +71,7 @@ function tslib.statusline()
     return ''
   end
 
-  local indicator_size = vim.api.nvim_win_get_width(0) / 2 - 10
+  local indicator_size = nvim.win_get_width(0) / 2 - 10
   local stl = names[1]
   for i = 2, #names do
     if (stl:len() + 2 * #names) >= indicator_size then
@@ -100,16 +100,16 @@ local function text_between(start_node, end_node, bufnr)
   local start_row, start_col, end_row, end_col = range_between(start_node, end_node)
 
   local lines
-  local eof_row = vim.api.nvim_buf_line_count(bufnr)
+  local eof_row = nvim.buf_line_count(bufnr)
   if start_row >= eof_row then
     return nil
   end
 
   if end_col == 0 then
-    lines = vim.api.nvim_buf_get_lines(bufnr, start_row, end_row, true)
+    lines = nvim.buf_get_lines(bufnr, start_row, end_row, true)
     end_col = -1
   else
-    lines = vim.api.nvim_buf_get_lines(bufnr, start_row, end_row + 1, true)
+    lines = nvim.buf_get_lines(bufnr, start_row, end_row + 1, true)
   end
 
   if #lines > 0 then
@@ -210,7 +210,7 @@ local function eat_newlines(match, _, bufnr, pred, metadata)
   end
 
   local eaten = 0
-  while vim.api.nvim_buf_get_lines(bufnr, end_line + 1, end_line + 2, false)[1] == '' do
+  while nvim.buf_get_lines(bufnr, end_line + 1, end_line + 2, false)[1] == '' do
     eaten = eaten + 1
     if max and eaten > max then
       break
@@ -237,7 +237,7 @@ local function trim_newlines(match, _, bufnr, pred, metadata)
     start_line, start_col, end_line, end_col = unpack(metadata.range)
   end
 
-  while vim.api.nvim_buf_get_lines(bufnr, end_line, end_line + 1, false)[1] == '' do
+  while nvim.buf_get_lines(bufnr, end_line, end_line + 1, false)[1] == '' do
     end_line = end_line - 1
   end
 
@@ -291,11 +291,11 @@ local function predicate(pre)
       if col == 0 then
         return true
       end
-      char = vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, true)[1]
+      char = nvim.buf_get_lines(bufnr, lnum, lnum + 1, true)[1]
       char = string.sub(char, col, col)
     else
       local _, _, lnum, col = node:range()
-      char = vim.api.nvim_buf_get_lines(bufnr, lnum, lnum + 1, true)[1]
+      char = nvim.buf_get_lines(bufnr, lnum, lnum + 1, true)[1]
       if col == #char then
         return true
       end

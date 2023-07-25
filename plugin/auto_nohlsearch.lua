@@ -10,4 +10,4 @@ vim.on_key(
       end
     end
   end,
-  vim.api.nvim_create_namespace 'auto_hlsearch')
+  nvim.create_namespace 'auto_hlsearch')
