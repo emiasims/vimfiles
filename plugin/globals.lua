@@ -28,9 +28,13 @@ _G.T = setmetatable({}, {
   end,
 })
 
-
 function _G.P1(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify_once(vim.inspect(v))
   return v
 end
+
+_G.nvim = vim.iter(vim.api):fold({}, function(t, k, v)
+  t[k:sub(6)] = v  -- removes 'nvim_' ➜ nvim.buf_call
+  return t
+end)
