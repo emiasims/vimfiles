@@ -6,6 +6,7 @@ return {
   config = function()
     local map = function(...) vim.keymap.set({ 'n', 'x', 'o' }, ...) end
     local ctx = require 'ctx'
+    local contexts = require 'ctx.builtin'
     local text = require 'ctx.text'
 
     ctx.set({ 'n', 'x', 'o' }, '0', {
@@ -37,7 +38,7 @@ return {
         eft = 'EditFtplugin',
         eq = 'vsp|TSEditQuery highlights',
         eqa = 'vsp|TSEditQueryUserAfter highlights',
-        es = 'vsp|EditSnippets',
+        es = 'vertical EditSnippets',
         ['e!'] = 'mkview | edit!',
         use = 'UltiSnipsEdit',
         ase = 'AutoSourceEnable',
@@ -86,7 +87,7 @@ return {
         glo = 'Git log --all --oneline --graph -n 20',
       },
       -- Basically, when a command can be completed, I want the above expansions
-      function() return vim.fn.getcmdcompltype() == 'command' end,
+      contexts.cmd_start,
       { clear = true, cdesc = 'At command line start' }
     )
 
@@ -149,17 +150,18 @@ return {
         or res:match_str(text.around_cursor(-2, 1) or ''))
     end
 
-    -- cdesc = 'Inside pair'
     local in_nlpair = function()
       local _, pre, post = text.lines_around(-1, 1)
       pre, post = pre:match(pat.pre), post:match(pat.post)
       return pre and post and re:match_str(pre .. post)
     end
-    -- cdesc = "Inside multiline pair"
 
     local make_pair = function(pair)
       local open, close = unpack(vim.split(pair, ''))
-      return function() ls.lsp_expand(('%s$1%s$0'):format(open, close)) end
+      return {
+        rhs = function() ls.lsp_expand(('%s$1%s$0'):format(open, close)) end,
+        rdesc = 'Insert snippet pair ' .. pair,
+      }
     end
 
     -- Set the keybinds to insert the pairs
@@ -172,14 +174,15 @@ return {
     local jump = function() ls.jump(1) end
     local back =  function() ls.jump(-1) end
 
+    local right = '<C-g>U<Right>'
     -- Completing a pair is just tapping the <Right> key.
     -- Or, jumping out of the snippet
     ctx.add_each({ 'i', 's' }, {
-      [')'] = jump,
-      [']'] = jump,
-      ['}'] = jump,
-      ['"'] = jump,
-      ["'"] = jump,
+      [')'] = right,
+      [']'] = right,
+      ['}'] = right,
+      ['"'] = right,
+      ["'"] = right,
     }, completing_pair, { clear = true })
 
     ctx.add_each({ 'i', 's' }, {
