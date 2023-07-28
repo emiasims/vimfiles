@@ -63,17 +63,15 @@ command('Delview', function(cmd)
   end
 
   local ufo = require 'ufo'
-  ufo.openAllFolds()
-  ufo.disable()
-  ufo.enable()
+  ufo.detach()
   vim.cmd.filetype 'detect'
   vim.cmd.write()
   vim.o.foldlevel = 99
-  nvim.feedkeys('zx', 'nt', true)
-  vim.schedule(function()
-    ufo.closeAllFolds()
-    nvim.feedkeys('zvzz', 'mt', true)
-  end)
+  nvim.feedkeys('zE', 'nt', true)
+  ufo.attach()
+  -- ufo is async, let it do its thing then close folds
+  -- zV is zMzv ➜ zM is ufo.closeAllFolds, needs 'mt'
+  vim.schedule_wrap(nvim.feedkeys)('zVzz', 'mt', true)
 end)
 
 command('EditFtplugin', function(cmd)
