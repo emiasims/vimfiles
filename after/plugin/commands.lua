@@ -77,12 +77,18 @@ command('Delview', function(cmd)
 end)
 
 command('EditFtplugin', function(cmd)
-  vim.cmd.edit(
+  local edit = vim.cmd.edit
+  if cmd.smods.vertical or cmd.smods.horizontal then
+    edit = vim.cmd.split
+  end
+  edit {
     ('%s/%s/%s.%s'):format(
       vim.fn.stdpath 'config',
       'after/ftplugin',
       cmd.args == '' and vim.bo.filetype or cmd.args,
-      cmd.bang and 'lua' or 'vim'))
+      cmd.bang and 'lua' or 'vim'),
+    mods = cmd.smods,
+  }
   vim.bo.bufhidden = 'wipe'
   vim.bo.buflisted = false
 end, { nargs = '?', bang = true, complete = 'filetype' })
