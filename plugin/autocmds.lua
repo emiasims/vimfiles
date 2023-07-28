@@ -30,15 +30,12 @@ autocmd('OptionSet', {
   end,
 })
 
-nvim.create_augroup('term-mode', { clear = true })
-nvim.create_autocmd({ 'WinEnter', 'BufWinEnter' }, {
-  group = 'term-mode',
+autocmd({ 'WinEnter', 'BufWinEnter' }, {
   pattern = 'term://*',
   callback = function() if vim.b.last_mode == 't' then vim.cmd.startinsert() end end,
 })
 
-nvim.create_autocmd('TermOpen', {
-  group = 'term-mode',
+autocmd('TermOpen', {
   pattern = '*',
   callback = function(ev)
     vim.b[ev.buf].last_mode = 't'
