@@ -12,9 +12,11 @@ return {
     local path = { snip = vim.fn.stdpath 'config' .. '/snippets' }
     path.lua = path.snip .. '/luasnip'
     path.mate = path.snip .. '/snipmate'
+    local lua_load = require 'luasnip.loaders.from_lua'
+    local mate_load = require 'luasnip.loaders.from_snipmate'
 
-    require 'luasnip.loaders.from_lua'.lazy_load { paths = path.lua }
-    require 'luasnip.loaders.from_snipmate'.lazy_load { paths = path.mate }
+    lua_load.lazy_load { paths = path.lua }
+    mate_load.lazy_load { paths = path.mate }
 
     local function get_files(ft)
       return vim.iter.filter(function(f) return f:match('^' .. path.snip) end,
@@ -28,20 +30,41 @@ return {
       local filetype = cmd.args == '' and vim.bo.filetype or cmd.args
       local files = get_files(filetype)
 
+      local editcmd = vim.cmd.edit
+      if cmd.smods.horizontal or cmd.smods.vertical then
+        editcmd = vim.cmd.split
+      end
+
       local prompt
       if #files == 0 then
         require 'mia.snippet'.import(filetype)
-        require 'luasnip.loaders.from_snipmate'.load { paths = path.mate }
         files = get_files(filetype)
-        prompt = "Select one of (just imported):"
+        prompt = 'Select one of (just imported):'
+        if #files == 0 then
+        prompt = 'Select one of (to create):'
+          files = {
+            path.mate .. ('/%s.snippets'):format(filetype),
+            path.lua .. ('/%s.lua'):format(filetype),
+          }
+        end
       end
       if #files == 1 then
-        vim.cmd.edit(files[1])
+        editcmd(files[1])
       else
         vim.ui.select(files, {
           prompt = prompt,
-          format_item = vim.fs.basename
-        }, function(name) vim.cmd.edit(name) end)
+          format_item = vim.fs.basename,
+        }, function(name) editcmd { name, mods = cmd.smods } end)
+        nvim.create_autocmd('BufWritePost', {
+          desc = 'Ensure files loaded',
+          callback = function()
+            lua_load.load { paths = path.lua }
+            mate_load.load { paths = path.mate }
+          end,
+          once = true,
+          nested = true,
+          buffer = 0
+        })
       end
     end, { nargs = '?', complete = 'filetype' })
   end,
