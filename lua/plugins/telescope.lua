@@ -1,6 +1,7 @@
 return {
   'nvim-telescope/telescope.nvim',
   event = { 'InsertEnter', 'CmdlineEnter' },
+  cmd = 'Telescope',
   dependencies = { 'debugloop/telescope-undo.nvim' },
 
   config = function()
