@@ -12,7 +12,13 @@ vim.keymap.set('n', '<F6>', '<cmd>UndotreeToggle<Cr>')
 
 return {
   'tpope/vim-repeat',
-  { 'tpope/vim-speeddating', event = 'VeryLazy' },
+  -- 'tpope/vim-speeddating',
+  {
+    'tpope/vim-speeddating',
+    event = 'VeryLazy',
+    -- makes sure these are properly set, if a map for <C-a> or <C-x> is made ahead of loading
+    keys = { { '<Plug>SpeedDatingFallbackUp', '<C-a>' }, { '<Plug>SpeedDatingFallbackDown', '<C-x>' } },
+  },
   {
     'tpope/vim-commentary',
     config = function()

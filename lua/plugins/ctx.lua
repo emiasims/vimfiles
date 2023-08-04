@@ -25,7 +25,7 @@ return {
     }, { default = '0^' })
     map('g0', '0')
 
-    -- count_gi ➜ insert count characters before automatically exiting insert
+    -- <count>gi ➜ insert count characters before automatically exiting insert
     ctx.set('n', 'gi', {
       rhs = function()
         vim.cmd.startinsert()
@@ -71,6 +71,7 @@ return {
         T = "execute 'term fish'|startinsert<C-left><Right><Right><Right><Right>",
         term = 'term fish',
         f = 'Telescope fd',
+        fh = 'Telescope fd cwd=<C-r>=expand("%:h")<Cr>',
         o = 'Telescope fd cwd=~/org',
         u = 'Telescope undo',
         l = 'Telescope buffers',
@@ -189,12 +190,9 @@ return {
       ['{'] = make_pair('{}'),
     }, pair_allowed, { cdesc = 'Nextchar != word char', clear = true })
 
-    local jump = function() ls.jump(1) end
-    local back =  function() ls.jump(-1) end
-
     local right = '<C-g>U<Right>'
     -- Completing a pair is just tapping the <Right> key.
-    -- Or, jumping out of the snippet
+    -- Or, jumping out of the snippet with <Tab>
     ctx.add_each({ 'i', 's' }, {
       [')'] = right,
       [']'] = right,
@@ -232,8 +230,8 @@ return {
     })
 
     ctx.add_each({ 'i', 's' }, {
-      ['<Tab>'] = { jump, rdesc = 'Jump to next node' },
-      ['<S-Tab>'] = { back, rdesc = 'Jump to previous node' },
+      ['<Tab>'] = { rhs = function() return ls.jump(1) end, rdesc = 'Jump to next node' },
+      ['<S-Tab>'] = { rhs = function() return ls.jump(-1) end, rdesc = 'Jump to previous node' },
     }, ls.in_snippet, { cdesc = 'in luasnip', clear = true })
 
     ctx.add_each({ 'i', 's' }, {

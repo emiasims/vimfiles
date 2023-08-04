@@ -70,6 +70,7 @@ return {
     lspconfig.clangd.setup {}
     lspconfig.jsonls.setup {}
     lspconfig.vimls.setup {}
+    lspconfig.julials.setup {}
 
     vim.diagnostic.config { virtual_text = false, signs = true, underline = true }
 
