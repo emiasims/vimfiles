@@ -19,11 +19,13 @@ vim.keymap.set('n', '\\ga', 'yiqva]p`[i.<Esc>e:silent! call repeat#set("\\ga")<C
 vim.keymap.set('n', '\\gA', 'ysiw"ysa"]X:silent!call repeat#set("\\gA")<Cr>', { buffer = true })
 
 local ctx = require 'ctx'
-local cts = require 'ctx.treesitter'
 
-ctx.set('n', '<C-a>', {
-  { 'ciwFalse<Esc>', cts.on_node('true') },
-  { 'ciwTrue<Esc>', cts.on_node('false') },
-}, { default = ctx.global, buffer = true })
+ctx.set('n', '<C-a>',
+  { 'ciwTrue<Esc>', ctx.treesitter.on_node 'false' },
+  { default = '<Plug>SpeedDatingUp', buffer = true })
+
+ctx.set('n', '<C-x>',
+  { 'ciwFalse<Esc>', ctx.treesitter.on_node 'true' },
+  { default = '<Plug>SpeedDatingDown', buffer = true })
 
 nvim.buf_create_user_command(0, 'Outline', 'lvimgrep /\\v^\\s*%(def |class )/ % | lopen', {})
