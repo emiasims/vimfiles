@@ -3,7 +3,7 @@ augroup vimrc_general
   au BufWinLeave * if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif
   au BufWinEnter * if empty(&buftype) && &modifiable && !empty(expand('%')) | silent! loadview | endif
 
-  autocmd WinEnter,FocusGained * checktime
+  autocmd WinEnter,FocusGained * silent! checktime
 
   " Update filetype on save if empty
   autocmd BufWritePost * ++nested if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif
