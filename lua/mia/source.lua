@@ -11,7 +11,7 @@ function source.reload_lua_module(filename)
     return  -- vim.notify(string.format('Reloaded %s', filename))
   end
 
-  if parent == 'mia' then
+  if parent == 'mia' or parent == 'vim' then
     package.loaded[module] = dofile(filename)
     vim.notify(string.format('Reloaded %s', relative))
     return
