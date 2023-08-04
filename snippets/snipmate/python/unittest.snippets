@@ -1,0 +1,38 @@
+snippet asni Assert not in
+	self.assertNotIn(${1:needle}, ${2:haystack}${3:, '${4:message}'})$0
+
+snippet asi Assert is
+	self.assertIs(${1:expected}, ${2:actual}${3:, '${4:message}'})$0
+
+snippet as Assert
+	self.assert_(${1:boolean expression}${2:, '${3:message}'})$0
+
+snippet asint Assert is not
+	self.assertIsNot(${1:expected}, ${2:actual}${3:, '${4:message}'})$0
+
+snippet asne Assert not equal
+	self.assertNotEqual(${1:expected}, ${2:actual}${3:, '${4:message}'})$0
+
+snippet asino Assert is None
+	self.assertIsNone(${1:actual}${2:, '${3:message}'})$0
+
+snippet fail Fail (a test)
+	self.fail('${1:message}')$0
+
+snippet asr Assert raises
+	self.assertRaises(${1:exception}, ${2:callable}, ${3:args})$0
+
+snippet asinno Assert is not None
+	self.assertIsNotNone(${1:actual}${2:, '${3:message}'})$0
+
+snippet ase Assert equal
+	self.assertEqual(${1:expected}, ${2:actual}${3:, '${4:message}'})$0
+
+snippet ast Assert True
+	self.assertTrue(${1:actual}${2:, '${3:message}'})$0
+
+snippet asin Assert in
+	self.assertIn(${1:needle}, ${2:haystack}${3:, '${4:message}'})$0
+
+snippet asf Assert False
+	self.assertFalse(${1:actual}${2:, '${3:message}'})$0

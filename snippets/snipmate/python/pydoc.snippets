@@ -1,0 +1,121 @@
+snippet """test Module-level docstrings for test files are not required. They should be included only when there is additional information that can be provided.
+
+Examples include some specifics on how the test should be run, an explanation of an unusual setup pattern, dependency on the external environment, and so on. Docstrings that do not provide any new information should not be used, such as """Tests for foo.bar."""
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+	"""
+
+snippet """class A Python docstring for classes, including a one-line summary, details, attributes, and returns.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Attributes:
+	    ${3:attribute_name}: ${4:type and description.}
+	"""
+
+snippet """function A Python docstring for functions and methods, including short summary, details, args, returns, and example.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Args:
+	    ${4:argument_name}: ${5:type and description.}
+
+	Returns:
+	    ${3:type and description of the returned object.}
+
+	Example:
+	    # ${6:Description of my example.}
+	    ${7:use_it_this_way(arg1, arg2)}
+	"""
+
+snippet """function_typed Alternative Python docstring for functions and methods, with a different type syntax. Some teams prefer it.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Args:
+	    ${5:argument_name} (${6:type}): ${7:description.}
+
+	Returns:
+	    ${3:type}: {4:Description of the returned object.}
+
+	Example:
+	    # ${8:Description of my example.}
+	    ${9:use_it_this_way(arg1, arg2)}
+	"""
+
+snippet """exception A Python docstring for exceptions, including a one-line summary, description, and attributes.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Attributes:
+	    ${3:attribute_name}: ${4:type and description.}
+	"""
+
+snippet "" A simple Python docstring comment. Useful when you prefer to add the docstrings manually on functions.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+	"""
+
+snippet """module A Python docstring for modules, including a one-line summary, details, and example.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Examples:
+	    # ${3:Description of my example.}
+	    ${4:use_it_this_way(arg1, arg2)}
+	"""
+
+snippet """generator A Python docstring for generator methods, including a one-line summary, details, parameters, yields, and example. It is the same, but it has yields instead of returns.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Args:
+	    ${4:argument_name}: ${5:type and description.}
+
+	Yields:
+	    ${3:type and description of the yielded object.}
+
+	Example:
+	    # ${6:Description of my example.}
+	    ${7:use_it_this_way(arg1, arg2)}
+	"""
+
+snippet 
+
+
+raises A Python docstring for methods when we want to be exclicit about the errors it Raises. Use it only when is relevant.
+	Raises:
+	    ${1:ErrorName}: ${2:Error description.}$0
+
+snippet """ A Python docstring for functions and methods, including short summary, details, args, returns, and examples. This docstring is an synonym of """function.
+	"""
+	${1:A one-line summary.}
+
+	${2:Detailed description.}$0
+
+	Args:
+	    ${4:argument_name}: ${5:type and description.}
+
+	Returns:
+	    ${3:type and description of the returned object.}
+
+	Example:
+	    # ${6:Description of my example.}
+	    ${7:use_it_this_way(arg1, arg2)}
+	"""

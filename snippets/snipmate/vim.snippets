@@ -1,0 +1,51 @@
+snippet f function
+	function! ${2:`expand('%') =~ 'autoload' ? substitute(matchstr(expand('%:p'),'autoload/\zs.*\ze.vim'),'[/\\]','#','g').'#' : 's:'`}${1:function_name}(${3}) abort
+		${0}
+	endfunction
+
+snippet t try ... catch statement
+	try
+		${1:${VISUAL}}
+	catch ${2}
+		${0}
+	endtry
+
+snippet for for ... in loop
+	for ${1} in ${2}
+		${0:${VISUAL}}
+	endfor
+
+snippet forkv for [key, value] in loop
+	for [${1},${2}] in items(${3})
+		${0}
+		unlet $1 $2
+	endfor
+
+snippet wh while loop
+	while ${1}
+		${0:${VISUAL}}
+	endwhile
+
+snippet if if statement
+	if ${1}
+		${0:${VISUAL}}
+	endif
+
+snippet ife if ... else statement
+	if ${1}
+		${2:${VISUAL}}
+	else
+		${0}
+	endif
+
+snippet au augroup ... autocmd block
+	augroup ${1:AU_NAME}
+		autocmd!
+		autocmd ${2:BufRead,BufNewFile} ${3:*.ext,*.ext3|<buffer[=N]>} ${0}
+	augroup END
+
+snippet let
+	let ${1:variable} = ${0: value}
+
+snippet exe
+	execute ${1}

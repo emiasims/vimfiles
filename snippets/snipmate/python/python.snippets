@@ -1,0 +1,81 @@
+snippet try/except Code snippet for a try/except statement
+	try:
+		${1:pass}
+	except ${2:expression} as ${3:identifier}:
+		${4:pass}
+
+snippet async/def Code snippet for an async statement
+	async def ${1:funcname}(${2:parameter_list}):
+		${3:pass}
+
+snippet mark/markdown Code snippet to add a new markdown cell
+	# %% [markdown]
+
+snippet def static class method Code snippet for a static class method
+	@staticmethod
+	def ${1:funcname}(${2:parameter_list}):
+		${3:pass}
+
+snippet try/finally Code snippet for a try/finally statement
+	try:
+		${1:pass}
+	finally:
+		${2:pass}
+
+snippet add/new/cell Code snippet to add a new cell
+	# %%
+
+snippet async/for Code snippet for an async for statement
+	async for ${1:target} in ${2:iter}:
+		${3:block}
+
+snippet try/except/else Code snippet for a try/except/else statement
+	try:
+		${1:pass}
+	except ${2:expression} as ${3:identifier}:
+		${4:pass}
+	else:
+		${5:pass}
+
+snippet def abstract class method Code snippet for an abstract class method
+	def ${1:funcname}(self, ${2:parameter_list}):
+		raise NotImplementedError
+
+snippet async/for/else Code snippet for an async for statement with else
+	async for ${1:target} in ${2:iter}:
+		${3:block}
+	else:
+		${4:block}
+
+snippet try/except/finally Code snippet for a try/except/finally statement
+	try:
+		${1:pass}
+	except ${2:expression} as ${3:identifier}:
+		${4:pass}
+	finally:
+		${5:pass}
+
+snippet async/with Code snippet for an async with statement
+	async with ${1:expr} as ${2:var}:
+		${3:block}
+
+snippet try/except/else/finally Code snippet for a try/except/else/finally statement
+	try:
+		${1:pass}
+	except ${2:expression} as ${3:identifier}:
+		${4:pass}
+	else:
+		${5:pass}
+	finally:
+		${6:pass}
+
+snippet lambda Code snippet for a lambda statement
+	lambda ${1:parameter_list}: ${2:expression}
+
+snippet __main__ Code snippet for a `if __name__ == "__main__": ...` block
+	if __name__ == "__main__":
+	    ${1:pass}
+
+snippet def class method Code snippet for a class method
+	def ${1:funcname}(self, ${2:parameter_list}):
+		${3:pass}

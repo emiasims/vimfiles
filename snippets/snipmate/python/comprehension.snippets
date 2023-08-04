@@ -1,0 +1,26 @@
+snippet gci Create a generator based on existing iterables, with condition if statement.
+	(${1:key} for ${2:value} in ${3:iterable} if ${4:condition})$0
+
+snippet dci Handy and faster way to create dictories based on existing dictionaries, with conditional if statement.
+	{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:iterable} if ${6:condition}}$0
+
+snippet lc List comprehension for creating a list based on existing lists.
+	[${1:value} for ${2:value} in ${3:iterable}]$0
+
+snippet sc Create a set based on existing iterables.
+	{${1:value} for ${2:value} in ${3:iterable}}$0
+
+snippet sci Create a set based on existing iterables, with condition if statement.
+	{${1:value} for ${2:value} in ${3:iterable} if ${4:condition}}$0
+
+snippet lci List comprehension for creating a list based on existing lists, with conditional if statement.
+	[${1:value} for ${2:value} in ${3:iterable} if ${4:condition}$0]
+
+snippet gc Create a generator based on existing iterables.
+	(${1:key} for ${2:value} in ${3:iterable})$0
+
+snippet lcie List comprehension for creating a list based on existing lists, with conditional if-else statement.
+	[${1:value} if ${2:condition} else ${3:condition} for ${4:value} in ${5:iterable}]$0
+
+snippet dc Handy and faster way to create dictories based on existing dictionaries.
+	{${1:key}: ${2:value} for ${3:key}, ${4:value} in ${5:iterable}}$0
