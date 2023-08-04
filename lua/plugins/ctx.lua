@@ -25,6 +25,24 @@ return {
     }, { default = '0^' })
     map('g0', '0')
 
+    -- count_gi ➜ insert count characters before automatically exiting insert
+    ctx.set('n', 'gi', {
+      rhs = function()
+        vim.cmd.startinsert()
+        local nchars, max, auid = 0, vim.v.count, nil
+        auid = nvim.create_autocmd({ 'TextChangedI', 'TextChangedP', 'InsertLeave' }, {
+          callback = function()
+            nchars = nchars + 1
+            if nchars >= max or not vim.fn.mode():match('[iI]') then
+              vim.cmd.stopinsert()
+              nvim.del_autocmd(auid)
+            end
+          end
+        })
+      end,
+      context = function() return vim.v.count > 0 end,
+    })
+
     ctx.set({ 'n', 'o' }, '$', { 'g$', ctx.opt.wrap.on })
     ctx.add('x', '$', { 'g$h', ctx.opt.wrap.on }, { default = '$h', clear = true })
     map('g$', '$')
