@@ -48,13 +48,13 @@ end
 function repl.send_text(text, target)
   target = target or repl.get_target()
   if not target then
-    return nvim_err 'No term displayed in current window.'
+    return nvim_err 'No terminal window displayed in current tab.'
   end
 
   if type(text) == 'string' then
     text = { text }
   end
-  local endl = vim.fn.getbufvar(0, 'repl_endline', '<CR>')
+  local endl = vim.fn.getbufvar(vim.fn.bufnr(), 'repl_endline', '<CR>')
   text = table.concat(text, endl) .. endl
   if vim.o.filetype == 'python' then
     text = text .. endl
@@ -156,7 +156,7 @@ function repl.start(filetype)
     repl.send_modeline()
   end
   -- repl._setup_keymaps(bufnr)
-  repl._setup_endline(bufnr)
+  repl._setup_endline(bufnr, filetype)
 end
 
 nvim.create_user_command('Repl', function(cmd)
