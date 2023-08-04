@@ -20,6 +20,7 @@ nvim.create_autocmd({ 'BufRead', 'BufNewFile' }, {
 
 nvim.create_autocmd('DirChanged', {
   group = gid,
+  pattern = 'window',
   desc = 'manually set autochdir',
   callback = function(ev) vim.b[ev.buf].autochdir = vim.fn.getcwd() end,
 })
