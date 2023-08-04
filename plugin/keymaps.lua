@@ -10,6 +10,12 @@ nmap('<F8>', cmd 'w|so%')
 xmap('gs', ':s//g<Left><Left>')
 cmap('!', '<C-]>!')
 
+local og = require 'mia.og'
+og.gx = og.gx or vim.fn.maparg('gx', 'n', false, true).callback
+og.vgx = og.vgx or vim.fn.maparg('gx', 'x', false, true).callback
+nmap('<F2>', og.gx)
+xmap('<F2>', og.vgx)
+
 -- associated with autocmds in lua/mia/autocmds.lua
 tmap('<Plug>(termLeave)', "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
 tmap('<Plug>(term2nmode)', "<C-\\><C-n>:let b:last_mode = 't'<Cr>", silent)

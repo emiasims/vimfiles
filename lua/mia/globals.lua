@@ -38,3 +38,17 @@ _G.nvim = vim.iter(vim.api):fold({}, function(t, k, v)
   t[k:sub(6)] = v  -- removes 'nvim_' ➜ nvim.buf_call
   return t
 end)
+
+local og = require 'mia.og'
+og.system = og.system or vim.system
+-- vim.system isnt working for me with xdg-open? idk. Could be way more
+-- robust or intricate, but I don't really care
+vim.system = function(cmd, opts, on_exit)
+  if type(cmd) == 'table' and cmd[1] == 'xdg-open' then
+    local jopts = opts or vim.empty_dict()
+    jopts.on_exit = on_exit
+    local res = vim.fn.jobstart(cmd, jopts)
+    cmd = { 'true' }
+  end
+  return og.system(cmd, opts, on_exit)
+end

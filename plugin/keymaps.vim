@@ -20,7 +20,7 @@ nnoremap Y y$
 augroup vimrc_crmap
   autocmd!
   " Not sure why quickfix lists are modifiable.
-  autocmd BufEnter * if &modifiable | nnoremap <buffer> <Cr> za| endif
+  autocmd BufEnter * if &modifiable | nnoremap <buffer> <Cr> za| xnoremap <buffer> <Cr> za| endif
 augroup END
 
 nnoremap zE zMzO
@@ -99,8 +99,6 @@ nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap}p
 nnoremap g<Cr> i<Cr><Esc>l
 
-nnoremap <expr> <silent> g<Space> :<C-u>autocmd TextChangedI <buffer> ++once stopinsert<Cr>i
-
 nnoremap \p "0p
 nnoremap \P "0P
 xnoremap \p "0p
@@ -140,9 +138,6 @@ else
   nnoremap <silent> <Esc>[1;5D :<C-u>call winresize#go(0, v:count1)<CR>
   nnoremap <silent> <Esc>[1;5C :<C-u>call winresize#go(0, -v:count1)<CR>
 endif
-
-nnoremap <silent> <F2> :call util#openf(expand("<cfile>"))<CR>
-xnoremap <silent> <F2> :<C-u>call util#openf(util#get_visual_selection())<CR>
 
 onoremap ar a]
 onoremap ir i]
