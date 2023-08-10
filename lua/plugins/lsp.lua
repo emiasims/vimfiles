@@ -11,7 +11,7 @@ return {
     'jose-elias-alvarez/null-ls.nvim',
   },
   config = function()
-    require 'mason-lspconfig'.setup { ensure_installed = { 'pylsp', 'clangd' } }
+    require 'mason-lspconfig'.setup { ensure_installed = { 'pylsp', 'clangd', 'lua_ls' } }
 
     local lsp_status = require 'lsp-status'
     lsp_status.register_progress()
