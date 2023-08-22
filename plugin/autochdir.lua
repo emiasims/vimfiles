@@ -3,7 +3,10 @@ vim.opt.autochdir = false
 local function gitdir(path, bufnr)
   if vim.b[bufnr].autochdir then
     return vim.b[bufnr].autochdir
+  elseif path:match '^fugitive' then
+    return path:match 'fugitive://(.*)/%.git.*'
   end
+
   local dir = vim.fn.finddir('.git', path .. ';')
   if dir ~= '' then
     return vim.fn.fnamemodify(dir, ':p'):match '(.*)/%.git/?'
