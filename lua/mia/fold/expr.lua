@@ -7,6 +7,7 @@ local query = setmetatable({
     lua = '(chunk (comment) @fold (#lua-match? @fold "^%-%-%-"))',
     python = '(module (comment) @fold)',
     vimdoc = '(block (line (h1))) @fold (block (line (h2))) @fold (block (line (tag))) @fold',
+    org = '(body (_ (_ (checkbox) (_)* contents: (_ (_ (checkbox)))) @fold))',
   },
 }, {
   __index = function(tbl, key)
@@ -58,5 +59,19 @@ function expr.python(bufnr)
   return group_consecutive(lines)
 end
 
+function expr.org(bufnr)
+  local root = ts.get_parser(bufnr, 'org'):parse()[1]:root()
+  local start_row, end_row
+  local folds = {}
+  for _, node, _ in query.org:iter_captures(root, bufnr, 0, -1) do
+    start_row, _, end_row = node:range()
+    if end_row - start_row > 4 then
+      folds[#folds+1] = { startLine = start_row, endLine = end_row - 1 }
+    end
+  end
+  return folds
+end
+
 -- used in lua/plugins/ufo
+-- list of { startLine = lnum, endLine = lnum }
 return setmetatable(expr, { __index = function() return function() return {} end end })
