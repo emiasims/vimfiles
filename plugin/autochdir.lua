@@ -27,3 +27,8 @@ nvim.create_autocmd('DirChanged', {
   desc = 'manually set autochdir',
   callback = function(ev) vim.b[ev.buf].autochdir = vim.fn.getcwd() end,
 })
+
+nvim.create_user_command('FixAutochdir', function()
+  vim.b.autochdir = nil
+  vim.cmd.lcd(gitdir(vim.fn.expand('%:p'), vim.fn.bufnr()))
+end, {})
