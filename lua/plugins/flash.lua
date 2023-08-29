@@ -19,26 +19,42 @@ return {
     flash.setup(cfg.opts)
     local map, oxmap = require 'mapfun' 'mO'
     local char = require 'flash.plugins.char'
+    local s_state
 
+    -- want the jumplist to act like sneak, and , and ; to work on both
+    -- fFtT and sS.
     local jump = function(forward)
-      local state = flash.jump { search = { forward = forward } }
-      state.opts.highlight.backdrop = false
-      state.opts.label.after = false
-      char.state = state  -- HACK: get ,; to use their autocmd
-      char.state._mia = true
+      char.jumping = true
+      s_state = flash.jump { search = { forward = forward } }
+
+      -- setup opts for ,;
+      s_state.opts = vim.tbl_deep_extend('force', s_state.opts, {
+        highlight = { backdrop = false },
+        label = { after = false },
+        jump = { jumplist = false },  -- first is added, stop on ,;
+      })
+
+      s_state.hide = function(self)
+        -- but on hide, re-enable jumplist
+        self.opts.jump.jumplist = true
+        getmetatable(self).hide(self)
+      end
+
+      char.state = s_state  -- HACK: get ,; to use their autocmd
     end
 
     local continue_jump = function(forward)
       if not char.state then
         return
       end
-      if char.state._mia then
-        char.state:hide()                         -- if repeating ,;
-        char.state.opts.search.forward = forward  -- used in labeling
+      if char.state == s_state then
+        getmetatable(s_state).hide(s_state)    -- fixes labeling
+        s_state.opts.search.forward = forward  -- used in labeling on jump
       end
       char.state:show()
       char.jumping = true
       char[forward and 'right' or 'left']()
+      char.state.opts.jump.jumplist = false
       vim.schedule(function() char.jumping = false end)
     end
 
@@ -53,14 +69,14 @@ return {
 
     map('s', function() jump(true) end)
     map('S', function() jump(false) end)
-    map('<C-s>', flash.treesitter)
-    oxmap('ys', flash.treesitter_search)
     map(';', function() continue_jump(true) end)
     map(',', function() continue_jump(false) end)
 
-    map('f', function() char_jump 'f' end)
-    map('F', function() char_jump 'F' end)
-    map('t', function() char_jump 't' end)
-    map('T', function() char_jump 'T' end)
+    vim.iter { 'f', 'F', 't', 'T' }:each(function(key)
+      map(key, function() char_jump(key) end)
+    end)
+
+    map('<C-s>', flash.treesitter)
+    oxmap('ys', flash.treesitter_search)
   end,
 }
