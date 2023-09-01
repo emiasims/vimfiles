@@ -56,3 +56,14 @@ nmap('K', require 'mia.zotero'.zotero_open)
 nmap('K', require 'mia.zotero'.zotero_select)
 
 imap(';c', require 'mia.zotero'.cite)
+
+local ctx = require 'ctx'
+local in_query = ctx.treesitter.in_query
+
+ctx.set('n', '~', {
+    { rhs = '[%lr/', context = in_query('org', '(checkbox !status) @cursor'), remap = true },
+    { rhs = 'rX', context = in_query('org', '(checkbox (status) @_s (#eq? @_s "/")) @cursor') },
+    { rhs = 'r ', context = in_query('org', '(checkbox (status) @_s (#eq? @_s "X")) @cursor') },
+  }, { default = ctx.global, buffer = true, repeat_count = true })
+
+-- ctx.set()

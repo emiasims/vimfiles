@@ -1,6 +1,6 @@
 (
   [
-    (document (section) @fold)
+    (document [(body)(section)] @fold)
     (property_drawer . (property)) @fold
     (drawer (contents)) @fold
     (section (section) @fold (section) . )

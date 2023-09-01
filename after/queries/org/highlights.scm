@@ -10,13 +10,13 @@
 (item . (_) @todo (#eq? @todo "GOAL"))
 (item . (_) @bold (#eq? @bold "CANCELLED")) @text.strike @comment
 
+(listitem contents: (paragraph [(sym)(str)(num)]+ @tag . (sym ":") @special . (sym ":" prev: "sym" !next) @special))
 ; U+2713 U+2717
-(listitem (checkbox (status) @text.todo.checked (#eq? @text.todo.checked "/") (#set! conceal "✓")) . contents: (paragraph) @text.strike)
-(listitem (checkbox (status) @error (#eq? @error "X") (#set! conceal "✗")) . contents: (paragraph) @comment)
+(listitem (checkbox (status) @text.todo.checked (#eq? @text.todo.checked "/") (#set! conceal "✓")) . contents: (paragraph) @dark)
+(listitem (checkbox (status) @error (#eq? @error "X") (#set! conceal "✗")) . contents: (paragraph) @comment @text.strike)
 (listitem (checkbox (status) @todo (#eq? @todo "-")) . contents: (paragraph [(str)(sym)(num)]+ @typedef))
 (listitem contents: (paragraph [(sym)(str)(num)]+ @tag . (sym ":") @special . (sym ":" prev: "sym" !next) @special))
 
 (body (paragraph (sym ":").(nl).) . (list (listitem (bullet) @boldconst (#eq? @boldconst "-") (#set! conceal "⤷")) ))
-(listitem contents: (paragraph [(sym)(str)(num)]+ @tag . (sym ":") @special . (sym ":" prev: "sym" !next) @special))
 
 ((paragraph . (sym "-")) @comment (#lua-match? @comment "^%-%-%-%-%-+$"))

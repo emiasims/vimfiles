@@ -21,12 +21,9 @@ end
 function M.org(virtText, lnum, endLnum, width, truncate, ctx)
   local newVirtText = M.default(virtText, lnum, endLnum, width, truncate, ctx)
 
-  if ctx.text:match '^%*+' then
-    if newVirtText[2][1] == '*' then
-      newVirtText[1] = { newVirtText[1][1]:gsub('.', '-'), 'conceal' }
-      newVirtText[2][1] = '❥'  -- U+2765
-    else
-      newVirtText[1][1] = '❥'  -- U+2765
+  for _, chunk in ipairs(newVirtText) do
+    if chunk[1] == '❤' then
+      chunk[1] = '❥'  -- U+2765
     end
   end
 
