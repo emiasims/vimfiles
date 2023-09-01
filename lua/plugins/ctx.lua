@@ -190,9 +190,10 @@ return {
       ['{'] = make_pair('{}'),
     }, pair_allowed, { cdesc = 'Nextchar != word char', clear = true })
 
-    local right = '<C-g>U<Right>'
+    local right = '<C-]><C-g>U<Right>'
     -- Completing a pair is just tapping the <Right> key.
     -- Or, jumping out of the snippet with <Tab>
+    -- But also I want abbrevs to trigger, so add that in with <C-]>
     ctx.add_each({ 'i', 's' }, {
       [')'] = right,
       [']'] = right,
