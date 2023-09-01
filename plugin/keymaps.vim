@@ -13,8 +13,8 @@ inoremap <C-c> <Esc>
 inoremap <Esc> <C-c>
 snoremap <C-c> <Esc>
 snoremap <Esc> <C-c>
-inoremap jk <Esc>
-snoremap jk <Esc>
+inoremap jk <C-]><Esc>
+snoremap jk <C-]><Esc>
 nnoremap Y y$
 
 augroup vimrc_crmap

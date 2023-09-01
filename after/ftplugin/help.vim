@@ -1,6 +1,6 @@
 if !&modifiable
   if exists(':helpclose')
-    nnoremap <buffer> q :helpclose<CR>
+    nnoremap <buffer> q <cmd>helpclose<CR>
   else
     nnoremap <buffer> q :q<CR>
   endif

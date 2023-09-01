@@ -53,6 +53,8 @@ function! statusline#dirinfo(active) abort " {{{1
   let statuslinetext = a:active ? '%#stlDirInfo#' : ''
   if exists('b:term_title')
     let statuslinetext .= ' ' . b:term_title . ' '
+  elseif @% =~ '^fugitive'
+    let statuslinetext .= s:gitinfo() . ' '
   else  " Generally, we want something like (master)dirname/
     let statuslinetext .= s:gitinfo() . (empty(expand('%:h')) ? '' : expand('%:h') . '/') . ' '
   endif
@@ -73,7 +75,7 @@ endfunction
 
 function! statusline#fileinfo(active) abort " {{{1
   " Returns: 'filename modified spacer'
-  let statuslinetext = ' %t'
+  let statuslinetext = ' %{@% =~ "^fugitive" ? fugitive#Object(@%) : expand("%:t")}'
   " Should catch attention when unfocused
   if a:active
     let statuslinetext .= &modifiable ? '%#stlModified#' : ''

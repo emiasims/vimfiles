@@ -13,6 +13,9 @@ vim.iter {
   ['false'] = 'False',
   ['&&'] = 'and',
   ['||'] = 'or',
+  ['\\b'] = 'β',
+  ['\\g'] = 'γ',
+  ['\\t'] = 'τ',
 }:each(function(lhs, rhs) vim.keymap.set('ia', lhs, rhs, { buffer = true }) end)
 
 vim.keymap.set('n', '\\ga', 'yiqva]p`[i.<Esc>e:silent! call repeat#set("\\ga")<Cr>', { buffer = true })

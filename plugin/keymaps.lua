@@ -33,7 +33,7 @@ tmap('<M-n>', '<Plug>(termLeave)', remap)
 tmap('<C-Space>', '<Space>')
 tmap('<S-Space>', '<Space>')
 
-nmap('<F10>', function() vim.lsp.buf.inlay_hint(0) end)
+nmap('<F10>', function() vim.lsp.inlay_hint(0) end, { desc = 'Toggle inlay hints' })
 nmap('<F3>', cmd 'messages clear')
 nmap('<F4>', cmd 'messages')
 nmap('<F7>', function()

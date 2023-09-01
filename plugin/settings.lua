@@ -38,6 +38,7 @@ vim.iter {
   conceallevel = 2,
   foldlevelstart = 99,
   foldnestmax = 3,
+  jumpoptions = 'stack',
 
   listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
   fillchars = { vert = '┃' },

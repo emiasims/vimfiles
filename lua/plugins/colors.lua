@@ -56,6 +56,7 @@ return {
 
         ['@text.strong'] = { fg = colors.none },
         ['@text.emphasis'] = { fg = colors.none },
+        ['@text.strike'] = { fg = colors.none },
         ['@text.uri'] = { style = { 'italic' } },  -- underline = false didn't work?
 
         ['@method'] = { link = '@function.builtin' },
