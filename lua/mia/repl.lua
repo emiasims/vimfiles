@@ -13,6 +13,19 @@ local cfg = {
   mark = 'x',
   keybinds = { repl_only = false },
   endline = { python = '<Cr><C-u>' }, -- default and filetypes
+  on_attach = {
+    python = function()
+      local setup_greek = function(char)
+        vim.keymap.set('t', '\\' .. char, vim.fn.digraph_get('*' .. char))
+      end
+      for i = 65, 90 do
+        setup_greek(string.char(i))
+      end
+      for i = 97, 122 do
+        setup_greek(string.char(i))
+      end
+    end
+  },
 }
 
 function repl.setup(opts)
@@ -156,6 +169,9 @@ function repl.start(filetype)
     repl.send_modeline()
   end
   -- repl._setup_keymaps(bufnr)
+  if cfg.on_attach[filetype] then
+    cfg.on_attach[filetype]()
+  end
   repl._setup_endline(bufnr, filetype)
 end
 
