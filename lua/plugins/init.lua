@@ -38,7 +38,6 @@ return {
   { 'tommcdo/vim-lion', keys = { 'gl', 'gL' } },
   { 'echasnovski/mini.cursorword', event = 'VeryLazy', config = true },
   'jeetsukumaran/vim-filebeagle',
-  'inkarkat/vim-SyntaxRange',
   'mbbill/undotree',
 
   'nvim-lua/popup.nvim',
