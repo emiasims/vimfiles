@@ -4,6 +4,7 @@ return {
   opts = {
     search = { multi_window = false, wrap = false },
     modes = {
+      search = { enabled = false },
       char = {
         highlight = { backdrop = false },
         keys = {},
