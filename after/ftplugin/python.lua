@@ -18,17 +18,16 @@ vim.iter {
   ['\\t'] = 'τ',
 }:each(function(lhs, rhs) vim.keymap.set('ia', lhs, rhs, { buffer = true }) end)
 
-vim.keymap.set('n', '\\ga', 'yiqva]p`[i.<Esc>e:silent! call repeat#set("\\ga")<Cr>', { buffer = true })
-vim.keymap.set('n', '\\gA', 'ysiw"ysa"]X:silent!call repeat#set("\\gA")<Cr>', { buffer = true })
-
 local ctx = require 'ctx'
 
-ctx.set('n', '<C-a>',
-  { 'ciwTrue<Esc>', ctx.treesitter.on_node 'false' },
-  { default = '<Plug>SpeedDatingUp', buffer = true })
+ctx.set('n', '\\ga', {
+  { 'yiqva]p`[i.<Esc>e', ctx.treesitter.in_node 'subscript', remap = true },
+  { '<Plug>Ysurroundiw"<Plug>Ysurrounda"]X%', ctx.treesitter.in_node 'attribute', remap = true},
+}, { buffer = true })  -- remap?
 
-ctx.set('n', '<C-x>',
-  { 'ciwFalse<Esc>', ctx.treesitter.on_node 'true' },
-  { default = '<Plug>SpeedDatingDown', buffer = true })
+ctx.set('n', '~', {
+  { 'ciwTrue<Esc>`[', ctx.treesitter.on_node 'false' },
+  { 'ciwFalse<Esc>`[', ctx.treesitter.on_node 'true' },
+}, { default = ctx.global, buffer = true })
 
-nvim.buf_create_user_command(0, 'Outline', 'lvimgrep /\\v^\\s*%(def |class )/ % | lopen', {})
+vim.keymap.set('n', 'gO', '<cmd>lvimgrep /\\v^\\s*%(def |class )/ % | lopen<Cr>', { buffer = true })
