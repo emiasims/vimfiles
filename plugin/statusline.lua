@@ -2,6 +2,20 @@ local ts_statusline = require 'mia.tslib'.statusline
 local fugitive_object = vim.fn['fugitive#Object']  ---@type function
 local fugitive_head = vim.fn['fugitive#Head']  ---@type function
 
+local stl = setmetatable({
+  winid = function() return vim.g.statusline_winid end,
+  bufnr = function() return nvim.win_get_buf(vim.g.statusline_winid) end,
+  bufname = function() return nvim.buf_get_name(nvim.win_get_buf(vim.g.statusline_winid)) end,
+}, {
+  __index = function(t, name)
+    if name == 'bo' then
+      return vim.bo[t.bufnr()]
+    elseif name == 'wo' then
+      return vim.wo[t.winid()]
+    end
+  end,
+})
+
 local obsession_status
 obsession_status = function()
   if vim.g.loaded_obsession then
@@ -39,7 +53,8 @@ local function hl(text, group, skip_close)
 end
 
 local function gitinfo()
-  if vim.g.loaded_fugitive and vim.bo.modifiable then
+  if vim.g.loaded_fugitive and stl.bo.modifiable then
+  -- if vim.g.loaded_fugitive and vim.bo.modifiable then
     local head = fugitive_head()
     return head ~= '' and ('(%s)'):format(head) or ''
   end
@@ -47,19 +62,19 @@ local function gitinfo()
 end
 
 local function dirinfo()
-  if vim.bo.filetype == 'help' or vim.bo.buftype == 'nofile' then
+  if stl.bo.filetype == 'help' or stl.bo.buftype == 'nofile' then
     return ''
   end
   if vim.b.term_title then
     return vim.b.term_title
-  elseif nvim.buf_get_name(0):match '^fugitive' then
+  elseif stl.bufname():match '^fugitive' then
     return gitinfo()
   end
   return gitinfo() .. vim.fn.expand '%:h' .. '/'
 end
 
 local function filename()
-  local name = nvim.buf_get_name(0)
+  local name = stl.bufname()
   if name:match '^fugitive' then
     return ' ' .. fugitive_object(name)
   end
@@ -94,20 +109,21 @@ end
 
 local function encoding()
   local digits = math.ceil(math.log10(vim.fn.line '$' + 1))
-  local typeinfo = (' %s[%s]'):format(vim.bo.fileencoding, vim.bo.fileformat)
+  local typeinfo = (' %s[%s]'):format(stl.bo.fileencoding, stl.bo.fileformat)
   return typeinfo .. (' '):rep(14 + 2 * digits - #typeinfo)
 end
 
 local function active()
   local mode = mode_info()
+  local dir, fname = dirinfo(), filename()
   return table.concat {
     hl(mode.abbrev, mode.color),
-    hl(dirinfo(), 'stlDirInfo'),
-    filename(),
+    hl(dir, 'stlDirInfo'),
+    fname,
     hl('%m', 'stlModified'),
     peek(),
     '%=',
-    ts_statusline(),
+    ts_statusline(nvim.win_get_width(stl.winid()) - #dir - #fname - 38),
     obsession_status(),
     hl(error_info(), 'stlErrorInfo'),
     hl('%y', 'stlTypeInfo'),

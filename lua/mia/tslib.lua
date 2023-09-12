@@ -62,25 +62,24 @@ function tslib.nodelist_atcurs()
   return names
 end
 
-function tslib.statusline()
-  if not tslib.has_parser() then
+function tslib.statusline(width)
+  if width <= 0 or not tslib.has_parser() then
     return ''
   end
-  local names = tslib.nodelist_atcurs()
-  if #names == 0 then
+  local nodes = tslib.nodelist_atcurs()
+  local i, len = 1, 0
+  while (i <= #nodes and len + i + #nodes[i] <= width - (i == #nodes and 0 or 4)) do
+    len = len + #nodes[i]
+    i = i + 1
+  end
+  if i == 1 then
     return ''
+  end
+  if i <= #nodes then
+    nodes[i] = '...'
   end
 
-  local indicator_size = nvim.win_get_width(0) / 2 - 10
-  local stl = names[1]
-  for i = 2, #names do
-    if (stl:len() + 2 * #names) >= indicator_size then
-      stl = names[i]:sub(1, 1) .. '➜' .. stl
-    else
-      stl = names[i] .. '➔' .. stl
-    end
-  end
-  return stl
+  return table.concat(vim.iter(nodes):slice(1, i):rev():totable(), '➜')
 end
 
 local function range_between(start_node, end_node)
