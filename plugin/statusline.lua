@@ -52,7 +52,7 @@ local function hl(text, group, skip_close)
   return ('%%#%s# %s %s'):format(group, text, skip_close and '' or '%*')
 end
 
-local function gitinfo()
+local function git_info()
   if vim.g.loaded_fugitive and stl.bo.modifiable then
   -- if vim.g.loaded_fugitive and vim.bo.modifiable then
     local head = fugitive_head()
@@ -61,16 +61,16 @@ local function gitinfo()
   return ''
 end
 
-local function dirinfo()
+local function dir_info()
   if stl.bo.filetype == 'help' or stl.bo.buftype == 'nofile' then
     return ''
   end
   if vim.b.term_title then
     return vim.b.term_title
   elseif stl.bufname():match '^fugitive' then
-    return gitinfo()
+    return git_info()
   end
-  return gitinfo() .. vim.fn.expand '%:h' .. '/'
+  return git_info() .. vim.fn.expand '%:h' .. '/'
 end
 
 local function filename()
@@ -115,7 +115,7 @@ end
 
 local function active()
   local mode = mode_info()
-  local dir, fname = dirinfo(), filename()
+  local dir, fname = dir_info(), filename()
   return table.concat {
     hl(mode.abbrev, mode.color),
     hl(dir, 'stlDirInfo'),
@@ -132,7 +132,7 @@ local function active()
 end
 
 local function inactive()
-  return table.concat({ hl(' ', 'SignColumn'), dirinfo(), filename(), '%m %=%y', encoding() }, ' ')
+  return table.concat({ hl(' ', 'SignColumn'), dir_info(), filename(), '%m %=%y', encoding() }, ' ')
 end
 
 
