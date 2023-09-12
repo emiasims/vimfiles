@@ -8,8 +8,6 @@ vim.g.undotree_HighlightChangedText = 0
 vim.g.gutentags_cache_dir = vim.fn.stdpath 'data' .. '/tags'
 vim.g.gutentags_ctags_exclude = { 'data' }
 
-vim.keymap.set('n', '<F6>', '<cmd>UndotreeToggle<Cr>')
-
 return {
   'tpope/vim-repeat',
   -- 'tpope/vim-speeddating',

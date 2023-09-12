@@ -5,16 +5,32 @@ local remap = { remap = true }
 local silent = { silent = true }
 local cmd = function(c) return ('<Cmd>%s<Cr>'):format(c) end
 
-nmap('<F5>', cmd 'update|mkview|edit|TSBufEnable highlight')
-nmap('<F8>', cmd 'w|so%')
-xmap('gs', ':s//g<Left><Left>')
-cmap('!', '<C-]>!')
-
+nmap('<F1>', function() nvim.echo({ { require 'mia.tslib'.statusline(math.huge) } }, false, {}) end)
 local og = require 'mia.og'
 og.gx = og.gx or vim.fn.maparg('gx', 'n', false, true).callback
 og.vgx = og.vgx or vim.fn.maparg('gx', 'x', false, true).callback
 nmap('<F2>', og.gx)
 xmap('<F2>', og.vgx)
+
+nmap('<F3>', cmd 'messages clear')
+nmap('<F4>', cmd 'messages')
+
+nmap('<F5>', cmd 'update|mkview|edit|TSBufEnable highlight')
+nmap('<F6>', '<cmd>UndotreeToggle<Cr>')
+
+nmap('<F7>', function()
+  if vim.bo.fo:match 'a' then
+    vim.opt_local.formatoptions:remove 'a'
+  else
+    vim.opt_local.formatoptions:append 'a'
+  end
+end, { desc = 'Toggle paragraph autoformat' })
+
+nmap('<F8>', cmd 'w|so%')
+nmap('<F10>', function() vim.lsp.inlay_hint(0) end, { desc = 'Toggle inlay hints' })
+
+xmap('gs', ':s//g<Left><Left>')
+cmap('!', '<C-]>!')
 
 -- associated with autocmds in lua/mia/autocmds.lua
 tmap('<Plug>(termLeave)', "<C-\\><C-n>:let b:last_mode = 'n'<Cr>", silent)
@@ -33,17 +49,6 @@ tmap('<M-n>', '<Plug>(termLeave)', remap)
 tmap('<C-Space>', '<Space>')
 tmap('<S-Space>', '<Space>')
 
-nmap('<F10>', function() vim.lsp.inlay_hint(0) end, { desc = 'Toggle inlay hints' })
-nmap('<F3>', cmd 'messages clear')
-nmap('<F4>', cmd 'messages')
-nmap('<F7>', function()
-  if vim.bo.fo:match 'a' then
-    vim.opt_local.formatoptions:remove 'a'
-  else
-    vim.opt_local.formatoptions:append 'a'
-  end
-end, { desc = 'Toggle paragraph autoformat' })
-
 local function open_float_after(func)
   return function()
     if func then func() end
@@ -54,9 +59,7 @@ end
 nmap('\\d', open_float_after(nil))
 nmap('[d', open_float_after(vim.diagnostic.goto_prev))
 nmap(']d', open_float_after(vim.diagnostic.goto_next))
-
-imap('<C-h>', function() vim.lsp.buf.signature_help { focusable = false } end)
-
+imap('<C-h>', vim.lsp.buf.signature_help)
 
 -- lua/mia/repl.lua
 nmap('gxl', require 'mia.repl'.send_line, { dotrepeat = true })
