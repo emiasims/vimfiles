@@ -33,7 +33,7 @@ return {
   name = 'catppuccin',
   lazy = false,
   opts = {
-    integrations = { vim_sneak = true },
+    integrations = { vim_sneak = true, ufo = false },
 
     custom_highlights = function(colors)
       local util = require 'catppuccin.utils.colors'
