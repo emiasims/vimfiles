@@ -45,6 +45,7 @@ onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 inoremap <C-w> <C-g>u<C-w><C-g>u
 inoremap <C-u> <C-g>u<C-u><C-g>u
 inoremap <M-u> <C-k>*
+tnoremap <expr> <M-u> digraph_get('*' .. nr2char(getchar()))
 
 nnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 xnoremap <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
