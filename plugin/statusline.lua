@@ -1,11 +1,11 @@
 local ts_statusline = require 'mia.tslib'.statusline
 local fugitive_object = vim.fn['fugitive#Object']  ---@type function
-local fugitive_head = vim.fn['fugitive#Head']  ---@type function
 
 local stl = setmetatable({
   winid = function() return vim.g.statusline_winid end,
   bufnr = function() return nvim.win_get_buf(vim.g.statusline_winid) end,
-  bufname = function() return nvim.buf_get_name(nvim.win_get_buf(vim.g.statusline_winid)) end,
+  full_bufname = function() return nvim.buf_get_name(nvim.win_get_buf(vim.g.statusline_winid)) end,
+  bufname = function() return vim.fn.bufname(nvim.win_get_buf(vim.g.statusline_winid)) end,
 }, {
   __index = function(t, name)
     if name == 'bo' then
@@ -55,7 +55,7 @@ end
 local function git_info()
   if vim.g.loaded_fugitive and stl.bo.modifiable then
   -- if vim.g.loaded_fugitive and vim.bo.modifiable then
-    local head = fugitive_head()
+    local head = vim.fn.FugitiveHead(1, stl.bufnr())
     return head ~= '' and ('(%s)'):format(head) or ''
   end
   return ''
@@ -65,16 +65,16 @@ local function dir_info()
   if stl.bo.filetype == 'help' or stl.bo.buftype == 'nofile' then
     return ''
   end
-  if vim.b.term_title then
-    return vim.b.term_title
-  elseif stl.bufname():match '^fugitive' then
+  if vim.b[stl.bufnr()].term_title then
+    return vim.b[stl.bufnr()].term_title
+  elseif stl.full_bufname():match '^fugitive' then
     return git_info()
   end
-  return git_info() .. vim.fn.expand '%:h' .. '/'
+  return git_info() .. vim.fn.fnamemodify(stl.bufname(), ":h") .. '/'
 end
 
 local function filename()
-  local name = stl.bufname()
+  local name = stl.full_bufname()
   if name:match '^fugitive' then
     return ' ' .. fugitive_object(name)
   end
