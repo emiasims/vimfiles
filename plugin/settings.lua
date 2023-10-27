@@ -1,4 +1,4 @@
-vim.iter {
+local settings = {
   report = 0,
   path = { '.', '**' },
   virtualedit = 'block',
@@ -41,7 +41,7 @@ vim.iter {
   jumpoptions = 'stack',
 
   listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
-  fillchars = { vert = '┃' },
+  fillchars = { vert = '┃', fold = ' ' },
 
   undofile = true,
   shiftround = true,
@@ -63,11 +63,18 @@ vim.iter {
   termguicolors = true,
 
   wrap = false,
-  shell = 'bash'
+  shell = 'bash',
 
-}:each(function(name, value) vim.opt[name] = value end)
+  foldmethod = 'expr',
+  foldexpr = 'v:lua.vim.treesitter.foldexpr()',
+  foldtext = [[v:lua.require'mia.fold'.text()]],
+}
 
-if vim.fn.executable 'ag' then
+vim.iter(settings):each(function(name, value)
+  vim.opt[name] = value
+end)
+
+if vim.fn.executable('ag') then
   vim.opt.grepprg = 'ag --nogroup --nocolor'
 end
 

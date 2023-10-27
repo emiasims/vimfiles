@@ -1,6 +1,6 @@
 local ts = vim.treesitter
 
-local expr = {}
+local M = { default = ts.foldexpr }
 
 local query = setmetatable({
   strings = {
@@ -33,7 +33,7 @@ local function group_consecutive(lines)
   return groups
 end
 
-function expr.lua(bufnr)
+function M.lua(bufnr)
   local root = ts.get_parser(bufnr, 'lua'):parse()[1]:root()
   local lines = {}
   local line, col
@@ -46,7 +46,7 @@ function expr.lua(bufnr)
   return group_consecutive(lines)
 end
 
-function expr.python(bufnr)
+function M.python(bufnr)
   local root = ts.get_parser(bufnr, 'python'):parse()[1]:root()
   local lines = {}
   local line, col
@@ -59,19 +59,18 @@ function expr.python(bufnr)
   return group_consecutive(lines)
 end
 
-function expr.org(bufnr)
+function M.org(bufnr)
   local root = ts.get_parser(bufnr, 'org'):parse()[1]:root()
   local start_row, end_row
   local folds = {}
   for _, node, _ in query.org:iter_captures(root, bufnr, 0, -1) do
     start_row, _, end_row = node:range()
     if end_row - start_row > 4 then
-      folds[#folds+1] = { startLine = start_row, endLine = end_row - 1 }
+      folds[#folds + 1] = { startLine = start_row, endLine = end_row - 1 }
     end
   end
   return folds
 end
 
--- used in lua/plugins/ufo
 -- list of { startLine = lnum, endLine = lnum }
-return setmetatable(expr, { __index = function() return function() return {} end end })
+return M
