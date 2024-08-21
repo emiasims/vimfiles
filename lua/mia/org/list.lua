@@ -14,7 +14,7 @@ function list.reorder()
   -- get node type
   -- Get range of bullet: list -> listitem -> bullet
   local ls = list_node:named_child(0):named_child(0):range()
-  local bullet = nvim.buf_get_lines(0, ls, ls + 1, 0)[1]
+  local bullet = vim.api.nvim_buf_get_lines(0, ls, ls + 1, 0)[1]
   local start, is_text
   if bullet:match '^%s*%d+' then
     is_text = false
@@ -36,7 +36,7 @@ function list.reorder()
     item_node = list_node:named_child(i - start)
     ls, cs, le, ce = item_node:named_child(0):range()
     replacement = is_text and string.byte(i) or tostring(i)
-    nvim.buf_set_text(0, ls, cs, le, ce - 1, { replacement })
+    vim.api.nvim_buf_set_text(0, ls, cs, le, ce - 1, { replacement })
   end
 end
 

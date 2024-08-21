@@ -1,5 +1,5 @@
 if not vim.env.CONDA_PREFIX then
-  nvim.echo({ { "conda env 'nvim-base' not found", 'Error' } }, true, {})
+  vim.api.nvim_echo({ { "conda env 'nvim-base' not found", 'Error' } }, true, {})
 else
   _G._conda = {}
   _conda.env = vim.env.CONDA_PREFIX

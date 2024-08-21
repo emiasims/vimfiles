@@ -39,7 +39,7 @@ function M.lua(bufnr)
   local line, col
   for _, node, _ in query.lua:iter_captures(root, bufnr, 0, -1) do
     line, col = node:start()
-    if col == 0 or nvim.buf_get_lines(bufnr, line, line + 1, false)[1]:sub(col):match '^%s*$' then
+    if col == 0 or vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]:sub(col):match '^%s*$' then
       lines[#lines + 1] = line
     end
   end
@@ -52,7 +52,7 @@ function M.python(bufnr)
   local line, col
   for _, node, _ in query.python:iter_captures(root, bufnr, 0, -1) do
     line, col = node:start()
-    if col == 0 or nvim.buf_get_lines(bufnr, line, line + 1, false)[1]:sub(col):match '^%s*$' then
+    if col == 0 or vim.api.nvim_buf_get_lines(bufnr, line, line + 1, false)[1]:sub(col):match '^%s*$' then
       lines[#lines + 1] = line
     end
   end

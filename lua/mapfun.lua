@@ -1,3 +1,18 @@
+---@alias keymap.mode 'n' | 'v' | 's' | 'x' | 'o' | 'i' | 'l' | 'c' | 't' | '!' | '' | 'ia' | 'ca' | '!a'
+
+---@class keymap.opts
+---@field buffer? boolean
+---@field silent? boolean
+---@field nowait? boolean
+---@field desc? string
+---@field expr? boolean
+---@field remap? boolean
+---@field noremap? boolean
+---@field replace_termcodes? boolean
+
+---@class mapfun.opts: keymap.opts
+---@field dotrepeat? boolean
+
 local function dotrepeat(rhs, lhs)
   if type(rhs) == 'string' then
     assert(lhs)
@@ -9,6 +24,10 @@ local function dotrepeat(rhs, lhs)
   end
 end
 
+---@param mode keymap.mode
+---@param lhs string
+---@param rhs string | function
+---@param opts mapfun.opts
 local function set_with_repeat(mode, lhs, rhs, opts)
   opts = opts or {}
   local add_repeat = opts.dotrepeat
@@ -19,33 +38,46 @@ local function set_with_repeat(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, opts)
 end
 
+---@alias keymap.func fun(lhs: string, rhs: string | function, opts: keymap.opts | mapfun.opts)
+
+-- stylua: ignore start
+---@type table<keymap.mode, keymap.func>
 local M = {
-  c = function(...) set_with_repeat('c', ...) end,
-  x = function(...) set_with_repeat('x', ...) end,
-  n = function(...) set_with_repeat('n', ...) end,
-  t = function(...) set_with_repeat('t', ...) end,
-  o = function(...) set_with_repeat('o', ...) end,
-  i = function(...) set_with_repeat('i', ...) end,
-  s = function(...) set_with_repeat('s', ...) end,
-  O = function(...) set_with_repeat({ 'o', 'x' }, ...) end,
-  I = function(...) set_with_repeat({ 'i', 's' }, ...) end,
-  m = function(...) set_with_repeat({ 'n', 'x', 'o' }, ...) end,
-  dotrepeat = dotrepeat,
+  ia = function(...) vim.keymap.set('ia', ...) end,
+  ca = function(...) vim.keymap.set('ca', ...) end,
+  ['!a'] = function(...) vim.keymap.set('!a', ...) end,
+  [''] = function(...) set_with_repeat('', ...) end,
 }
 
+for mode in ('nvsxoilct!'):gmatch('.') do
+  M[mode] = function(...) set_with_repeat(mode, ...) end
+end
+-- stylua: ignore end
+
+-- TODO indexing buffer stuff?
+
 setmetatable(M, {
-  __call = function(tbl, chars, opts)
+  ---@param tbl table
+  ---@param modes keymap.mode | keymap.mode[]
+  ---@param opts mapfun.opts
+  ---@return keymap.func ...
+  __call = function(tbl, modes, opts)
     local funcs = {}
-    for c in chars:gmatch '.' do
-      local func = tbl[c]
+    if type(modes) == 'string' then
+      modes = { modes }
+    end
+    for _, mode in ipairs(modes) do
+      local func = tbl[mode]
+
       if opts then
         func = function(lhs, rhs, new_opts)
           if type(new_opts) == 'table' then
             opts = vim.tbl_extend('force', opts, new_opts)
           end
-          tbl[c](lhs, rhs, opts)
+          tbl[mode](lhs, rhs, opts)
         end
       end
+
       funcs[#funcs + 1] = func
     end
     return unpack(funcs)

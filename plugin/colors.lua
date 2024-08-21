@@ -9,5 +9,5 @@ local group_names = {
 
 -- Shouldn't this be done already? idk why it isn't
 for _, name in ipairs(group_names) do
-  nvim.set_hl(0, '@' .. name:lower(), { link = name, default = true })
+  vim.api.nvim_set_hl(0, '@' .. name:lower(), { link = name, default = true })
 end

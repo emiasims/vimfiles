@@ -2,7 +2,7 @@
 return {
   {
     'folke/flash.nvim',
-    event = 'VeryLazy',
+    lazy=false,
     opts = {
       search = { multi_window = false, wrap = false },
       label = { uppercase = false },
@@ -14,17 +14,17 @@ return {
             return { [';'] = 'right', [','] = 'left' }
           end,
           config = function(opts)
-            opts.autohide = nvim.get_mode().mode:find 'no'
+            opts.autohide = vim.api.nvim_get_mode().mode:find('no')
           end,
         },
       },
     },
     keys = {
+      --stylua: ignore start
       'f', 'F', 't', 'T', ',', ';',
-      ---@diagnostic disable
       { '<C-s>', function() require 'flash'.treesitter() end, mode = { 'n', 'x', 'o' } },
       { 'ys', function() require 'flash'.treesitter_search() end, mode = { 'n', 'x', 'o' } },
-      ---@diagnostic enable
+      --stylua: ignore end
     },
   },
   {
@@ -34,6 +34,7 @@ return {
       jump = { autojump = true },
       again = { search = { wrap = true } },  -- fix wrap
     },
+    keys = { 's', 'S' },
     dependencies = 'flash.nvim',
   },
 }

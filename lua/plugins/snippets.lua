@@ -1,3 +1,5 @@
+---@type LazySpec
+-- return {}
 return {
   'L3MON4D3/LuaSnip',
   build = 'make install_jsregexp',
@@ -21,12 +23,12 @@ return {
     local function get_files(ft)
       return vim.iter.filter(function(f) return f:match('^' .. path.snip) end,
         vim.list_extend(
-          nvim.get_runtime_file(('snippets/*/%s.*'):format(ft), true),
-          nvim.get_runtime_file(('snippets/*/%s/*.*'):format(ft), true)
+          vim.api.nvim_get_runtime_file(('snippets/*/%s.*'):format(ft), true),
+          vim.api.nvim_get_runtime_file(('snippets/*/%s/*.*'):format(ft), true)
         ))
     end
 
-    nvim.create_user_command('EditSnippets', function(cmd)
+    vim.api.nvim_create_user_command('EditSnippets', function(cmd)
       local filetype = cmd.args == '' and vim.bo.filetype or cmd.args
       local files = get_files(filetype)
 
@@ -41,7 +43,7 @@ return {
         files = get_files(filetype)
         prompt = 'Select one of (just imported):'
         if #files == 0 then
-        prompt = 'Select one of (to create):'
+          prompt = 'Select one of (to create):'
           files = {
             path.mate .. ('/%s.snippets'):format(filetype),
             path.lua .. ('/%s.lua'):format(filetype),
@@ -55,7 +57,7 @@ return {
           prompt = prompt,
           format_item = vim.fs.basename,
         }, function(name) editcmd { name, mods = cmd.smods } end)
-        nvim.create_autocmd('BufWritePost', {
+        vim.api.nvim_create_autocmd('BufWritePost', {
           desc = 'Ensure files loaded',
           callback = function()
             lua_load.load { paths = path.lua }
@@ -63,7 +65,7 @@ return {
           end,
           once = true,
           nested = true,
-          buffer = 0
+          buffer = 0,
         })
       end
     end, { nargs = '?', complete = 'filetype' })

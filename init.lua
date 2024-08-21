@@ -1,2 +1,5 @@
-require 'mia.globals'  -- 'nvim' = 'vim.api.nvim_' must be before plugins
-require 'mia.lazy'
+require('mia.globals').setup()
+_G.mia = require('mia')
+mia.setup('mia/plugin')  -- my 'plugins'
+
+require('mia.lazy')  -- plugins

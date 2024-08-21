@@ -1,3 +1,4 @@
+nnoremap <buffer> K K
 if !&modifiable
   if exists(':helpclose')
     nnoremap <buffer> q <cmd>helpclose<CR>

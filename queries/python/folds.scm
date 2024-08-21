@@ -1,9 +1,8 @@
 ; top level function and class definitions
 (module
   [
-    (decorated_definition (function_definition (block)))
+    (decorated_definition definition: (_ (block)))
     (function_definition (block))
-    (decorated_definition (class_definition (block)))
     (class_definition (block))
   ] @fold
 )

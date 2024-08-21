@@ -1,76 +1,71 @@
-local source = { re = [[\v%(^|/)%(lua/)\zs.{-}\ze%(/init)?\.lua$]] }
+---@type table<string, fun(ev: aucmd.trigger)>
+local M = {}
 
--- For use with SourceCmd autocmd event
-function source.reload_lua_module(filename)
-  local relative = vim.fn.matchstr(filename, [[\v%(^|/)%(lua/)\zs.{-}%(/init)?\.lua$]])
-  local module = vim.fn.matchstr(relative, [[\v.{-}\ze%(/init)?\.lua$]])
-  local parent = vim.split(module, '/')[1]
-  module = module:gsub('/', '.')
-  if module == '' then
-    dofile(filename)
-    return  -- vim.notify(string.format('Reloaded %s', filename))
+function M.lua(ev)
+  require('mia.reloader').reload_lua_module(ev.file, ev.buf)
+end
+
+function M.query(ev)
+  local ft, kind = ev.file:match('(%w+)/(%w+)%.scm')
+  local n = 0
+  local action, msg
+  if kind == 'highlights' then
+    action = function()
+      vim.cmd.TSBufDisable('highlight')
+      vim.cmd.TSBufEnable('highlight')
+    end
+    msg = 'Reloaded %s "%s" buffer%s highlights'
+  else
+    action = function()
+      vim.cmd.mkview()
+      vim.cmd.update()
+      vim.cmd.edit()
+      vim.cmd.loadview()
+    end
+    msg = 'Reloaded %s "%s" buffer%s'
   end
-
-  if parent == 'mia' or parent == 'vim' then
-    package.loaded[module] = dofile(filename)
-    vim.notify(string.format('Reloaded %s', relative))
-    return
-  end
-
-  if parent == 'plugins' then
-    local spec = dofile(filename)
-    package.loaded[module] = spec
-    require 'lazy.core.plugin'.Spec.new():parse { {}, spec }
-    require 'lazy.core.loader'.config(spec)
-    vim.notify(string.format("Reloaded '%s' config from '%s'", spec.name, relative))
-    return
-  end
-
-  _G._last_reloaded = source.unload(parent)
-  table.sort(_G._last_reloaded)
-
-  package.loaded[module] = dofile(filename) or true
-  for _, name in ipairs(_G._last_reloaded) do
-    if name ~= module then
-      require(name)
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].filetype == ft then
+      n = n + 1
+      vim.api.nvim_buf_call(buf, action)
     end
   end
-
-  vim.notify(string.format('Reloaded %s and all "%s" submodules', relative, parent))
+  vim.notify(msg:format(n, ft, n == 1 and '' or 's'))
 end
 
-function source.unload(name)
-  local _re = '^' .. name
-  _G._last_reloaded = {}
-  local unloaded = {}
-  for submod, _ in pairs(package.loaded) do
-    if submod:match(_re) then
-      package.loaded[submod] = nil
-      unloaded[#unloaded + 1] = submod
+function M.vim(ev)
+  vim.cmd.source(ev.file)
+end
+
+setmetatable(M, {
+  __index = function(_, k)
+    -- function to stop lua errors
+    return function(ev)
+      local msg = ('Unable to source filetype: ".%s"'):format(k)
+      if vim.api.nvim_buf_get_name(ev.buf) == ev.file then
+        msg = ('Unable to source %s files'):format(vim.bo[ev.buf].filetype)
+      end
+      vim.api.nvim_echo({ { msg, 'ErrorMsg' } }, true, {})
     end
-  end
-  return unloaded
-end
+  end,
 
-function source.set_query(filename, notify)
-  -- Get query files
-  -- re-source in order, simple now
-  local match = vim.fn.matchlist(filename, [[\v%(^|/)queries/([^/]+)/([^/]+).scm$]])
-  if #match == 0 then
-    error 'what happened'
-  end
-  local lang, name = match[2], match[3]
-  -- local files = vim.treesitter.query.get_files(lang, name)
-  local f = io.open(filename)
-  if f then
-    local qstr = f:read '*all'
-    f:close()
-    vim.treesitter.query.set(lang, name, qstr)
-  end
-  if notify then
-    local relative = vim.fn.matchstr(filename, [[\v%(^|/)\zsqueries/[^/]+/[^/]+.scm$]])
-    vim.notify(('Set query "%s" for lang "%s" from %s'):format(name, lang, relative))
-  end
-end
+  __call = util.restore_opt( --
+    { eventignore = { append = { 'SourceCmd' } } },
+    function(t, ev)
+      local ft = vim.bo[ev.buf].filetype
+      if vim.fn.fnamemodify(vim.fn.bufname(ev.buf), ':p') ~= ev.file then
+        ft = ev.file:match('%.(%w+)$')
+      end
 
-return source
+      local s, r = pcall(t[ft], ev)
+      if not s then
+        vim.schedule(function()
+          -- scheduled to avoid error in autocmd, which would stop the autocmd
+          error(r, 0)
+        end)
+      end
+    end
+  ),
+})
+
+return M

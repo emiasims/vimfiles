@@ -1,15 +1,16 @@
+---@type LazySpec
 return {
   'echasnovski/mini.doc',
   lazy = true,
 
   config = function()
-    nvim.create_augroup('mia-minidoc', { clear = true })
+    vim.api.nvim_create_augroup('mia-minidoc', { clear = true })
     local autocmd_id
-    nvim.create_user_command('MinidocEnable', function()
+    vim.api.nvim_create_user_command('MinidocEnable', function()
       if autocmd_id then
-        nvim.del_autocmd(autocmd_id)
+        vim.api.nvim_del_autocmd(autocmd_id)
       end
-      autocmd_id = nvim.create_autocmd('BufWritePost', {
+      autocmd_id = vim.api.nvim_create_autocmd('BufWritePost', {
         pattern = '*.lua',
         group = 'mia-minidoc',
         desc = 'Write docs on save',
@@ -20,9 +21,9 @@ return {
         end,
       })
     end, {})
-    nvim.create_user_command('MinidocDisable', function()
+    vim.api.nvim_create_user_command('MinidocDisable', function()
       if autocmd_id then
-        nvim.del_autocmd(autocmd_id)
+        vim.api.nvim_del_autocmd(autocmd_id)
       end
       autocmd_id = nil
     end, {})

@@ -1,3 +1,4 @@
+---@type LazySpec
 return {
   'nvim-treesitter/nvim-treesitter',
   event = { 'BufReadPost', 'BufNewFile' },
@@ -17,7 +18,7 @@ return {
 
     require 'nvim-treesitter.configs'.setup {
       -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-      ensure_installed = { 'bash', 'cpp', 'lua', 'python', 'c', 'javascript', 'org' },
+      ensure_installed = { 'bash', 'cpp', 'lua', 'python', 'c', 'javascript', 'org', 'regex', 'luap' },
 
       highlight = {
         enable = true,  -- false will disable the whole extension

@@ -1,91 +1,105 @@
 local M = {}
 
+-- Cache on ts changes
+-- Add elements with priority to a list : remove lowest prio on too smol
+
 local ts = vim.treesitter
 local api = vim.api
+---@return { [1]: string, [2]: string[] }[]
 function M.tsfoldtext(lnum, bufnr)
-  local foldstart = lnum or vim.v.foldstart
-  local bufnr = bufnr or api.nvim_get_current_buf()
+  lnum = lnum or vim.v.foldstart
+  bufnr = bufnr or api.nvim_get_current_buf()
 
   ---@type boolean, LanguageTree
   local ok, parser = pcall(ts.get_parser, bufnr)
   if not ok then
-    return vim.fn.foldtext()
+    return { { vim.fn.foldtext() or '', 'Folded' } }
   end
 
   local query = ts.query.get(parser:lang(), 'highlights')
   if not query then
-    return vim.fn.foldtext()
+    return { { vim.fn.foldtext() or '', 'Folded' } }
   end
 
-  local tree = parser:parse { foldstart - 1, foldstart }[1]
+  local tree = parser:parse({ lnum - 1, lnum })[1]
 
-  local line = api.nvim_buf_get_lines(bufnr, foldstart - 1, foldstart, false)[1]
-  if not line then
-    return vim.fn.foldtext()
+  local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
+  if not line or line:match('^%s*$') then
+    return { { vim.fn.foldtext() or '', 'Folded' } }
   end
 
-  -- local highlights = {}
-  -- local ids_per_char = {}
-  -- for i = 1, #line do
-  --   ids_per_char[i] = {}
-  -- end
+  ---@type { id: integer, conceal: string?, group: string, priority: integer, range: { [1]: integer, [2]: integer } }
+  local highlights = {}
 
-  local highlights = { { id = 1, group = '@folded', priority = 1, range = { 0, #line } } }
+  ---@type { integer: table<integer,boolean> }
   local ids_per_char = {}
   for i = 1, #line do
-    ids_per_char[i] = { 1 }
+    ids_per_char[i] = {}
   end
 
-  for id, node, metadata in query:iter_captures(tree:root(), 0, foldstart - 1, foldstart) do
+  for id, node, metadata in query:iter_captures(tree:root(), 0, lnum - 1, lnum) do
     local name = query.captures[id]
-    local start_row, start_col, end_row, end_col = node:range()
-
+    local start_row, start_col, _, end_row, end_col =
+      unpack(vim.treesitter.get_range(node, bufnr, metadata))
     local priority = tonumber(metadata.priority or vim.highlight.priorities.treesitter)
 
-    if start_row <= foldstart - 1 and end_row >= foldstart - 1 then
-      start_col = start_row < foldstart - 1 and 0 or start_col
-      end_col = end_row > foldstart - 1 and #line or end_col
+    if start_row <= lnum - 1 and end_row >= lnum - 1 then
+      start_col = start_row < lnum - 1 and 0 or start_col
+      end_col = end_row > lnum - 1 and #line or end_col
 
-      local hl = {
-        id = #highlights + 1,
+      local hlid = #highlights + 1
+      table.insert(highlights, {
+        id = hlid, -- for stabilizing sort
         conceal = metadata.conceal,
         group = '@' .. name,
         priority = priority,
         range = { start_col, end_col },
-      }
-      highlights[hl.id] = hl
+      })
 
       for i = start_col + 1, end_col do
-        table.insert(ids_per_char[i], hl.id)
+        ids_per_char[i][hlid] = true
       end
     end
   end
 
-  -- split into chunks with uniform ranges
-  local chunks = {}
-  local current = { ids = ids_per_char[1], range = { 1, 1 } }
+  -- split into chunks with uniform ranges for highlighting
+  ---@type { ids: table<integer, boolean>, range: { [1]: integer, [2]: integer } }
+  local chunks = { { ids = ids_per_char[1], range = { 1, 1 } } }
+  local current = chunks[1]
   for i = 2, #line do
-    local ids = ids_per_char[i]
-    if vim.deep_equal(current.ids, ids) then
-      current.range[2] = i
+    -- if the # of hls is different, obviously a different chunk
+    local new_chunk = #current.ids ~= #ids_per_char[i]
+    -- otherwise, make sure the ids are the same
+    for id, _ in pairs(ids_per_char[i]) do
+      if new_chunk then
+        break
+      end
+      new_chunk = new_chunk or not current.ids[id]
+    end
+
+    if new_chunk then
+      -- start a new chunk when we need to
+      table.insert(chunks, { ids = ids_per_char[i], range = { i, i } })
+      current = chunks[#chunks]
     else
-      table.insert(chunks, current)
-      current = { ids = ids, range = { i, i } }
+      -- after verifying, just increase the range of the chunk
+      current.range[2] = i
     end
   end
-  if current then
-    table.insert(chunks, current)
-  end
 
+  ---@type { [1]: string, [2]: string[] }[]
   local result = {}
+
+  -- sort chunk hls by priority and apply conceal or get chunk text
   for _, chunk in ipairs(chunks) do
     local hls = {}
-    for ix, id in ipairs(chunk.ids) do
-      hls[ix] = highlights[id]
+    for id, _ in pairs(chunk.ids) do
+      table.insert(hls, highlights[id])
     end
 
     table.sort(hls, function(a, b)
-      return a.priority < b.priority or (a.priority == b.priority and a.id < b.id)
+      -- id keeps the insertion order stable - table.sort is not a stable sort
+      return a.priority < b.priority or (a.priority == b.priority and a.id <= b.id)
     end)
 
     local conceal
@@ -93,19 +107,16 @@ function M.tsfoldtext(lnum, bufnr)
       conceal = conceal or hl.conceal
       hls[ix] = hl.group
     end
-    if #hls == 0 then
-      hls = { '@folded' }
-    end
-
-    table.insert(result, { conceal or line:sub(chunk.range[1], chunk.range[2]), hls })
+    local text = conceal or line:sub(chunk.range[1], chunk.range[2])
+    table.insert(result, { text, hls })
   end
 
   return result
 end
 
-function M.default(foldtext)
+function M.default(foldtext, bufnr)
   if not foldtext then
-    foldtext = M.tsfoldtext()
+    foldtext = M.tsfoldtext(nil, bufnr)
   end
 
   if type(foldtext) == 'string' then
@@ -119,19 +130,29 @@ function M.default(foldtext)
   for _, chunk in ipairs(foldtext) do
     vtWidth = vtWidth + vim.fn.strdisplaywidth(chunk[1])
   end
-  local width = nvim.win_get_width(0) - 4
-  local target = width - sufWidth - ((vim.o.number and 1 or 0) * vim.o.numberwidth)
+
+  local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+  local target = wininfo.width - wininfo.textoff - sufWidth
+
   if vtWidth < target then
     suffix = (' '):rep(target - vtWidth) .. suffix
-    table.insert(foldtext, { suffix, 'Comment' })
   end
+  table.insert(foldtext, { suffix, 'Comment' })
   return foldtext
 end
 
 function M.org()
-  local foldtext = M.default()
+  local foldtext
+  if vim.v.foldstart == 1 and vim.fn.getline(1):match('^%s*#%+[tT][iI][tT][lL][eE]:') then
+    foldtext = M.tsfoldtext(1)
+    foldtext = { foldtext[#foldtext] }
+  end
 
-  local heart = vim.iter(foldtext):find(function(t) return t[1] == '❤' end)
+  foldtext = M.default(foldtext)
+
+  local heart = vim.iter(foldtext):find(function(t)
+    return t[1] == '❤'
+  end)
   if heart then
     heart[1] = '❥'
   end
@@ -139,29 +160,108 @@ function M.org()
   return foldtext
 end
 
-function M.python()
+-- function M.lua(lnum, bufnr)
+-- end
+
+function M.python(lnum, bufnr)
+  lnum = lnum or vim.v.foldstart
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   local foldtext = M.tsfoldtext()
-  local bufnr = nvim.get_current_buf()
-  local text = vim.fn.getline(vim.v.foldstart)  --[[@as string]]
+  local text = vim.fn.getbufoneline(bufnr, lnum) --[[@as string]]
 
   -- Process decorated functions
-  if text:match '^%s*@' then
-    local pos = { vim.v.foldstart - 1, #vim.fn.getbufline(bufnr, vim.v.foldstart)[1] - 1 }
-    local decorator = vim.treesitter.get_node { bufnr = bufnr, pos = pos }
+  if text:match('^%s*@') then
+    local pos = { lnum - 1, #vim.fn.getbufline(bufnr, lnum)[1] - 1 }
+    local decorator = vim.treesitter.get_node({ bufnr = bufnr, pos = pos })
     while decorator and decorator:type() ~= 'decorated_definition' do
       decorator = decorator:parent()
     end
     if not decorator then
-      return M.default()
+      return M.default(foldtext)
     end
 
-    local line = decorator:field 'definition'[1]:start()
+    local line = decorator:field('definition')[1]:start()
     local new_foldtext = M.tsfoldtext(line + 1)
-    while #new_foldtext > 0 and new_foldtext[1][1]:match '^%s+$' do
+    while #new_foldtext > 0 and new_foldtext[1][1]:match('^%s+$') do
       table.remove(new_foldtext, 1)
     end
     new_foldtext[1][1] = ' ' .. new_foldtext[1][1]
     vim.list_extend(foldtext, new_foldtext)
+
+    -- Process decorated functions
+  elseif text:match('^%s*class') then
+    local pos = { lnum - 1, #vim.fn.getbufline(bufnr, lnum)[1] - 1 }
+    local class = vim.treesitter.get_node({ bufnr = bufnr, pos = pos })
+    while class and class:type() ~= 'class_definition' do
+      class = class:parent()
+    end
+    if not class then
+      return M.default(foldtext)
+    end
+
+    local params
+    for node in class:field('body')[1]:iter_children() do
+      if
+        node:type() == 'function_definition'
+        and vim.treesitter.get_node_text(node:field('name')[1], bufnr):match('__init__')
+      then
+        params = node:field('parameters')[1]
+        break
+      end
+    end
+    if not params then
+      return M.default(foldtext)
+    end
+    local matcher = function(char)
+      return function(chunk)
+        return chunk[1] == char
+      end
+    end
+
+    -- local it_ft = vim.iter(require('mia.fold').ts_chunks(params, bufnr))
+    -- local it_ft = vim.iter(P(require('mia.fold').ts_chunks(params:start() + 1, bufnr)))
+    local it_ft = vim.iter(M.tsfoldtext(params:start() + 1, bufnr))
+    local open = it_ft:find(matcher('('))
+    local close = it_ft:rfind(matcher(')'))
+    if not (open and close) then
+      return M.default(foldtext)
+    end
+
+    if it_ft:peek() and it_ft:peek()[1] == 'self' then
+      it_ft:next()
+      while it_ft:peek() and (it_ft:peek()[1]:match('^%s*,%s*$') or it_ft:peek()[1]:match('^%s$')) do
+        it_ft:next()
+      end
+    end
+    local args = it_ft:totable()
+
+    local semi = table.remove(foldtext)
+    table.insert(foldtext, open)
+    vim.list_extend(foldtext, args)
+    table.insert(foldtext, close)
+    table.insert(foldtext, semi)
+  elseif text:match('^%s*"""%s*$') then
+    local nb = vim.api.nvim_buf_call(bufnr, function()
+      return vim.fn.nextnonblank(lnum + 1)
+    end)
+    local docline = vim.fn.getbufline(bufnr, nb)[1]:match('^%s*(%S.*)')
+    local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+    local target = wininfo.width - wininfo.textoff - 11 - 15
+    docline = table.concat(
+      vim.iter(docline:gmatch('%S*')):fold({ len = 0, text = {} }, function(t, s)
+        if s == '' then
+        elseif t.len + #s > target then
+          t.len = 9000
+        else
+          t.len = t.len + #s
+          table.insert(t.text, s)
+        end
+        return t
+      end).text,
+      ' '
+    )
+    table.insert(foldtext, { ' ' })
+    table.insert(foldtext, { docline, 'String' })
   end
 
   return M.default(foldtext)

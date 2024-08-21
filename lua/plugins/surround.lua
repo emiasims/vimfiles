@@ -1,8 +1,10 @@
 -- needs doing before it's loaded, config occurs after packadd.
 vim.g.surround_no_mappings = 1
 
+---@type LazySpec
 return {
   'tpope/vim-surround',
+  ---@diagnostic disable: missing-fields
   keys = {
     { 'Z', '<Plug>VSurround', mode = 'x' },
     { 'cZ', '<Plug>CSurround', mode = 'n' },
@@ -15,4 +17,5 @@ return {
     { 'gZ', '<Plug>YSurround', mode = 'n' },
     { 'gz', '<Plug>Ysurround', mode = 'n' },
   },
+  ---@diagnostic enable: missing-fields
 }

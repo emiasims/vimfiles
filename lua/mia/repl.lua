@@ -1,15 +1,12 @@
 local repl = {}
 
-local function nvim_err(msg)
-  nvim.echo({ { msg, 'Error' } }, true, {})
-end
-
 local cfg = {
   cmd = {
     python = _G._conda.env .. '/bin/ipython',  -- lua/mia/conda.lua
     julia = 'julia'
   },
   keys = { global = true, motion = 'gx', line = 'gxl' },
+  tkeys = { confirm = '<Cr>' },
   mark = 'x',
   keybinds = { repl_only = false },
   endline = { python = '<Cr><C-u>' }, -- default and filetypes
@@ -39,18 +36,18 @@ end
 
 function repl._setup_endline(bufnr, filetype)
   if bufnr == true then
-    bufnr = nvim.get_current_buf()
+    bufnr = vim.api.nvim_get_current_buf()
   end
   vim.b.repl_endline = cfg.endline[filetype]
 end
 
 function repl.get_target()
   local winnr = vim.tbl_filter(function(x)
-    return nvim.buf_get_option(vim.fn.winbufnr(x), 'buftype') == 'terminal'
-  end, nvim.tabpage_list_wins(0))[1]
+    return vim.api.nvim_buf_get_option(vim.fn.winbufnr(x), 'buftype') == 'terminal'
+  end, vim.api.nvim_tabpage_list_wins(0))[1]
   if winnr then
     local buffer = vim.fn.winbufnr(winnr)
-    for _, chan in ipairs(nvim.list_chans()) do
+    for _, chan in ipairs(vim.api.nvim_list_chans()) do
       if chan.buffer and buffer == vim.fn.bufnr(chan.buffer) then
         return chan
       end
@@ -61,7 +58,7 @@ end
 function repl.send_text(text, target)
   target = target or repl.get_target()
   if not target then
-    return nvim_err 'No terminal window displayed in current tab.'
+    return vim.api.nvim_err_writeln 'No terminal window displayed in current tab.'
   end
 
   if type(text) == 'string' then
@@ -72,8 +69,8 @@ function repl.send_text(text, target)
   if vim.o.filetype == 'python' then
     text = text .. endl
   end
-  text = nvim.replace_termcodes(text, true, false, true)
-  nvim.chan_send(target.id, text)
+  text = vim.api.nvim_replace_termcodes(text, true, false, true)
+  vim.api.nvim_chan_send(target.id, text)
 end
 
 function repl.send_range(open, close, linewise)
@@ -82,24 +79,24 @@ function repl.send_range(open, close, linewise)
     open, close, linewise = { open }, { close }, true
   else
     -- send range over two marks
-    open = nvim.buf_get_mark(0, open)
-    close = nvim.buf_get_mark(0, close)
+    open = vim.api.nvim_buf_get_mark(0, open)
+    close = vim.api.nvim_buf_get_mark(0, close)
   end
-  nvim.buf_set_mark(0, 'x', open[1], open[2], {})
+  vim.api.nvim_buf_set_mark(0, 'x', open[1], open[2], {})
   if linewise then
-    repl.send_text(nvim.buf_get_lines(0, open[1] - 1, close[1], true))
+    repl.send_text(vim.api.nvim_buf_get_lines(0, open[1] - 1, close[1], true))
   else
-    repl.send_text(nvim.buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
+    repl.send_text(vim.api.nvim_buf_get_text(0, open[1] - 1, open[2], close[1] - 1, close[2] + 1, {}))
   end
 end
 
 function repl.send_visual()
   if vim.fn.visualmode():match '[vV]' then
     -- this is odd. Is there a better way to exit visual mode and update the marks?
-    nvim.feedkeys('', 'nx', false)
+    vim.api.nvim_feedkeys('', 'nx', false)
     repl.send_range('<', '>', vim.fn.visualmode():match 'V')
   else
-    nvim_err 'Trying to send visual text when not in visual char or line mode'
+    vim.api.nvim_err_writeln 'Trying to send visual text when not in visual char or line mode'
   end
 end
 
@@ -107,7 +104,7 @@ function repl.opfunc(type)
   if type == 'line' or type == 'char' then
     repl.send_range('[', ']', type == 'line')
   else
-    nvim_err 'Unable send blocks to repl'
+    vim.api.nvim_err_writeln 'Unable send blocks to repl'
   end
 end
 
@@ -117,11 +114,11 @@ function repl.send_motion()
 end
 
 function repl.send_line()
-  local line = nvim.get_current_line()
+  local line = vim.api.nvim_get_current_line()
   local ws = #line:match '^%s*'
-  nvim.buf_set_mark(0, 'x', vim.fn.line '.', ws, {})
+  vim.api.nvim_buf_set_mark(0, 'x', vim.fn.line '.', ws, {})
   repl.send_text(line:sub(ws + 1))
-  nvim.feedkeys('j', 'n', false)
+  vim.api.nvim_feedkeys('j', 'n', false)
 end
 
 function repl.send_modeline()
@@ -158,13 +155,13 @@ function repl.start(filetype)
   if cfg.cmd[filetype] == 'function' then
     bufnr = cfg.cmd[filetype]()
     if not bufnr then
-      nvim_err(('Repl setup function for "%s" must return terminal buffer number'):format(filetype))
+      vim.api.nvim_err_writeln(('Repl setup function for "%s" must return terminal buffer number'):format(filetype))
       return
     end
   else
     vim.cmd.vsplit()
     vim.cmd.term(cfg.cmd[filetype])
-    bufnr = nvim.get_current_buf()
+    bufnr = vim.api.nvim_get_current_buf()
     vim.cmd.wincmd 'p'
     repl.send_modeline()
   end
@@ -175,11 +172,11 @@ function repl.start(filetype)
   repl._setup_endline(bufnr, filetype)
 end
 
-nvim.create_user_command('Repl', function(cmd)
+vim.api.nvim_create_user_command('Repl', function(cmd)
   -- set up keybinds here?
   repl.start(cmd.args == '' and vim.bo.filetype or cmd.args)
 end, { nargs = '?', complete = 'filetype', bar = true })
 
-nvim.create_user_command('ReplModeLine', repl.send_modeline, { bar = true })
+vim.api.nvim_create_user_command('ReplModeLine', repl.send_modeline, { bar = true })
 
 return repl

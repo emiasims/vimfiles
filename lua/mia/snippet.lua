@@ -28,8 +28,8 @@ end
 
 local function from_vscode(ft)
   local snipfiles = vim.list_extend(
-    nvim.get_runtime_file(('snippets/%s.json'):format(ft), true),
-    nvim.get_runtime_file(('snippets/%s/*.json'):format(ft), true)
+    vim.api.nvim_get_runtime_file(('snippets/%s.json'):format(ft), true),
+    vim.api.nvim_get_runtime_file(('snippets/%s/*.json'):format(ft), true)
   )
 
   local it = vim.iter(snipfiles)

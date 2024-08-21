@@ -1,18 +1,25 @@
----@diagnostic disable: duplicate-set-field
-function _G.P(...)
+local G = {}
+
+function G.P(...)
   local v = select(2, ...) and { ... } or ...
-  vim.notify(vim.inspect(v))
-  return v
+  print(vim.inspect(v))
+  return ...
 end
 
-_G.T = setmetatable({}, {
+function G.N(...)
+  local v = select(2, ...) and { ... } or ...
+  vim.notify(vim.inspect(v))
+  return ...
+end
+
+G.T = setmetatable({}, {
   __call = function(self, ...)
     self[1](...)
   end,
 
   __index = function(_, key)
     if type(key) ~= 'number' then
-      error 'Indexing T must be done with a number'
+      error('Indexing T must be done with a number')
     end
 
     return function(...)
@@ -29,26 +36,34 @@ _G.T = setmetatable({}, {
   end,
 })
 
-function _G.P1(...)
+---@param ... any
+---@return any
+function G.P1(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify_once(vim.inspect(v))
   return v
 end
 
-_G.nvim = vim.iter(vim.api):fold({}, function(t, k, v)
-  t[k:sub(6)] = v  -- removes 'nvim_' ➜ nvim.buf_call
-  return t
-end)
-
-local og = require 'mia.og'
-og.system = og.system or vim.system
--- basic workaround for me for https://github.com/neovim/neovim/issues/24567
-vim.system = function(cmd, opts, on_exit)
-  if type(cmd) == 'table' and cmd[1] == 'xdg-open' then
-    local jopts = opts or vim.empty_dict()
-    jopts.on_exit = on_exit
-    vim.fn.jobstart(cmd, jopts)
-    cmd = { 'true' }
-  end
-  return og.system(cmd, opts, on_exit)
+function G.rerequire(module)
+  package.loaded[module] = nil
+  return require(module)
 end
+
+function G.put(vals)
+  if type(vals) ~= 'table' then
+    vals = { vals }
+  end
+  G.vim.api.nvim_put(vals, 'l', true, false)
+end
+
+local function setup()
+  _G.util = require('mia.util')
+  _G.keys = vim.tbl_keys
+  _G.vals = vim.tbl_values
+
+  for name, func in pairs(G) do
+    _G[name] = func
+  end
+end
+
+return { G = G, setup = setup }

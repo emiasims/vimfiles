@@ -1,5 +1,5 @@
 -- --------------------------------------------------------------------------
--- Name        Latte      Frappe     Macchiato   Mocha      Usage
+-- Name        Latte      Frappe   **Macchiato   Mocha      Usage
 -- ----------- ---------- ---------- ----------- ---------- -----------------
 -- rosewater   #dc8a78    #f2d5cf    #f4dbd6     #f5e0dc    Winbar
 -- flamingo    #dd7878    #eebebe    #f0c6c6     #f2cdcd    Target word
@@ -28,15 +28,16 @@
 -- mantle      #e6e9ef    #292c3c    #1e2030     #181825    Darker bg
 -- crust       #dce0e8    #232634    #181926     #11111b    Darkest bg
 
+---@type LazySpec
 return {
   'catppuccin/nvim',
   name = 'catppuccin',
   lazy = false,
   opts = {
-    integrations = { vim_sneak = true, ufo = false },
+    integrations = { vim_sneak = false, ufo = false, noice=true, notify=true },
 
     custom_highlights = function(colors)
-      local util = require 'catppuccin.utils.colors'
+      local util = require('catppuccin.utils.colors')
       local stl = {
         base = util.brighten(colors.base, 0.12),
         mantle = util.brighten(colors.mantle, 0.1),
@@ -57,9 +58,9 @@ return {
         ['@text.strong'] = { fg = colors.none },
         ['@text.emphasis'] = { fg = colors.none },
         ['@text.strike'] = { fg = colors.none },
-        ['@text.uri'] = { style = { 'italic' } },  -- underline = false didn't work?
+        ['@text.uri'] = { style = { 'italic' } }, -- underline = false didn't work?
 
-        ['@method'] = { link = '@function.builtin' },
+        -- ['@method'] = { link = '@lsp.type.method' },
 
         CommentSansItalic = { fg = colors.overlay0 },
 
@@ -75,11 +76,19 @@ return {
         TabLineWin = { fg = colors.mauve, bg = stl.mantle, bold = true },
         TabLineSelNumber = { fg = colors.red, bg = stl.mantle, bold = true },
 
+        TabCopySel = { fg = colors.mauve, bg = stl.mantle, bold = true },
+        -- TabLineTask = { fg = colors.yellow, bg = stl.mantle, bold = true },
+        -- TabLineNoTask = { fg = colors.red, bg = stl.mantle, bold = true },
+        TabLineRecording = { fg = colors.yellow, bg = stl.crust },
+        TabLineSession = { fg = colors.pink, bg = stl.crust },
+
         StatusLine = { bg = stl.crust },
         stlModified = { fg = colors.red, bg = stl.crust },
         stlTypeInfo = { fg = colors.sky, bg = stl.crust },
-        stlDirInfo = { fg = colors.blue, bg = stl.mantle },
         stlErrorInfo = { fg = colors.red, bg = stl.crust, bold = true },
+        stlDescription = { fg = colors.blue, bg = stl.mantle },
+        stlNodeTree = { fg = colors.overlay1, bg = stl.crust },
+
         stlNormalMode = { fg = colors.peach, bg = stl.base, bold = true },
         stlTerminalMode = { fg = colors.lavender, bg = stl.base, bold = true },
         stlInsertMode = { bg = colors.sky, fg = colors.base, bold = true },
@@ -87,14 +96,13 @@ return {
         stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
 
         FlashBackdrop = { link = 'CommentSansItalic' },
-
       }
     end,
   },
 
   config = function(config)
-    vim.cmd.highlight 'clear'
-    require 'catppuccin'.setup(config.opts)
-    require 'catppuccin'.load 'macchiato'
+    vim.cmd.highlight('clear')
+    require('catppuccin').setup(config.opts)
+    require('catppuccin').load('macchiato')
   end,
 }
