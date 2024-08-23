@@ -162,6 +162,10 @@ end)
 --
 
 command('UpdateMeta', function()
+
+  -- mia values or something
+
+  -- vim.hlgroup
   local hls = {}
   local hexpat = string.rep('[%da-fA-F]', 6)
   for name, hl in pairs(vim.api.nvim_get_hl(0, {})) do
@@ -211,5 +215,18 @@ end, {
   nargs = '?',
   complete = 'file',
 })
+
+-- commands({
+--   Move = { 'Edit file as root', '' },
+--   Delete = { 'Delete' },
+--   Delview = {},
+--   EditFtplugin = {},
+--   CloseHiddenBuffers = {},
+--   Redir = {},
+--   Clearqflist = {},
+--   Clearloclist = {},
+--   UpdateMeta = {},
+--   SudoEdit = {},
+-- })
 
 return M

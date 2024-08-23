@@ -1,4 +1,4 @@
-local line = require('mia.plugin.line')
+local line = mia.line
 local a = vim.api
 
 ---@alias winlayout {[1]: 'leaf', [2]: number} | {[1]: 'row'|'col', [2]: winlayout[]}

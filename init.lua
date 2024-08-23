@@ -1,5 +1,4 @@
-require('mia.globals').setup()
-_G.mia = require('mia')
-mia.setup('mia/plugin')  -- my 'plugins'
-
-require('mia.lazy')  -- plugins
+_G.mia = require('mia').setup({ 'plugin', 'autoload' })
+mia.require('global')
+mia.require('lazy')
+mia.load('plugin')

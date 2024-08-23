@@ -1,5 +1,5 @@
 return setmetatable({
-  _original = mia.loaded.og and mia.og._original or {},
+  -- _original = mia.loaded.og and mia.og._original or {},
 }, {
   __index = function(t, k)
     return t._original[k]
