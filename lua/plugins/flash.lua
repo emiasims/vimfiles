@@ -2,7 +2,6 @@
 return {
   {
     'folke/flash.nvim',
-    lazy=false,
     opts = {
       search = { multi_window = false, wrap = false },
       label = { uppercase = false },

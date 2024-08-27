@@ -2,17 +2,18 @@
 return {
   {
     'milisims/lazy-ctx.nvim',
-    -- event = 'VeryLazy',
+    event = 'VeryLazy',
     -- priority = math.huge,
-    lazy = false,
+    -- lazy = true,
     config = true,
     dev = true,
+    dependencies = { 'ctx.nvim' },
   },
   {
     'milisims/ctx.nvim',
     -- FIXME: reloading doesn't reload keys defined like this
     dev = true,
-    dependencies = { 'lazy-ctx.nvim' },
+    -- dependencies = { 'lazy-ctx.nvim' },
     ctx = {
       {
         mode = 'ca',

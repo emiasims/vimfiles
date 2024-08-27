@@ -5,6 +5,7 @@ vim.g.copilot_assume_mapped = true
 return {
   {
     'Robitx/gp.nvim',
+    event = 'VeryLazy',
     opts = {
       providers = {
         openai = { disable = false, secret = mia.secrets.openai },

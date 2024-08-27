@@ -2,6 +2,6 @@
 return {
   'williamboman/mason.nvim',
   build = ':MasonUpdate',
-  lazy = false,
+  event = 'VeryLazy',
   config = true,
 }

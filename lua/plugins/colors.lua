@@ -34,7 +34,7 @@ return {
   name = 'catppuccin',
   lazy = false,
   opts = {
-    integrations = { vim_sneak = false, ufo = false, noice=true, notify=true },
+    integrations = { vim_sneak = false, ufo = false, noice = true, notify = true },
 
     custom_highlights = function(colors)
       local util = require('catppuccin.utils.colors')
@@ -101,7 +101,9 @@ return {
   },
 
   config = function(config)
-    vim.cmd.highlight('clear')
+    if not vim.fn.has('vim_starting') then
+      vim.cmd.highlight('clear')
+    end
     require('catppuccin').setup(config.opts)
     require('catppuccin').load('macchiato')
   end,
