@@ -1,4 +1,22 @@
+-- settings that make a visual change, so do them immediately on starting.
+
+local set = function(name, value)
+  vim.opt[name] = value
+end
+
 local settings = {
+  cmdheight = 1,
+  colorcolumn = '80', -- must be string
+  signcolumn = 'yes',
+  number = true,
+  relativenumber = true,
+  showcmdloc = 'tabline',
+  showtabline = 2,
+}
+
+vim.iter(settings):each(set)
+
+settings = {
   report = 0,
   path = { '.', '**' },
   virtualedit = 'block',
@@ -28,12 +46,8 @@ local settings = {
   shortmess = 'aAoOTIcF',
   scrolloff = 4,
   sidescrolloff = 2,
-  showtabline = 2,
   pumheight = 20,
-  cmdheight = 1,
   cmdwinheight = 5,
-  colorcolumn = '80', -- must be string
-  signcolumn = 'yes',
   showbreak = '↘',
   wildmode = { 'longest:full', 'full' },
   conceallevel = 2,
@@ -56,20 +70,17 @@ local settings = {
   autowriteall = true,
   splitright = true,
   showfulltag = true,
-  number = true,
-  relativenumber = true,
   -- lazyredraw = true,
   cursorline = true,
   list = true,
   termguicolors = true,
-
-  showcmdloc = 'tabline',
 
   sessionoptions = { 'blank', 'buffers', 'folds', 'tabpages', 'winsize', 'terminal' },
 
   wrap = false,
   shell = 'bash',
 
+  -- TODO move to mia.fold
   foldmethod = 'expr',
   foldexpr = 'v:lua.vim.treesitter.foldexpr()',
   foldtext = [[v:lua.require'mia.fold'.text()]],
@@ -78,8 +89,9 @@ local settings = {
   guicursor = { 'n-v:block', 'i-ci-ve-c:ver25', 'r-cr:hor20', 'o:hor50' },
 }
 
-vim.iter(settings):each(function(name, value)
-  vim.opt[name] = value
+-- faster load..
+vim.schedule(function()
+  vim.iter(settings):each(set)
 end)
 
 if vim.fn.executable('ag') then
@@ -103,14 +115,17 @@ else
   vim.opt.backupdir:append('.')
 end
 
--- nvim uses modeline to set filetype for help.
--- I don't want modelines, so add a filetype for it
-vim.opt.modeline = false
-local is_text = require('vim.filetype.detect').txt
-local is_help = function(...)
-  return is_text(...) or 'help'
-end
-vim.filetype.add({
-  extension = { txt = is_help },
-  pattern = { ['/doc/[^/]*%.txt$'] = is_help },
-})
+-- -- nvim uses modeline to set filetype for help.
+-- -- I don't want modelines, so add a filetype for it
+
+vim.schedule(function()
+  vim.opt.modeline = false
+  local is_text = require('vim.filetype.detect').txt
+  local is_help = function(...)
+    return is_text(...) or 'help'
+  end
+  vim.filetype.add({
+    extension = { txt = is_help },
+    pattern = { ['/doc/[^/]*%.txt$'] = is_help },
+  })
+end)
