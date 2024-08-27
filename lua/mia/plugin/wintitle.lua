@@ -156,6 +156,7 @@ M.setup = function()
     end,
   })
 end
+M.setup()
 
 -- maybe tab stuff?
 
