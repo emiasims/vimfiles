@@ -1,3 +1,6 @@
+if has('nvim')
+  finish
+endif
 augroup vimrc_general
   autocmd!
   au BufWinLeave * if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif

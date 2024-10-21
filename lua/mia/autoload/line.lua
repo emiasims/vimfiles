@@ -70,14 +70,18 @@ local function build(spec)
 
   local eval = compile(spec)
 
-  -- local maps = map(opts)
+  local last_success = 'Tabline generation failed'
   return function(_opts)
-    local opts = setup(_opts)
-    local ret = front .. table.concat(eval(opts), sep) .. back
-    if teardown then
-      teardown(opts)
-    end
-    return ret
+    local ok, ret = pcall(function()
+      local opts = setup(_opts)
+      local ret = front .. table.concat(eval(opts), sep) .. back
+      if teardown then
+        teardown(opts)
+      end
+      return ret
+    end)
+    last_success = ok and ret or last_success
+    return last_success
   end
 end
 

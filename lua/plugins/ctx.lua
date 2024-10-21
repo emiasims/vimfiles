@@ -13,8 +13,13 @@ return {
     'milisims/ctx.nvim',
     -- FIXME: reloading doesn't reload keys defined like this
     dev = true,
-    -- dependencies = { 'lazy-ctx.nvim' },
     ctx = {
+      -- Tab: if all whitespace,
+      -- if not whitespace, but there's a ghost-text completion, accept it
+      -- normal tab otherwise
+
+      -- <C-t> on cmdline that starts with e or edit, make it tabedit and go
+      -- same for C-v for vsplit and C-s for split? something like that
       {
         mode = 'ca',
         ctx = 'builtin.cmd_start',
@@ -29,7 +34,10 @@ return {
           ase = 'AutoSourceEnable',
           asd = 'AutoSourceDisable',
           vga = 'vimgrep // **/*.<C-r>=expand("%:e")<Cr><C-Left><Left><Left>',
-          cqf = 'Clearqflist',
+          ccle = 'Cclearquickfix',
+          cclear = 'Cclearquickfix',
+          lcle = 'Lclearloclist',
+          lclear = 'Lclearloclist',
           w2 = 'w',
           dws = 'mkview | silent! %s/\\s\\+$// | loadview | update',
           eh = 'edit <C-r>=expand("%:h")<Cr>/',

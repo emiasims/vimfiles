@@ -108,12 +108,12 @@ end
 local function peek()
   ---@diagnostic disable
   local res
-  if _G.peek == 'function' then
-    res = peek(_G.peek())
-  elseif _G.peek == 'table' then
-    res = table.concat(_G.peek, ' ')
+  if type(_G.peek) == 'function' then
+    res = _G.peek()
+  elseif type(_G.peek) == 'table' then
+    res = vim.inspect(_G.peek):gsub('\n', ' ')
   elseif _G.peek ~= nil then
-    res = tostring(_G.peek)
+    res = vim.inspect(_G.peek)
   end
   return res or ''
   ---@diagnostic enable
@@ -175,7 +175,7 @@ local function inspect(...)
     vim.cmd.normal({ cmd, bang = true })
     vim.treesitter.inspect_tree({})
   else
-    util.warn('No action for mouse click: ' .. mouse)
+    mia.warn('No action for mouse click: ' .. mouse)
   end
 
 end
@@ -187,26 +187,32 @@ end
 -- width that deals with laststatus
 
 local function active()
-  local mode = mode_info()
-  local info = buf_info()
-  -- local w = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(stl.winid())
-  -- w = w - #info.desc - #info.title
-  -- local dir, fname = dir_info(), filename()
-  return table.concat({
-    hl(mode.abbrev, mode.color),
-    hl(info.desc, 'stlDescription'),
-    info.title,
-    hl('%m', 'stlModified'),
-    hl(macro(), 'stlRecording'),
-    peek(),
-    '%=%#stlNodeTree#',
-    node_tree(),
-    -- hl(node_tree(), 'stlNodeTree'),
-    obsession_status(),
-    hl(error_info(), 'stlErrorInfo'),
-    hl('%y', 'stlTypeInfo'),
-    hl(cursor_info(), mode.color),
-  })
+  local ok, res = pcall(function()
+    local mode = mode_info()
+    local info = buf_info()
+    -- local w = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(stl.winid())
+    -- w = w - #info.desc - #info.title
+    -- local dir, fname = dir_info(), filename()
+    return table.concat({
+      hl(mode.abbrev, mode.color),
+      hl(info.desc, 'stlDescription'),
+      info.title,
+      hl('%m', 'stlModified'),
+      hl(macro(), 'stlRecording'),
+      peek(),
+      '%=%#stlNodeTree#',
+      node_tree(),
+      -- hl(node_tree(), 'stlNodeTree'),
+      obsession_status(),
+      hl(error_info(), 'stlErrorInfo'),
+      hl('%y', 'stlTypeInfo'),
+      hl(cursor_info(), mode.color),
+    })
+  end)
+  if not ok then
+    return 'Error: ' .. res
+  end
+  return res
 end
 
 local function inactive()

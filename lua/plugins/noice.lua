@@ -52,7 +52,7 @@ return {
 
     -- hide virtual text when hlsearch is disabled.
     -- Not sure if this is suppsed to happen automatically, but it doesn't for me
-    util.autocmd('OptionSet', {
+    mia.autocmd('OptionSet', {
       pattern = 'hlsearch',
       callback = function()
         if not vim.v.option_new then
@@ -60,6 +60,17 @@ return {
         end
       end,
     })
+
+    -- mia.augroup({
+    --   OptionSet = {
+    --     hlsearch = function()
+    --       if not vim.v.option_new then
+    --         require('noice.view').get_view('virtualtext', {}):hide()
+    --       end
+    --     end,
+    --   },
+    -- })
+
   end,
 
   dependencies = { 'MunifTanjim/nui.nvim', 'stevearc/dressing.nvim' },

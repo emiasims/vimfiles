@@ -1,6 +1,7 @@
 ---@type LazySpec
 return {
   'echasnovski/mini.starter',
+  lazy = vim.fn.argc() > 0,
   config = function()
     local starter = require('mini.starter')
     starter.setup({

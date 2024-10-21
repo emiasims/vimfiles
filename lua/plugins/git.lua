@@ -3,7 +3,7 @@ return {
   { 'tpope/vim-fugitive', event = 'VeryLazy' },
   {
     'lewis6991/gitsigns.nvim',
-    event = { 'BufNewFile', 'BufReadPost' },
+    event = 'TextChanged',
     opts = {
       on_attach = function(bufnr)
         local gs = require('gitsigns')

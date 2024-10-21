@@ -11,8 +11,6 @@ vim.g.gutentags_ctags_exclude = { 'data' }
 ---@type LazySpec
 return {
   'tpope/vim-repeat',
-  'tpope/vim-obsession',
-  -- 'tpope/vim-scriptease',
   { 'tpope/vim-abolish', cmd = { 'Subvert', 'Abolish' }, keys = 'cr' },
   {
     'tpope/vim-commentary',

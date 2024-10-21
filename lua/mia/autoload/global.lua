@@ -1,20 +1,5 @@
 local G = {}
 
-local REQUIRE = require
-local load_error = {}
-local loading = {}
-function G.require(module)
-  table.insert(loading, module)
-  local ok, mod = pcall(REQUIRE, module)
-  table.remove(loading)
-  if not ok then
-    load_error[module] = load_error[module] or {}
-    table.insert(load_error[module], mod)
-    error(mod, 0)
-  end
-  return mod
-end
-
 function G.P(...)
   local v = select(2, ...) and { ... } or ...
   print(vim.inspect(v))
@@ -61,7 +46,7 @@ end
 
 function G.rerequire(module)
   package.loaded[module] = nil
-  return G.require(module)
+  return require(module)
 end
 
 function G.put(vals)
@@ -71,7 +56,6 @@ function G.put(vals)
   G.vim.api.nvim_put(vals, 'l', true, false)
 end
 
-G.util = G.require('mia.util')
 G.keys = vim.tbl_keys
 G.vals = vim.tbl_values
 

@@ -1,4 +1,7 @@
-_G.mia = require('mia').setup({ 'plugin', 'autoload' })
+_G.mia = require('mia')
+
 mia.require('global')
-mia.require('lazy')
-mia.load('plugin')
+
+mia.load('plugin') -- loads all in that dir
+require('mia.lazy_init') -- plugins
+mia.load('after')

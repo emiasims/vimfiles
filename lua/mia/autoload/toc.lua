@@ -90,11 +90,20 @@ local function get_toc(bufnr, lang)
 end
 
 local function show_toc()
-  local name = vim.fn.bufname()
-  local toc = get_toc()
-  vim.fn.setloclist(0, toc, ' ')
-  vim.cmd.lopen()
-  vim.w.quickfix_title = 'Table of Contents: ' .. name
+  local parser = vim.treesitter.get_parser()
+  local _, query = pcall(vim.treesitter.query.get, parser:lang(), 'toc')
+
+  if parser and query then
+    local name = vim.fn.bufname()
+    local toc = get_toc()
+    vim.fn.setloclist(0, toc, ' ')
+    vim.cmd.lopen()
+    vim.w.quickfix_title = 'Table of Contents: ' .. name
+  elseif parser then
+    mia.warn("No toc query found for '" .. parser:lang() .. "'")
+  else
+    mia.warn('No parser found for filetype ' .. vim.treesitter.language.get_lang(vim.bo.filetype))
+  end
 end
 
 return {

@@ -32,7 +32,7 @@
 return {
   'catppuccin/nvim',
   name = 'catppuccin',
-  lazy = false,
+  ---@type CatppuccinOptions
   opts = {
     integrations = { vim_sneak = false, ufo = false, noice = true, notify = true },
 
@@ -100,11 +100,16 @@ return {
     end,
   },
 
+  ---@param config { opts:  CatppuccinOptions }
   config = function(config)
     if not vim.fn.has('vim_starting') then
       vim.cmd.highlight('clear')
     end
     require('catppuccin').setup(config.opts)
     require('catppuccin').load('macchiato')
+    vim.schedule(function()
+      -- prevents flicker with using cache manually
+      vim.cmd.redraw({ bang = true })
+    end)
   end,
 }

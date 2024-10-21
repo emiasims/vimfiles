@@ -33,7 +33,7 @@ local function pretty_windows(opts)
   }
 end
 
-local function setup()
+local function prep()
   local tab_id = a.nvim_get_current_tabpage()
   local tab_nr = a.nvim_tabpage_get_number(tab_id)
   local win_id = a.nvim_get_current_win()
@@ -109,7 +109,8 @@ end
 
 ---@param opts tabline.opts
 local function tabnr(opts)
-  return { ' ' .. tostring(opts.eval.nr), opts.eval.hl }
+  local session = vim.t[opts.eval.id].session_group
+  return { ' ' .. tostring(opts.eval.nr) .. (session and (' ' .. session) or ''), opts.eval.hl }
 end
 
 local function session()
@@ -140,30 +141,41 @@ local function macro()
   return reg ~= '' and ('[q:%s]'):format(reg)
 end
 
-local tabline = line.build( --
-  {
-    setup = setup,
-    each_tab({ --
-      tabnr,
-      -- task,
-      pretty_windows,
-    }, { active = 'TabLineSel', inactive = 'TabLine' }),
-    { '%=', 'TabLineFill' }, -- separator
-    { macro, 'TabLineRecording' },
-    { '%S ', 'TabLineFill' }, -- showmsg
-    { session, 'TabLineSession' }, -- showmsg
-  }
-)
-
-vim.o.tabline = '%!v:lua.mia.tabline()'
-
-return setmetatable({
-  tabline = tabline,
-  setup = setup,
+local M = setmetatable({
+  prep = prep,
   each_tab = each_tab,
   tabnr = tabnr,
   task = task,
   pretty_windows = pretty_windows,
   macro = macro,
   session = session,
-}, { __call = tabline })
+}, {
+  __call = function(t)
+    if not t.tabline then
+      t.setup()
+    end
+    return t.tabline()
+  end,
+})
+
+function M.setup()
+  M.tabline = line.build( --
+    {
+      setup = prep,
+      each_tab({ --
+        tabnr,
+        -- task,
+        pretty_windows,
+      }, { active = 'TabLineSel', inactive = 'TabLine' }),
+      { '%=', 'TabLineFill' }, -- separator
+      { macro, 'TabLineRecording' },
+      { '%S ', 'TabLineFill' }, -- showmsg
+      { session, 'TabLineSession' }, -- showmsg
+    }
+  )
+
+  vim.o.tabline = '%!v:lua.mia.tabline()'
+end
+M.setup()
+
+return M

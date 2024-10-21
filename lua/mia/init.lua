@@ -1,63 +1,42 @@
-local M = {}
+local M = {
+  core_fn = {
+    load = 'mia.core.package',
+    require = 'mia.core.package',
+    on_reload = 'mia.core.config',
+  },
+}
 
-local function _find(kind, glob, one)
-  glob = vim.fs.joinpath('*', M._fprefix, kind, glob or '*')
-  local files = vim.api.nvim_get_runtime_file(glob, not one)
+function M.setup()
+  vim.loader.enable()
+  setmetatable(M, nil)
 
-  local plugs = {}
-  for _, file in ipairs(files) do
-    local name = file:match('/([^/]+)%.lua$')
-    plugs[name] = ('%s.%s.%s'):format(M._prefix, kind, name)
-  end
+  M.util = require('mia.util')
+  require('mia.core.config').setup()
+  require('mia.core.package').setup()
 
-  if one and #files > 1 then
-    local msg = "Multiple plugins found for '%s':\n%s"
-    error(msg:format(glob, table.concat(vim.tbl_keys(files), '\n')))
-  end
-  return plugs
+  return setmetatable(M, {
+    __index = function(_, name)
+      if M.core_fn[name] then
+        return require(M.core_fn[name])[name]
+      end
+      M[name] = M.util[name] or M.require(name)
+      return M[name]
+    end,
+  })
 end
 
-function M.setup(kinds)
-  local name = debug.getinfo(1, 'S').source:sub(2):match('nvim/lua/(.+)/init%.lua$')
-
-  M._prefix = name
-  M._fprefix = M._prefix:gsub('%.', '/')
-
-  local plugins = {}
-  for _, kind in ipairs(kinds) do
-    table.insert(plugins, _find(kind))
+function M.reset()
+  for name, modname in pairs(M.plugin) do
+    M[name] = package.loaded[modname] or nil
   end
-  M.plugin = vim.tbl_extend('force', unpack(plugins))
-
-  return M
+  M.util = require('mia.util')
 end
 
-function M.load(kind, glob)
-  local imods
-  if glob then
-    imods = vim.iter(vim.tbl_values(_find(kind, '*')))
-  else
-    local pat = ('^%s%%.%s%%..+$'):format(vim.pesc(M._prefix), vim.pesc(kind))
-    imods = vim.iter(M.plugin):map(function(_, modname)
-      return modname:match(pat)
-    end)
-  end
-  imods:each(require)
-end
+-- register autocmds
+-- register cmds
+-- inspect to see if necessary
+-- update meta can do this
 
-function M.require(modname)
-  if not M.plugin[modname] then
-    M.plugin[modname] = _find('*', modname, true)[1]
-    if not M.plugin[modname] then
-      error('Plugin not found: ' .. modname)
-    end
-  end
+M.setup()
 
-  return require(M.plugin[modname])
-end
-
-return setmetatable(M, {
-  __index = function(_, name)
-    return M.require(name)
-  end,
-})
+return M

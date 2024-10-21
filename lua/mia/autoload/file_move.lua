@@ -5,18 +5,15 @@ M.python = function(src, dest, force)
     return
   end
 
-  local src_import= src:gsub('/', '.'):gsub('.py$', ''):gsub('%.%.', '.')
-  local dest_import= dest:gsub('/', '.'):gsub('.py$', ''):gsub('%.%.', '.')
+  local src_import = src:gsub('/', '.'):gsub('.py$', ''):gsub('%.%.', '.')
+  local dest_import = dest:gsub('/', '.'):gsub('.py$', ''):gsub('%.%.', '.')
 
   -- Move imports when we're done here
   local search = ('/%s/ **/*.py'):format(src_import)
   local sub = ('s/%s/%s/g%%s'):format(src_import, dest_import)
   vim.schedule(function()
     vim.ui.input({
-      prompt = ("Replace imports?\n('%s' to '%s')\n[Y/n/c[onfirm]]: "):format(
-      src_import,
-      dest_import
-      ),
+      prompt = ("Replace imports?\n('%s' to '%s')\n[Y/n/c[onfirm]]: "):format(src_import, dest_import),
       default = 'y',
     }, function(input)
       input = (input and input or 'n'):sub(1, 1):lower()
@@ -53,20 +50,19 @@ M.python = function(src, dest, force)
   if vim.fn.filereadable(src) == 1 then
     return M.Move(src, dest, force, true)
   end
-
 end
 
-M.Move = function(src, dest, force, skip_ft)
-  local orig_buf = vim.fn.bufnr()  --[[@as string]]
+M.move = function(src, dest, force, skip_ft)
+  local orig_buf = vim.fn.bufnr() --[[@as string]]
 
   if vim.fn.bufnr(src) == -1 and vim.fn.filereadable(src) ~= 1 then
-      vim.api.nvim_echo({ { 'Unknown src to move: ' .. src, 'ErrorMsg' } }, true, {})
+    vim.api.nvim_echo({ { 'Unknown src to move: ' .. src, 'ErrorMsg' } }, true, {})
   elseif vim.fn.bufnr(src) == -1 or vim.fn.bufnr(src) ~= orig_buf then
     vim.cmd.edit({ src, mods = { keepalt = true, keepjumps = true, silent = true } })
   end
 
   if vim.fn.isdirectory(dest) == 1 then
-    dest = ('%s/%s'):format(dest, vim.fn.expand('%:t'))
+    dest = vim.fs.joinpath(dest, vim.fn.expand('%:t'))
   end
   if vim.fn.filereadable(dest) == 1 and not force then
     vim.api.nvim_echo({ { 'E13: File exists (add ! to override)', 'ErrorMsg' } }, true, {})
@@ -95,7 +91,21 @@ M.Move = function(src, dest, force, skip_ft)
   end
 
   return ret
+end
 
+M.cmd = function(cmd)
+  local src, dest = cmd.fargs[1], cmd.fargs[2]
+  if not dest then
+    dest = src
+    src = vim.fn.expand('%')
+  end
+  local moved = M.move(src, dest, cmd.bang)
+  if moved then
+    for ix, mv in ipairs(moved) do
+      moved[ix] = mv[1] .. ' to ' .. mv[2]
+    end
+    mia.warn('Moved: ' .. table.concat(moved, ', '))
+  end
 end
 
 return M

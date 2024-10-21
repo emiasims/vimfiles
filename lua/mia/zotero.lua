@@ -1,14 +1,14 @@
 local M = {}
 
-local pickers = require 'telescope.pickers'
-local finders = require 'telescope.finders'
-local conf = require 'telescope.config'.values
-local actions = require 'telescope.actions'
-local action_state = require 'telescope.actions.state'
+local pickers = require('telescope.pickers')
+local finders = require('telescope.finders')
+local conf = require('telescope.config').values
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
 
 local function get_libfile()
-  local libfile = vim.fn.expand '~/.zotero/library.json'
-  if vim.fn.filereadable 'library.json' > 0 then
+  local libfile = vim.fn.expand('~/.zotero/library.json')
+  if vim.fn.filereadable('library.json') > 0 then
     libfile = 'library.json'
   end
   return libfile
@@ -16,25 +16,33 @@ end
 
 local function open_or_write(entry)
   -- lazy, do this with actions
-  local bufn = vim.fn.bufadd(vim.fn.expand '~/org/papers.org')
+  local bufn = vim.fn.bufadd(vim.fn.expand('~/org/papers.org'))
   vim.fn.bufload(bufn)
   if vim.fn.bufnr() ~= bufn then
-    vim.cmd [[edit ~/org/papers.org]]
+    vim.cmd([[edit ~/org/papers.org]])
   end
   local search = vim.fn.search('\\V' .. entry.DOI, 'w')
   if search > 0 then
     vim.fn.search('^\\*', 'b')
-    vim.cmd [[normal! zMzo]]
+    vim.cmd([[normal! zMzo]])
     return
   end
 
-  setmetatable(entry, { __index = function() return '' end })
+  setmetatable(entry, {
+    __index = function()
+      return ''
+    end,
+  })
 
   local text = { '', '* ' .. entry.title }
-  text[#text + 1] = vim.fn.eval [[org#time#dict('[today]').totext()]]
+  text[#text + 1] = vim.fn.eval([[org#time#dict('[today]').totext()]])
   text[#text + 1] = ':properties:'
   for _, a in ipairs(entry.creators) do
-    setmetatable(a, { __index = function() return '' end })
+    setmetatable(a, {
+      __index = function()
+        return ''
+      end,
+    })
     text[#text + 1] = (':author+: %s %s'):format(a.firstName, a.lastName)
   end
   text[#text + 1] = ':doi: ' .. 'https://doi.org/' .. entry.DOI
@@ -53,7 +61,7 @@ local function open_or_write(entry)
   text[#text + 1] = ''
   vim.api.nvim_buf_set_lines(bufn, -1, -1, false, text)
   vim.schedule(function()
-    vim.cmd [[normal! G3kgqlzRGzx]]
+    vim.cmd([[normal! G3kgqlzRGzx]])
   end)
 
   -- local props = {}
@@ -80,8 +88,8 @@ local function open_or_write(entry)
 end
 
 local function get_finder(fname)
-  return finders.new_table {
-    results = vim.fn.json_decode(io.open(fname):read '*a').items,
+  return finders.new_table({
+    results = vim.fn.json_decode(io.open(fname):read('*a')).items,
     entry_maker = function(entry)
       local name = ''
       if entry.creators and entry.creators[1] then
@@ -108,73 +116,77 @@ local function get_finder(fname)
         -- ordinal = name .. (entry.abstractNote or ''),
       }
     end,
-  }
+  })
 end
 
 function M.pick(opts)
   local libfile = get_libfile()
 
   opts = opts or {}
-  pickers.new(opts, {
-    prompt_title = 'colors',
-    finder = get_finder(libfile),
-    sorter = conf.generic_sorter(opts),
-    attach_mappings = function(prompt_bufnr, _)
-      actions.select_default:replace(function()
-        -- TODO https://github.com/nvim-telescope/telescope.nvim/issues/416#issuecomment-841273053
-        -- open file with one selection, quickfix list for multiple
-        -- open_or_write(action_state.get_selected_entry().value)
-        local selections = action_state.get_current_picker(prompt_bufnr):get_multi_selection()
-        actions.close(prompt_bufnr)
-        if #selections > 1 then
-          P(#selections)
-          error "Can't do multi selections yet"
-        else
-          open_or_write(action_state.get_selected_entry().value)
-        end
-      end)
-      return true
-    end,
-  }):find()
+  pickers
+    .new(opts, {
+      prompt_title = 'colors',
+      finder = get_finder(libfile),
+      sorter = conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, _)
+        actions.select_default:replace(function()
+          -- TODO https://github.com/nvim-telescope/telescope.nvim/issues/416#issuecomment-841273053
+          -- open file with one selection, quickfix list for multiple
+          -- open_or_write(action_state.get_selected_entry().value)
+          local selections = action_state.get_current_picker(prompt_bufnr):get_multi_selection()
+          actions.close(prompt_bufnr)
+          if #selections > 1 then
+            P(#selections)
+            error("Can't do multi selections yet")
+          else
+            open_or_write(action_state.get_selected_entry().value)
+          end
+        end)
+        return true
+      end,
+    })
+    :find()
 end
 
 function M.cite(opts)
   local libfile = get_libfile()
 
   opts = opts or {}
-  pickers.new(opts, {
-    prompt_title = 'colors',
-    finder = get_finder(libfile),
-    sorter = conf.generic_sorter(opts),
-    attach_mappings = function(prompt_bufnr, _)
-      actions.select_default:replace(function()
-        local selections = action_state.get_current_picker(prompt_bufnr):get_multi_selection()
-        actions.close(prompt_bufnr)
-        local citations = {}
-        if #selections > 1 then
-          for _, entry in ipairs(selections) do
-            citations[#citations + 1] = '@' .. entry.value.citationKey
+  pickers
+    .new(opts, {
+      prompt_title = 'colors',
+      finder = get_finder(libfile),
+      sorter = conf.generic_sorter(opts),
+      attach_mappings = function(prompt_bufnr, _)
+        actions.select_default:replace(function()
+          local selections = action_state.get_current_picker(prompt_bufnr):get_multi_selection()
+          actions.close(prompt_bufnr)
+          local citations = {}
+          if #selections > 1 then
+            for _, entry in ipairs(selections) do
+              citations[#citations + 1] = '@' .. entry.value.citationKey
+            end
+          else
+            citations[1] = '@' .. action_state.get_selected_entry().value.citationKey
           end
-        else
-          citations[1] = '@' .. action_state.get_selected_entry().value.citationKey
-        end
-        local citekey = ('[cite:%s]'):format(table.concat(citations, ';'))
+          local citekey = ('[cite:%s]'):format(table.concat(citations, ';'))
 
-        vim.schedule(function()
-          vim.api.nvim_put({ citekey }, 'c', true, true)
-          vim.fn.feedkeys 'a'
+          vim.schedule(function()
+            vim.api.nvim_put({ citekey }, 'c', true, true)
+            vim.fn.feedkeys('a')
+          end)
         end)
-      end)
-      return true
-    end,
-  }):find()
+        return true
+      end,
+    })
+    :find()
 end
 
 function M.zotero_open()
-  local citation = vim.fn.expand '<cword>'
+  local citation = vim.fn.expand('<cword>')
   local libfile = get_libfile()
 
-  local items = vim.fn.json_decode(io.open(libfile):read '*a').items
+  local items = vim.fn.json_decode(io.open(libfile):read('*a')).items
   for _, item in ipairs(items) do
     if item.citationKey == citation then
       -- select the item in zotero by default
@@ -189,7 +201,7 @@ function M.zotero_open()
         if attachment.title and vim.endswith(attachment.title, 'pdf') then
           -- want to open, not select. Extract itemKey (why isn't that in attachments?)
           action = {
-            uri = 'zotero://open-pdf/library/items/' .. attachment.select:match '%w+$',
+            uri = 'zotero://open-pdf/library/items/' .. attachment.select:match('%w+$'),
             msg = { { ('pdf for "%s" opened in Zotero.'):format(citation) } },
           }
           break
@@ -207,10 +219,10 @@ function M.zotero_open()
 end
 
 function M.zotero_select()
-  local citation = vim.fn.expand '<cword>'
+  local citation = vim.fn.expand('<cword>')
   local libfile = get_libfile()
 
-  local items = vim.fn.json_decode(io.open(libfile):read '*a').items
+  local items = vim.fn.json_decode(io.open(libfile):read('*a')).items
   for _, item in ipairs(items) do
     if item.citationKey == citation then
       -- select the item in zotero by default

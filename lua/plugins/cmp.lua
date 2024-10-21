@@ -1,3 +1,5 @@
+local cache
+
 ---@type LazySpec
 return {
   'hrsh7th/nvim-cmp',
@@ -18,6 +20,14 @@ return {
     local lspkind = require('lspkind')
     local cmp = require('cmp')
 
+    local lsp_filter = function(entry, ctx)
+      return not (
+        ctx.filetype == 'python'
+        and (entry.completion_item.insertText or entry.completion_item.label):match('^__.*__$')
+        and ctx.cursor_before_line:sub(-1) ~= '_'
+      )
+    end
+
     ---@diagnostic disable: missing-fields
     cmp.setup({
       snippet = {
@@ -33,28 +43,18 @@ return {
         -- ['<Cr>'] = cmp.mapping.confirm({ select = true }),
         ['<Plug>(miaCmpConfirm)'] = cmp.mapping.confirm({ select = true }),
       }),
+
       sources = cmp.config.sources({
         { name = 'luasnip' },
+        { name = 'nvim_lsp', entry_filter = lsp_filter, },
         { name = 'nvim_lua' },
-        {
-          name = 'nvim_lsp',
-          ---@param entry cmp.Entry
-          ---@param ctx cmp.Context
-          ---@return boolean
-          entry_filter = function(entry, ctx)
-            return not (
-              ctx.filetype == 'python'
-              and (entry.completion_item.insertText or entry.completion_item.label):match('^__.*__$')
-              and ctx.cursor_before_line:sub(-1) ~= '_'
-            )
-          end,
-        },
       }, {
         { name = 'buffer', keyword_length = 4, priority = -1 },
         { name = 'path' },
       }),
 
       formatting = {
+
         format = lspkind.cmp_format({
           mode = 'symbol_text',
           symbol_map = {
@@ -72,8 +72,27 @@ return {
             path = '[path]',
             vsnip = '[snip]',
           },
+
+          before = function(entry, item)
+            item.dup = (entry.source.name == 'nvim_lua' and 0) or item.dup
+            return item
+          end,
         }),
       },
+    })
+
+    -- won't go twice
+    mia.monkey.patch('cmp.view.custom_entries_view', {
+      open = function(self, offset, entries)
+        local dedup, deduped = {}, {}
+        for _, e in ipairs(entries) do
+          if not dedup[e.completion_item.insertText or e.completion_item.label] then
+            dedup[e.completion_item.insertText or e.completion_item.label] = true
+            table.insert(deduped, e)
+          end
+        end
+        return super(self, offset, deduped)
+      end,
     })
 
     --cmp.setup.filetype({ 'python' }, {

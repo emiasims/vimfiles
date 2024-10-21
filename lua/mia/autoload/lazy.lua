@@ -1,19 +1,14 @@
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  vim.fn.system({
-    'git',
-    'clone',
-    '--filter=blob:none',
-    'https://github.com/folke/lazy.nvim.git',
-    '--branch=stable', -- latest stable release
-    lazypath,
-  })
-end
-vim.opt.rtp:prepend(lazypath)
-vim.g.mapleader = '\\'
+return setmetatable({}, {
+  __index = function(t, modname)
+    return setmetatable({}, {
+      __index = function(_, key)
+        t[modname] = mia[modname]
+        return t[modname][key]
+      end,
 
-require('lazy').setup('plugins', {
-  change_detection = { notify = false },
-  dev = { path = vim.fn.stdpath('config') .. '/mia_plugins' },
-  -- ui = { border = 'rounded' },
+      __call = function(_, ...)
+        return mia[modname](...)
+      end,
+    })
+  end,
 })

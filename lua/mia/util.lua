@@ -1,9 +1,56 @@
 local M = {
-  misc = {
-    ns = vim.api.nvim_create_namespace('mia-general'),
-    gid = vim.api.nvim_create_augroup('mia-general', {}),
-  },
+  ns = vim.api.nvim_create_namespace('mia-general'),
+  group = vim.api.nvim_create_augroup('mia-general', {}),
 }
+
+local D
+D = {  -- debug tools
+  scriptname = function()
+    return debug.getinfo(2, 'S').source:sub(2)
+  end,
+
+  ---@return fun(): (number, string, any)
+  iupvalues = function(fn)
+    local i = 0
+    return function()
+      i = i + 1
+      return i, debug.getupvalue(fn, i)
+    end
+  end,
+
+  ---@return fun(): (string, any)
+  pupvalues = function(fn)
+    local i = 0
+    return function()
+      i = i + 1
+      return debug.getupvalue(fn, i)
+    end
+  end,
+
+  get_upvalues = function(fn)
+    return vim.iter(D.pupvalues(fn)):fold({}, mia.tbl.rawset)
+  end,
+
+  get_upvalue = function(name, fn)
+    for k, v in D.pupvalues(fn) do
+      if k == name then
+        return v
+      end
+    end
+  end,
+
+  clone_fn = function(fn)
+    local dumped = string.dump(fn)
+    local cloned = loadstring(dumped) --[[@as function]]
+
+    for i in D.iupvalues(fn) do
+      debug.upvaluejoin(cloned, i, fn, i)
+    end
+
+    return cloned
+  end,
+}
+M.debug = D
 
 M.get_visual = function(concat, allowed)
   allowed = allowed and ('[%s]'):match(allowed) or '[vV]'
@@ -29,128 +76,22 @@ M.get_visual = function(concat, allowed)
   return text
 end
 
----@param name string
----@param cmd cmd.usercmd
----@param opts? cmd.create_opts
-M.command = function(name, cmd, opts)
-  vim.api.nvim_create_user_command(name, cmd, opts or {})
+M.copy = function(val)
+  return type(val) == 'table' and mia.tbl.copy(val) or val
 end
 
----@class cmd.fullusercmd: cmd.create_opts
----@field [1] string name
----@field [2] cmd.usercmd command
+---@alias mia.commands table<string, mia.command.def>
 
----@param ... cmd.fullusercmd
-M.commands = function(...)
-  for _, opts in ipairs({ ... }) do
-    local name, cmd = opts[1], opts[2]
-    opts[1], opts[2] = nil, nil
-    M.command(name, cmd, opts)
-  end
-end
-
----@alias mia.aucmd string|function|vim.api.keyset.create_autocmd
-
----@param opts mia.aucmd
-local function _normalize(opts)
-  if type(opts) == 'function' then
-    opts = { callback = opts, group = M.misc.gid }
-  elseif type(opts) == 'string' then
-    opts = { command = opts, group = M.misc.gid }
-  end
-  return opts
+---@param cmds mia.commands
+M.commands = function(cmds)
+  vim.iter(cmds):each(mia.command)
+  return cmds
 end
 
 ---@param event aucmd.event|aucmd.event[]
 ---@param opts mia.aucmd
 M.autocmd = function(event, opts)
-  return vim.api.nvim_create_autocmd(event, _normalize(opts))
-end
-
----@param group string|number
----@param autocmds { [1]: aucmd.event, [2]: mia.aucmd }[]
----@param opts? { clear: boolean }
-M.augroup = function(group, autocmds, opts)
-  opts = opts or { clear = true }
-  if type(group) == 'string' then
-    group = vim.api.nvim_create_augroup(group, { clear = opts.clear })
-  end
-  for _, ac in ipairs(autocmds) do
-    local _opts = _normalize(ac[2])
-    _opts.group = group
-    M.autocmd(ac[1], _opts)
-  end
-end
-
-local Opt = {}
-M.Opt = Opt
-
-Opt.set = function(opt, val)
-  local name, scope = opt._info.name, opt._info.scope
-  if scope then
-    scope = scope == 'global' and 'opt_global' or 'opt_local'
-  else
-    scope = 'opt'
-  end
-  vim[scope][name] = val
-end
-
-Opt.parse = function(name, val)
-  local setf, scope = Opt.set, 'opt'
-
-  if type(val) == 'table' then
-    val = vim.deepcopy(val)
-    scope = (val.global == nil and 'opt') or (val.global and 'opt_global') or 'opt_local'
-
-    if val.append or val.prepend or val.remove then
-      local fn = (val.append and 'append') or (val.prepend and 'prepend') or 'remove'
-      setf = function(_opt, _val)
-        _opt[fn](_opt, _val)
-      end
-      val = val[fn]
-    end
-  end
-
-  return { name = name, scope = scope, value = val, setf = setf }
-end
-
-Opt.save = function(o)
-  local save = vim[o.scope][o.name]:get()
-  o.setf(vim[o.scope][o.name], o.value)
-  return { name = o.name, scope = o.scope, value = save }
-end
-
-Opt.restore = function(s)
-  vim[s.scope][s.name] = s.value
-end
-
----@generic F: function
----@param opts table<string, any>
----@param func `F`
----@return F
-M.restore_opt = function(opts, func)
-  opts = vim.iter(opts):map(Opt.parse):totable()
-
-  return function(...)
-    local saved = vim.tbl_map(Opt.save, opts)
-    local s, r = pcall(func, ...)
-    vim.tbl_map(Opt.restore, saved)
-
-    if not s then
-      error(r, 0)
-    end
-    return r
-  end
-end
-
----@param t1 table
----@param t2 table
----@return table
-M.tbl_update = function(t1, t2)
-  for k, v in pairs(t2) do
-    t1[k] = v
-  end
-  return t1
+  mia.augroup(opts.group or M.group, { [event] = opts }, false)
 end
 
 ---@generic F: function
@@ -166,30 +107,24 @@ M.partial = function(func, ...)
   end
   return function(...) -- 'b', 'c'
     local a = vim.deepcopy(args)
-    local ix = 1
-    for _, i in ipairs(required) do
-      a[i] = select(ix, ...)
-      ix = ix + 1
+    for callix, argix in ipairs(required) do
+      a[argix] = select(callix, ...)
     end
-    for i = ix, select('#', ...) do
-      table.insert(a, select(i, ...))
-    end
-
+    vim.list_extend(a, { select(#a, ...) })
     return func(unpack(a))
+
+    -- return func(unpack(a), select(#a, ...))
   end
 end
 
----@generic F: function
----@param func `F`
----@return F
-M.defaults = function(func, ...)
-  local args = { ... }
-  return function(...)
-    return func(unpack(vim.tbl_extend('force', args, { ... })))
+M.const = function(val, skip_copy)
+  val = skip_copy and val or vim.deepcopy(val)
+  return function()
+    return val
   end
 end
 
-M.fast_notify = function(msg, level, opts, once)
+M.notify = function(msg, level, opts, once)
   local notify = once and vim.notify_once or vim.notify
   if vim.in_fast_event() then
     vim.schedule(function()
@@ -200,28 +135,24 @@ M.fast_notify = function(msg, level, opts, once)
   end
 end
 
-M.info = M.partial(M.fast_notify, nil, vim.log.levels.INFO, {}, false)
-M.warn = M.partial(M.fast_notify, nil, vim.log.levels.WARN, {}, false)
-M.err = M.partial(M.fast_notify, nil, vim.log.levels.ERROR, {}, false)
-M.info_once = M.partial(M.fast_notify, nil, vim.log.levels.INFO, {}, true)
-M.warn_once = M.partial(M.fast_notify, nil, vim.log.levels.WARN, {}, true)
-M.err_once = M.partial(M.fast_notify, nil, vim.log.levels.ERROR, {}, true)
+M.info = M.partial(M.notify, nil, vim.log.levels.INFO, {}, false)
+M.warn = M.partial(M.notify, nil, vim.log.levels.WARN, {}, false)
+M.err = M.partial(M.notify, nil, vim.log.levels.ERROR, {}, false)
+M.info_once = M.partial(M.notify, nil, vim.log.levels.INFO, {}, true)
+M.warn_once = M.partial(M.notify, nil, vim.log.levels.WARN, {}, true)
+M.err_once = M.partial(M.notify, nil, vim.log.levels.ERROR, {}, true)
 
-M.echo = function(...)
-  vim.api.nvim_echo({ ... }, true, {})
+---add %N parsing to string.format. %N will be replaced with the Nth argument
+M.formatn = function(fmt, ...)
+  local fargs = { ... }
+  return fmt
+    :gsub('%%%d+', function(n)
+      local arg = tonumber(n:sub(2)) --[[@as integer]]
+      return vim.pesc(('%s'):format(select(arg, unpack(fargs))))
+    end)
+    :format(...)
 end
 
-function M.fread(file)
-  local fd = assert(io.open(file, 'r'))
-  local data = fd:read('*a')
-  fd:close()
-  return data
-end
-
-function M.fwrite(file, contents)
-  local fd = assert(io.open(file, 'w+'))
-  fd:write(contents)
-  fd:close()
-end
+-- partial wrap?
 
 return M
