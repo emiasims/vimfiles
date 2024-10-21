@@ -23,13 +23,13 @@ settings = {
   formatoptions = '1crlj',
   updatetime = 500,
   winaltkeys = 'no',
-  viewoptions = { 'folds', 'cursor', 'slash', 'unix' },
+  viewoptions = { 'cursor', 'folds' },
   timeoutlen = 750,
   ttimeoutlen = 250, -- for key codes
 
   fileformats = { 'unix', 'dos', 'mac' },
   swapfile = false,
-  shada = { "'300", '<10', '@50', 's100', 'h' },
+  shada = { "'300", '<500', 's100', 'h' },
   textwidth = 99,
   softtabstop = 2,
   tabstop = 2,
@@ -70,12 +70,12 @@ settings = {
   autowriteall = true,
   splitright = true,
   showfulltag = true,
-  -- lazyredraw = true,
+  lazyredraw = true,
   cursorline = true,
   list = true,
   termguicolors = true,
 
-  sessionoptions = { 'blank', 'buffers', 'folds', 'tabpages', 'winsize', 'terminal' },
+  sessionoptions = { 'buffers', 'folds', 'winsize', 'terminal' },
 
   wrap = false,
   shell = 'bash',
