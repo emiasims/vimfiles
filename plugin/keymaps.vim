@@ -16,11 +16,8 @@ inoremap jk <C-]><Esc>
 snoremap jk <Esc>
 nnoremap Y y$
 
-augroup vimrc_crmap
-  autocmd!
-  " Not sure why quickfix lists are modifiable.
-  autocmd BufEnter * if &modifiable | nnoremap <buffer> <Cr> za| xnoremap <buffer> <Cr> za| endif
-augroup END
+nnoremap <C-m> <Nop>
+nnoremap <Cr> za
 
 nnoremap zE zMzO
 nnoremap zO zCzO
