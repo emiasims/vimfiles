@@ -24,6 +24,8 @@ setlocal breakindent
 setlocal breakindentopt=min:50,shift:2
 setlocal commentstring=<!--%s-->
 
+setlocal foldmethod=expr
+
 let b:ncm2_look_enabled = 1
 let b:autopairs_skip = ["'"]
 let b:post_pumaccept = ' '

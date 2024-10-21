@@ -12,3 +12,4 @@ if has('nvim')
   setlocal number relativenumber signcolumn=no
 endif
 setlocal colorcolumn=80
+setlocal foldmethod=expr
