@@ -25,15 +25,6 @@ local cfg = {
   },
 }
 
-function M.setup(opts)
-  -- cfg
-  -- keybinds: global or only when you open a repl?
-  -- end of line per filetype
-  -- whether or not to mark
-
-  M._setup_keymaps(false)
-end
-
 function M._setup_endline(bufnr, filetype)
   if bufnr == true then
     bufnr = vim.api.nvim_get_current_buf()
@@ -167,7 +158,6 @@ function M.start(filetype)
     vim.cmd.wincmd('p')
     M.send_modeline()
   end
-  -- repl._setup_keymaps(bufnr)
   if cfg.on_attach[filetype] then
     cfg.on_attach[filetype]()
   end
