@@ -4,10 +4,11 @@ local a = vim.api
 ---@alias winlayout {[1]: 'leaf', [2]: number} | {[1]: 'row'|'col', [2]: winlayout[]}
 local function _wins(tree, prev, opts)
   if tree[1] == 'leaf' then
+    local name = opts.win_info[tree[2]].name:gsub('%%', '%%%%')
     if tree[2] == opts.current.win then
-      return line.cfmt(opts.win_info[tree[2]].name, 'TabLineWin')
+      return line.cfmt(name, 'TabLineWin')
     end
-    return opts.win_info[tree[2]].name
+    return name
   end
 
   local sep = tree[1] == 'row' and '|' or '/'
@@ -47,12 +48,12 @@ local function prep()
       local name = vim.split(vim.fn.fnamemodify(vim.fn.bufname(vim.fn.winbufnr(winid)), ':p'), '/')
       local short = name[#name]
       win_info[winid] = { name = short, dir = name[#name - 1] }
-      -- bufname_counts[short] = bufname_counts[short] and bufname_counts[short] + 1 or 1
       if id == tab_id and winid == win_id then
         win_info[winid].current = true
       end
     end
   end
+
   for _, buf in ipairs(a.nvim_list_bufs()) do
     local name = vim.fn.fnamemodify(vim.fn.bufname(buf), ':t')
     bufname_counts[name] = bufname_counts[name] and bufname_counts[name] + 1 or 1
@@ -103,37 +104,16 @@ local function each_tab(segments, defaults)
     end
     opts.eval = {}
     return table.concat(t, ' ')
-    -- return '%.' .. .. '(' .. table.concat(t, ' ') .. '%)'
   end
 end
 
 ---@param opts tabline.opts
 local function tabnr(opts)
-  local session = vim.t[opts.eval.id].session_group
-  return { ' ' .. tostring(opts.eval.nr) .. (session and (' ' .. session) or ''), opts.eval.hl }
+  return { ' ' .. tostring(opts.eval.nr), opts.eval.hl }
 end
 
 local function session()
-  if vim.v.this_session == '' then
-    return
-  end
-  local name = vim.v.this_session:match('([^/]*)%.vim$')
-  if name == 'Session' then
-    name = vim.fs.basename(vim.fs.dirname(vim.v.this_session))
-  end
-  return ('[S: %s]'):format(name)
-end
-
----@param opts tabline.opts
-local function task(opts)
-  local _task = vim.t[opts.eval.id].task
-  _task = _task and ('[T: %s]'):format(_task) or '[No Task]'
-
-  if not opts.eval.active_tab then
-    return { _task, opts.eval.hl }
-  end
-
-  return { _task, vim.t[opts.eval.id].task and 'TabLineTask' or 'TabLineNoTask' }
+  return vim.g.session and mia.session.status() or nil
 end
 
 local function macro()
@@ -145,7 +125,6 @@ local M = setmetatable({
   prep = prep,
   each_tab = each_tab,
   tabnr = tabnr,
-  task = task,
   pretty_windows = pretty_windows,
   macro = macro,
   session = session,
@@ -164,7 +143,6 @@ function M.setup()
       setup = prep,
       each_tab({ --
         tabnr,
-        -- task,
         pretty_windows,
       }, { active = 'TabLineSel', inactive = 'TabLine' }),
       { '%=', 'TabLineFill' }, -- separator
