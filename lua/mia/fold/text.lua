@@ -192,10 +192,10 @@ function M.ts_lsp_chunks(lnum, bufnr)
   local tmfmt = Formatter('@lsp.typemod.%s.%s')
 
   local highlighter = lsp_hlr.active[bufnr]
-  if highlighter then
+  if highlighter and highlighter.client_state then
     for _, client in pairs(highlighter.client_state) do
       local tokens = vim
-        .iter(client.current_result.highlights)
+        .iter(client.current_result.highlights or {})
         :filter(function(hl)
           return hl.line == lnum - 1 and hl.marked
         end)

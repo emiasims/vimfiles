@@ -3,11 +3,12 @@ local Cache = {}
 M._cache = Cache
 
 -- would love this to be cached with vim.treesitter._fold
-M.text = function(lnum, bufnr)
+function M.text(lnum, bufnr)
   lnum = lnum or vim.v.foldstart
   bufnr = bufnr ~= 0 and bufnr or vim.api.nvim_get_current_buf()
 
   if not Cache[bufnr] then
+    Cache[bufnr] = {}
     vim.api.nvim_buf_attach(bufnr, false, {
       on_bytes = function(_, _, _, sr, _, _, old_er, _, _, new_er)
         if not Cache[bufnr] then
@@ -40,18 +41,17 @@ M.text = function(lnum, bufnr)
     })
   end
 
-  local cache = Cache[bufnr] or {}
+  local cache = Cache[bufnr]
   if not cache[lnum] then
     local text = require('mia.fold.text')
     local ft = vim.bo[vim.api.nvim_get_current_buf()].filetype
     local fn = text[ft] or text.default
     cache[lnum] = fn(lnum, bufnr)
   end
-  Cache[bufnr] = cache
-  return cache[lnum] or ''
+  return cache[lnum] or '...'
 end
 
-M.expr = function()
+function M.expr()
   -- mia.runtime('fold', ft)
   local expr = require('mia.fold.expr')
   local ft = vim.bo[vim.api.nvim_get_current_buf()].filetype
@@ -59,6 +59,25 @@ M.expr = function()
     return expr[ft]()
   end
   return expr['default']()
+end
+
+function M.setup()
+  vim.opt.foldmethod = 'expr'
+  vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  vim.opt.foldtext = [[v:lua.require'mia.fold'.text()]]
+  mia.keymap({
+    'zx',
+    function()
+      local bn = vim.api.nvim_get_current_buf()
+      local expr = require('vim.treesitter._fold').foldexpr
+      local foldCache = mia.debug.get_upvalue('foldinfos', expr)
+      Cache[bn] = nil
+      foldCache[bn] = nil
+      return 'zx'
+    end,
+    expr = true,
+    desc = 'Clear fold cache and recompute folds as normal',
+  })
 end
 
 return M
