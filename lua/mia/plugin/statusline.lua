@@ -22,16 +22,7 @@ stl = setmetatable({
   end,
 })
 
-local obsession_status
-obsession_status = function()
-  if vim.g.loaded_obsession then
-    obsession_status = function()
-      return ' ' .. vim.fn.ObsessionStatus()
-    end
-    return obsession_status()
-  end
-  return ''
-end
+local HOME = '^' .. vim.pesc(vim.env.HOME)
 
 local modecolors = {
   n = { color = 'stlNormalMode', abbrev = 'n' },
@@ -60,15 +51,6 @@ local function hl(text, group, skip_close)
   return ('%%#%s# %s %s'):format(group, text, skip_close and '' or '%*')
 end
 
-local function git_info()
-  if vim.g.loaded_fugitive and stl.bo.modifiable then
-    -- if vim.g.loaded_fugitive and vim.bo.modifiable then
-    local head = vim.fn.FugitiveHead(1, stl.bufnr())
-    return head ~= '' and ('(%s)'):format(head) or ''
-  end
-  return ''
-end
-
 local function term_info()
   local bvs = vim.b[stl.bufnr()]
   local desc = bvs.stl_desc
@@ -82,19 +64,28 @@ local function term_info()
 end
 
 local function file_info()
-  local dir
+  local desc
   local file = vim.fs.basename(stl.full_bufname())
 
   if stl.bo.filetype ~= 'help' and stl.bo.buftype ~= 'nofile' then
-    dir = git_info()
     if stl.full_bufname():match('^fugitive') then
       file = vim.fn['fugitive#Object'](stl.full_bufname())
-    else
-      dir = dir .. vim.fn.fnamemodify(stl.bufname(), ':h') .. '/'
+    elseif vim.g.loaded_fugitive and stl.bo.modifiable then
+      -- git info
+      local branch = vim.fn.FugitiveHead(1, stl.bufnr())
+      branch = branch ~= '' and ('(%s)'):format(branch) or nil
+
+      if branch then
+        desc = branch .. vim.fn.fnamemodify(stl.bufname(), ':h') .. '/'
+      else
+        -- no git info, just show the directory
+        -- desc = vim.fn.getcwd() .. '/'
+        desc = vim.fn.getcwd() .. '/'
+        file = stl.bufname()
+      end
     end
   end
-
-  return { desc = dir or '', title = file }
+  return { desc = desc or '', title = file }
 end
 
 local function buf_info()
@@ -102,7 +93,7 @@ local function buf_info()
     return { desc = stl.bufname(), title = '' }
   end
   local info = stl.bo.buftype == 'terminal' and term_info() or file_info()
-  return { desc = info.desc, title = ' ' .. info.title }
+  return { desc = info.desc, title = ' ' .. info.title:gsub(' ', '␣'):gsub('%%', '%%%%') }
 end
 
 local function peek()
@@ -177,7 +168,6 @@ local function inspect(...)
   else
     mia.warn('No action for mouse click: ' .. mouse)
   end
-
 end
 
 -- priority wrapper?
@@ -195,7 +185,7 @@ local function active()
     -- local dir, fname = dir_info(), filename()
     return table.concat({
       hl(mode.abbrev, mode.color),
-      hl(info.desc, 'stlDescription'),
+      hl(info.desc:gsub(HOME, '~'), 'stlDescription'),
       info.title,
       hl('%m', 'stlModified'),
       hl(macro(), 'stlRecording'),
@@ -203,7 +193,6 @@ local function active()
       '%=%#stlNodeTree#',
       node_tree(),
       -- hl(node_tree(), 'stlNodeTree'),
-      obsession_status(),
       hl(error_info(), 'stlErrorInfo'),
       hl('%y', 'stlTypeInfo'),
       hl(cursor_info(), mode.color),
