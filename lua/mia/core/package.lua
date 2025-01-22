@@ -1,26 +1,34 @@
 local uv = vim.uv
 local Config = require('mia.core.config')
 
+local UpdateTrackers
+
+---@type table<string, mia.pkg>
+local Packages
+
 local M = {
-  packages = {},
-  not_updated = {},
+  loaded = {},
+  changed = {},
+  tracking = false,
 }
 
 ---@class mia.pkg
 ---@field path string
 ---@field kind string
 ---@field name string
+---@field alias? string
 ---@field loaded boolean
 ---@field mianame string
 ---@field modname string
 ---@field mtime number
 ---@field ismod boolean is a directory module or a file
-local Package = {}
-Package.__index = Package
+---@field up_to_date boolean?
+local Spec = {}
+Spec.__index = Spec
 
 ---@param path string
 ---@return mia.pkg
-Package.get = function(path)
+function Spec.new(path)
   local kind, name = path:match('/([^/]+)/([^/]+)%.lua$')
   local file_type = 'file'
   if not kind then
@@ -31,31 +39,50 @@ Package.get = function(path)
     path = path,
     kind = kind,
     name = name,
+    alias = Config.aliases[name],
     mianame = 'mia.' .. name,
     modname = ('mia.%s.%s'):format(kind, name),
     ismod = file_type == 'directory',
-  }, Package)
+  }, Spec)
   pkg.mtime = pkg:get_mtime()
-  pkg.loaded = package.loaded[pkg.modname] and true
+  pkg.loaded = package.loaded[pkg.modname] and true or false
   return pkg
 end
 
-function Package:reload()
-  if self.loaded then
+function Spec:load()
+  local mod = require(self.modname)
+  if type(mod) == 'table' then
+    local setup = rawget(mod, 'setup')
+    if setup and vim.is_callable(setup) then
+      setup()
+    end
+  end
+  return mod
+end
+
+function Spec:reload(force)
+  if force or self.loaded then
+    local save = package.loaded[self.modname]
     package.loaded[self.mianame] = nil
     package.loaded[self.modname] = nil
-    local mod = require(self.mianame)
-    if mod.setup then
-      mod.setup()
+    _G.mia[self.name] = nil
+    M.changed[self.name] = nil
+
+    local ok, mod = pcall(Spec.load, self)
+    if not ok then
+      mia.err('Error loading package: ' .. self.mianame .. '\n' .. mod)
+      package.loaded[self.modname] = save
+      return
     end
+    return mod
   end
 end
 
-local fs_stat = function(path)
+local function fs_stat(path)
   return uv.fs_stat(path).mtime.sec
 end
 
-function Package:get_mtime()
+function Spec:get_mtime()
   if not self.ismod then
     return fs_stat(self.path)
   end
@@ -71,18 +98,17 @@ function Package:get_mtime()
   return mtime
 end
 
-M.get = function(str)
-  str = Config.aliases[str] or str
-  if M.packages[str] then
-    return M.packages[str]
+function M.get(name)
+  if Packages[name] then
+    return Packages[name]
   end
-  if str:match('/') then
-    return Package.get(str)
+  if name:match('/') then
+    return Spec.new(name)
   end
-  error(('No module found at "%s"'):format(str))
+  error(('No module found at "%s"'):format(name))
 end
 
-local get_paths = function(kinds)
+local function get_paths(kinds)
   if not kinds then
     return Config.paths
   elseif type(kinds) == 'string' then
@@ -98,17 +124,26 @@ local get_paths = function(kinds)
   return paths
 end
 
-M.list = function(kinds)
+function M.names()
+  return vim.tbl_keys(Packages)
+end
+
+function M.list(kinds)
+  if kinds == true then
+    return Packages
+  end
   local kind_paths = get_paths(kinds)
 
   local mods = {}
   for _, path in pairs(kind_paths) do
     for filename, _ in vim.fs.dir(path) do
       local name = filename:match('(.+)%.lua$')
+      -- TODO why is this here?
       if mods[name] then
         error(('Duplicate module name: %s'):format(name))
       end
-      mods[name] = Package.get(vim.fs.joinpath(path, filename))
+      local mod = Spec.new(vim.fs.joinpath(path, filename))
+      mods[name] = mod
     end
   end
   return mods
@@ -116,93 +151,92 @@ end
 
 ---@param kinds? string|string[]
 ---@return mia.pkg[] updated The packages that have been changed or added
-M.get_updates = function(kinds)
+function M.get_updates(kinds)
   local updated = {}
   for name, mod in pairs(M.list(kinds)) do
-    if not M.packages[name] or mod.mtime ~= M.packages[name].mtime then
+    if not Packages[name] or mod.mtime ~= Packages[name].mtime then
       table.insert(updated, mod)
-      -- M.packages[name] = mod
     end
   end
   return updated
 end
 
-M.enable_tracking = function()
-  local trackers = {}
+--- Use to disable previously set up mods or to have a 'reload guard'
+---@param fn string
+function M.on_reload(fn)
+  local info = debug.getinfo(2, 'S')
+  local path = info.source:match('/lua/(mia/.*)$')
+  local name = path:gsub('%.lua$', ''):gsub('%/init$', ''):gsub('/', '.')
+
+  -- local name = path:gsub('/', '.')
+  local mod = package.loaded[name]
+  if type(mod) ~= 'table' then
+    return
+  end
+  if type[fn] == 'function' then
+    fn(mod)
+  else
+    mod[fn]()
+  end
+end
+
+function M.enable_tracking()
+  UpdateTrackers = {}
   for kind, path in pairs(Config.paths) do
-    trackers[kind] = uv.new_fs_poll()
-    -- local _kind = kind
-    trackers[kind]:start(path, 2000, function(_, _)
-      for name, mod in pairs(M.list(kind)) do
-        if not M.packages[name] or mod.mtime ~= M.packages[name].mtime then
-          M.packages[mod.name] = mod
-          if mod.loaded then
-            M.not_updated[mod.name] = mod
-          else
-          end
+    UpdateTrackers[kind] = uv.new_fs_poll()
+
+    UpdateTrackers[kind]:start(path, 2000, function(_, _)
+      for _, mod in ipairs(M.get_updates(kind)) do
+        Packages[mod.name] = mod
+        M.changed[mod.name] = true
+        if mod.loaded then
+          Packages[mod.name].up_to_date = false
         end
       end
     end)
   end
-  M.trackers = trackers
+  M.tracking = true
 end
 
-M.disable_tracking = function()
-  if M.trackers then
-    for _, tracker in pairs(M.trackers) do
+function M.disable_tracking()
+  if UpdateTrackers then
+    for _, tracker in pairs(UpdateTrackers) do
       tracker:stop()
     end
-    M.tracker = nil
+    UpdateTrackers = nil
   end
+  M.tracking = false
 end
-Config.on_reload('disable_tracking')
+M.on_reload('disable_tracking')
 
-M.reload_all = function(force)
-  if force then
-    for _, mod in pairs(M.packages) do
-      if mod.loaded then
-        mod:reload()
-      end
-    end
-    M.not_updated = {}
-    return
-  end
-end
-
-M.reload = function(kind)
-  for name, mod in pairs(M.not_updated) do
-    local ok, err = pcall(mod.reload, mod)
-    if ok then
-      M.not_updated[name] = nil
-    else
-      mia.err(('Error reloading %s: %s'):format(name, err))
-    end
-  end
-end
-
-M.load = function(kind)
-  for _, spec in pairs(M.packages) do
+function M.load(kind, force)
+  for _, spec in pairs(Packages) do
     if spec.kind == kind then
-      local ok, res = pcall(require, spec.modname)
-      if not ok then
-        M.err('Error loading plugin:' .. spec.modname .. '\n' .. res)
+      if force then
+        spec:reload(force)
+      else
+        spec:load()
       end
     end
   end
 end
 
-M.require = function(modname)
+function M.require(modname)
   local spec = M.get(modname)
   if not spec then
     error('Plugin not found: ' .. modname)
   end
 
-  return require(spec.modname)
+  return package.loaded[spec.modname] or spec:load()
 end
 
-M.setup = function()
-  M.packages = M.list()
-  Config.packages = M.packages
+function M.setup()
+  M.packages = setmetatable(M.list(), {
+    __index = function(t, name)
+      return rawget(t, Config.aliases[name])
+    end,
+  })
+  Packages = M.packages
   M.enable_tracking()
 end
 

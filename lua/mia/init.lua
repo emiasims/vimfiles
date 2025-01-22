@@ -10,26 +10,23 @@ function M.setup()
   vim.loader.enable()
   setmetatable(M, nil)
 
-  M.util = require('mia.util')
+  M.util = require('mia.core.util')
+  require('mia.core.global')
   require('mia.core.config').setup()
   require('mia.core.package').setup()
+  require('mia.core.ftplugin').setup()
 
   return setmetatable(M, {
     __index = function(_, name)
       if M.core_fn[name] then
         return require(M.core_fn[name])[name]
       end
-      M[name] = M.util[name] or M.require(name)
-      return M[name]
+      return M.util[name] or package.loaded['mia.' .. name] or M.require(name)
+    end,
+    __vim_complete = function()
+      return M.require('package').packages
     end,
   })
-end
-
-function M.reset()
-  for name, modname in pairs(M.plugin) do
-    M[name] = package.loaded[modname] or nil
-  end
-  M.util = require('mia.util')
 end
 
 -- register autocmds
@@ -37,6 +34,4 @@ end
 -- inspect to see if necessary
 -- update meta can do this
 
-M.setup()
-
-return M
+return M.setup()

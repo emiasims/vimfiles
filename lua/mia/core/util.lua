@@ -28,7 +28,7 @@ D = {  -- debug tools
   end,
 
   get_upvalues = function(fn)
-    return vim.iter(D.pupvalues(fn)):fold({}, mia.tbl.rawset)
+    return vim.iter(D.pupvalues(fn)):fold({}, rawset)
   end,
 
   get_upvalue = function(name, fn)
@@ -52,7 +52,7 @@ D = {  -- debug tools
 }
 M.debug = D
 
-M.get_visual = function(concat, allowed)
+function M.get_visual(concat, allowed)
   allowed = allowed and ('[%s]'):match(allowed) or '[vV]'
   local mode = vim.fn.mode():match(allowed)
   if mode then
@@ -76,29 +76,39 @@ M.get_visual = function(concat, allowed)
   return text
 end
 
-M.copy = function(val)
+function M.copy(val)
   return type(val) == 'table' and mia.tbl.copy(val) or val
 end
 
 ---@alias mia.commands table<string, mia.command.def>
 
 ---@param cmds mia.commands
-M.commands = function(cmds)
+function M.commands(cmds)
   vim.iter(cmds):each(mia.command)
   return cmds
 end
 
 ---@param event aucmd.event|aucmd.event[]
 ---@param opts mia.aucmd
-M.autocmd = function(event, opts)
+function M.autocmd(event, opts)
   mia.augroup(opts.group or M.group, { [event] = opts }, false)
 end
 
+-- M.true = setmetatable({}, {
+--   __eq = function(a, b)
+--     return 
+--   end,
+-- })
+
+--- Text
 ---@generic F: function
----@param func `F`
+---@param func F
 ---@return F
-M.partial = function(func, ...)
+function M.partial(func, ...)
   local args = { ... }
+  if #vim.tbl_keys(args) == 0 then
+    return func
+  end
   local required = {}
   for i = 1, select('#', ...) do
     if args[i] == nil then
@@ -117,14 +127,14 @@ M.partial = function(func, ...)
   end
 end
 
-M.const = function(val, skip_copy)
+function M.const(val, skip_copy)
   val = skip_copy and val or vim.deepcopy(val)
   return function()
     return val
   end
 end
 
-M.notify = function(msg, level, opts, once)
+function M.notify(msg, level, opts, once)
   local notify = once and vim.notify_once or vim.notify
   if vim.in_fast_event() then
     vim.schedule(function()
@@ -143,7 +153,7 @@ M.warn_once = M.partial(M.notify, nil, vim.log.levels.WARN, {}, true)
 M.err_once = M.partial(M.notify, nil, vim.log.levels.ERROR, {}, true)
 
 ---add %N parsing to string.format. %N will be replaced with the Nth argument
-M.formatn = function(fmt, ...)
+function M.formatn(fmt, ...)
   local fargs = { ... }
   return fmt
     :gsub('%%%d+', function(n)
