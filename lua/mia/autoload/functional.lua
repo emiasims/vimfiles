@@ -3,29 +3,41 @@ local F = {
   const = mia.const,
 }
 
-F.eat = function(n, fn)
+function F.eat(n, fn)
   if type(n) == 'function' then
     fn, n = n, 1
   end
-  return function(...)
-    local args = {}
-    for i = n + 1, select('#', ...) do
-      table.insert(args, select(i, ...))
+  if n == 0 then
+    return fn
+  elseif n > 0 then
+    -- eat up to N
+    n = n + 1
+    return function(...)
+      return fn(select(n, ...))
     end
-    return fn(unpack(args))
+  end
+  -- eat everything AFTER n
+  n = -n
+  return function(...)
+    return fn(unpack(vim.iter({ ... }):slice(1, n):totable()))
   end
 end
 
-F.call = function(fn, ...)
+function F.call(fn, ...)
   if type(fn) ~= 'function' then
     return F.partial(F.call, nil, ...)
   end
   return fn(...)
 end
 
-F.index = mia.tbl.index
+function F.index(t, ...)
+  if type(t) == 'table' then
+    return F.partial(vim.tbl_get, t, ...)
+  end
+  return F.partial(vim.tbl_get, nil, ...)
+end
 
-F.pass = function(n, fn)
+function F.pass(n, fn)
   if type(n) == 'function' then
     fn, n = n, 2
   end
@@ -39,7 +51,7 @@ F.pass = function(n, fn)
   end
 end
 
-F.ixeq = function(key, val)
+function F.ixeq(key, val)
   return function(t)
     return t[key] == val
   end
