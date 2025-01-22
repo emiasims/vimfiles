@@ -4,7 +4,7 @@ local set = function(name, value)
   vim.opt[name] = value
 end
 
-local settings = {
+local now = {
   cmdheight = 1,
   colorcolumn = '80', -- must be string
   signcolumn = 'yes',
@@ -12,11 +12,11 @@ local settings = {
   relativenumber = true,
   showcmdloc = 'tabline',
   showtabline = 2,
+  foldnestmax = 3,
+  sessionoptions = { 'blank', 'help', 'winsize', 'terminal', 'tabpages' },
 }
 
-vim.iter(settings):each(set)
-
-settings = {
+local schedule = {
   report = 0,
   path = { '.', '**' },
   virtualedit = 'block',
@@ -52,7 +52,6 @@ settings = {
   wildmode = { 'longest:full', 'full' },
   conceallevel = 2,
   foldlevelstart = 99,
-  foldnestmax = 3,
   jumpoptions = 'stack',
 
   listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
@@ -75,23 +74,17 @@ settings = {
   list = true,
   termguicolors = true,
 
-  sessionoptions = { 'buffers', 'folds', 'winsize', 'terminal' },
-
   wrap = false,
   shell = 'bash',
-
-  -- TODO move to mia.fold
-  foldmethod = 'expr',
-  foldexpr = 'v:lua.vim.treesitter.foldexpr()',
-  foldtext = [[v:lua.require'mia.fold'.text()]],
 
   -- mostly default. cmdline vertical
   guicursor = { 'n-v:block', 'i-ci-ve-c:ver25', 'r-cr:hor20', 'o:hor50' },
 }
 
--- faster load..
+vim.iter(now):each(set)
+
 vim.schedule(function()
-  vim.iter(settings):each(set)
+  vim.iter(schedule):each(set)
 end)
 
 if vim.fn.executable('ag') then
@@ -115,9 +108,8 @@ else
   vim.opt.backupdir:append('.')
 end
 
--- -- nvim uses modeline to set filetype for help.
--- -- I don't want modelines, so add a filetype for it
-
+-- nvim uses modeline to set filetype for help.
+-- I don't want modelines, so add a filetype for it
 vim.schedule(function()
   vim.opt.modeline = false
   local is_text = require('vim.filetype.detect').txt
