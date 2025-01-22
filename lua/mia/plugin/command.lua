@@ -3,11 +3,11 @@ local Commands = setmetatable({}, { __mode = 'v' })
 
 -- TODO buffer or global dictionary?
 
-local get_cmd = function(name)
+local function get_cmd(name)
   return name and Commands[name] or Commands
 end
 
-local wrap_cmd = function(cb, bang)
+local function wrap_cmd(cb, bang)
   if not cb or type(cb) == 'string' then
     return cb
   end
@@ -43,7 +43,7 @@ local AllowedReplacements = {
 }
 
 ---@param command string
-local parse_string_cmd = function(command)
+local function parse_string_cmd(command)
   local replacements = {}
   for k, v in pairs(AllowedReplacements) do
     if command:find(k) then
@@ -63,7 +63,7 @@ local parse_string_cmd = function(command)
 end
 
 ---@param completions string[]|fun(...): string[]
-local wrap_list_completion = function(completions, ...)
+local function wrap_list_completion(completions, ...)
   local get
   if vim.is_callable(completions) then
     get = mia.partial(completions, ...)
@@ -128,7 +128,7 @@ local function parse_cmd(opts)
       local prefix = o.fargs[1]
       if prefix and subcommands[prefix] then
         table.remove(o.fargs, 1)
-        o.args = o.args:match('^%s*' .. vim.pesc(prefix) .. '%s*')
+        o.args = o.args:match('^%s*' .. vim.pesc(prefix) .. '%s*(.*)')
         subcommands[prefix].cb(o)
       else
         original_cmd(o)
@@ -182,7 +182,7 @@ end
 
 ---@param name string
 ---@param opts mia.command.def
-local create = function(name, opts)
+local function create(name, opts)
   -- script name of calling command
   -- if in watched dir, then register it for reload
   local cmd = parse_cmd(opts)
@@ -195,7 +195,7 @@ local create = function(name, opts)
 end
 
 -- set false to remove, otherwise overwrites
-local update = function(name, opts)
+local function update(name, opts)
   local cmd = get_cmd(name)
   local updates = parse_cmd(opts)
 

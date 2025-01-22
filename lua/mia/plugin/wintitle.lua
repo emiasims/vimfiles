@@ -4,12 +4,12 @@ local function is_float(wid)
   return vim.api.nvim_win_get_config(wid).zindex
 end
 
-local valid_buf = function(buf)
+local function valid_buf(buf)
   buf = buf or 0
   return ({ [''] = true, help = true })[vim.bo[buf].buftype]
 end
 
-local on_win = function(_, win, buf, toprow, _)
+local function on_win(_, win, buf, toprow, _)
   if not valid_buf(buf) or is_float(win) then
     return
   end
@@ -23,12 +23,12 @@ local on_win = function(_, win, buf, toprow, _)
   })
 end
 
-M.enable = function()
+function M.enable()
   M.disable()
   vim.api.nvim_set_decoration_provider(M.ns, { on_win = on_win })
 end
 
-M.disable = function()
+function M.disable()
   vim.api.nvim_set_decoration_provider(M.ns, {})
   for _, b in ipairs(vim.api.nvim_list_bufs()) do
     vim.api.nvim_buf_clear_namespace(b, M.ns, 0, -1)

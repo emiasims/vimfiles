@@ -101,7 +101,7 @@ local impl = {
   },
 }
 
-local on_call = function(modname)
+local function on_call(modname)
   return setmetatable({}, {
     __index = function(_, k)
       return function(...)
