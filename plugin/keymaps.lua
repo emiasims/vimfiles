@@ -1,3 +1,6 @@
+-- extracts defaults and remaps
+mia.keymap.remap({ { '<F2>', 'gx' } })
+
 mia.keymap({
   { '<F3>', '<Cmd>messages clear|echohl Type|echo "Messages cleared."|echohl None<Cr>' },
   { '<F4>', '<Cmd>messages<Cr>' },
