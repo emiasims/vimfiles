@@ -19,6 +19,15 @@ local M = {
     return ks
   end,
 
+  pop = function(t, ...)
+    local ret = {}
+    for _, k in ipairs({ ... }) do
+      table.insert(ret, t[k])
+      t[k] = nil
+    end
+    return unpack(ret)
+  end,
+
   rm = function(t, ...)
     for _, k in ipairs({ ... }) do
       t[k] = nil
@@ -75,11 +84,6 @@ local M = {
 
   insert = function(t, v)
     table.insert(t, v)
-    return t
-  end,
-
-  rawset = function(t, k, v)
-    rawset(t, k, v)
     return t
   end,
 
