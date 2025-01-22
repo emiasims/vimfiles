@@ -1,6 +1,6 @@
 local M = {}
 
-M.delete_surrounding_function = function()
+function M.delete_surrounding_function()
   local query = vim.treesitter.query.get(vim.o.filetype, 'textobjects')
   if not query then
     mia.warn('No textobjects query found for filetype ' .. vim.o.filetype)

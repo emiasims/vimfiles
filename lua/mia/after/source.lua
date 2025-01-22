@@ -2,17 +2,17 @@ local M = {}
 
 ---@param lang string
 ---@return function
-M.get = function(lang)
+function M.get(lang)
   local ok, srcf = pcall(require, 'mia.source.' .. lang)
   if not ok then
-    error(('Unable to source filetype: "%s"'):format(lang), 0)
+    error(('Unable to source filetype: "%s"\n%s'):format(lang, srcf), 0)
   end
 
   return mia.restore_opt({ eventignore = { append = { 'SourceCmd' } } }, srcf)
 end
 
 ---@param ev nil|string|number|aucmd.callback.arg
-M.source = function(ev)
+function M.source(ev)
   local file, buf
   if type(ev) == 'string' then
     file = vim.fn.fnamemodify(ev, ':p')
@@ -33,18 +33,22 @@ M.source = function(ev)
   end
   local src = M.get(ft)
 
+  if vim.v.vim_did_enter == 1 and vim.api.nvim_buf_get_name(buf) == file then
+    vim.api.nvim_buf_call(buf, vim.cmd.update)
+  end
+
   local s, r = pcall(src, file, buf)
   if not s then
     mia.err(r)
   end
 end
 
-M.enable = function()
+function M.enable()
   mia.augroup('mia-source', { SourceCmd = M.source }, true)
 end
 M.enable()
 
-M.disable = function()
+function M.disable()
   pcall(vim.api.nvim_del_augroup_by_name, 'mia-source')
 end
 

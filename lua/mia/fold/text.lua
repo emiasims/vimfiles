@@ -6,6 +6,7 @@ local M = {}
 local ts = vim.treesitter
 local api = vim.api
 local lsp_hlr = require('vim.lsp.semantic_tokens').__STHighlighter
+
 ---@return { [1]: string, [2]: string[] }[]
 function M.tsfoldtext(lnum, bufnr)
   lnum = lnum or vim.v.foldstart

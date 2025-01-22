@@ -19,7 +19,7 @@ local function compute_text_and_levels(bufnr, info, srow, erow, parse_injections
   end
 end
 
-M.setup = function()
+function M.setup()
   local fold = { expr = require('vim.treesitter._fold').foldexpr }
   local upvalues = mia.debug.get_upvalues(fold.expr)
   fold.on_bytes = upvalues.on_bytes
