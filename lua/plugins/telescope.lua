@@ -1,3 +1,15 @@
+local cfg_cmd = vim.inspect({
+  cwd = '~',
+  find_command = {
+    'git',
+    '--git-dir=' .. vim.env.HOME .. '/.cfg/',
+    '--work-tree=' .. vim.env.HOME,
+    'ls-files',
+    '--exclude-standard',
+    '--cached',
+  },
+}, { newline = '', indent = '' })
+
 ---@type LazySpec
 return {
   'nvim-telescope/telescope.nvim',
@@ -59,6 +71,7 @@ return {
         em = 'Telescope emoji',
         ws = 'Telescope lsp_dynamic_workspace_symbols',
         ev = 'Telescope fd cwd=' .. vim.fn.stdpath('config'),
+        ecf = ('lua require("telescope.builtin").find_files(%s)'):format(cfg_cmd),
         evp = 'Telescope fd cwd=' .. vim.fn.stdpath('config') .. '/mia_plugins',
         evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
         evr = 'Telescope fd cwd=' .. vim.env.VIMRUNTIME,
@@ -72,7 +85,7 @@ return {
       layout_strategy = 'flex',
       layout_config = {
         flex = {
-          flip_columns = 140,
+          flip_columns = 120,
           vertical = {
             vertical = {
               prompt_position = 'bottom',
@@ -96,7 +109,7 @@ return {
         '$ignore',
         '^src/parser.c$',
       },
-      mappings = { i = { ['<C-s>'] = 'select_horizontal' } },
+      mappings = { i = { ['<C-s>'] = 'select_horizontal' }, n = { ['<C-c>'] = 'close' } },
     },
     extensions = {
       -- See link for defaults & all options available
