@@ -1,6 +1,6 @@
 local M = {}
 
-M.python = function(src, dest, force)
+function M.python(src, dest, force)
   if vim.startswith(src, 'tests/') then
     return
   end
@@ -52,7 +52,7 @@ M.python = function(src, dest, force)
   end
 end
 
-M.move = function(src, dest, force, skip_ft)
+function M.move(src, dest, force, skip_ft)
   local orig_buf = vim.fn.bufnr() --[[@as string]]
 
   if vim.fn.bufnr(src) == -1 and vim.fn.filereadable(src) ~= 1 then
@@ -93,7 +93,7 @@ M.move = function(src, dest, force, skip_ft)
   return ret
 end
 
-M.cmd = function(cmd)
+function M.cmd(cmd)
   local src, dest = cmd.fargs[1], cmd.fargs[2]
   if not dest then
     dest = src

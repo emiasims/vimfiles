@@ -1,4 +1,7 @@
+---@type table<string, fun(): string>
 return setmetatable({}, {
+  ---@param key string
+  ---@return string
   __call = function(_, key)
     if vim.env[key] then
       return vim.env[key]
@@ -14,6 +17,8 @@ return setmetatable({}, {
     end
   end,
 
+  ---@param key string
+  ---@return fun(): string
   __index = function(M, key)
     return function()
       return M(key)

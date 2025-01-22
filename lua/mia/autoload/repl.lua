@@ -174,7 +174,7 @@ function M.start(filetype)
   M._setup_endline(bufnr, filetype)
 end
 
-M.cmd = function(cmd)
+function M.cmd(cmd)
   M.start(cmd.args == '' and vim.bo.filetype or cmd.args)
 end
 

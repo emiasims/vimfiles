@@ -1,3 +1,5 @@
+-- for creating lua/mia/_meta_gen.lua
+
 local F = setmetatable({
   _order = {},
 }, {
@@ -9,7 +11,7 @@ local F = setmetatable({
 
 local Iter = vim.iter
 
-local Formatter = function(fmt)
+local function Formatter(fmt)
   return function(...)
     local fargs = { ... }
     return fmt
@@ -23,7 +25,7 @@ end
 
 local sort = mia.tbl.sort
 
-F.header = function()
+function F.header()
   return {
     '---@meta _',
     "error('Cannot require a meta file')",
@@ -31,7 +33,7 @@ F.header = function()
   }
 end
 
-F.mia = function()
+function F.mia()
   local fmt = {
     mia = Formatter('mia.%s = ... ---@module "%s"'),
     alias = Formatter('mia.%s = mia.%s'),
@@ -52,7 +54,7 @@ F.mia = function()
   }):totable()
 end
 
-F.auevents = function()
+function F.auevents()
   local doc = vim.api.nvim_get_runtime_file('*/autocmd.txt', true)[1]
   local lines = vim.fn.readfile(doc)
 
@@ -91,7 +93,7 @@ F.auevents = function()
   return { '---@alias autocmd.event', sort(Iter(events):map(Formatter('---|"%s" %s')):totable()) }
 end
 
-F.hlgroups = function()
+function F.hlgroups()
   local hexpat = string.rep('[%da-fA-F]', 6)
   local _nohex = function(name)
     return not (name:match('^' .. hexpat .. '$') or name:match('^0x' .. hexpat .. '$'))
@@ -127,7 +129,7 @@ F.hlgroups = function()
   }
 end
 
-local get = function()
+local function get()
   return Iter(F._order) -- key names
     :map(mia.F.index(F)) -- get the functions
     :map(mia.F.call) -- get the results in order
@@ -136,7 +138,7 @@ local get = function()
     :totable()
 end
 
-local write = function()
+local function write()
   local lines = get()
   local fname = vim.fn.stdpath('config') .. '/lua/mia/_meta_gen.lua'
   local metafile = io.open(fname, 'w')

@@ -2,7 +2,7 @@ local util = require('mia.util')
 
 local M = { }
 
-M.exec = function(cmd, print_output)
+function M.exec(cmd, print_output)
   vim.fn.inputsave()
   local password = vim.fn.inputsecret('Password: ')
   vim.fn.inputrestore()
@@ -22,7 +22,7 @@ M.exec = function(cmd, print_output)
   return true
 end
 
-M.write = function(tmpf, path)
+function M.write(tmpf, path)
   -- `bs=1048576` is equivalent to `bs=1M` for GNU dd or `bs=1m` for BSD dd
   -- Both `bs=1M` and `bs=1m` are non-POSIX
   local cmd =
@@ -44,7 +44,7 @@ M.write = function(tmpf, path)
   end
 end
 
-M.setup = function(opts)
+function M.setup(opts)
   if M.job then
     M.job:kill(15)
     -- while :is_closing()

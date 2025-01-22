@@ -1,6 +1,6 @@
 local M = {}
 
-M.patch = function(modname, patch)
+function M.patch(modname, patch)
   local mod = require(modname)
   if type(mod) ~= 'table' then
     error('module is not a table: ' .. modname)

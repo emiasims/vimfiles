@@ -1,4 +1,4 @@
-local nilfunc = function() end
+local function nilfunc() end
 
 ---@enum (key) mia.log.level
 local Messages = {
@@ -16,7 +16,7 @@ local inspect = mia.partial(vim.inspect, nil, { newline = ' ', indent = '' })
 
 ---@param fmt string
 ---@vararg any
-local formatf = function(fmt, ...)
+local function formatf(fmt, ...)
   return mia.formatn(fmt, unpack(vim.tbl_map(inspect, { ... })))
 end
 
@@ -28,7 +28,7 @@ local hls = {
   error = 'ErrorMsg',
 }
 
-local _parse = function(level, scope, msg)
+local function _parse(level, scope, msg)
   if type(scope) == 'table' then
     scope = vim.iter(scope):flatten(math.huge):totable()
     scope[2] = vim.iter(scope):skip(1):join('][')
@@ -67,16 +67,16 @@ local Log = {
 }
 Log.notify = Log.echo
 
-M.clear = function()
+function M.clear()
   Messages = {}
 end
 
-M.disable = function()
+function M.disable()
   Messages = {}
 end
 
 ---Wraps with mia.partial to save the log settings
-M.wrap = function(fn, ...)
+function M.wrap(fn, ...)
   local active_logs = vim.deepcopy(M.active)
   fn = mia.partial(fn, ...)
   return function(...)
@@ -88,7 +88,7 @@ M.wrap = function(fn, ...)
 end
 
 ---@param levels? mia.log.level|mia.log.level[] nil: all
-M.show = function(levels)
+function M.show(levels)
   if not levels then
     levels = vim.tbl_keys(Messages)
   elseif type(levels) == 'string' then
@@ -116,7 +116,7 @@ end
 
 ---@param level mia.log.level
 ---@param destination 'echo' | 'notify' | 'file' | 'table' | boolean | nil
-M.activate = function(level, destination)
+function M.activate(level, destination)
   if not destination then
     M.active[level] = nil
   else

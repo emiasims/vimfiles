@@ -182,7 +182,7 @@ local function functionReport(information)
   return report
 end
 
-local onDebugHook = function(hookType)
+local function onDebugHook(hookType)
   local information = debug.getinfo(2, 'nS')
   if hookType == 'call' then
     local funcReport = functionReport(information)

@@ -1,4 +1,4 @@
-local set = function(opt, val)
+local function set(opt, val)
   local name, scope = opt._info.name, opt._info.scope
   if scope then
     scope = scope == 'global' and 'opt_global' or 'opt_local'
@@ -8,7 +8,7 @@ local set = function(opt, val)
   vim[scope][name] = val
 end
 
-local parse = function(name, val)
+local function parse(name, val)
   local setf, scope = set, 'opt'
 
   if type(val) == 'table' then
@@ -27,13 +27,13 @@ local parse = function(name, val)
   return { name = name, scope = scope, value = val, setf = setf }
 end
 
-local save = function(o)
+local function save(o)
   local save = vim[o.scope][o.name]:get()
   o.setf(vim[o.scope][o.name], o.value)
   return { name = o.name, scope = o.scope, value = save }
 end
 
-local restore = function(s)
+local function restore(s)
   vim[s.scope][s.name] = s.value
 end
 

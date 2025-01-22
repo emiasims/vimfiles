@@ -89,7 +89,7 @@ local M = {
 
 }
 
-M.categorize = function(t, k, preserve_ix)
+function M.categorize(t, k, preserve_ix)
   local cats = {}
   local tinsert = not preserve_ix and M.isarr(t)
   for ix, v in pairs(t) do
@@ -106,7 +106,7 @@ end
 
 M.todict = M.rawset
 
-M.update = function(t1, t2, shallow)
+function M.update(t1, t2, shallow)
   for k, v in pairs(t2) do
     if type(v) == 'table' and type(t1[k]) == "table" and not shallow then
       M.update(t1[k], v)
