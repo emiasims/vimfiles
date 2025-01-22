@@ -1,6 +1,6 @@
 -- lazy.nvim plugins
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
   if vim.v.shell_error ~= 0 then
@@ -20,10 +20,4 @@ require('lazy').setup({
   change_detection = { notify = false },
   dev = { path = vim.fn.stdpath('config') .. '/mia_plugins' },
   profiling = { require = true },
-  -- ui = { border = 'rounded' },
 })
-
--- vim.defer_fn(function()
---   pcall(require, 'lspconfig')
---   pcall(require, 'nvim-treesitter')
--- end, 10)
