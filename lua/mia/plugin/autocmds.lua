@@ -39,6 +39,10 @@ return mia.augroup('mia-autocmds', {
   FocusGained = 'rshada',
   FocusLost = 'wshada',
 
+  -- cursor color macro recording
+  RecordingEnter = 'hi! link CursorLine CursorLRecording',
+  RecordingLeave = 'hi! link CursorLine CursorLBase',
+
   TextYankPost = {
     desc = 'Highlight yanked text briefly',
     callback = function()

@@ -82,6 +82,11 @@ return {
         TabLineRecording = { fg = colors.yellow, bg = stl.crust },
         TabLineSession = { fg = colors.pink, bg = stl.crust },
 
+        -- from catppuccin group definition
+        CursorLBase = { bg = util.darken(colors.surface0, 0.64, colors.base) },
+        CursorLRecording = { bg = util.darken(colors.yellow, 0.15, colors.base) },
+        CursorLine = { link = 'CursorLBase', force = true },
+
         StatusLine = { bg = stl.crust },
         stlModified = { fg = colors.red, bg = stl.crust },
         stlTypeInfo = { fg = colors.sky, bg = stl.crust },
@@ -105,11 +110,8 @@ return {
     if not vim.fn.has('vim_starting') then
       vim.cmd.highlight('clear')
     end
+
     require('catppuccin').setup(config.opts)
     require('catppuccin').load('macchiato')
-    vim.schedule(function()
-      -- prevents flicker with using cache manually
-      vim.cmd.redraw({ bang = true })
-    end)
   end,
 }
