@@ -14,55 +14,6 @@ return {
   },
 
   config = function()
-    local ns = vim.api.nvim_create_namespace('mia-copilot')
-    local hlgroup = 'CopilotSuggestion'
-
-    -- next 2 functions set up a pretty reveal for the copilot suggestions
-    local function setup_scanner_mark(buf, r, c)
-      return vim.api.nvim_buf_set_extmark(buf, ns, r - 1, c, {
-        end_col = c + 1,
-        hl_group = hlgroup,
-        right_gravity = false,
-        end_right_gravity = true,
-        strict = false,
-      })
-    end
-
-    local start_scanner = vim.schedule_wrap(function(buf, markid, speed)
-      local timer = vim.uv.new_timer()
-
-      ---@param mdeets vim.api.keyset.extmark_details
-      local setmark = function(start_row, start_col, mdeets)
-        vim.api.nvim_buf_set_extmark(buf, ns, start_row, start_col, {
-          id = markid,
-          end_row = mdeets.end_row,
-          end_col = mdeets.end_col,
-          hl_group = hlgroup,
-          strict = true,
-        })
-      end
-
-      local scan = function()
-        local success = pcall(function()
-          local m = vim.api.nvim_buf_get_extmark_by_id(buf, ns, markid, { details = true })
-          local dx = math.random(2, speed * 2 - 2)
-          -- local dx = 5
-          local success = pcall(setmark, m[1], m[2] + dx, m[3])
-          if not success then
-            setmark(m[1] + 1, 0, m[3])
-          end
-        end)
-        if not success then
-          timer:stop()
-          pcall(timer.close, timer)
-        end
-      end
-
-      timer:start(0, 15, vim.schedule_wrap(scan))
-    end)
-
-    local get_copilot_text = vim.fn['copilot#TextQueuedForInsertion']
-
     -- Want to be able to dot repeat insertions that include copilot
     local function repeatAccept(fn, fallback)
       return function()
@@ -72,14 +23,10 @@ return {
           return ret -- fallback
         end
 
-        local text = get_copilot_text()
-        Text = text
+        local text = vim.fn['copilot#TextQueuedForInsertion']()
 
         -- set up extmark to track the insertion + reveal prettily
-        local buf = vim.api.nvim_get_current_buf()
-        local curs = vim.api.nvim_win_get_cursor(0)
-        local id = setup_scanner_mark(buf, unpack(curs))
-        start_scanner(buf, id, math.floor(#text / 100) + 3)
+        mia.reveal.track({ speed = math.min(#text, 500), max = 5000 })
 
         -- return the actual text
         return table.concat({
@@ -89,8 +36,19 @@ return {
           ret:sub(en + 1),
           vim.keycode('<Cmd>set nopaste<Cr><C-g>u'),
         })
+
       end
     end
+
+    ---@param ev aucmd.callback.arg
+    mia.augroup('mia-copilot', {
+      BufEnter = function(ev)
+        local bo = vim.bo[ev.buf]
+        if bo.modifiable and bo.buftype == '' then
+          vim.b[ev.buf].workspace_folder = vim.fs.root(ev.buf, '.git')
+        end
+      end,
+    })
 
     mia.keymap({
       mode = 'i',

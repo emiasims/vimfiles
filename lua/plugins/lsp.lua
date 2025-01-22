@@ -3,23 +3,17 @@ local lsp = mia.on.call('vim.lsp.buf')
 ---@type LazySpec
 return {
 
+  'Bilal2453/luvit-meta',
   {
     'folke/lazydev.nvim',
     ft = 'lua', -- only load on lua files
     opts = {
       library = {
-        -- Library paths can be absolute
-        -- '~/projects/my-awesome-lib',
+        'mia',
         'lazy.nvim',
         'luvit-meta/library',
-        -- 'mini.notify',
         { path = 'mini.notify', words = { 'MiniNotify' } },
-        { path = 'mia', words = { 'mia' } },
-        -- TODO build a cache of paths and words
-
-        -- It can also be a table with trigger words / mods
-        -- Only load luvit types when the `vim.uv` word is found
-        -- { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
       },
     },
   },
@@ -49,7 +43,7 @@ return {
         julials = {},
         taplo = {},
 
-        ruff_lsp = {
+        ruff = {
           settings = { organizeImports = false },
           -- disable ruff as hover provider to avoid conflicts with pyright
           on_attach = function(client)
