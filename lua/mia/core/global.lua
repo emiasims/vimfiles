@@ -73,10 +73,20 @@ G.T = setmetatable({}, {
         select(1, ...)(select(2, ...))
       end
       vim.uv.update_time()
-      local end_t = vim.uv.now() - t1
-      print(('Runtime: %fs (%d times)'):format(end_t, key))
+      local dt = (vim.uv.now() - t1)
+      local unit = 'ms'
+      if dt > 100 then
+        dt = dt / 1000
+        unit = 's'
+      end
+      print(('Runtime: %g%s (%d times)'):format(dt, unit, key))
       if key > 1 then
-        print(('         %fs / call'):format(end_t / key))
+        dt = dt / key
+        if unit == 's' and dt <= 100 then
+          unit = 'ms'
+          dt = dt * 1000
+        end
+        print(('         %g%s / call'):format(dt, unit))
       end
     end
   end,
