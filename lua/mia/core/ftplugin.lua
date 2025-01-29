@@ -13,9 +13,9 @@ M.ftplugins = setmetatable({}, {
 })
 
 local Handler = {
-  opts = function(buf, opts)
+  opts = function(_, opts)
     for k, v in pairs(opts) do
-      vim.bo[buf][k] = v
+      vim.opt_local[k] = v
     end
   end,
 
