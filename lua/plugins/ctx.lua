@@ -80,7 +80,7 @@ return {
       { '$', { 'g$h', 'opt.wrap.on()' }, mode = 'x', default = '$h' },
       {
         '<Esc>',
-        { { '<C-e>', 'pumvisible' }, { '<C-e>', 'cmp_visible', remap = true } },
+        { { '<C-e>', 'pumvisible' }, { '<C-e>', 'blink_visible', remap = true } },
         mode = 'i',
       },
     },
@@ -315,14 +315,14 @@ return {
       local pumvisible = function()
         return vim.fn.pumvisible() ~= 0
       end
-      -- I don't want cmp.nvim to modify my keybinds, so use a plug mapping and then
+      -- I don't want completion to modify my keybinds, so use a plug mapping and then
       -- do it myself. see completion.lua for <Plug>(miaConfirmCmp) definition
       -- Wrapping cmp.visible so it doesn't fully load here
-      local cmp_visible = function()
-        return require('cmp').visible()
+      local blink_visible = function()
+        return require('blink.cmp').is_visible()
       end
       ctx.set('i', '<Cr>', {
-        { rhs = '<Plug>(miaCmpConfirm)', context = cmp_visible },
+        { rhs = '<Plug>(miaCmpConfirm)', context = blink_visible },
         { rhs = '<C-y>', context = pumvisible },
         { rhs = '<Cr><C-c>O', context = in_pair },
       })
