@@ -14,13 +14,13 @@ return {
         formatters_by_ft = {
           lua = { 'stylua' },
           python = { 'isort', 'black' },
-          markdown = { 'inject' },
+          markdown = { 'prettier', 'inject' },
         },
       },
       ---@param c {opts: conform.setupOpts}
       config = function(c)
         require('conform').setup(c.opts)
-        mia.fmtexpr = mia.restore_opt(    --
+        mia.fmtexpr = mia.restore_opt( --
           { eventignore = 'all' },
           function()
             require('conform').formatexpr()
