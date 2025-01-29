@@ -1,4 +1,4 @@
-local Config = { dir = vim.fn.stdpath('data') .. '/mia.session' }
+local Config = { dir = vim.fn.stdpath('state') .. '/mia.session' }
 
 local function expand(file)
   return vim.fs.joinpath(Config.dir, file)
