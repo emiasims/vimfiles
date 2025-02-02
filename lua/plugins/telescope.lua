@@ -1,19 +1,7 @@
-local cfg_cmd = vim.inspect({
-  cwd = '~',
-  find_command = {
-    'git',
-    '--git-dir=' .. vim.env.HOME .. '/.cfg/',
-    '--work-tree=' .. vim.env.HOME,
-    'ls-files',
-    '--exclude-standard',
-    '--cached',
-  },
-}, { newline = '', indent = '' })
-
 ---@type LazySpec
 return {
   'nvim-telescope/telescope.nvim',
-  -- event = { 'InsertEnter', 'CmdlineEnter' },
+  event = { 'InsertEnter', 'CmdlineEnter' },
   cmd = 'Telescope',
 
   dependencies = {
@@ -22,41 +10,11 @@ return {
     'lazy-ctx.nvim',
   },
 
-  -- keys = {
-  --   {
-  --     'ctx.each(telescope)',
-  --     'builtin.cmd_start',
-  --     mode = 'ca',
-  --     pairs = {
-  --       f = 'Telescope fd',
-  --       fh = 'Telescope fd cwd=<C-r>=expand("%:h")<Cr>',
-  --       o = 'Telescope fd cwd=~/org',
-  --       u = 'Telescope undo',
-  --       l = 'Telescope buffers',
-  --       t = 'Telescope tags',
-  --       tr = 'Telescope resume',
-  --       mr = 'Telescope oldfiles',
-  --       A = 'Telescope live_grep',
-  --       h = 'Telescope help_tags',
-  --       hi = 'Telescope highlights',
-  --       em = 'Telescope emoji',
-  --       ws = 'Telescope lsp_dynamic_workspace_symbols',
-  --       ev = 'Telescope fd cwd=' .. vim.fn.stdpath('config'),
-  --       evp = 'Telescope fd cwd=' .. vim.fn.stdpath('config') .. '/mia_plugins',
-  --       evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
-  --       evr = 'Telescope fd cwd=' .. vim.env.VIMRUNTIME,
-  --       gst = 'Telescope git_status',
-  --     },
-  --     clear = true,
-  --   },
-  -- },
-
-  keys = {
+  ctx = {
     {
-      'ctx.each(telescope)',
-      'builtin.cmd_start',
       mode = 'ca',
-      pairs = {
+      ctx = 'builtin.cmd_start',
+      each = {
         f = 'Telescope fd',
         fh = 'Telescope fd cwd=<C-r>=expand("%:h")<Cr>',
         o = 'Telescope fd cwd=~/org',
@@ -71,11 +29,21 @@ return {
         em = 'Telescope emoji',
         ws = 'Telescope lsp_dynamic_workspace_symbols',
         ev = 'Telescope fd cwd=' .. vim.fn.stdpath('config'),
-        ecf = ('lua require("telescope.builtin").find_files(%s)'):format(cfg_cmd),
         evp = 'Telescope fd cwd=' .. vim.fn.stdpath('config') .. '/mia_plugins',
         evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
         evr = 'Telescope fd cwd=' .. vim.env.VIMRUNTIME,
         gst = 'Telescope git_status',
+        ecf = ('lua require("telescope.builtin").find_files(%s)'):format(vim.inspect({
+          cwd = '~',
+          find_command = {
+            'git',
+            '--git-dir=' .. vim.env.HOME .. '/.cfg/',
+            '--work-tree=' .. vim.env.HOME,
+            'ls-files',
+            '--exclude-standard',
+            '--cached',
+          },
+        }, { newline = '', indent = '' })),
       },
     },
   },
@@ -85,7 +53,8 @@ return {
       layout_strategy = 'flex',
       layout_config = {
         flex = {
-          flip_columns = 120,
+          flip_columns = 135,
+          flip_lines = 35,
           vertical = {
             vertical = {
               prompt_position = 'bottom',
