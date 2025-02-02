@@ -3,6 +3,7 @@ return {
   'saghen/blink.cmp',
   dependencies = 'rafamadriz/friendly-snippets',
   event = { 'InsertEnter', 'CmdlineEnter' },
+  version = '*',
 
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config
