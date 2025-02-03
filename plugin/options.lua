@@ -1,91 +1,83 @@
 -- settings that make a visual change, so do them immediately on starting.
 
-local set = function(name, value)
-  vim.opt[name] = value
-end
+vim
+  .iter({
+    cmdheight = 1,
+    colorcolumn = '80', -- must be string
+    signcolumn = 'yes',
+    number = true,
+    relativenumber = true,
+    showcmdloc = 'tabline',
+    showtabline = 2,
+    foldnestmax = 3,
+    sessionoptions = { 'blank', 'help', 'winsize', 'terminal', 'tabpages' },
 
-local now = {
-  cmdheight = 1,
-  colorcolumn = '80', -- must be string
-  signcolumn = 'yes',
-  number = true,
-  relativenumber = true,
-  showcmdloc = 'tabline',
-  showtabline = 2,
-  foldnestmax = 3,
-  sessionoptions = { 'blank', 'help', 'winsize', 'terminal', 'tabpages' },
-}
+    report = 0,
+    path = { '.', '**' },
+    virtualedit = 'block',
+    formatoptions = '1crlj',
+    updatetime = 500,
+    winaltkeys = 'no',
+    viewoptions = { 'cursor', 'folds' },
+    timeoutlen = 750,
+    ttimeoutlen = 250, -- for key codes
 
-local schedule = {
-  report = 0,
-  path = { '.', '**' },
-  virtualedit = 'block',
-  formatoptions = '1crlj',
-  updatetime = 500,
-  winaltkeys = 'no',
-  viewoptions = { 'cursor', 'folds' },
-  timeoutlen = 750,
-  ttimeoutlen = 250, -- for key codes
+    fileformats = { 'unix', 'dos', 'mac' },
+    swapfile = false,
+    shada = { "'300", '<500', 's100', 'h' },
+    textwidth = 99,
+    softtabstop = 2,
+    tabstop = 2,
+    shiftwidth = 2,
+    matchtime = 3,
+    breakat = '   ;:,!?',
+    whichwrap = 'b,s,[,]',
+    spellsuggest = { 'best', '10' },
+    switchbuf = 'useopen',
+    diffopt = { 'algorithm:histogram', 'filler', 'closeoff' },
+    -- completeopt = { 'menuone', 'noselect', 'noinsert' },
+    completeopt = { 'menu', 'menuone', 'noselect' },
+    clipboard = 'unnamed',
+    shortmess = 'aAoOTIcF',
+    scrolloff = 4,
+    sidescrolloff = 2,
+    pumheight = 20,
+    cmdwinheight = 5,
+    showbreak = '↘',
+    wildmode = { 'longest:full', 'full' },
+    conceallevel = 2,
+    foldlevelstart = 99,
+    jumpoptions = 'stack',
 
-  fileformats = { 'unix', 'dos', 'mac' },
-  swapfile = false,
-  shada = { "'300", '<500', 's100', 'h' },
-  textwidth = 99,
-  softtabstop = 2,
-  tabstop = 2,
-  shiftwidth = 2,
-  matchtime = 3,
-  breakat = '   ;:,!?',
-  whichwrap = 'b,s,[,]',
-  spellsuggest = { 'best', '10' },
-  switchbuf = 'useopen',
-  diffopt = { 'algorithm:histogram', 'filler', 'closeoff' },
-  -- completeopt = { 'menuone', 'noselect', 'noinsert' },
-  completeopt = { 'menu', 'menuone', 'noselect' },
-  clipboard = 'unnamed',
-  shortmess = 'aAoOTIcF',
-  scrolloff = 4,
-  sidescrolloff = 2,
-  pumheight = 20,
-  cmdwinheight = 5,
-  showbreak = '↘',
-  wildmode = { 'longest:full', 'full' },
-  conceallevel = 2,
-  foldlevelstart = 99,
-  jumpoptions = 'stack',
+    listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
+    fillchars = { vert = '┃', fold = ' ' },
 
-  listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
-  fillchars = { vert = '┃', fold = ' ' },
+    undofile = true,
+    shiftround = true,
+    expandtab = true,
+    ignorecase = true,
+    smartcase = true,
+    infercase = true,
+    wildignorecase = true,
+    showmatch = true,
+    linebreak = true,
+    autowriteall = true,
+    splitright = true,
+    showfulltag = true,
+    lazyredraw = true,
+    cursorline = true,
+    list = true,
+    termguicolors = true,
 
-  undofile = true,
-  shiftround = true,
-  expandtab = true,
-  ignorecase = true,
-  smartcase = true,
-  infercase = true,
-  wildignorecase = true,
-  showmatch = true,
-  linebreak = true,
-  autowriteall = true,
-  splitright = true,
-  showfulltag = true,
-  lazyredraw = true,
-  cursorline = true,
-  list = true,
-  termguicolors = true,
+    wrap = false,
+    shell = 'bash',
 
-  wrap = false,
-  shell = 'bash',
-
-  -- mostly default. cmdline vertical
-  guicursor = { 'n-v:block', 'i-ci-ve-c:ver25', 'r-cr:hor20', 'o:hor50' },
-}
-
-vim.iter(now):each(set)
-
-vim.schedule(function()
-  vim.iter(schedule):each(set)
-end)
+    -- mostly default. cmdline vertical
+    guicursor = { 'n-v:block', 'i-ci-ve-c:ver25', 'r-cr:hor20', 'o:hor50' },
+  })
+  :each(function(name, value)
+    vim.opt[name] = value
+  end)
 
 if vim.fn.executable('ag') then
   vim.opt.grepprg = 'ag --nogroup --nocolor'
