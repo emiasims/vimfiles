@@ -163,6 +163,16 @@ function M.formatn(fmt, ...)
     :format(...)
 end
 
--- partial wrap?
+function M.yank(reg, value)
+  if not value then
+    reg, value = '', reg
+  end
+  vim.fn.setreg(reg, value)
+end
+
+function M.put(reg)
+  return vim.fn.getreg(reg)
+end
+
 
 return M
