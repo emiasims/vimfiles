@@ -11,9 +11,10 @@ return {
 
     keymap = {
       preset = 'default',
+      ['<C-Space>'] = {}, -- <Plug>(miaCmpSuggest)
       ['<C-d>'] = { 'scroll_documentation_down', 'fallback' },
       ['<Plug>(miaCmpConfirm)'] = { 'select_and_accept' },
-      ['<C-Space>'] = {},
+      ['<Plug>(miaCmpSuggest)'] = { 'show', 'show_documentation', 'hide_documentation' },
 
       cmdline = {
         preset = 'none',
