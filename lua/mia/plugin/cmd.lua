@@ -125,5 +125,6 @@ return mia.commands({
   SudoEdit = { on_call('sudo').edit, complete = 'file', nargs = '?' },
   Repl = { on_call('repl').cmd, nargs = '?', complete = 'filetype', bar = true },
   ReplModeLine = { on_call('repl').send_modeline, bar = true },
+  Job = { on_call('job').cmd, nargs = 1, bar = true, bang = true },
   -- Session = { on_call('session'), complete = 'file', desc = 'Session management' },
 })
