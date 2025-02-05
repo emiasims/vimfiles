@@ -12,6 +12,7 @@ stl = setmetatable({
   bufname = function()
     return vim.fn.bufname(vim.api.nvim_win_get_buf(stl.winid()))
   end,
+  timer = nil
 }, {
   __index = function(t, name)
     if name == 'bo' then
@@ -176,6 +177,12 @@ end
 -- deferred? needs to get width from rest of stl?
 -- width that deals with laststatus
 
+local function ai_spinner()
+  if package.loaded['codecompanion'] then
+    return mia.ai.status()
+  end
+end
+
 local function active()
   local ok, res = pcall(function()
     local mode = mode_info()
@@ -188,7 +195,7 @@ local function active()
       hl(info.desc:gsub(HOME, '~'), 'stlDescription'),
       info.title,
       hl('%m', 'stlModified'),
-      hl(macro(), 'stlRecording'),
+      hl(ai_spinner(), 'Added'),
       peek(),
       '%=%#stlNodeTree#',
       node_tree(),
