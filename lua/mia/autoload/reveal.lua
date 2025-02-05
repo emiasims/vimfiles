@@ -49,6 +49,7 @@ local start_scanner = function(opts)
   end
 
   timer:start(opts.dt, opts.dt, vim.schedule_wrap(cb))
+  return mopts.id
 end
 
 local M = {}
@@ -64,15 +65,36 @@ local M = {}
 ---@field hl_group? string Comment
 
 
-function normalize_opts(opts)
+local function normalize_opts(opts)
   opts = opts or {}
-  if not opts.pos then
-    opts.pos = vim.api.nvim_win_get_cursor(0)
+  -- default pos
+  if not opts.buf then
+    opts.buf = vim.api.nvim_get_current_buf()
+    opts.pos = opts.pos or vim.api.nvim_win_get_cursor(0)
+  end
+  if opts.buf and not opts.pos then
+    local win = vim.fn.bufwinid(opts.buf)
+    if win == -1 then
+      error('buf not in window')
+    end
+    opts.pos = vim.api.nvim_win_get_cursor(win)
     opts.pos[1] = opts.pos[1] - 1
   end
+  if opts.pos and not opts.buf then
+    opts.buf = vim.api.nvim_get_current_buf()
+  end
+
+  while opts.pos[1] < 0 do
+    opts.pos[1] = vim.api.nvim_buf_line_count(opts.buf) + opts.pos[1]
+  end
+
+  local cols = #vim.api.nvim_buf_get_lines(opts.buf, opts.pos[1], opts.pos[1] + 1, false)[1]
+  while opts.pos[2] < 0 do
+    opts.pos[2] = cols + opts.pos[2] + 1
+  end
+
   return vim.tbl_extend('keep', opts, {
     buf = vim.api.nvim_get_current_buf(),
-    pos = vim.api.nvim_win_get_cursor(0),
     ns = vim.api.nvim_create_namespace('mia-reveal'),
     hl_group = 'CommentSansItalic',
     speed = 100,
@@ -83,20 +105,24 @@ end
 
 ---@param opts mia.RevealOpts
 function M.track(opts)
-  return start_scanner(normalize_opts(opts))
+  opts = normalize_opts(opts)
+  return start_scanner(opts)
 end
 
 -----@param text string|string[]
 -----@param opts mia.RevealOpts
 function M.text(text, opts)
+  if type(text) == 'string' then
+    text = vim.split(text, '\n')
+  end
   local timeout = opts and opts.timeout
   opts = normalize_opts(opts)
-  text = type(text) == 'table' and table.concat(text, '\n') or text
-  opts.timeout = timeout or #text / opts.speed * 1000
-  mia.reveal.track(opts)
-  vim.api.nvim_paste(text, true, -1)
+  if not timeout then
+    opts.timeout = #table.concat(text, '\n') / opts.speed * 1000
+  end
+  start_scanner(opts)
+  local sr, sc = unpack(opts.pos)
+  vim.api.nvim_buf_set_text(opts.buf, sr, sc, sr, sc, text)
 end
-
-
 
 return M
