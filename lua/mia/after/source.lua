@@ -29,7 +29,7 @@ function M.source(ev)
 
   local ft = vim.filetype.match({ buf = buf, filename = file })
   if not ft then
-    error(('Unable to detect filetype for "%s"'):format(ev), 0)
+    error(('Unable to detect filetype for "%s"'):format(vim.inspect(ev)), 0)
   end
   local src = M.get(ft)
 
