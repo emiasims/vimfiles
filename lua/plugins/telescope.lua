@@ -3,6 +3,7 @@ return {
   'nvim-telescope/telescope.nvim',
   event = { 'InsertEnter', 'CmdlineEnter' },
   cmd = 'Telescope',
+  enabled = false,
 
   dependencies = {
     'xiyaowong/telescope-emoji.nvim',
@@ -33,7 +34,18 @@ return {
         evs = 'Telescope fd cwd=' .. vim.fn.stdpath('data') .. '/lazy',
         evr = 'Telescope fd cwd=' .. vim.env.VIMRUNTIME,
         gst = 'Telescope git_status',
-        ecf = ('lua require("telescope.builtin").find_files(%s)'):format(vim.inspect({
+        ecf = 'Telescope config_files',
+      },
+    },
+  },
+
+  config = function(spec)
+    local ts = require('telescope')
+    ts.setup(spec.opts --[[@as table]])
+
+    ts.extensions['config_files'] = {
+      config_files = function(opts)
+        return require('telescope.builtin').find_files(vim.tbl_extend('force', opts, {
           cwd = '~',
           find_command = {
             'git',
@@ -43,10 +55,10 @@ return {
             '--exclude-standard',
             '--cached',
           },
-        }, { newline = '', indent = '' })),
-      },
-    },
-  },
+        }))
+      end,
+    }
+  end,
 
   opts = {
     defaults = {

@@ -33,7 +33,6 @@ return {
   { 'wellle/targets.vim', event = 'ModeChanged *:*o*' },
   { 'tommcdo/vim-lion', keys = { 'gl', 'gL' } },
   { 'echasnovski/mini.cursorword', event = 'VeryLazy', config = true },
-  'jeetsukumaran/vim-filebeagle',
   'mbbill/undotree',
 
   'nvim-lua/popup.nvim',

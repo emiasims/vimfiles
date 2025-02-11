@@ -175,6 +175,7 @@ return {
 
       ctx.set('c', ' ', {
         cmdline_is({ rhs = 'lua ', cmdline = '' }),
+        cmdline_is({ rhs = '<C-]>', cmdline = 'pi' }),
         cmdline_is({ rhs = '<C-]>', cmdline = 'eh' }),
         cmdline_is({ rhs = '<C-]>', cmdline = 'mh' }),
         cmdline_is({ rhs = '<C-]>', cmdline = 'vga' }),
