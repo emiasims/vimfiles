@@ -11,10 +11,18 @@ local function build_sessinfo(buf)
   file = vim.fn.fnamemodify(file, ':p')
   local root = vim.fs.root(file, '.git')
 
+  local name
+  if root then
+    name = vim.fs.relpath(vim.fs.dirname(root), file)
+  else
+    name = vim.fs.relpath('~', file)
+    name = name and '~/' .. name
+  end
+
   ---@class mia.session
   local sess = {
     file = file,
-    name = root and (file:sub(#vim.fs.dirname(root) + 2)) or file,
+    name = name or file,
     root = root,
     path = expand(file:gsub('%%', '%%%%'):gsub('/', '%%') .. '.vim'),
   }
@@ -35,6 +43,7 @@ function M.mksession(sess)
 
   table.insert(lines, 2, ('lua vim.g.session=vim.json.decode([[%s]])'):format(vim.fn.json_encode(sess)))
   vim.fn.writefile(lines, sess.path)
+  vim.system({ 'ln', '-sf', sess.path, expand('last-session.vim') })
   vim.g.session = sess
 end
 
@@ -52,7 +61,7 @@ function M.get()
   local sessions = {}
 
   for f, ftype in vim.fs.dir(Config.dir) do
-    if ftype == 'file' and f:sub(-4) == '.vim' then
+    if ftype == 'file' and vim.endswith(f, '.vim') then
       local fd = assert(io.open(expand(f), 'r'))
       fd:read('*l') ---@diagnostic disable-line: discard-returns
       local info = fd:read('*l'):match('^lua vim.g.session=vim.json.decode%(%[%[(.*)%]%]%)$')
@@ -71,14 +80,16 @@ function M.get()
 end
 
 function M.list()
+  local sessions = M.get()
   mia.info('Sessions:')
-  for _, s in ipairs(M.get()) do
+  for _, s in ipairs(sessions) do
     if s.path == vim.v.this_session then
       mia.warn(' > ' .. s.name)
     else
       mia.info('   ' .. s.name)
     end
   end
+  return sessions
 end
 
 ---@param sess string|mia.session?
@@ -88,17 +99,13 @@ function M.lookup(sess)
   end
 
   local info = M.get()
-  -- return last used
-  if sess == nil then
-    local mtime = -2
-    local last, mt
-    for _, s in ipairs(info) do
-      mt = vim.fn.getftime(s.path)
-      if mt > mtime then
-        mtime, last = mt, s
-      end
+  if not sess or sess == 'last' then
+    local last = vim.uv.fs_readlink(expand('last-session.vim'))
+    if last and vim.fn.filereadable(last) == 1 then
+      return vim.iter(info):find(function(s)
+        return s.path == last
+      end)
     end
-    return last
 
   -- session object, verify with root and file
   elseif type(sess) == 'table' then
@@ -122,7 +129,7 @@ function M.load(sess)
     vim.cmd.source(vim.fn.fnameescape(sess.path))
     mia.warn('Session loaded: ' .. sess.name)
   else
-    mia.error('Session not found')
+    mia.err('Session not found')
   end
 end
 
@@ -134,6 +141,9 @@ end
 ---@param sess string|mia.session?
 function M.delete(sess)
   sess = M.lookup(sess)
+  if not sess then
+    return mia.err('Session not found')
+  end
   if sess.path == vim.v.this_session then
     M.disable()
     vim.g.session = nil
@@ -168,11 +178,14 @@ end
 
 function M.start(buf, name)
   M.enable()
-  local file = vim.fn.bufname(buf or 0)
-  vim.g.session = build_sessinfo(file)
-  if name then
-    vim.g.session.name = name
+  if not vim.g.session then
+    local file = vim.fn.bufname(buf or 0)
+    vim.g.session = build_sessinfo(file)
+    if name then
+      vim.g.session.name = name
+    end
   end
+
   M.mksession(vim.g.session)
   mia.warn('New session started: ' .. vim.g.session.name)
 end
@@ -247,6 +260,30 @@ function M.pick(opts)
     :find()
 end
 
+function M.mini_starter_items(nrecent)
+  local last = M.lookup()
+  local pick = { action = 'Session pick', name = 'Pick Sessions', section = 'Sessions' }
+  if not last then
+    return pick
+  end
+  ---@diagnostic disable-next-line: cast-local-type
+  last = ('Last Session (%s)'):format(last.name)
+  return { { action = 'Session load', name = last, section = 'Sessions' }, pick }
+end
+
+function M.clean()
+  mia.err('Delete all sessions?')
+  vim.ui.input({ prompt = '[y/N] ' }, function(input)
+    if input and input:lower():find('^%s*y') then
+      for name in vim.fs.dir(Config.dir, { follow = false }) do
+        if vim.endswith(name, '.vim') then
+          vim.fn.delete(expand(name))
+        end
+      end
+    end
+  end)
+end
+
 function M.setup()
   local list_complete = mia.command.wrap_complete(function()
     return vim.iter(M.get()):map(mia.tbl.index('name')):totable()
@@ -263,12 +300,16 @@ function M.setup()
   mia.command('Session', {
     subcommands = {
       list = tocmd(M.list),
+      pick = tocmd(M.pick),
+      last = tocmd(M.last),
+      clean = tocmd(M.clean),
       enter = { tocmd(M.enter), complete = 'buffer' },
       save = { tocmd(M.save), complete = list_complete },
       load = { tocmd(M.load), complete = list_complete },
       delete = { tocmd(M.delete), complete = list_complete },
       name = { tocmd(M.name), complete = list_complete },
       stop = tocmd(M.disable),
+      start = tocmd(M.start),
     },
     desc = 'Session management',
     nargs = '*',
@@ -303,12 +344,8 @@ function M.setup()
     VimEnter = function()
       local args = vim.fn.argv()
       vim.o.swapfile = false
-      if vim.g.session then
+      if vim.g.session or vim.fn.argc() == 0 then
         return
-      end
-
-      if vim.fn.argc() == 0 then
-        return M.load()
       end
 
       M.enter(vim.fn.fnamemodify(args[1], ':p'))
