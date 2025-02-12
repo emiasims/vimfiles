@@ -34,7 +34,7 @@ return {
   name = 'catppuccin',
   ---@type CatppuccinOptions
   opts = {
-    integrations = { vim_sneak = false, ufo = false, noice = true, notify = true },
+    integrations = { snacks = true, notify = true },
 
     custom_highlights = function(colors)
       local util = require('catppuccin.utils.colors')
@@ -64,7 +64,7 @@ return {
 
         CommentSansItalic = { fg = colors.overlay0 },
 
-        Folded = { fg = colors.blue, bg = stl.crust },
+        Folded = { fg = colors.blue, bg = colors.none },
         ColorColumn = { bg = stl.surface0 },
 
         Todo = { fg = colors.yellow, bg = colors.none, bold = true },
@@ -101,6 +101,9 @@ return {
         stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
 
         FlashBackdrop = { link = 'CommentSansItalic' },
+
+        SnacksIndent = { fg = stl.surface0 },
+        SnacksIndentScope = { fg = colors.surface1 },
       }
     end,
   },
