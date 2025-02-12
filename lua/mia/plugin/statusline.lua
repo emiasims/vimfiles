@@ -216,29 +216,42 @@ local function inactive()
   return table.concat({ hl(' ', 'SignColumn'), info.desc, info.title, '%m %=%y', encoding() }, ' ')
 end
 
+local timer
+local redraw_funcs = {}
+local function _refresh()
+  for func in pairs(redraw_funcs) do
+    redraw_funcs[func] = func() or nil
+  end
+  if not next(redraw_funcs) and timer then
+    pcall(timer.stop, timer)
+    pcall(timer.stop, timer)
+    timer = nil
+  end
+  vim.api.nvim__redraw({ statusline = true })
+end
+
+local function clear_redraw(func)
+  if not func then
+    redraw_funcs = {}
+  else
+    redraw_funcs[func] = nil
+  end
+end
+
+local function on_redraw(func)
+  redraw_funcs[func] = true
+  if not timer then
+    timer = vim.uv.new_timer()
+    timer:start(100, 100, vim.schedule_wrap(_refresh))
+  end
+end
+
 vim.go.statusline = '%!v:lua.mia.statusline()'
 vim.go.laststatus = 3
 
--- local statusline = line.build(--
---   {
---     setup = setup,
---     update_fname_extmarks,
---     { mode, modecolors },
---     { project, 'stlDescription' },
---     { dir, 'stlDescription' },
---     info.title,
---     { '%m', 'stlModified' },
---     peek,
---     '%=',
---     treesitter
---     session,
---     { error_info, 'stlErrorInfo' },
---     { '%y', 'stlTypeInfo' },
---     { cursor_info, modecolors },
---   },
--- )
-
 return setmetatable({
+  on_redraw = on_redraw,
+  clear_redraw = clear_redraw,
   active = active,
   inactive = inactive,
   stl = stl,

@@ -15,7 +15,6 @@ M.roles = {
 ---@alias mia.ai.messages { role: string, content: string, hide?: boolean }[]
 
 ---@param opts string|{ adapter: string?, query?: string, messages?: mia.ai.messages, sync: boolean? }
----@return Job job Plenary job, with `.response` field containing the response
 function M.ask(opts)
   local messages
   if type(opts) == 'string' then
@@ -115,23 +114,18 @@ local function setup()
 
   local spins = { '⠇', '⠏', '⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧' }
 
+  local function spin_it()
+    ix = ix % #spins + 1
+    return #requests > 0
+  end
+
   vim.api.nvim_create_autocmd({ 'User' }, {
     pattern = 'CodeCompanionRequest*',
     group = vim.api.nvim_create_augroup('mia-ai-spin', { clear = true }),
     callback = function(ev)
       if ev.match == 'CodeCompanionRequestStarted' then
         table.insert(requests, ev.data.id)
-        if not timer then
-          timer = vim.uv.new_timer()
-          timer:start(
-            100,
-            100,
-            vim.schedule_wrap(function()
-              ix = ix % #spins + 1
-              vim.api.nvim__redraw({ statusline = true })
-            end)
-          )
-        end
+        mia.statusline.on_redraw(spin_it)
       elseif ev.match == 'CodeCompanionRequestFinished' then
         table.remove(requests) -- doesn't really matter where it is in the list
       end
@@ -140,7 +134,7 @@ local function setup()
 
   get_status = function()
     if #requests > 0 then
-      return spins[ix]
+      return spins[ix] .. ':' .. #requests
     elseif timer then
       timer:stop()
       timer = nil
