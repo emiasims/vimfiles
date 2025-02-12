@@ -160,7 +160,7 @@ function M.reload_lua_module(filename, buf)
   local spec = M.get_spec(filename, buf)
   local msg = spec:source()
   if spec.kind and msg then
-    mia.warn(("Reloaded %s via '%s'"):format(msg, spec.kind))
+    mia.warn("Reloaded %s via '%s'", msg, spec.kind)
   end
 end
 

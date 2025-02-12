@@ -45,6 +45,7 @@ function M.mksession(sess)
   vim.fn.writefile(lines, sess.path)
   vim.system({ 'ln', '-sf', sess.path, expand('last-session.vim') })
   vim.g.session = sess
+  vim.v.this_session = sess.path
 end
 
 function M.status()
@@ -81,14 +82,16 @@ end
 
 function M.list()
   local sessions = M.get()
-  mia.info('Sessions:')
+  local chunks = { { 'Sessions:\n' } }
   for _, s in ipairs(sessions) do
     if s.path == vim.v.this_session then
-      mia.warn(' > ' .. s.name)
+      table.insert(chunks, { ' > ' .. s.name .. '\n', 'WarningMsg' })
     else
-      mia.info('   ' .. s.name)
+      table.insert(chunks, { '   ' .. s.name .. '\n' })
     end
   end
+  chunks[#chunks][1] = chunks[#chunks][1]:sub(1, -2)
+  vim.api.nvim_echo(chunks, false, {})
   return sessions
 end
 
@@ -127,7 +130,7 @@ function M.load(sess)
   if sess then
     M.enable()
     vim.cmd.source(vim.fn.fnameescape(sess.path))
-    mia.warn('Session loaded: ' .. sess.name)
+    mia.info('Session loaded: ' .. sess.name)
   else
     mia.err('Session not found')
   end
@@ -187,7 +190,7 @@ function M.start(buf, name)
   end
 
   M.mksession(vim.g.session)
-  mia.warn('New session started: ' .. vim.g.session.name)
+  mia.info('New session started: ' .. vim.g.session.name)
 end
 
 function M.pick(opts)

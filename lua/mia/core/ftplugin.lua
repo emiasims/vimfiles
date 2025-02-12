@@ -62,7 +62,7 @@ function M.do_ftplugin(buf, filetype)
     if ftp[name] then
       local ok, msg = pcall(handler, buf, ftp[name])
       if not ok then
-        mia.err(('Failed to set %s for %s in buffer %d:\n%s'):format(name, filetype, buf, msg))
+        mia.err('Failed to set %s for %s in buffer %d:\n%s', name, filetype, buf, msg)
       end
     end
   end

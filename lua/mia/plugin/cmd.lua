@@ -60,12 +60,17 @@ local impl = {
       if modified > 0 then
         msg = msg .. (', %s modified left open'):format(modified)
       end
-      mia.info(msg)
+      mia.info(
+        'Closed %d hidden buffer%s%s',
+        closed,
+        closed ~= 1 and 's' or '',
+        modified > 0 and (', %s modified left open'):format(modified) or ''
+      )
     end,
   },
 
   Redir = {
-    desc = "Redirect command output to a new scratch buffer",
+    desc = 'Redirect command output to a new scratch buffer',
     complete = 'command',
     nargs = '+',
     callback = function(cmd)
@@ -73,7 +78,7 @@ local impl = {
       ---@diagnostic disable-next-line: param-type-mismatch
       local output = vim.api.nvim_cmd(parsed, { output = true })
       if output == '' then
-        return mia.warn(('No output from "%s"'):format(cmd.args))
+        return mia.warn('No output from "%s"', cmd.args)
       end
 
       -- open window

@@ -70,7 +70,7 @@ function Spec:reload(force)
 
     local ok, mod = pcall(Spec.load, self)
     if not ok then
-      mia.err('Error loading package: ' .. self.mianame .. '\n' .. mod)
+      mia.err('Error loading package: %s\n%s', self.mianame, mod)
       package.loaded[self.modname] = save
       return
     end

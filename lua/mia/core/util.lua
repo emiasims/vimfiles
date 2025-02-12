@@ -120,7 +120,7 @@ function M.partial(func, ...)
     for callix, argix in ipairs(required) do
       a[argix] = select(callix, ...)
     end
-    vim.list_extend(a, { select(#a, ...) })
+    vim.list_extend(a, { select(#required + 1, ...) })
     return func(unpack(a))
 
     -- return func(unpack(a), select(#a, ...))
@@ -134,8 +134,11 @@ function M.const(val, skip_copy)
   end
 end
 
-function M.notify(msg, level, opts, once)
+function M.notify(level, opts, once, msg, ...)
   local notify = once and vim.notify_once or vim.notify
+  if select('#', ...) > 0 then
+    msg = msg:format(...)
+  end
   if vim.in_fast_event() then
     vim.schedule(function()
       notify(msg, level, opts)
@@ -145,12 +148,12 @@ function M.notify(msg, level, opts, once)
   end
 end
 
-M.info = M.partial(M.notify, nil, vim.log.levels.INFO, {}, false)
-M.warn = M.partial(M.notify, nil, vim.log.levels.WARN, {}, false)
-M.err = M.partial(M.notify, nil, vim.log.levels.ERROR, {}, false)
-M.info_once = M.partial(M.notify, nil, vim.log.levels.INFO, {}, true)
-M.warn_once = M.partial(M.notify, nil, vim.log.levels.WARN, {}, true)
-M.err_once = M.partial(M.notify, nil, vim.log.levels.ERROR, {}, true)
+M.info = M.partial(M.notify, vim.log.levels.INFO, {}, false, nil)
+M.warn = M.partial(M.notify, vim.log.levels.WARN, {}, false, nil)
+M.err = M.partial(M.notify, vim.log.levels.ERROR, {}, false, nil)
+M.info_once = M.partial(M.notify, vim.log.levels.INFO, {}, true, nil)
+M.warn_once = M.partial(M.notify, vim.log.levels.WARN, {}, true, nil)
+M.err_once = M.partial(M.notify, vim.log.levels.ERROR, {}, true, nil)
 
 ---add %N parsing to string.format. %N will be replaced with the Nth argument
 function M.formatn(fmt, ...)

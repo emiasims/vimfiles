@@ -100,7 +100,7 @@ local function show_toc()
     vim.cmd.lopen()
     vim.w.quickfix_title = 'Table of Contents: ' .. name
   elseif parser then
-    mia.warn("No toc query found for '" .. parser:lang() .. "'")
+    mia.warn("No toc query found for '%s'", parser:lang())
   else
     mia.warn('No parser found for filetype ' .. vim.treesitter.language.get_lang(vim.bo.filetype))
   end

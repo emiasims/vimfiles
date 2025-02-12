@@ -104,7 +104,7 @@ function M.cmd(cmd)
     for ix, mv in ipairs(moved) do
       moved[ix] = mv[1] .. ' to ' .. mv[2]
     end
-    mia.warn('Moved: ' .. table.concat(moved, ', '))
+    mia.info('Moved: ' .. table.concat(moved, ', '))
   end
 end
 
