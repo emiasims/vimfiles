@@ -35,16 +35,15 @@ return {
           schema = { model = { default = 'deepseek-r1:7b' } },
         })
       end,
-      flash = function()
+      gemini = function()
         return require('codecompanion.adapters').extend('gemini', {
-          name = 'Gemini Flash',
-          schema = { model = { default = 'gemini-2.0-flash-exp' } },
+          schema = { model = { default = 'gemini-2.0-flash-001' } },
         })
       end,
       pro = function()
         return require('codecompanion.adapters').extend('gemini', {
           name = 'Gemini Pro',
-          schema = { model = { default = 'gemini-1.5-pro' } },
+          schema = { model = { default = 'gemini-2.0-pro-exp-02-05' } },
         })
       end,
     },
@@ -57,10 +56,11 @@ return {
         keymaps = {
           completion = { modes = { i = '<Plug>(disabled)' } },
           send = { modes = { n = '<C-g>', i = '<C-g><C-g>' } },
-          close = { modes = { n = '<Plug>(disabled)', i = '<Plug>(disabled)' } },
+          close = { modes = { n = 'ZZ', i = '<Plug>(disabled)' } },
           next_chat = { modes = { n = ']c' } },
           previous_chat = { modes = { n = '[c' } },
           stop = { modes = { n = '<Plug>(cc-stop)' } },
+          options = { modes = { n = 'g?' } }
         },
       },
     },
