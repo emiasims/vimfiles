@@ -46,12 +46,12 @@ local impl = {
     nargs = '*',
     bar = true,
     range = true,
-    callback = function()
-      -- local closed = {}
+    bang = true,
+    callback = function(cmd)
       local closed, modified = 0, 0
       vim.iter(vim.fn.getbufinfo({ buflisted = 1 })):each(function(info)
         modified = modified + ((info.hidden + info.changed == 2) and 1 or 0)
-        if info.hidden == 1 and info.changed == 0 then
+        if (info.hidden == 1 or info.loaded == 0) and (cmd.bang or info.changed == 0) then
           vim.cmd.bdelete({ info.bufnr, mods = { silent = true } })
           closed = closed + 1
         end
