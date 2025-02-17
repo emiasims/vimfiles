@@ -138,6 +138,8 @@ function M.notify(level, opts, once, msg, ...)
   local notify = once and vim.notify_once or vim.notify
   if select('#', ...) > 0 then
     msg = msg:format(...)
+  elseif type(msg) ~= 'string' then
+    msg = vim.inspect(msg)
   end
   if vim.in_fast_event() then
     vim.schedule(function()
