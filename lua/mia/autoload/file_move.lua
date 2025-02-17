@@ -70,10 +70,18 @@ function M.move(src, dest, force, skip_ft)
   end
 
   local path = vim.fn.expand('%:p')
-  vim.cmd.file({ vim.fn.fnameescape(dest), mods = { silent = true, keepalt = true } })
-  vim.cmd.write({ bang = true, mods = { silent = true } })
-  vim.cmd.filetype({ 'detect', mods = { silent = true } })
-  vim.fn.delete(path)
+  local rename = function()
+    vim.cmd.file({ vim.fn.fnameescape(dest), mods = { silent = true, keepalt = true } })
+    vim.cmd.write({ bang = true, mods = { silent = true } })
+    vim.cmd.filetype({ 'detect', mods = { silent = true } })
+    vim.fn.delete(path)
+  end
+
+  if Snacks then
+    Snacks.rename.on_rename_file(path, dest, rename)
+  else
+    rename()
+  end
 
   if vim.fn.bufnr() ~= orig_buf then
     vim.cmd.buffer({ orig_buf, mods = { keepalt = true, keepjumps = true, silent = true } })
