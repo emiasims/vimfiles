@@ -10,7 +10,7 @@ vim
     showcmdloc = 'tabline',
     showtabline = 2,
     foldnestmax = 3,
-    sessionoptions = { 'help', 'winsize', 'terminal', 'tabpages' },
+    sessionoptions = { 'help', 'winsize', 'terminal', 'tabpages', 'skiprtp' },
 
     report = 0,
     path = { '.', '**' },
