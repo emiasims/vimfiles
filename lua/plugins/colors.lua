@@ -77,8 +77,6 @@ return {
         TabLineSelNumber = { fg = colors.red, bg = stl.mantle, bold = true },
 
         TabCopySel = { fg = colors.mauve, bg = stl.mantle, bold = true },
-        -- TabLineTask = { fg = colors.yellow, bg = stl.mantle, bold = true },
-        -- TabLineNoTask = { fg = colors.red, bg = stl.mantle, bold = true },
         TabLineRecording = { fg = colors.yellow, bg = stl.crust },
         TabLineSession = { fg = colors.pink, bg = stl.crust },
 
@@ -101,6 +99,8 @@ return {
         stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
 
         FlashBackdrop = { link = 'CommentSansItalic' },
+
+        FloatBorder = { link = 'WinSeparator', force = true },
 
         SnacksIndent = { fg = stl.surface0 },
         SnacksIndentScope = { fg = colors.surface1 },
