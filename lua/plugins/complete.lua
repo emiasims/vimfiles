@@ -15,8 +15,9 @@ return {
       ['<C-d>'] = { 'scroll_documentation_down', 'fallback' },
       ['<Plug>(miaCmpConfirm)'] = { 'select_and_accept' },
       ['<Plug>(miaCmpSuggest)'] = { 'show', 'show_documentation', 'hide_documentation' },
-
-      cmdline = {
+    },
+    cmdline = {
+      keymap = {
         preset = 'none',
         ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
         ['<C-c>'] = { 'cancel', 'fallback' },
