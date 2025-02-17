@@ -18,6 +18,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   spec = { import = 'plugins' },
   change_detection = { notify = false },
-  dev = { path = vim.fn.stdpath('config') .. '/mia_plugins', fallback = true },
+  dev = { path = vim.fn.stdpath('config') .. '/mia_plugins' },
   profiling = { require = true },
+  ui = { border = 'rounded' },
 })
