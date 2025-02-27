@@ -16,23 +16,6 @@ return {
       ['<Plug>(miaCmpConfirm)'] = { 'select_and_accept' },
       ['<Plug>(miaCmpSuggest)'] = { 'show', 'show_documentation', 'hide_documentation' },
     },
-    cmdline = {
-      keymap = {
-        preset = 'none',
-        ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
-        ['<C-c>'] = { 'cancel', 'fallback' },
-        ['<C-p>'] = { 'select_prev', 'fallback' },
-        ['<C-n>'] = { 'select_next', 'fallback' },
-      },
-    },
-
-    completion = {
-      menu = {
-        auto_show = function(ctx)
-          return ctx.mode ~= 'cmdline'
-        end,
-      },
-    },
 
     sources = {
       default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'codecompanion' },
