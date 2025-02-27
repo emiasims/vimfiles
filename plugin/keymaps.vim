@@ -22,6 +22,7 @@ nnoremap <Cr> za
 nnoremap zE zMzO
 nnoremap zO zCzO
 nnoremap zV zMzv
+nnoremap ZQ <Cmd>qall!<CR>
 
 nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
