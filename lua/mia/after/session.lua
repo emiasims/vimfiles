@@ -193,74 +193,32 @@ function M.start(buf, name)
   mia.info('New session started: ' .. vim.g.session.name)
 end
 
-function M.pick(opts)
-  local pickers = require('telescope.pickers')
-  local finders = require('telescope.finders')
-  local conf = require('telescope.config').values
-  local previewers = require('telescope.previewers')
+function M.pick()
+  return Snacks.picker.pick('Sessions', {
+    sort = { fields = { 'time:desc' } },
+    matcher = { frecency = true, sort_empty = true, cwd_bonus = false, },
+    format = 'text',
+    items = M.get(),
 
-  -- results, entry_maker
-  opts = opts or {}
-  pickers
-    .new(opts, {
-      prompt_title = 'Sessions',
-      finder = finders.new_table({
-        results = M.get(),
-        entry_maker = function(entry)
-          return {
-            value = entry,
-            display = entry.name,
-            ordinal = vim.fn.getftime(entry.path),
-          }
-        end,
-      }),
-      previewer = previewers.new_buffer_previewer({
-        ---@param entry { value:mia.session, display:string, ordinal:number }
-        define_preview = function(self, entry)
-          local lines = vim.fn.readfile(entry.value.path)
-
-          local sess = lines[2]:match('^lua vim.g.session=vim.json.decode%(%[%[(.*)%]%]%)$')
-          if not sess then
-            return
-          end
-
-          ---@type mia.session
-          sess = vim.json.decode(sess)
-
-          local bit = vim.iter(lines):map(mia.partial(string.match, nil, '^badd %+%d+ (.*)$'))
-
-          if sess.root then
-            bit
-              :map(mia.partial(vim.fn.fnamemodify, nil, ':p'))
-              :map(mia.partial(string.match, nil, '^' .. vim.pesc(sess.root) .. '/(.*)$'))
-          end
-
-          local info = vim.split(vim.inspect(sess), '\n')
-          info[1] = 'SessInfo = {'
-          table.insert(info, '')
-          table.insert(info, '')
-          table.insert(info, 'Buffers = [[')
-          vim.list_extend(info, bit:totable())
-          table.insert(info, ']]')
-
-          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, info)
-          local parser = assert(vim.treesitter.get_parser(self.state.bufnr, 'lua', { error = false }))
-          vim.treesitter.highlighter.new(parser)
-        end,
-      }),
-      sorter = conf.generic_sorter(opts),
-      attach_mappings = function(prompt_bufnr)
-        local actions = require('telescope.actions')
-        local action_state = require('telescope.actions.state')
-        actions.select_default:replace(function()
-          actions.close(prompt_bufnr)
-          local selection = action_state.get_selected_entry()
-          vim.cmd.source(selection.path)
-        end)
-        return true
-      end,
-    })
-    :find()
+    transform = function(sess, ctx)
+      return {
+        time = vim.uv.fs_stat(sess.path).mtime.sec,
+        file = sess.path,
+        text = sess.name,
+        -- text = vim.inspect(sess),
+        sess = sess,
+        name = sess.name,
+        -- preview = { text = vim.inspect(sess) },
+        -- TODO buffers saved, tabs
+      }
+    end,
+    confirm = function(picker, item, _)
+      picker:close()
+      if item then
+        M.load(item.file)
+      end
+    end,
+  })
 end
 
 function M.mini_starter_items(nrecent)
@@ -301,6 +259,7 @@ function M.setup()
   vim.fn.mkdir(Config.dir, 'p')
 
   mia.command('Session', {
+    callback = tocmd(M.pick),
     subcommands = {
       list = tocmd(M.list),
       pick = tocmd(M.pick),
