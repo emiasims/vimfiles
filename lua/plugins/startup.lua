@@ -1,3 +1,9 @@
+local Pick = function(name, opts)
+  return function()
+    return Snacks.picker[name](opts)
+  end
+end
+
 ---@type LazySpec
 return {
   'echasnovski/mini.starter',
@@ -11,11 +17,15 @@ return {
         mia.session.mini_starter_items(3),
         Starter.sections.recent_files(3, true),
         Starter.sections.recent_files(3, false, true),
-        { action = 'Telescope find_files', name = 'Files', section = 'Telescope' },
-        { action = 'Telescope help_tags', name = 'Help tags', section = 'Telescope' },
-        { action = 'Telescope oldfiles', name = 'Recent files', section = 'Telescope' },
-        { action = 'Telescope fd cwd=~/.config/nvim', name = 'Vim files', section = 'Telescope' },
-        { action = 'Telescope config_files', name = 'Shell config files', section = 'Telescope' },
+        { action = Pick('files'), name = 'Files', section = 'Pick' },
+        { action = Pick('help'), name = 'Help tags', section = 'Pick' },
+        { action = Pick('recent'), name = 'Recent files', section = 'Pick' },
+        {
+          action = Pick('files', { cwd = vim.fn.stdpath('config') }),
+          name = 'Vim files',
+          section = 'Pick',
+        },
+        { action = Pick('config_files'), name = 'Shell config files', section = 'Pick' },
         Starter.sections.builtin_actions(),
       },
       header = '',
