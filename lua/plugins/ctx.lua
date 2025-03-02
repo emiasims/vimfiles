@@ -24,6 +24,9 @@ return {
         mode = 'ca',
         ctx = 'builtin.cmd_start',
         each = {
+          sq = 'Session quit',
+          qq = 'Session quit',
+
           he = 'help',
           eft = 'EditFtplugin',
           eq = 'vsp|TSEditQuery highlights',

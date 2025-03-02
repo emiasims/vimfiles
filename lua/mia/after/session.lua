@@ -259,7 +259,6 @@ function M.setup()
   vim.fn.mkdir(Config.dir, 'p')
 
   mia.command('Session', {
-    callback = tocmd(M.pick),
     subcommands = {
       list = tocmd(M.list),
       pick = tocmd(M.pick),
@@ -272,6 +271,10 @@ function M.setup()
       name = { tocmd(M.name), complete = list_complete },
       stop = tocmd(M.disable),
       start = tocmd(M.start),
+      quit = function()
+        M.delete()
+        vim.cmd('qall!')
+      end
     },
     desc = 'Session management',
     nargs = '*',
