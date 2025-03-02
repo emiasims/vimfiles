@@ -2,7 +2,7 @@ local M = {}
 
 local cfg = {
   cmd = {
-    python = _G._conda.env .. '/bin/ipython', -- lua/mia/conda.lua
+    python = vim.fs.joinpath(mia.venv.bin, 'ipython'),
     julia = 'julia',
   },
   keys = { global = true, motion = 'gx', line = 'gxl' },
