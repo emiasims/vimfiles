@@ -8,18 +8,10 @@ return {
     mia.command('Pick', {
       nargs = '+',
       callback = function(cmd)
-        local picker = cmd.fargs[1]
+        local opts = { source = cmd.fargs[1] }
 
-        -- only support string arguments?
-        if not picker then
-          Snacks.picker.pick()
-        elseif #cmd.fargs == 1 then
-          Snacks.picker[picker]()
-        end
-
-        local opts = {}
         for i = 2, #cmd.fargs do
-          local k, v = cmd.fargs[i]:match('^(%w+)=.*$') -- escaping ws works
+          local k, v = cmd.fargs[i]:match('^(%w+)=(.*)$') -- escaping ws works
           if not k then
             error('Invalid argument: ' .. cmd.fargs[i])
           end
@@ -31,7 +23,7 @@ return {
           opts[k] = v
         end
 
-        Snacks.picker[picker](opts)
+        Snacks.picker.pick(opts)
       end,
 
       -- arglead, cmdline, cursorpos
@@ -67,7 +59,7 @@ return {
         elseif opt == 'layout' then
           return vim.tbl_keys(Snacks.picker.config.get().layouts)
         elseif opt == 'cwd' then
-          return vim.fn.getcompletion(arglead:sub(#opt + 2), 'file', true)
+          return vim.fn.getcompletion(arglead:sub(#opt + 2), 'dir', true)
         elseif type(opts[opt]) == 'boolean' then
           return { 'true', 'false' }
         end
