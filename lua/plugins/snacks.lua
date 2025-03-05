@@ -11,16 +11,17 @@ return {
         local opts = { source = cmd.fargs[1] }
 
         for i = 2, #cmd.fargs do
-          local k, v = cmd.fargs[i]:match('^(%w+)=(.*)$') -- escaping ws works
+          local k, v = cmd.fargs[i]:match('^(%w+)=(.*)$')  -- escaping ws works
           if not k then
             error('Invalid argument: ' .. cmd.fargs[i])
           end
           if v == 'true' then
-            v = true
+            opts[k] = true
           elseif v == 'false' then
-            v = false
+            opts[k] = false
+          else
+            opts[k] = vim.fn.expandcmd(v)
           end
-          opts[k] = v
         end
 
         Snacks.picker.pick(opts)
@@ -29,7 +30,7 @@ return {
       -- arglead, cmdline, cursorpos
       complete = function(arglead, cmdline, _)
         if cmdline == 'Pick ' then
-          return vim.tbl_keys(Snacks.picker.config.get().sources --[[@as table]])
+          return vim.tbl_keys(Snacks.picker.config.get().sources  --[[@as table]])
         end
 
         local opts = Snacks.picker.config.get({ source = cmdline:match('Pick (%S+)') })
@@ -51,11 +52,11 @@ return {
           return { 'input', 'list' }
         elseif opt == 'finder' then
           return vim
-            .iter(Snacks.picker.config.get().sources)
-            :map(function(_, v)
-              return type(v.finder) == 'string' and v.finder or nil
-            end)
-            :totable()
+              .iter(Snacks.picker.config.get().sources)
+              :map(function(_, v)
+                return type(v.finder) == 'string' and v.finder or nil
+              end)
+              :totable()
         elseif opt == 'layout' then
           return vim.tbl_keys(Snacks.picker.config.get().layouts)
         elseif opt == 'cwd' then
@@ -86,7 +87,7 @@ return {
     quickfile = { enabled = true },
     scope = { enabled = true },
     statuscolumn = { enabled = true },
-    words = { enabled = false }, -- ??
+    words = { enabled = false },  -- ??
 
     picker = {
       enabled = true,
@@ -98,7 +99,7 @@ return {
         },
       },
       layouts = {
-        pseudo_sidebar = { -- sidebar, but in floating windows.
+        pseudo_sidebar = {  -- sidebar, but in floating windows.
           layout = {
             box = 'horizontal',
             backdrop = false,
@@ -144,11 +145,11 @@ return {
           format = 'file',
           finder = function()
             return vim
-              .iter(vim.fn.systemlist('git cfg ls-files --exclude-standard'))
-              :map(function(item)
-                return { file = item, cwd = vim.env.HOME }
-              end)
-              :totable()
+                .iter(vim.fn.systemlist('git cfg ls-files --exclude-standard'))
+                :map(function(item)
+                  return { file = item, cwd = vim.env.HOME, text = item }
+                end)
+                :totable()
           end,
         },
       },
