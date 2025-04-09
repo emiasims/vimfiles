@@ -31,13 +31,10 @@ local Handler = {
     mia.keymap(keys)
   end,
 
-  ctx = function(buf, ctx)
-    for lhs, cm in pairs(ctx) do
-      local maps, opts = mia.tbl.splitarr(cm)
-      local mode = mia.tbl.pop(opts.mode) or 'n'
-      opts.buffer = buf
-      -- ctx.set(mode, lhs, maps, opts)
-    end
+  ctxmap = function(buf, spec)
+    spec = mia.tbl.copy(spec)
+    spec.buffer = buf
+    require('ctxmap').keymap.sets(spec)
   end,
 }
 

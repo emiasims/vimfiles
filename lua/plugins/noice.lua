@@ -4,7 +4,7 @@ return {
   enabled = false,
   event = 'VeryLazy',
   keys = { { '<F4>', '<Cmd>Noice<Cr>' } },
-  ctx = { { 'no', { 'Noice', 'builtin.cmd_start' }, mode = 'ca' } },
+  ctxmap = { { 'no', { 'builtin.cmd_start', 'Noice' }, mode = 'ca' } },
   ---@type NoiceConfig
   opts = {
 
