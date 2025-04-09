@@ -44,10 +44,25 @@ return mia.augroup('mia-autocmds', {
   RecordingLeave = 'hi! link CursorLine CursorLBase',
 
   TextYankPost = {
-    desc = 'Highlight yanked text briefly',
-    callback = function()
-      vim.highlight.on_yank({ higroup = 'Visual', timeout = 400 })
-    end,
+    {
+      desc = 'Highlight yanked text briefly',
+      callback = function()
+        vim.highlight.on_yank({ higroup = 'Visual', timeout = 400 })
+      end,
+    },
+    {
+      desc = 'Shift yanked text to registers 1-9',
+      callback = function(a)
+        local event = vim.v.event
+        if event.operator == 'y' and event.regname == '' then
+          local un = tonumber(vim.fn.getreginfo('"').points_to)
+          for i = 9, 1, -1 do
+            local r = vim.fn.getreginfo(i - 1)
+            vim.fn.setreg(i, r.regcontents, r.regtype .. (un == i and 'u' or ''))
+          end
+        end
+      end,
+    },
   },
 
   OptionSet = {
