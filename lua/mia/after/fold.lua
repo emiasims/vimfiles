@@ -62,9 +62,9 @@ function M.expr()
 end
 
 function M.setup()
-  vim.opt.foldmethod = 'expr'
-  vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-  vim.opt.foldtext = [[v:lua.require'mia.fold'.text()]]
+  vim.o.foldmethod = 'expr'
+  vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+  vim.o.foldtext = 'v:lua.mia.fold.text()'
   mia.keymap({
     'zx',
     function()
