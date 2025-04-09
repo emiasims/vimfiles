@@ -129,24 +129,6 @@ return {
       { 'tc', 'TabCopy' },
       { 'tsl', 'TabSlice' },
       { 'tsp', 'tab split' },
-
-      -- For fugitive.vim, from cmdline config abbreviations
-      { 'git', 'Git' },
-      -- gst = 'Telescope git_status',  # see ./telescope.lua
-      { 'gpl', 'Git pull' },
-      { 'gpu', 'Git push' },
-      { 'gad', 'Git add' },
-      { 'gap', 'Git add --patch' },
-      { 'gau', 'Git add --update' },
-      { 'gaup', 'Git add --update --patch' },
-      { 'gd', 'Git diff' },
-      { 'gdc', 'Git diff --cached' },
-      { 'gwd', 'Git diff --color-words' },
-      { 'grh', 'Git reset HEAD --' },
-      { 'gcim', 'Git commit -m' },
-      { 'gbr', 'Git branch' },
-      { 'gco', 'Git checkout' },
-      { 'glo', 'Git log --all --oneline --graph -n 20' },
     },
   },
 }
