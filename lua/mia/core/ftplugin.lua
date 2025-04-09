@@ -16,7 +16,23 @@ M.ftplugins = setmetatable({}, {
   end,
 })
 
-local Handler = {
+local Handler
+
+local function do_handlers(buf, spec, filetype)
+  if not spec then
+    return
+  end
+  for name, handler in pairs(Handler) do
+    if spec[name] then
+      local ok, msg = pcall(handler, buf, spec[name])
+      if not ok then
+        mia.err('Failed to set %s for %s in buffer %d:\n%s', name, filetype, buf, msg)
+      end
+    end
+  end
+end
+
+Handler = {
   opts = function(_, opts)
     for k, v in pairs(opts) do
       vim.opt_local[k] = v
@@ -40,36 +56,21 @@ local Handler = {
     spec.buffer = buf
     require('ctxmap').keymap.sets(spec)
   end,
+
+  config = function(buf, cfg, filetype)
+    do_handlers(buf, cfg(buf), filetype)
+  end,
 }
 
-M.handler = vim
-  .iter(Handler)
-  :map(function(name, handler)
-    return name,
-      function(buf, val)
-        if not val then
-          buf, val = 0, buf
-        end
-        handler(buf, val)
-      end
-  end)
-  :fold({}, rawset)
-
 function M.do_ftplugin(buf, filetype)
-  buf = buf or vim.api.nvim_get_current_buf()
-  filetype = filetype or vim.bo[buf].filetype
-  local ftp = M.ftplugins[filetype] or {}
-  for name, handler in pairs(Handler) do
-    if ftp[name] then
-      local ok, msg = pcall(handler, buf, ftp[name])
-      if not ok then
-        mia.err('Failed to set %s for %s in buffer %d:\n%s', name, filetype, buf, msg)
-      end
-    end
+  if not buf or buf == 0 then
+    buf = vim.api.nvim_get_current_buf()
   end
+  filetype = filetype or vim.bo[buf].filetype
+  do_handlers(buf, M.ftplugins[filetype], filetype)
 end
 
-function M.setup()
+function _setup()
   vim.api.nvim_create_autocmd('Filetype', {
     callback = function(ev)
       M.do_ftplugin(ev.buf, ev.match)
@@ -81,6 +82,14 @@ function M.setup()
       M.do_ftplugin(buf)
     end
   end)
+end
+
+function M.setup()
+  if vim.fn.has('vim_starting') == 1 then
+    vim.api.nvim_create_autocmd('VimEnter', { callback = _setup })
+  else
+    _setup()
+  end
 end
 
 return M
