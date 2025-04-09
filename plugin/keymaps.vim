@@ -96,14 +96,6 @@ nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap`]p
 nnoremap g<Cr> i<Cr><Esc>l
 
-nnoremap \p "0p
-nnoremap \P "0P
-xnoremap \p "0p
-xnoremap \P "0P
-
-xnoremap \y "*y
-xnoremap \Y "+y
-
 " Select last edited text. improved over `[v`], eg works with visual block
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
