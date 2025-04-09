@@ -62,21 +62,19 @@ mia.command('Pick', {
   end,
 })
 
-M.put_register = {
-  layout = 'vscode',
-  preview = 'none',
+M.put_register = function(opts)
+  opts = opts or {}
 
-  finder = function(_, ctx)
-    if ctx and ctx.picker then
-      ctx.picker.buf = { ---@diagnostic disable-line: inject-field
-        nr = vim.api.nvim_get_current_buf(),
-        pos = vim.api.nvim_win_get_cursor(0),
-        undo = false,
-      }
-    end
+  local buf = {
+    nr = vim.api.nvim_get_current_buf(),
+    pos = vim.api.nvim_win_get_cursor(0),
+    undo = false,
+  }
 
-    -- could just use finder = 'registers', but I wanted a different default order
-    return vim
+  return Snacks.picker.pick(vim.tbl_extend('force', {
+    layout = 'select',
+    preview = 'none',
+    items = vim
       .iter(('*+"0123456789abcdefghijklmnopqrstuvwxyz-/#=_'):gmatch('.'))
       :map(function(reg)
         local info = vim.fn.getreginfo(reg)
@@ -93,51 +91,49 @@ M.put_register = {
           }
         end
       end)
-      :totable()
-  end,
+      :totable(),
 
-  format = function(item)
-    return {
-      { ' ' },
-      { item.reg, 'SnacksPickerRegister' },
-      { '[', 'SnacksPickerDelim' },
-      { item.type, 'SnacksPickerUndoAdded' },
-      { ']', 'SnacksPickerDelim' },
-      { ': ' },
-      { ' ' },
-      { item.content },
-    }
-  end,
+    format = function(item)
+      return {
+        { ' ' },
+        { item.reg, 'SnacksPickerRegister' },
+        { '[', 'SnacksPickerDelim' },
+        { item.type, 'SnacksPickerUndoAdded' },
+        { ']', 'SnacksPickerDelim' },
+        { ': ' },
+        { ' ' },
+        { item.content },
+      }
+    end,
 
-  on_change = function(picker, item)
-    local buf = picker.buf ---@diagnostic disable-line: undefined-field
-    local msg
-    vim.api.nvim_buf_call(buf.nr, function()
-      if buf.undo then
-        vim.cmd.undo({ bang = true })
-      end
-      vim.api.nvim_win_set_cursor(0, buf.pos)
-      buf.undo, msg = pcall(vim.api.nvim_put, item.data.content, item.data.type, true, false)
-      if not buf.undo then
-        mia.err(msg)
-      end
-    end)
-  end,
-
-  on_close = function(picker)
-    local buf = picker.buf ---@diagnostic disable-line: undefined-field
-    if buf.undo then
+    on_change = function(_, item)
+      local msg
       vim.api.nvim_buf_call(buf.nr, function()
-        vim.cmd.undo({ bang = true })
+        if buf.undo then
+          vim.cmd.undo({ bang = true })
+        end
+        vim.api.nvim_win_set_cursor(0, buf.pos)
+        buf.undo, msg = pcall(vim.api.nvim_put, item.data.content, item.data.type, true, false)
+        if not buf.undo then
+          mia.err(msg)
+        end
       end)
-    end
-  end,
+    end,
 
-  confirm = function(picker, item)
-    picker:close()
-    vim.api.nvim_put(item.data.content, item.data.type, true, false)
-  end,
-}
+    on_close = function(picker)
+      if buf.undo then
+        vim.api.nvim_buf_call(buf.nr, function()
+          vim.cmd.undo({ bang = true })
+        end)
+      end
+    end,
+
+    confirm = function(picker, item)
+      picker:close()
+      vim.api.nvim_put(item.data.content, item.data.type, true, false)
+    end,
+  }, opts))
+end
 
 ---@module 'snacks'
 ---@type snacks.picker.Config
@@ -243,7 +239,6 @@ M.picker_opts = {
           :totable()
       end,
     },
-    put_register = M.put_register,
   },
 }
 
@@ -279,7 +274,7 @@ M.ctxmap = {
 }
 
 M.keys = {
-  { '\\p', '<Cmd>Pick put_register<Cr>', desc = 'Pick register & put' },
+  { '\\p', M.put_register, desc = 'Pick register & put' },
   { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
   { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
   { 'gr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
