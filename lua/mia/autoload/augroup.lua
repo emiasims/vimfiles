@@ -37,7 +37,7 @@ end
 ---@param spec mia.augroup
 return function(group, spec, clear)
   if type(group) == 'string' then
-    group = vim.api.nvim_create_augroup(group, { clear = not (clear == false) })
+    group = vim.api.nvim_create_augroup(group, { clear = (clear ~= false) })
   end
   return _process_augroup(spec, { group = group })
 end

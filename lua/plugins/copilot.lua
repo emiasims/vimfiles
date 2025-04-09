@@ -40,8 +40,8 @@ return {
       end
     end
 
-    ---@param ev aucmd.callback.arg
     mia.augroup('mia-copilot', {
+      ---@param ev aucmd.callback.arg
       BufEnter = function(ev)
         local bo = vim.bo[ev.buf]
         if bo.modifiable and bo.buftype == '' then

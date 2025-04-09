@@ -18,20 +18,14 @@ return {
         },
       },
     },
-    keys = {
-      --stylua: ignore start
-      'f', 'F', 't', 'T', ',', ';',
-      { '<C-s>', function() require 'flash'.treesitter() end, mode = { 'n', 'x', 'o' } },
-      { 'ys', function() require 'flash'.treesitter_search() end, mode = { 'n', 'x', 'o' } },
-      --stylua: ignore end
-    },
+    keys = { 'f', 'F', 't', 'T', ',', ';' },
   },
   {
     'milisims/flashy-sneakers.nvim',
     dev = true,
     opts = {
       jump = { autojump = true },
-      again = { search = { wrap = true } },  -- fix wrap
+      again = { search = { wrap = true } }, -- fix wrap
     },
     keys = { 's', 'S' },
     dependencies = 'flash.nvim',
