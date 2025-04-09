@@ -1,5 +1,3 @@
--- nnoremap <silent> <expr> <buffer> K ':help ' . expand('<cword>') . ((expand('<cWORD>') =~# expand('<cword>') . '(') ? "(\<Cr>" : "\<Cr>")
-
 H = {}
 function H.is_spec(buf, filename)
   return filename:match('_spec.lua$')
@@ -28,12 +26,15 @@ return {
         :totable(),
     },
   },
-  ctx = {
+  ctxmap = {
     {
       '~',
-      { { 'ciwTrue<Esc>`[', node = 'false' }, { 'ciwFalse<Esc>`[', node = 'true' } },
-      default = '<ctx:global>',
+      {
+        { 'ts.is_node("false")', 'ciwtrue<Esc>`[' },
+        { 'ts.is_node("true")', 'ciwfalse<Esc>`[' },
+      },
+      -- default = 'G[~]',
     },
-    { 'as', { '[[@as]]<Left><Left>', '<Ctx:prefix>--as' } },
+    { 'as', { 'text.before("--as$")', '[[@as]]<Left><Left>' }, mode = 'ia' },
   },
 }
