@@ -8,6 +8,10 @@ local M = { handler = {} }
 
 M.ftplugins = setmetatable({}, {
   __index = function(_, key)
+    local ftp = require('mia.ftplugin')[key]
+    if ftp then
+      return ftp
+    end
     return vim.F.npcall(require, 'mia.ftplugin.' .. key)
   end,
 })
