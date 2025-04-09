@@ -196,7 +196,7 @@ end
 function M.pick()
   return Snacks.picker.pick('Sessions', {
     sort = { fields = { 'time:desc' } },
-    matcher = { frecency = true, sort_empty = true, cwd_bonus = false, },
+    matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
     format = 'text',
     items = M.get(),
 
@@ -205,10 +205,8 @@ function M.pick()
         time = vim.uv.fs_stat(sess.path).mtime.sec,
         file = sess.path,
         text = sess.name,
-        -- text = vim.inspect(sess),
         sess = sess,
         name = sess.name,
-        -- preview = { text = vim.inspect(sess) },
         -- TODO buffers saved, tabs
       }
     end,
@@ -274,7 +272,7 @@ function M.setup()
       quit = function()
         M.delete()
         vim.cmd('qall!')
-      end
+      end,
     },
     desc = 'Session management',
     nargs = '*',

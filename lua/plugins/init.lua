@@ -11,6 +11,7 @@ vim.g.gutentags_ctags_exclude = { 'data' }
 ---@type LazySpec
 return {
   'tpope/vim-repeat',
+  'gregorias/coop.nvim',
   { 'tpope/vim-abolish', cmd = { 'Subvert', 'Abolish' }, keys = 'cr' },
   {
     'tpope/vim-commentary',
@@ -32,7 +33,6 @@ return {
   { 'tommcdo/vim-exchange', keys = { 'cx', 'cxx', 'cxc', { 'X', mode = 'x' } } },
   { 'wellle/targets.vim', event = 'ModeChanged *:*o*' },
   { 'tommcdo/vim-lion', keys = { 'gl', 'gL' } },
-  { 'echasnovski/mini.cursorword', event = 'VeryLazy', config = true },
   'mbbill/undotree',
 
   'nvim-lua/popup.nvim',

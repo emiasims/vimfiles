@@ -28,7 +28,9 @@ function M.source(ev)
   end
 
   local ft = vim.filetype.match({ buf = buf, filename = file })
-  if not ft then
+  if not ft and vim.startswith(file, vim.fs.normalize(vim.o.viewdir)) then
+    ft = 'vim'
+  elseif not ft then
     error(('Unable to detect filetype for "%s"'):format(vim.inspect(ev)), 0)
   end
   local src = M.get(ft)
