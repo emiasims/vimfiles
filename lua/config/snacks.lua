@@ -62,6 +62,7 @@ mia.command('Pick', {
   end,
 })
 
+local ns = vim.api.nvim_create_namespace('snacks_put_register')
 M.put_register = function(opts)
   opts = opts or {}
 
@@ -94,21 +95,26 @@ M.put_register = function(opts)
       :totable(),
 
     format = function(item)
+      -- like :registers
       return {
-        { ' ' },
-        { item.reg, 'SnacksPickerRegister' },
-        { '[', 'SnacksPickerDelim' },
+        { '  ' },
         { item.type, 'SnacksPickerUndoAdded' },
-        { ']', 'SnacksPickerDelim' },
-        { ': ' },
-        { ' ' },
+        { '  "' },
+        { item.reg, 'SnacksPickerRegister' },
+        { '   ' },
         { item.content },
       }
     end,
 
     on_change = function(_, item)
       local msg
+      local opts = {
+        number_hl_group = 'Special',
+        hl_group = 'Visual',
+        strict = false,
+      }
       vim.api.nvim_buf_call(buf.nr, function()
+        vim.api.nvim_buf_clear_namespace(buf.nr, ns, 0, -1)
         if buf.undo then
           vim.cmd.undo({ bang = true })
         end
@@ -116,11 +122,27 @@ M.put_register = function(opts)
         buf.undo, msg = pcall(vim.api.nvim_put, item.data.content, item.data.type, true, false)
         if not buf.undo then
           mia.err(msg)
+        else
+          -- highlight with Visual extmark
+          local sr, sc = unpack(vim.api.nvim_buf_get_mark(buf.nr, '['))
+          local er, ec = unpack(vim.api.nvim_buf_get_mark(buf.nr, ']'))
+          sr, er = sr - 1, er - 1
+          opts.end_col = ec + 1
+          if item.type == 'b' then
+            for i = sr, er do
+              opts.end_line = i
+              vim.api.nvim_buf_set_extmark(buf.nr, ns, i, sc, opts)
+            end
+          else
+            opts.end_line = er
+            vim.api.nvim_buf_set_extmark(buf.nr, ns, sr, sc, opts)
+          end
         end
       end)
     end,
 
     on_close = function(picker)
+      vim.api.nvim_buf_clear_namespace(buf.nr, ns, 0, -1)
       if buf.undo then
         vim.api.nvim_buf_call(buf.nr, function()
           vim.cmd.undo({ bang = true })
@@ -274,7 +296,7 @@ M.ctxmap = {
 }
 
 M.keys = {
-  { '\\p', M.put_register, desc = 'Pick register & put' },
+  { '<C-p>', M.put_register, desc = 'Pick register & put' },
   { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
   { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
   { 'gr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
