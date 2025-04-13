@@ -72,6 +72,23 @@ mia.augroup('mia-snacks', {
   end,
 })
 
+local function get_regitem(reg)
+  local info = vim.fn.getreginfo(reg)
+
+  if not MacroReg[reg] and info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
+    local type = ({ v = 'c', V = 'l', ['\22'] = 'b' })[info.regtype:sub(1, 1)]
+    type = type or info.regtype:sub(1, 1)
+    local value = table.concat(info.regcontents, '\\n')
+    return {
+      text = reg .. ': ' .. value,
+      type = type,
+      reg = reg,
+      content = value,
+      data = { type = info.regtype, content = info.regcontents },
+    }
+  end
+end
+
 local ns = vim.api.nvim_create_namespace('snacks_put_register')
 M.put_register = function(opts)
   opts = opts or {}
@@ -86,23 +103,15 @@ M.put_register = function(opts)
     layout = 'select',
     preview = 'none',
     items = vim
-      .iter(('*+"0123456789abcdefghijklmnopqrstuvwxyz-/#=_'):gmatch('.'))
-      :map(function(reg)
-        local info = vim.fn.getreginfo(reg)
-        if not MacroReg[reg] and info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
-          local type = ({ v = 'c', V = 'l', ['\22'] = 'b' })[info.regtype:sub(1, 1)]
-          type = type or info.regtype:sub(1, 1)
-          local value = table.concat(info.regcontents, '\\n')
-          return {
-            text = reg .. ': ' .. value,
-            type = type,
-            reg = reg,
-            content = value,
-            data = { type = info.regtype, content = info.regcontents },
-          }
-        end
-      end)
-      :totable(),
+    .iter(('*"+0123456789abcdefghijklmnopqrstuvwxyz-/#=_')
+    :gmatch('.'))
+    :map(get_regitem)
+    :fold({}, function(items, item)
+      if #items == 0 or item.content ~= items[#items].content or item.type ~= items[#items].type then
+        table.insert(items, item)
+      end
+      return items
+     end),
 
     format = function(item)
       -- like :registers
