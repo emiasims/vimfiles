@@ -62,6 +62,16 @@ mia.command('Pick', {
   end,
 })
 
+local MacroReg = mia.cache.file('macro_reg')
+mia.augroup('mia-snacks', {
+  TextYankPost = function()
+    MacroReg[vim.v.event.regname] = nil
+  end,
+  RecordingLeave = function()
+    MacroReg[vim.v.event.regname] = true
+  end,
+})
+
 local ns = vim.api.nvim_create_namespace('snacks_put_register')
 M.put_register = function(opts)
   opts = opts or {}
@@ -79,7 +89,7 @@ M.put_register = function(opts)
       .iter(('*+"0123456789abcdefghijklmnopqrstuvwxyz-/#=_'):gmatch('.'))
       :map(function(reg)
         local info = vim.fn.getreginfo(reg)
-        if info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
+        if not MacroReg[reg] and info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
           local type = ({ v = 'c', V = 'l', ['\22'] = 'b' })[info.regtype:sub(1, 1)]
           type = type or info.regtype:sub(1, 1)
           local value = table.concat(info.regcontents, '\\n')
