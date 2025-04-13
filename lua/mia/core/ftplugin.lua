@@ -52,7 +52,7 @@ Handler = {
   end,
 
   ctxmap = function(buf, spec)
-    spec = mia.tbl.copy(spec)
+    spec = vim.deepcopy(spec)
     spec.buffer = buf
     require('ctxmap').keymap.sets(spec)
   end,
