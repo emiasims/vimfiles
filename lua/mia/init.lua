@@ -1,10 +1,4 @@
-local M = {
-  core_fn = {
-    load = 'mia.core.package',
-    require = 'mia.core.package',
-    on_reload = 'mia.core.config',
-  },
-}
+local M = {}
 
 function M.setup()
   vim.loader.enable()
@@ -16,22 +10,18 @@ function M.setup()
   require('mia.core.package').setup()
   require('mia.core.ftplugin').setup()
 
+  M.load = package.loaded['mia.core.package'].load
+  M.require = package.loaded['mia.core.package'].require
+
   return setmetatable(M, {
-    __index = function(_, name)
-      if M.core_fn[name] then
-        return require(M.core_fn[name])[name]
+    __index = function(t, name)
+      if t.util[name] then
+        return t.util[name]
       end
-      return M.util[name] or package.loaded['mia.' .. name] or M.require(name)
-    end,
-    __vim_complete = function()
-      return M.require('package').packages
+      t[name] = package.loaded['mia.' .. name] or M.require(name) or nil
+      return t[name]
     end,
   })
 end
-
--- register autocmds
--- register cmds
--- inspect to see if necessary
--- update meta can do this
 
 return M.setup()
