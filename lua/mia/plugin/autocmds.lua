@@ -52,14 +52,21 @@ return mia.augroup('mia-autocmds', {
     },
     {
       desc = 'Shift yanked text to registers 1-9',
-      callback = function(a)
+      callback = function()
         local event = vim.v.event
+        ---@diagnostic disable-next-line: undefined-field
         if event.operator == 'y' and event.regname == '' then
           local un = tonumber(vim.fn.getreginfo('"').points_to)
-          for i = 9, 1, -1 do
-            local r = vim.fn.getreginfo(i - 1)
-            vim.fn.setreg(i, r.regcontents, r.regtype .. (un == i and 'u' or ''))
-          end
+          local i, reg, last = 1, vim.fn.getreginfo('1'), vim.fn.getreginfo('0')
+          repeat
+            ---@diagnostic disable-next-line: param-type-mismatch
+            vim.fn.setreg(i, last.regcontents, last.regtype .. (un == i and 'u' or ''))
+            i, reg, last = i + 1, vim.fn.getreginfo(i + 1), reg
+          until i > 9
+            -- if its empty, we can stop there. Don't need to save it
+            or (#last.regcontents == 1 and last.regcontents[1]:match('^%s*$'))
+            -- if the next register is the same as this one, don't need to save it
+            or vim.deep_equal(reg.regcontents, last.regcontents)
         end
       end,
     },
@@ -73,6 +80,7 @@ return mia.augroup('mia-autocmds', {
         return
       end
 
+      ---@diagnostic disable-next-line: undefined-field
       if vim.v.option_new == '1' and vim.v.option_old == '0' and vim.o.formatoptions:match('t') then
         vim.b._old_fo = vim.bo.formatoptions
         vim.opt_local.formatoptions:remove('t')
