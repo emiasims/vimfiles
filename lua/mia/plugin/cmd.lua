@@ -27,17 +27,49 @@ local impl = {
       if cmd.smods.vertical or cmd.smods.horizontal then
         edit = vim.cmd.split
       end
-      edit({
-        ('%s/%s/%s.%s'):format(
-          vim.fn.stdpath('config'),
-          'after/ftplugin',
-          cmd.args == '' and vim.bo.filetype or cmd.args,
-          cmd.bang and 'lua' or 'vim'
-        ),
-        mods = cmd.smods,
-      })
-      vim.bo.bufhidden = 'wipe'
-      vim.bo.buflisted = false
+      local ft = cmd.args == '' and vim.bo.filetype or cmd.args
+      local files = vim
+        .iter(vim.api.nvim_get_runtime_file('**/ftplugin/' .. ft .. '.*', true))
+        :map(function(file)
+          return {
+            path = file,
+            text = file
+              :gsub('^' .. vim.pesc(vim.env.VIMRUNTIME) .. '/', ' : ')
+              :gsub('^' .. vim.pesc(vim.fn.stdpath('config')) .. '/', ' : ')
+              :gsub('^' .. vim.pesc(vim.env.HOME) .. '/', '~/'),
+          }
+        end)
+        :totable()
+
+      if
+        cmd.bang -- user doesn't have a config
+        or not vim.iter(files):any(function(item)
+          return item.path:find('lua/mia/ftplugin') or item.path:find('after/ftplugin')
+        end)
+      then
+        local suffix = 'ftplugin/' .. ft .. '.lua'
+        table.insert(files, 1, {
+          path = vim.fn.stdpath('config') .. '/after/' .. suffix,
+          text = ' : after/' .. suffix,
+        })
+        table.insert(files, 2, {
+          path = vim.fn.stdpath('config') .. '/lua/mia/' .. suffix,
+          text = ' : lua/mia/' .. suffix,
+        })
+      end
+
+      vim.ui.select(files, {
+        prompt = 'Select ftplugin file',
+        format_item = function(item)
+          return item.text
+        end,
+      }, function(item)
+        if item then
+          edit({ item.path, mods = cmd.smods })
+          vim.bo.bufhidden = 'wipe'
+          vim.bo.buflisted = false
+        end
+      end)
     end,
   },
 
