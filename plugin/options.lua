@@ -11,6 +11,7 @@ vim
     showtabline = 2,
     foldnestmax = 3,
     sessionoptions = { 'help', 'winsize', 'terminal', 'tabpages', 'skiprtp' },
+    smoothscroll = true,
 
     report = 0,
     path = { '.', '**' },
