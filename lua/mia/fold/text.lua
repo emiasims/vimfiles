@@ -1,18 +1,12 @@
 local M = {}
 
--- Cache on ts changes
--- Add elements with priority to a list : remove lowest prio on too smol
-
 local ts = vim.treesitter
 local api = vim.api
-local lsp_hlr = require('vim.lsp.semantic_tokens').__STHighlighter
 
----@return { [1]: string, [2]: string[] }[]
-function M.tsfoldtext(lnum, bufnr)
+function M.extract(lnum, bufnr)
   lnum = lnum or vim.v.foldstart
   bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
 
-  ---@type boolean, vim.treesitter.LanguageTree
   local ok, parser = pcall(ts.get_parser, bufnr)
   if not ok then
     return { { vim.fn.foldtext() or '', 'Folded' } }
@@ -30,245 +24,12 @@ function M.tsfoldtext(lnum, bufnr)
     return { { vim.fn.foldtext() or '', 'Folded' } }
   end
 
-  ---@type { id: integer, conceal: string?, group: string, priority: integer, range: { [1]: integer, [2]: integer } }
-  local highlights = {}
-  ---@type { integer: table<integer,boolean> }
-  local ids_per_char = {}
-  for i = 1, #line do
-    ids_per_char[i] = {}
-  end
-
-  local add = function(hl, sc, ec, prio, conceal)
-    local hlid = #highlights + 1
-    table.insert(highlights, {
-      id = hlid, -- for stabilizing sort
-      conceal = conceal,
-      group = hl,
-      priority = prio,
-      range = { sc, ec },
-    })
-
-    for i = sc + 1, ec do
-      ids_per_char[i][hlid] = true
-    end
-  end
-
-  for id, node, metadata in query:iter_captures(tree:root(), 0, lnum - 1, lnum) do
-    local name = query.captures[id]
-    local start_row, start_col, _, end_row, end_col =
-      unpack(vim.treesitter.get_range(node, bufnr, metadata))
-    local priority = tonumber(metadata.priority or vim.highlight.priorities.treesitter)
-
-    if start_row <= lnum - 1 and end_row >= lnum - 1 then
-      start_col = start_row < lnum - 1 and 0 or start_col
-      end_col = end_row > lnum - 1 and #line or end_col
-      add('@' .. name, start_col, end_col, priority, metadata.conceal)
-    end
-  end
-
-  -- split into chunks with uniform ranges for highlighting
-  ---@type { ids: table<integer, boolean>, range: { [1]: integer, [2]: integer } }
-  local chunks = { { ids = ids_per_char[1], range = { 1, 1 } } }
-  local current = chunks[1]
-  for i = 2, #line do
-    -- if the # of hls is different, obviously a different chunk
-    local new_chunk = #current.ids ~= #ids_per_char[i]
-    -- otherwise, make sure the ids are the same
-    for id, _ in pairs(ids_per_char[i]) do
-      if new_chunk then
-        break
-      end
-      new_chunk = new_chunk or not current.ids[id]
-    end
-
-    if new_chunk then
-      -- start a new chunk when we need to
-      table.insert(chunks, { ids = ids_per_char[i], range = { i, i } })
-      current = chunks[#chunks]
-    else
-      -- after verifying, just increase the range of the chunk
-      current.range[2] = i
-    end
-  end
-
-  ---@type { [1]: string, [2]: string[] }[]
-  local result = {}
-
-  -- sort chunk hls by priority and apply conceal or get chunk text
-  for _, chunk in ipairs(chunks) do
-    local hls = {}
-    for id, _ in pairs(chunk.ids) do
-      table.insert(hls, highlights[id])
-    end
-
-    table.sort(hls, function(a, b)
-      -- id keeps the insertion order stable - table.sort is not a stable sort
-      return a.priority < b.priority or (a.priority == b.priority and a.id <= b.id)
-    end)
-
-    local conceal
-    for ix, hl in ipairs(hls) do
-      conceal = conceal or hl.conceal
-      hls[ix] = hl.group
-    end
-    local text = conceal or line:sub(chunk.range[1], chunk.range[2])
-    table.insert(result, { text, hls })
-  end
-
-  return result
-end
-
-function M.ts_lsp_chunks(lnum, bufnr)
-  lnum = lnum or vim.v.foldstart
-  bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
-
-  ---@type boolean, vim.treesitter.LanguageTree
-  local ok, parser = pcall(ts.get_parser, bufnr)
-  if not ok then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local query = ts.query.get(parser:lang(), 'highlights')
-  if not query then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local tree = parser:parse({ lnum - 1, lnum })[1]
-
-  local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
-  if not line or line:match('^%s*$') then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  ---@type { id: integer, conceal: string?, group: string, priority: integer, range: { [1]: integer, [2]: integer } }
-  local highlights = {}
-  ---@type { integer: table<integer,boolean> }
-  local ids_per_char = {}
-  for i = 1, #line do
-    ids_per_char[i] = {}
-  end
-
-  local add = function(hl, sc, ec, prio, conceal)
-    local hlid = #highlights + 1
-    table.insert(highlights, {
-      id = hlid, -- for stabilizing sort
-      conceal = conceal,
-      group = hl,
-      priority = prio,
-      range = { sc, ec },
-    })
-
-    for i = sc + 1, ec do
-      ids_per_char[i][hlid] = true
-    end
-  end
-
-  for id, node, metadata in query:iter_captures(tree:root(), 0, lnum - 1, lnum) do
-    local name = query.captures[id]
-    local start_row, start_col, _, end_row, end_col =
-      unpack(vim.treesitter.get_range(node, bufnr, metadata))
-    local priority = tonumber(metadata.priority or vim.highlight.priorities.treesitter)
-
-    if start_row <= lnum - 1 and end_row >= lnum - 1 then
-      start_col = start_row < lnum - 1 and 0 or start_col
-      end_col = end_row > lnum - 1 and #line or end_col
-      add('@' .. name, start_col, end_col, priority, metadata.conceal)
-    end
-  end
-
-  -- semantic tokens
-  local ft = vim.bo[bufnr].filetype
-  local p = vim.highlight.priorities.semantic_tokens
-
-  local Formatter = function(string)
-    string = string .. '.' .. ft
-    return function(...)
-      return string:format(...)
-    end
-  end
-
-  local tfmt = Formatter('@lsp.type.%s')
-  local mfmt = Formatter('@lsp.mod.%s')
-  local tmfmt = Formatter('@lsp.typemod.%s.%s')
-
-  local highlighter = lsp_hlr.active[bufnr]
-  if highlighter and highlighter.client_state then
-    for _, client in pairs(highlighter.client_state) do
-      local tokens = vim
-        .iter(client.current_result.highlights or {})
-        :filter(function(hl)
-          return hl.line == lnum - 1 and hl.marked
-        end)
-        :totable()
-
-      if highlights then
-        for _, token in ipairs(tokens) do
-          -- see vim/lsp/semantic_tokens.lua  :on_win func
-          add(tfmt(token.type), token.start_col, token.end_col, p)
-          for mod in pairs(token.modifiers or {}) do
-            add(mfmt(mod), token.start_col, token.end_col, p + 1)
-            add(tmfmt(token.type, mod), token.start_col, token.end_col, p + 2)
-          end
-        end
-      end
-    end
-  end
-
-  -- split into chunks with uniform ranges for highlighting
-  ---@type { ids: table<integer, boolean>, range: { [1]: integer, [2]: integer } }
-  local chunks = { { ids = ids_per_char[1], range = { 1, 1 } } }
-  local current = chunks[1]
-  for i = 2, #line do
-    -- if the # of hls is different, obviously a different chunk
-    local new_chunk = #current.ids ~= #ids_per_char[i]
-    -- otherwise, make sure the ids are the same
-    for id, _ in pairs(ids_per_char[i]) do
-      if new_chunk then
-        break
-      end
-      new_chunk = new_chunk or not current.ids[id]
-    end
-
-    if new_chunk then
-      -- start a new chunk when we need to
-      table.insert(chunks, { ids = ids_per_char[i], range = { i, i } })
-      current = chunks[#chunks]
-    else
-      -- after verifying, just increase the range of the chunk
-      current.range[2] = i
-    end
-  end
-
-  ---@type { [1]: string, [2]: string[] }[]
-  local result = {}
-
-  -- sort chunk hls by priority and apply conceal or get chunk text
-  for _, chunk in ipairs(chunks) do
-    local hls = {}
-    for id, _ in pairs(chunk.ids) do
-      table.insert(hls, highlights[id])
-    end
-
-    table.sort(hls, function(a, b)
-      -- id keeps the insertion order stable - table.sort is not a stable sort
-      return a.priority < b.priority or (a.priority == b.priority and a.id <= b.id)
-    end)
-
-    local conceal
-    for ix, hl in ipairs(hls) do
-      conceal = conceal or hl.conceal
-      hls[ix] = hl.group
-    end
-    local text = conceal or line:sub(chunk.range[1], chunk.range[2])
-    table.insert(result, { text, hls })
-  end
-
-  return result
+  return mia.highlights.extract(bufnr, lnum)
 end
 
 function M.default(foldtext, bufnr)
   if type(foldtext) ~= 'table' then
-    foldtext = M.ts_lsp_chunks(foldtext, bufnr)
+    foldtext = M.extract(foldtext, bufnr)
   end
 
   if type(foldtext) == 'string' then
@@ -296,7 +57,7 @@ end
 function M.org()
   local foldtext
   if vim.v.foldstart == 1 and vim.fn.getline(1):match('^%s*#%+[tT][iI][tT][lL][eE]:') then
-    foldtext = M.ts_lsp_chunks(1)
+    foldtext = M.extract(1)
     foldtext = { foldtext[#foldtext] }
   end
 
@@ -317,13 +78,13 @@ function M.help(lnum, bufnr)
   if lnum > 1 then
     lnum = lnum + 1
   end
-  return M.default(M.ts_lsp_chunks(lnum, bufnr))
+  return M.default(M.extract(lnum, bufnr))
 end
 
 function M.python(lnum, bufnr)
   lnum = lnum or vim.v.foldstart
   bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
-  local foldtext = M.ts_lsp_chunks()
+  local foldtext = M.extract()
   local text = vim.fn.getbufoneline(bufnr, lnum) --[[@as string]]
 
   -- Process decorated functions
@@ -338,7 +99,7 @@ function M.python(lnum, bufnr)
     end
 
     local line = decorator:field('definition')[1]:start()
-    local new_foldtext = M.ts_lsp_chunks(line + 1)
+    local new_foldtext = M.extract(line + 1)
     while #new_foldtext > 0 and new_foldtext[1][1]:match('^%s+$') do
       table.remove(new_foldtext, 1)
     end
@@ -377,7 +138,7 @@ function M.python(lnum, bufnr)
 
     -- local it_ft = vim.iter(require('mia.fold').ts_chunks(params, bufnr))
     -- local it_ft = vim.iter(P(require('mia.fold').ts_chunks(params:start() + 1, bufnr)))
-    local it_ft = vim.iter(M.ts_lsp_chunks(params:start() + 1, bufnr))
+    local it_ft = vim.iter(M.extract(params:start() + 1, bufnr))
     local open = it_ft:find(matcher('('))
     local close = it_ft:rfind(matcher(')'))
     if not (open and close) then
