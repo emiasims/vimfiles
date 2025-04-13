@@ -65,7 +65,7 @@ function Spec:reload(force)
     local save = package.loaded[self.modname]
     package.loaded[self.mianame] = nil
     package.loaded[self.modname] = nil
-    _G.mia[self.name] = nil
+    mia[self.name] = nil
     M.changed[self.name] = nil
 
     local ok, mod = pcall(Spec.load, self)

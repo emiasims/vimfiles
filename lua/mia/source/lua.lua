@@ -39,6 +39,7 @@ end
 function R.mia(spec)
   local pkg = mia.package.get(spec.module:match('[^.]+$'))
   pkg:reload(true)
+  mia[pkg.name] = package.loaded[pkg.modname]
   return pkg.modname
 end
 
