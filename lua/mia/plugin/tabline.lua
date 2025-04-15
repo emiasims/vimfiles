@@ -39,18 +39,19 @@ local function prep()
   local tab_nr = a.nvim_tabpage_get_number(tab_id)
   local win_id = a.nvim_get_current_win()
   local win_info = {}
-  -- local id2name = {}
   local bufname_counts = { ['init.lua'] = 1 } -- all init.lua gets modified
 
   -- setup
   for _, id in ipairs(a.nvim_list_tabpages()) do
     for _, winid in ipairs(a.nvim_tabpage_list_wins(id)) do
-      local name = vim.split(vim.fn.fnamemodify(vim.fn.bufname(vim.fn.winbufnr(winid)), ':p'), '/')
-      local short = name[#name]
-      win_info[winid] = { name = short, dir = name[#name - 1] }
-      if id == tab_id and winid == win_id then
-        win_info[winid].current = true
-      end
+      local buf = vim.fn.winbufnr(winid)
+      local path = vim.split(vim.fn.fnamemodify(vim.fn.bufname(buf), ':p'), '/')
+      win_info[winid] = {
+        name = path[#path],
+        dir = path[#path - 1],
+        buf = buf,
+        current = id == tab_id and winid == win_id,
+      }
     end
   end
 
@@ -61,9 +62,12 @@ local function prep()
   bufname_counts[''] = 0 -- don't try to modify unnamed buffers
 
   -- add name modifications. Duplicates, scratch, colors
+  local qf_buf = vim.fn.getqflist({ qfbufnr = true }).qfbufnr
   for _, info in pairs(win_info) do
     if bufname_counts[info.name] > 1 and info.dir then
       info.name = ('%s➔%s'):format(info.dir, info.name)
+    elseif vim.bo[info.buf].buftype == 'quickfix' then
+      info.name = info.buf == qf_buf and '[qf]' or '[loc]'
     elseif info.name == '' then
       info.name = '[Scratch]'
     end
