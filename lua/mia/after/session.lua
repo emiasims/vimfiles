@@ -171,7 +171,7 @@ function M.enable()
 end
 
 function M.enter(buf, ...)
-  local sess = build_sessinfo(buf or 0)
+  local sess = build_sessinfo(buf or vim.api.nvim_get_current_buf())
   if M.lookup(sess) then
     M.load(sess)
   else
