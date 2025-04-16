@@ -182,7 +182,7 @@ end
 function M.start(buf, name)
   M.enable()
   if not vim.g.session then
-    local file = vim.fn.bufname(buf or 0)
+    local file = vim.fn.bufname(buf or vim.api.nvim_get_current_buf())
     vim.g.session = build_sessinfo(file)
     if name then
       vim.g.session.name = name
