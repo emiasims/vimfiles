@@ -122,7 +122,8 @@ return {
       { 'w2', 'w' },
       { 'dws', 'mkview | silent! %s/\\s\\+$// | loadview | update' },
       { 'eh', 'edit <C-r>=expand("%:h")<Cr>/', eat = ' ' },
-      { 'mh', 'Move <C-r>=expand("%:h")<Cr>/', eat = ' ' },
+      { 'mh', 'Move <C-r>=expand("%:h")<Cr>/', eat = '%s' },
+      { 'mf', 'edit ~/.config/nvim/lua/mia/<C-z>', eat = ' ' },
       { 'T', 'execute "term fish"|startinsert' },
       { 'term', 'term fish' },
 
