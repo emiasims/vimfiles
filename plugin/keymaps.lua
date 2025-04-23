@@ -80,6 +80,7 @@ mia.keymap({
   { '<C-,>', 'g,' },
   { '.', '.<C-]>', mode = 'i' },
   { '.', '.<C-]>', mode = 'c' },
+  { '<C-t>', '<Home>tab split|<End>', mode = 'c' },
   { { '<MiddleMouse>', '"*p' }, { '<BS>', '"*' }, mode = { 'n', 'x' } },
 
   { 'nvim.', 'vim.api.nvim_', mode = { 'ia', 'ca' } },

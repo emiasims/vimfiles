@@ -1,5 +1,14 @@
 -- settings that make a visual change, so do them immediately on starting.
 
+local function _set(name, value)
+  local ok, msg = pcall(function(n, v)
+    vim.opt[n] = v
+  end, name, value)
+  if not ok then
+    mia.err('Error setting option vim.opt[%s] = %s\n%s', vim.inspect(name), vim.inspect(value), msg)
+  end
+end
+
 vim
   .iter({
     cmdheight = 1,
@@ -46,6 +55,7 @@ vim
     cmdwinheight = 5,
     showbreak = '↘',
     wildmode = { 'longest:full', 'full' },
+    wildignorecase = true,
     conceallevel = 2,
     foldlevelstart = 99,
     jumpoptions = 'stack',
@@ -59,7 +69,6 @@ vim
     ignorecase = true,
     smartcase = true,
     infercase = true,
-    wildignorecase = true,
     showmatch = true,
     linebreak = true,
     autowriteall = true,
@@ -76,9 +85,7 @@ vim
     -- mostly default. cmdline vertical
     guicursor = { 'n-v:block', 'i-ci-ve-c:ver25', 'r-cr:hor20', 'o:hor50' },
   })
-  :each(function(name, value)
-    vim.opt[name] = value
-  end)
+  :each(_set)
 
 if vim.fn.executable('ag') then
   vim.opt.grepprg = 'ag --nogroup --nocolor'
