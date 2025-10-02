@@ -87,9 +87,8 @@ return {
       local lsp_status = require('lsp-status')
       lsp_status.register_progress()
 
-      local lspconfig = require('lspconfig')
       for server, config in pairs(cfg.opts.setup) do
-        lspconfig[server].setup(config)
+        vim.lsp.config(server, config)
       end
 
       vim.diagnostic.config({ virtual_text = false, signs = true, underline = true })
