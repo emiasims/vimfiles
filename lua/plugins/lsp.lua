@@ -87,19 +87,12 @@ return {
       local lsp_status = require('lsp-status')
       lsp_status.register_progress()
 
+      vim.diagnostic.config({ virtual_text = false, signs = true, underline = true })
       for server, config in pairs(cfg.opts.setup) do
         vim.lsp.config(server, config)
+        vim.lsp.enable(server)
       end
 
-      vim.diagnostic.config({ virtual_text = false, signs = true, underline = true })
-
-      for _, b in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.bo[b].filetype and vim.bo[b].buftype == '' then
-          vim.api.nvim_buf_call(b, function()
-            vim.api.nvim_exec_autocmds('FileType', { group = 'lspconfig', pattern = vim.bo.filetype })
-          end)
-        end
-      end
     end,
   },
 }
