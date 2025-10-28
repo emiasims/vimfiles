@@ -3,6 +3,7 @@ vim.g.copilot_assume_mapped = true
 
 return {
   'github/copilot.vim',
+  enabled = mia.ide.enabled,
   lazy = false,
   keys = {
     { '<C-Space>', '<Plug>(CopilotAccept)', mode = 'i' },

@@ -20,6 +20,7 @@ return {
 
   {
     'neovim/nvim-lspconfig',
+    enabled = mia.ide.enabled,
     event = 'VeryLazy',
     dependencies = { 'mason.nvim', 'wbthomason/lsp-status.nvim' },
 
