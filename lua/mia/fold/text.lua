@@ -54,25 +54,6 @@ function M.default(foldtext, bufnr)
   return foldtext
 end
 
-function M.org()
-  local foldtext
-  if vim.v.foldstart == 1 and vim.fn.getline(1):match('^%s*#%+[tT][iI][tT][lL][eE]:') then
-    foldtext = M.extract(1)
-    foldtext = { foldtext[#foldtext] }
-  end
-
-  foldtext = M.default(foldtext)
-
-  local heart = vim.iter(foldtext):find(function(t)
-    return t[1] == '❤'
-  end)
-  if heart then
-    heart[1] = '❥'
-  end
-
-  return foldtext
-end
-
 function M.help(lnum, bufnr)
   lnum = lnum or vim.v.foldstart
   if lnum > 1 then
