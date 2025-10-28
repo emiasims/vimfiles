@@ -12,12 +12,9 @@ return {
       'LazyGitFilterCurrentFile',
     },
     ctxmap = {
-      { 'lg', 'LazyGit',
-      mode = 'ca',
-      ctx = 'cmd.start',
+      { 'lg', 'LazyGit', mode = 'ca', ctx = 'cmd.start' },
     },
   },
-},
 
   {
     'lewis6991/gitsigns.nvim',
