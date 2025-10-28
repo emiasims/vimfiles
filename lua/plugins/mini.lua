@@ -1,9 +1,9 @@
 ---@type LazySpec
 return {
-  { 'echasnovski/mini.test', event = 'VeryLazy' },
-  { 'echasnovski/mini.cursorword', event = 'VeryLazy', config = true },
+  { 'nvim-mini/mini.test', event = 'VeryLazy' },
+  { 'nvim-mini/mini.cursorword', event = 'VeryLazy', config = true },
   {
-    'echasnovski/mini.doc',
+    'nvim-mini/mini.doc',
     lazy = true,
 
     config = function()
@@ -33,31 +33,34 @@ return {
     end,
   },
   {
-    'echasnovski/mini.starter',
+    'nvim-mini/mini.starter',
     enabled = true,
     lazy = vim.fn.argc() > 0,
     event = 'CmdlineEnter',
     config = function()
       local Starter = require('mini.starter')
-      local Pick = function(name, cmd)
-        cmd = 'Pick ' .. cmd
-        return { action = cmd, name = name, section = 'Pick' }
+      local cfgdir = vim.fn.stdpath('config')
+      local items = {
+        mia.session.mini_starter_items(3),
+        Starter.sections.recent_files(3, true),
+        Starter.sections.recent_files(3, false, true),
+        { section = 'Pick', name = 'Files', action = 'Pick files' },
+        { section = 'Pick', name = 'Help tags', action = 'Pick help' },
+        { section = 'Pick', name = 'Recent files', action = 'Pick recent' },
+        { section = 'Pick', name = 'Vim files', action = 'Pick files cwd=' .. cfgdir },
+        { section = 'Pick', name = 'Shell config files', action = 'Pick config_files' },
+        { section = 'Plugin', name = 'Pick', action = 'Pick files cwd=' .. cfgdir .. '/lua/plugins' },
+        { section = 'Plugin', name = 'Lazy', action = 'Lazy' },
+      }
+      if mia.ide.enabled() then
+        vim.list_extend(items, {
+          { section = 'Plugin', name = 'Add new', action = 'echo NYI' },
+          { section = 'Plugin', name = 'Develop new', action = 'echo NYI' },
+          { section = 'Plugin', name = 'Mason', action = 'Mason' },
+        })
       end
-      Starter.setup({
-        items = {
-          mia.session.mini_starter_items(3),
-          Starter.sections.recent_files(3, true),
-          Starter.sections.recent_files(3, false, true),
-          Pick('Files', 'files'),
-          Pick('Help tags', 'help'),
-          Pick('Recent files', 'recent'),
-          Pick('Vim files', 'files cwd=' .. vim.fn.stdpath('config')),
-          Pick('Shell config files', 'config_files'),
-          Starter.sections.builtin_actions(),
-        },
-        header = '',
-        footer = '',
-      })
+      table.insert(items, Starter.sections.builtin_actions())
+      Starter.setup({ items = items, header = '', footer = '' })
     end,
   },
 }
