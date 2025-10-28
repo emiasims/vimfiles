@@ -6,20 +6,10 @@ return {
   build = ':TSUpdate',
   dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
   config = function()
-    if vim.fn.isdirectory(vim.env.HOME .. '/Projects/tree-sitter-org') > 0 then
-      require('nvim-treesitter.parsers').get_parser_configs().org = {
-        install_info = {
-          url = '~/Projects/tree-sitter-org',
-          files = { 'src/parser.c', 'src/scanner.c' },
-        },
-        filetype = 'org',
-      }
-    end
-
     ---@diagnostic disable-next-line: missing-fields
     require('nvim-treesitter.configs').setup({
       -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-      ensure_installed = { 'bash', 'cpp', 'lua', 'python', 'c', 'javascript', 'org', 'regex', 'luap' },
+      ensure_installed = { 'bash', 'cpp', 'lua', 'python', 'c', 'javascript', 'regex', 'luap' },
 
       highlight = {
         enable = true, -- false will disable the whole extension
@@ -30,10 +20,7 @@ return {
         },
       },
 
-      indent = {
-        enable = false,
-        disable = { 'org' },
-      },
+      indent = { enable = false },
 
       textobjects = {
         swap = {

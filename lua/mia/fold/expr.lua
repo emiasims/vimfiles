@@ -59,18 +59,5 @@ function M.python(bufnr)
   return group_consecutive(lines)
 end
 
-function M.org(bufnr)
-  local root = ts.get_parser(bufnr, 'org'):parse()[1]:root()
-  local start_row, end_row
-  local folds = {}
-  for _, node, _ in query.org:iter_captures(root, bufnr, 0, -1) do
-    start_row, _, end_row = node:range()
-    if end_row - start_row > 4 then
-      folds[#folds + 1] = { startLine = start_row, endLine = end_row - 1 }
-    end
-  end
-  return folds
-end
-
 -- list of { startLine = lnum, endLine = lnum }
 return M
