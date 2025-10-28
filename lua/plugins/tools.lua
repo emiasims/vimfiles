@@ -1,6 +1,7 @@
 ---@type LazySpec
 return {
   'williamboman/mason.nvim',
+  enabled = mia.ide.enabled,
   build = ':MasonUpdate',
   lazy = true,
   config = true,
