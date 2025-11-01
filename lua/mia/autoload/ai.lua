@@ -98,57 +98,23 @@ function M.to_buf(opts)
   })
 end
 
-local get_status
 local function setup()
-  if not package.loaded['codecompanion'] or get_status then
-    return get_status
-  end
-  -- if get_status then
-  --   return true
-  -- end
-
   local requests = {}
-
-  local ix = 1
-  local timer
-
-  local spins = { '⠇', '⠏', '⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧' }
-
-  local function spin_it()
-    ix = ix % #spins + 1
-    return #requests > 0
-  end
-
   vim.api.nvim_create_autocmd({ 'User' }, {
     pattern = 'CodeCompanionRequest*',
     group = vim.api.nvim_create_augroup('mia-ai-spin', { clear = true }),
     callback = function(ev)
+      local eid = ev.data.id
       if ev.match == 'CodeCompanionRequestStarted' then
-        table.insert(requests, ev.data.id)
-        mia.statusline.on_redraw(spin_it)
+        requests[eid] = mia.spinner.add(function()
+          return requests[eid] == nil
+        end)
       elseif ev.match == 'CodeCompanionRequestFinished' then
-        table.remove(requests) -- doesn't really matter where it is in the list
+        requests[eid] = nil
       end
     end,
   })
-
-  get_status = function()
-    if #requests > 0 then
-      return spins[ix] .. ':' .. #requests
-    elseif timer then
-      timer:stop()
-      timer = nil
-    end
-  end
-
-  return get_status
 end
-
-function M.status()
-  if not setup() then
-    return
-  end
-  return get_status()
-end
+setup()
 
 return M
