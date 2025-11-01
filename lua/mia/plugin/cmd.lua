@@ -166,6 +166,7 @@ return mia.commands({
     subcommands = {
       start = on_call('job').start,
       refresh = on_call('job').refresh,
+      watch = on_call('job').watch,
     },
     nargs = '+',
     bar = true,
