@@ -127,6 +127,10 @@ return {
       { 'T', 'execute "term fish"|startinsert' },
       { 'term', 'term fish' },
 
+      { 'js', 'Job start' },
+      { 'jw', 'Job watch' },
+      { 'jr', 'Job refresh' },
+
       { 'tc', 'TabCopy' },
       { 'tsl', 'TabSlice' },
       { 'tsp', 'tab split' },

@@ -36,6 +36,10 @@ function M.send_request(args)
     content = M.fetch(url)
   end
   M.do_webhook(url, content)
+  M.watch()
+end
+
+function M.watch()
   local done = false
   mia.spinner.add(function()
     return done
