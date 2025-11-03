@@ -4,6 +4,7 @@ local lsp = mia.on.call('vim.lsp.buf')
 return {
 
   'Bilal2453/luvit-meta',
+  { 'lewis6991/nvim-test', lazy = true },
   {
     'folke/lazydev.nvim',
     ft = 'lua', -- only load on lua files
@@ -24,11 +25,7 @@ return {
     event = 'VeryLazy',
     dependencies = { 'mason.nvim', 'wbthomason/lsp-status.nvim' },
 
-    -- 'mason-lspconfig.nvim',
-    -- 'mason-tool-installer.nvim',
-
     keys = {
-      -- 'gd', 'gr', 'K', '\\ca'
       { 'gd', lsp.definition, desc = 'Goto Definition' },
       { 'gr', lsp.references, desc = 'Goto References' },
       { 'K', lsp.hover, desc = 'Show help' },
@@ -37,12 +34,13 @@ return {
 
     opts = {
       setup = {
-        ts_ls = {},
-        clangd = {},
-        jsonls = {},
-        vimls = {},
-        julials = {},
-        taplo = {},
+        ts_ls = true,
+        clangd = true,
+        jsonls = true,
+        vimls = true,
+        julials = true,
+        taplo = true,
+        emmylua_ls = true,
 
         ruff = {
           settings = { organizeImports = false },
@@ -52,33 +50,7 @@ return {
           end,
         },
 
-        lua_ls = {
-          settings = {
-            Lua = {
-              workspace = { checkThirdParty = false },
-              telemetry = { enable = false },
-              hint = { enable = true },
-              format = {
-                enable = true,
-                defaultConfig = { -- must be strings
-                  indent_size = '2',
-                  quote_style = 'single',
-                  -- call_arg_parentheses = 'remove',
-                  trailing_table_separator = 'smart',
-                  align_continuous_assign_statement = 'false',
-                  align_continuous_rect_table_field = 'false',
-                  align_array_table = 'false',
-                  space_before_inline_comment = '2',
-                },
-              },
-            },
-          },
-        },
-
         pyright = {
-          -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-          -- capabilities.textDocument.publishDiagnostics.tagSupport.valueSet = { 2 }
-          -- capabilities = capabilities,
           settings = { python = { analysis = { diagnosticMode = 'workspace' } } },
         },
       },
@@ -89,11 +61,13 @@ return {
       lsp_status.register_progress()
 
       vim.diagnostic.config({ virtual_text = false, signs = true, underline = true })
+      ---@cast cfg.opts {setup: table<string, any>}
       for server, config in pairs(cfg.opts.setup) do
-        vim.lsp.config(server, config)
-        vim.lsp.enable(server)
+        if type(config) == 'table' then
+          vim.lsp.config(server, config)
+        end
       end
-
+      vim.lsp.enable(vim.tbl_keys(cfg.opts.setup))
     end,
   },
 }

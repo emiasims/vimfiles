@@ -39,7 +39,7 @@ return {
         ensure_installed = {
           'basedpyright',
           'clangd',
-          'lua_ls',
+          'emmylua_ls',
           'debugpy',
           'ruff-lsp',
           'black',
