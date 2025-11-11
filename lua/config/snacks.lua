@@ -72,7 +72,7 @@ mia.augroup('mia-snacks', {
   end,
 })
 
-local function get_regitem(reg)
+function M.get_regitem(reg)
   local info = vim.fn.getreginfo(reg)
 
   if not MacroReg[reg] and info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
@@ -90,7 +90,7 @@ local function get_regitem(reg)
 end
 
 local ns = vim.api.nvim_create_namespace('snacks_put_register')
-M.put_register = function(opts)
+function M.put_register(opts)
   opts = opts or {}
 
   local buf = {
@@ -103,15 +103,14 @@ M.put_register = function(opts)
     layout = 'select',
     preview = 'none',
     items = vim
-    .iter(('*"+0123456789abcdefghijklmnopqrstuvwxyz-/#=_')
-    :gmatch('.'))
-    :map(get_regitem)
-    :fold({}, function(items, item)
-      if #items == 0 or item.content ~= items[#items].content or item.type ~= items[#items].type then
-        table.insert(items, item)
-      end
-      return items
-     end),
+      .iter(('*"+0123456789abcdefghijklmnopqrstuvwxyz-/#=_'):gmatch('.'))
+      :map(M.get_regitem)
+      :fold({}, function(items, item)
+        if #items == 0 or item.content ~= items[#items].content or item.type ~= items[#items].type then
+          table.insert(items, item)
+        end
+        return items
+      end),
 
     format = function(item)
       -- like :registers
@@ -188,8 +187,9 @@ M.picker_opts = {
     },
   },
   layouts = {
-    pseudo_sidebar = { -- sidebar, but in floating windows.
-      layout = {
+    -- sidebar, but in floating windows.
+    pseudo_sidebar = { --[[@as snacks.picker.layout.Config]]
+      layout = {  ---@diagnostic disable-line: missing-fields
         box = 'horizontal',
         backdrop = false,
         row = 1,
@@ -255,20 +255,6 @@ M.picker_opts = {
           :totable()
       end,
     },
-    nvim_plugins = {
-      multi = {
-        {
-          finder = 'files',
-          format = 'file',
-          cwd = vim.fn.stdpath('data') .. '/lazy',
-        },
-        {
-          finder = 'files',
-          format = 'file',
-          cwd = vim.fn.stdpath('config') .. '/mia_plugins',
-        },
-      },
-    },
     config_files = {
       format = 'file',
       finder = function()
@@ -283,48 +269,23 @@ M.picker_opts = {
   },
 }
 
-M.ctxmap = {
-  {
-    mode = 'ca',
-    -- ctx = 'builtin.cmd_start',
-    ctx = 'cmd.start',
-    { 'p', 'Pick smart' },
-    { 'pi', 'Pick' },
-    { 'pp', 'Pick pickers' },
-    { 'f', 'Pick files' },
-    { 'fh', 'Pick files cwd=%:h' },
-    { 'u', 'Pick undo' },
-    { 'l', 'Pick buffers' },
-    { 'pr', 'Pick resume' },
-    { 'mr', 'Pick recent' },
-    { 'A', 'Pick grep' },
-    { 'h', 'Pick help' },
-    { 'n', 'Pick notifications' },
-    { 'ex', 'Pick explorer' },
-    { 'hi', 'Pick highlights' },
-    { 'em', 'Pick icons' },
-    { 't', 'Pick lsp_symbols' },
-    { 'ps', 'Pick lsp_symbols' },
-    { 'pws', 'Pick lsp_workspace_symbols' },
-    { 'ev', 'Pick files cwd=<C-r>=stdpath("config")<Cr>' },
-    { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/mia_plugins' },
-    { 'evr', 'Pick files cwd=$VIMRUNTIME' },
-    { 'evs', 'Pick nvim_plugins' },
-    { 'ecf', 'Pick config_files' },
-    { 'gst', 'Pick git_status' },
-    { 'ep', 'Pick prompts' },
+M.lazy_opts = {
+  bigfile = { enabled = true },
+  dashboard = { enabled = false },
+  explorer = { enabled = true },
+  indent = { enabled = true, indent = { char = '╎' } },
+  input = { enabled = true },
+  notifier = {
+    enabled = true,
+    style = 'history',
+    top_down = false,
   },
-  { '<C-p>', { 'opt.buftype() == "" and opt.modifiable()', M.put_register }, desc = 'Pick register & put' },
-}
+  quickfile = { enabled = true },
+  scope = { enabled = true },
+  statuscolumn = { enabled = true },
+  words = { enabled = false }, -- ??
 
-M.keys = {
-  { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
-  { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
-  { 'gr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
-  { 'gI', '<Cmd>Pick lsp_implementations<Cr>', desc = 'Goto Implementation' },
-  { 'gy', '<Cmd>Pick lsp_type_definitions<Cr>', desc = 'Goto T[y]pe Definition' },
-  { '<C-g><C-o>', '<Cmd>Pick jumps<Cr>', desc = 'Pick jumps' },
-  { 'z-', '<Cmd>Pick spelling<Cr>', desc = 'Pick spelling' },
+  picker = M.picker_opts,
 }
 
 return M

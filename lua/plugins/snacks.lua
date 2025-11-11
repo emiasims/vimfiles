@@ -3,30 +3,58 @@ return {
   priority = 1000,
   lazy = false,
 
-  ---@module 'snacks'
-  ---@type snacks.Config
-  opts = {
-    -- your configuration comes here
-    -- or leave it empty to use the default settings
-    -- refer to the configuration section below
-    bigfile = { enabled = true },
-    dashboard = { enabled = false },
-    explorer = { enabled = true },
-    indent = { enabled = true, indent = { char = '╎' } },
-    input = { enabled = true },
-    notifier = {
-      enabled = true,
-      style = 'history',
-      top_down = false,
+  ctxmap = {
+    {
+      mode = 'ca',
+      -- ctx = 'builtin.cmd_start',
+      ctx = 'cmd.start',
+      { 'p', 'Pick smart' },
+      { 'pi', 'Pick' },
+      { 'pp', 'Pick pickers' },
+      { 'f', 'Pick files' },
+      { 'fh', 'Pick files cwd=%:h' },
+      { 'u', 'Pick undo' },
+      { 'l', 'Pick buffers' },
+      { 'pr', 'Pick resume' },
+      { 'mr', 'Pick recent' },
+      { 'A', 'Pick grep' },
+      { 'h', 'Pick help' },
+      { 'n', 'Pick notifications' },
+      { 'ex', 'Pick explorer' },
+      { 'hi', 'Pick highlights' },
+      { 'em', 'Pick icons' },
+      { 't', 'Pick lsp_symbols' },
+      { 'ps', 'Pick lsp_symbols' },
+      { 'pws', 'Pick lsp_workspace_symbols' },
+      { 'ev', 'Pick files cwd=<C-r>=stdpath("config")<Cr>' },
+      { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/mia_plugins' },
+      { 'evs', 'Pick files cwd=<C-r>=stdpath("data")<Cr>/lazy' },
+      { 'evr', 'Pick files cwd=$VIMRUNTIME' },
+      { 'ecf', 'Pick config_files' },
+      { 'gst', 'Pick git_status' },
+      { 'ep', 'Pick prompts' },
     },
-    quickfile = { enabled = true },
-    scope = { enabled = true },
-    statuscolumn = { enabled = true },
-    words = { enabled = false }, -- ??
-
-    -- a lot of config, worth separation
-    picker = require('config.snacks').picker_opts,
+    {
+      '<C-p>',
+      {
+        'opt.buftype() == "" and opt.modifiable()',
+        function()
+          return require('config.snacks').put_register()
+        end,
+      },
+      desc = 'Pick register & put'
+    },
   },
-  ctxmap = { require('config.snacks').ctxmap },
-  keys = require('config.snacks').keys,
+  keys = {
+    { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
+    { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
+    { 'gr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
+    { 'gI', '<Cmd>Pick lsp_implementations<Cr>', desc = 'Goto Implementation' },
+    { 'gy', '<Cmd>Pick lsp_type_definitions<Cr>', desc = 'Goto T[y]pe Definition' },
+    { '<C-g><C-o>', '<Cmd>Pick jumps<Cr>', desc = 'Pick jumps' },
+    { 'z-', '<Cmd>Pick spelling<Cr>', desc = 'Pick spelling' },
+  },
+  opts = function()
+    return require('config.snacks').lazy_opts
+  end,
 }
