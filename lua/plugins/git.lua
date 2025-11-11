@@ -15,10 +15,4 @@ return {
       { 'lg', 'LazyGit', mode = 'ca', ctx = 'cmd.start' },
     },
   },
-
-  {
-    'lewis6991/gitsigns.nvim',
-    event = { 'TextChanged', 'SafeState' },
-    opts = {},
-  },
 }

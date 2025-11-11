@@ -40,5 +40,4 @@ return {
   'ludovicchabant/vim-gutentags',
 
   'JuliaEditorSupport/julia-vim',
-  { 'rktjmp/lush.nvim', lazy = true, cmd = 'Lushify' },
 }
