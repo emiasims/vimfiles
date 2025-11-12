@@ -1,6 +1,6 @@
 ---@type LazySpec
 return {
-  { 'tpope/vim-fugitive', event = 'VeryLazy' },
+  'tpope/vim-fugitive',
   {
     'kdheepak/lazygit.nvim',
     lazy = true,

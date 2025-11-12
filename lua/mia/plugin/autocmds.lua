@@ -43,6 +43,14 @@ return mia.augroup('mia-autocmds', {
   RecordingEnter = 'hi! link CursorLine CursorLRecording',
   RecordingLeave = 'hi! link CursorLine CursorLBase',
 
+  -- BufInfo
+  [{ 'BufEnter', 'TermEnter', 'TermRequest' }] = {
+    desc = 'Set workspace folder',
+    callback = function(ev)
+      vim.b[ev.buf].bufinfo = mia.bufinfo(ev.buf)
+    end,
+  },
+
   TextYankPost = {
     {
       desc = 'Highlight yanked text briefly',
@@ -59,8 +67,9 @@ return mia.augroup('mia-autocmds', {
           local un = tonumber(vim.fn.getreginfo('"').points_to)
           local i, reg, last = 1, vim.fn.getreginfo('1'), vim.fn.getreginfo('0')
           repeat
-            ---@diagnostic disable-next-line: param-type-mismatch
+            ---@diagnostic disable-next-line: param-type-not-match
             vim.fn.setreg(i, last.regcontents, last.regtype .. (un == i and 'u' or ''))
+            ---@diagnostic disable-next-line: param-type-not-match
             i, reg, last = i + 1, vim.fn.getreginfo(i + 1), reg
           until i > 9
             -- if its empty, we can stop there. Don't need to save it

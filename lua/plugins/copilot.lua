@@ -40,16 +40,7 @@ return {
 
       end
     end
-
-    mia.augroup('mia-copilot', {
-      ---@param ev aucmd.callback.arg
-      BufEnter = function(ev)
-        local bo = vim.bo[ev.buf]
-        if bo.modifiable and bo.buftype == '' then
-          vim.b[ev.buf].workspace_folder = vim.fs.root(ev.buf, '.git')
-        end
-      end,
-    })
+    -- Note: workspace_folder is used, set by mia.autocmds
 
     mia.keymap({
       mode = 'i',

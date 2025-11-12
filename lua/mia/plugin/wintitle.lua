@@ -1,21 +1,13 @@
 local M = { ns = vim.api.nvim_create_namespace('mia-wintitle') }
 
+---@return boolean
 local function is_float(wid)
-  return vim.api.nvim_win_get_config(wid).zindex
+  return vim.api.nvim_win_get_config(wid).relative ~= ""
 end
 
-local function valid_buf(buf)
-  buf = buf or 0
-  return ({ [''] = true, help = true })[vim.bo[buf].buftype]
-end
-
-local function on_win(_, win, buf, toprow, _)
-  if not valid_buf(buf) or is_float(win) then
-    return
-  end
-  local title = vim.api.nvim_eval_statusline(' %f ', { winid = win, use_winbar = true })
-  vim.api.nvim_buf_set_extmark(buf, M.ns, toprow, 0, {
-    virt_text = { { title.str, 'Comment' } },
+local function _set_mark(buf, line, text)
+  vim.api.nvim_buf_set_extmark(buf, M.ns, line, 0, {
+    virt_text = { { ' ' .. text .. ' ', 'Comment' } },
     virt_text_pos = 'right_align',
     hl_mode = 'combine',
     ephemeral = true,
@@ -23,9 +15,40 @@ local function on_win(_, win, buf, toprow, _)
   })
 end
 
+local function on_win(_, _, buf, toprow, _)
+  local bufinfo = mia.bufinfo.get(buf)
+  if not bufinfo then
+    return
+  end
+  if bufinfo.type == 'file' then
+    _set_mark(buf, toprow, bufinfo.relative_path)
+    if bufinfo.root then
+      _set_mark(buf, toprow + 1, bufinfo.root.short)
+    end
+  elseif bufinfo.type == 'help' then
+    _set_mark(buf, toprow, bufinfo.file)
+  elseif bufinfo.type == 'terminal' then
+    _set_mark(buf, toprow, 'cmd: ' .. bufinfo.cmd)
+    _set_mark(buf, toprow + 1, bufinfo.title)
+  end
+
+end
+
 function M.enable()
   M.disable()
-  vim.api.nvim_set_decoration_provider(M.ns, { on_win = on_win })
+  vim.api.nvim_set_decoration_provider(M.ns, {
+    on_win = function(...)
+      if is_float(select(2, ...)) then
+        return
+      end
+      local ok, err = pcall(on_win, ...)
+      if not ok then
+        vim.schedule(M.disable)
+        mia.err(err)
+        mia.warn_once('Disabling wintitle')
+      end
+    end,
+  })
 end
 
 function M.disable()
