@@ -179,5 +179,16 @@ function M.put(reg)
   return vim.fn.getreg(reg)
 end
 
+M.reg = setmetatable({}, {
+  __newindex = function(_, reg, value)
+    if type(value) == 'table' then
+      value = vim.inspect(value)
+    end
+    M.yank(reg, value)
+  end,
+  __index = function(_, reg)
+    return vim.fn.getreg(reg)
+  end,
+})
 
 return M
