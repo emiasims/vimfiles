@@ -64,7 +64,7 @@ function G.put(vals)
   if type(vals) ~= 'table' then
     vals = { vals }
   end
-  G.vim.api.nvim_put(vals, 'l', true, false)
+  vim.api.nvim_put(vals, 'l', true, false)
 end
 
 G.keys = vim.tbl_keys
