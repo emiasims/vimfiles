@@ -1,7 +1,6 @@
 local M = {}
 
 function M.setup()
-  vim.loader.enable()
   setmetatable(M, nil)
 
   M.util = require('mia.core.util')
