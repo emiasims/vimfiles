@@ -7,7 +7,6 @@ local function hl(group, text)
   return ('%%#%s#%s%%*'):format(group, text or '')
 end
 
-
 local function window_layout(win_names, tabid)
   local current_win = a.nvim_get_current_win()
   local current_tab = a.nvim_get_current_tabpage()
@@ -16,9 +15,9 @@ local function window_layout(win_names, tabid)
   local tabnr = a.nvim_tabpage_get_number(tabid)
   local winlayout = vim.fn.winlayout(tabnr)
 
-  -- 1. Build the post-order stack (This part is unchanged)
+  -- 1. Build the post-order stack
   local traversal = {} -- Traversal stack
-  local ordered = {}   -- Post-order node stack
+  local ordered = {} -- Post-order node stack
 
   table.insert(traversal, winlayout)
   while #traversal > 0 do
@@ -35,8 +34,7 @@ local function window_layout(win_names, tabid)
   -- 2. Process nodes and build results
   local results = {}
 
-  while #ordered > 0 do
-    local node = table.remove(ordered)
+  for node in vim.iter(ordered):rev() do
     local node_type = node[1]
 
     if node_type == 'leaf' then
@@ -48,7 +46,6 @@ local function window_layout(win_names, tabid)
         name = hl('TabLinesel', name)
       end
 
-      -- Instead of a `str` field, we use an `items` table
       table.insert(results, { items = { name }, type = 'leaf' })
     else
       -- Branching node: combine children with separators
@@ -60,11 +57,11 @@ local function window_layout(win_names, tabid)
         table.insert(child_results, 1, table.remove(results))
       end
 
-      local items = vim.deepcopy(child_results[1].items)
+      local items = child_results[1].items
 
       for i = 2, num_children do
         local prev_res = child_results[i - 1] --[[@as table]]
-        local curr_res = child_results[i]
+        local curr_res = child_results[i] --[[@as table]]
 
         local sep = sep_char
 
@@ -77,9 +74,7 @@ local function window_layout(win_names, tabid)
         end
 
         table.insert(items, sep)
-        for _, item in ipairs(curr_res.items) do
-          table.insert(items, item)
-        end
+        vim.list_extend(items, curr_res.items)
       end
 
       table.insert(results, { items = items, type = node_type })
@@ -106,7 +101,6 @@ local function tab_layout()
   for _, tabid in ipairs(a.nvim_list_tabpages()) do
     local win_names = {}
     for _, winid in ipairs(a.nvim_tabpage_list_wins(tabid)) do
-      -- Get the names of each window
       local buf = vim.fn.winbufnr(winid)
       local name, dir = mia.bufinfo.tabline(buf)
       name = name or vim.fn.bufname(buf)

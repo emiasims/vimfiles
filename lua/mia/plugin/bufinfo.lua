@@ -130,7 +130,7 @@ M.tabline = function(bufnr)
     return info.file, vim.fs.basename(vim.fs.dirname(info.path))
   elseif info.type == 'terminal' then
     ---@cast info.title string
-    return ('[%s:%s]'):format(info.cmd, info.title:sub(1, 20)), info.pid
+    return ('[%s:%s]'):format(info.cmd, info.title:sub(1, 20))
   elseif info.type == 'help' then
     return ('[help:%s]'):format(info.file)
   elseif info.type == 'quickfix' then
