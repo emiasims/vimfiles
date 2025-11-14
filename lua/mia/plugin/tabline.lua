@@ -61,7 +61,7 @@ local function tab_layout()
     -- First, for this tab get the names as displayed for each window
     for _, winid in ipairs(a.nvim_tabpage_list_wins(tabid)) do
       local buf = vim.fn.winbufnr(winid)
-      local name, dir = mia.bufinfo.tabline(buf)
+      local name, dir = unpack(mia.bufinfo(buf).tabline)
       name = name or vim.fn.bufname(buf)
 
       -- if the file buffer is duplicated in name, indicate which with a prefix

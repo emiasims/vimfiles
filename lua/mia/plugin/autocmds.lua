@@ -44,10 +44,10 @@ return mia.augroup('mia-autocmds', {
   RecordingLeave = 'hi! link CursorLine CursorLBase',
 
   -- BufInfo
-  [{ 'BufEnter', 'TermEnter', 'TermRequest' }] = {
+  [{ 'BufEnter', 'BufFilePost', 'TermEnter', 'TermRequest' }] = {
     desc = 'Set workspace folder',
     callback = function(ev)
-      vim.b[ev.buf].bufinfo = mia.bufinfo(ev.buf)
+      vim.b[ev.buf].bufinfo = mia.bufinfo.get(ev.buf)
     end,
   },
 
