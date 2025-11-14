@@ -16,22 +16,13 @@ local function _set_mark(buf, line, text)
 end
 
 local function on_win(_, _, buf, toprow, _)
-  local bufinfo = mia.bufinfo.get(buf)
-  if not bufinfo then
+  local bufinfo = mia.bufinfo(buf)
+  if not bufinfo or not bufinfo.wintitle then
     return
   end
-  if bufinfo.type == 'file' then
-    _set_mark(buf, toprow, bufinfo.relative_path)
-    if bufinfo.root then
-      _set_mark(buf, toprow + 1, bufinfo.root.short)
-    end
-  elseif bufinfo.type == 'help' then
-    _set_mark(buf, toprow, bufinfo.file)
-  elseif bufinfo.type == 'terminal' then
-    _set_mark(buf, toprow, 'cmd: ' .. bufinfo.cmd)
-    _set_mark(buf, toprow + 1, bufinfo.title)
+  for i, v in ipairs(bufinfo.wintitle) do
+    _set_mark(buf, toprow + i - 1, v)
   end
-
 end
 
 function M.enable()

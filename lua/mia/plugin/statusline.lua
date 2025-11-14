@@ -21,7 +21,7 @@ end
 local function buf_info()
   local winid = vim.g.statusline_winid or vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_win_get_buf(winid)
-  local desc, title = mia.bufinfo.statusline(bufnr)
+  local desc, title = unpack(mia.bufinfo(bufnr).statusline)
   return desc, title:gsub('%%', '%%%%')
 end
 

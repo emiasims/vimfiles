@@ -33,7 +33,7 @@ end
 
 M.file_with_git = function(bufpath, bufnr, gitroot)
   local rel_path = vim.fs.relpath(gitroot, bufpath)
-  return {
+  local info = {
     type = 'file',
     path = bufpath,
     relative_path = rel_path,
@@ -41,57 +41,89 @@ M.file_with_git = function(bufpath, bufnr, gitroot)
     dir = vim.fs.dirname(rel_path),
     root = git_info(gitroot, bufnr),
   }
+  info.tabline = { info.file, vim.fs.basename(vim.fs.dirname(info.path)) }
+  info.statusline = { ('(%s)%s/'):format(info.root.branch, info.dir), info.file }
+  info.wintitle = { info.relative_path, info.root.short }
+  return info
 end
 
 M.file_nogit = function(bufname, _)
   local shortname = shorten_home(bufname)
-  return {
+  local info = {
     type = 'file',
     path = bufname,
     relative_path = shortname,
     file = vim.fs.basename(shortname),
     dir = vim.fs.dirname(shortname),
   }
+  info.tabline = { info.file, vim.fs.basename(vim.fs.dirname(info.path)) }
+  info.statusline = { info.dir .. '/', info.file }
+  info.wintitle = { info.relative_path }
+  return info
 end
 
 M.terminal = function(bufname, bufnr)
   local dir, pid, cmd = bufname:match('^term://(.*)/(%d+):(.*)$')
-  return {
+  local info = {
     type = 'terminal',
     title = vim.b[bufnr].term_title or '', -- set by terminal
     dir = dir,
     pid = pid,
     cmd = cmd,
   }
+  info.tabline = { ('[%s:%s]'):format(info.cmd, info.title:sub(1, 20)) }
+  info.statusline = { info.cmd, info.title }
+  info.wintitle = { 'cmd: ' .. info.cmd, info.title }
+  return info
 end
 
 M.quickfix = function()
+  local title = vim.fn.getqflist({ title = true }).title or ''
   return {
     type = 'quickfix',
-    title = vim.fn.getqflist({ title = true }).title or '',
+    title = title,
+    tabline = { '[quickfix]' },
+    statusline = { '[Quickfix]', title }
   }
 end
 
 M.help = function(bufname)
-  return { type = 'help', file = vim.fs.basename(bufname) }
+  local file = vim.fs.basename(bufname)
+  return {
+    type = 'help',
+    file = file,
+    statusline = { '[Help]', file },
+    tabline = { ('[help:%s]'):format(file) },
+    wintitle = { file },
+  }
 end
-
 
 M.nofile = function(_, bufnr, gitroot)
   if _G.Snacks then ---@diagnostic disable-line: unnecessary-if
     for _, explorer in ipairs(Snacks.picker.get({ source = 'explorer' })) do
       for _, w in ipairs(explorer.layout:get_wins()) do
         if w.buf == bufnr then
-          return { type = 'directory', cwd = explorer:cwd() }
+          local cwd = explorer:cwd()
+          return {
+            type = 'directory',
+            cwd = cwd,
+            tabline = { ('[dir:%s]'):format(vim.fs.basename(cwd)) },
+            statusline = { cwd .. '/', '[Explorer]' },
+          }
         end
       end
     end
   end
 
+  local info = { type = 'scratch' }
   if gitroot then
-    return { type = 'scratch', cwd = git_info(gitroot).short }
+    info.cwd = git_info(gitroot).short
+  else
+    info.cwd = shorten_home(vim.fn.getcwd())
   end
-  return { type = 'scratch', cwd = shorten_home(vim.fn.getcwd()) }
+  info.statusline = { info.cwd .. '/', '[Scratch]' }
+  info.tabline = { '[Scratch]' }
+  return info
 end
 
 M.get = function(bufnr)
@@ -123,48 +155,8 @@ M.get = function(bufnr)
   return bufinfo
 end
 
----@return string, string?
-M.tabline = function(bufnr)
-  local info = M.get(bufnr)
-  if info.type == 'file' then
-    return info.file, vim.fs.basename(vim.fs.dirname(info.path))
-  elseif info.type == 'terminal' then
-    ---@cast info.title string
-    return ('[%s:%s]'):format(info.cmd, info.title:sub(1, 20))
-  elseif info.type == 'help' then
-    return ('[help:%s]'):format(info.file)
-  elseif info.type == 'quickfix' then
-    return '[quickfix]'
-  elseif info.type == 'directory' then
-    return ('[dir:%s]'):format(vim.fs.basename(info.cwd))
-  elseif info.type == 'scratch' then
-    return '[Scratch]'
-  end
-  return '[?]'
-end
-
-M.statusline = function(bufnr)
-  local info = M.get(bufnr)
-  if info.type == 'file' and info.root then
-    return ('(%s)%s/'):format(info.root.branch, info.dir), info.file
-  elseif info.type == 'file' then
-    return info.dir .. '/', info.file
-  elseif info.type == 'terminal' then
-    return info.cmd, info.title
-  elseif info.type == 'help' then
-    return '[Help]', info.file
-  elseif info.type == 'quickfix' then
-    return '[Quickfix]', info.title
-  elseif info.type == 'directory' then
-    return info.cwd .. '/', '[Explorer]'
-  elseif info.type == 'scratch' then
-    return info.cwd .. '/', '[Scratch]'
-  end
-  return { '[?]', '??' }
-end
-
 return setmetatable(M, {
-  __call = function(_, ...)
-    return M.get(...)
+  __call = function(_, bufnr)
+    return vim.b[bufnr].bufinfo or M.get(bufnr)
   end,
 })
