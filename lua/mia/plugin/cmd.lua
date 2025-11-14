@@ -1,5 +1,15 @@
+local function on_call(modname)
+  return setmetatable({}, {
+    __index = function(_, k)
+      return function(...)
+        return mia[modname][k](...)
+      end
+    end,
+  })
+end
+
 ---@type mia.commands
-local impl = {
+local M = {
   Delete = {
     bang = true,
     callback = function(cmd)
@@ -24,6 +34,7 @@ local impl = {
     complete = 'filetype',
     callback = function(cmd)
       local edit = vim.cmd.edit
+      ---@diagnostic disable-next-line: undefined-field
       if cmd.smods.vertical or cmd.smods.horizontal then
         edit = vim.cmd.split
       end
@@ -35,7 +46,7 @@ local impl = {
             path = file,
             text = file
               :gsub('^' .. vim.pesc(vim.env.VIMRUNTIME) .. '/', ' : ')
-              :gsub('^' .. vim.pesc(vim.fn.stdpath('config')) .. '/', ' : ')
+              :gsub('^' .. vim.pesc(vim.fn.stdpath('config') --[[@as string]]) .. '/', ' : ')
               :gsub('^' .. vim.pesc(vim.env.HOME) .. '/', '~/'),
           }
         end)
@@ -110,7 +121,8 @@ local impl = {
       ---@diagnostic disable-next-line: param-type-mismatch
       local output = vim.api.nvim_cmd(parsed, { output = true })
       if output == '' then
-        return mia.warn('No output from "%s"', cmd.args)
+        mia.warn('No output from "%s"', cmd.args)
+        return
       end
 
       -- open window
@@ -136,28 +148,16 @@ local impl = {
       vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.split(output, '\n'))
     end,
   },
-}
 
-local function on_call(modname)
-  return setmetatable({}, {
-    __index = function(_, k)
-      return function(...)
-        return mia[modname][k](...)
-      end
-    end,
-  })
-end
+  Cclearquickfix = function()
+    vim.fn.setqflist({})
+  end,
 
--- stylua: ignore
-return mia.commands({
+  Lclearloclist = function()
+    vim.fn.setloclist(0, {})
+  end,
+
   Move = { on_call('file_move').cmd, nargs = '+', complete = 'file', bang = true },
-  Delete = impl.Delete,
-  Delview = impl.Delview,
-  EditFtplugin = impl.EditFtplugin,
-  CloseHiddenBuffers = impl.CloseHiddenBuffers,
-  Redir = impl.Redir,
-  Cclearquickfix = function() vim.fn.setqflist({}) end,
-  Lclearloclist = function() vim.fn.setloclist(0, {}) end,
   UpdateMeta = on_call('metagen').write,
   SudoEdit = { on_call('sudo').edit, complete = 'file', nargs = '?' },
   Repl = { on_call('repl').cmd, nargs = '?', complete = 'filetype', bar = true },
@@ -171,5 +171,6 @@ return mia.commands({
     nargs = '+',
     bar = true,
   },
-  -- Session = { on_call('session'), complete = 'file', desc = 'Session management' },
-})
+}
+
+return mia.commands(M)
