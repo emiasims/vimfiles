@@ -181,11 +181,6 @@ M.picker_opts = {
   enabled = true,
   layout = 'pseudo_sidebar',
 
-  win = {
-    input = {
-      keys = { ['<C-t>'] = { 'tabdrop', mode = { 'i', 'n' } } },
-    },
-  },
   layouts = {
     -- sidebar, but in floating windows.
     pseudo_sidebar = { --[[@as snacks.picker.layout.Config]]
