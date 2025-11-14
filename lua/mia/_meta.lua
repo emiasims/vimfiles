@@ -118,7 +118,7 @@ error('Cannot require a meta file')
 ---@field event? aucmd.event|aucmd.event[]
 
 
--- ---@alias mia.commands table<string, mia.command|cmd.opts.create|cmd.callback|string>
+---@alias mia.commands table<string, mia.command|cmd.opts.create|cmd.callback|string>
 
 
 ---@class mia.command.def: cmd.opts.create
