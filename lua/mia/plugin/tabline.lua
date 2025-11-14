@@ -7,89 +7,46 @@ local function hl(group, text)
   return ('%%#%s#%s%%*'):format(group, text or '')
 end
 
-local function window_layout(win_names, tabid)
-  local current_win = a.nvim_get_current_win()
-  local current_tab = a.nvim_get_current_tabpage()
-  local is_current_tab = (tabid == current_tab)
+local function window_layout(layout, names)
+  local node_type = layout[1]
 
-  local tabnr = a.nvim_tabpage_get_number(tabid)
-  local winlayout = vim.fn.winlayout(tabnr)
+  if node_type == 'leaf' then
+    return { names[layout[2]], type = 'leaf' }
+  end
 
-  -- 1. Build the post-order stack
-  local traversal = {} -- Traversal stack
-  local ordered = {} -- Post-order node stack
+  -- First do it recursively..
+  local it = vim.iter(layout[2]):map(function(_layout)
+    return window_layout(_layout, names)
+  end)
 
-  table.insert(traversal, winlayout)
-  while #traversal > 0 do
-    local node = table.remove(traversal)
-    table.insert(ordered, node)
+  -- now join with separator logic:
+  -- add padding that separates units within the window layout.
+  -- A| B/C indicates A takes the left vsplit, and B and C take the right splits
+  -- A|B /C indicates A and B take the top split vertically, and C takes the bottom
+  local res = it:fold(it:next(), function(t, node)
+    local sep = (node_type == 'row') and '|' or '/'
 
-    if node[1] ~= 'leaf' then
-      for i = 1, #node[2] do
-        table.insert(traversal, node[2][i])
-      end
+    if t.type ~= 'leaf' and t.type ~= node_type then
+      sep = ' ' .. sep
     end
-  end
 
-  -- 2. Process nodes and build results
-  local results = {}
-
-  for node in vim.iter(ordered):rev() do
-    local node_type = node[1]
-
-    if node_type == 'leaf' then
-      local name = win_names[node[2]]
-
-      if is_current_tab and node[2] == current_win then
-        name = hl('TabLineWin', name)
-      elseif is_current_tab then
-        name = hl('TabLinesel', name)
-      end
-
-      table.insert(results, { items = { name }, type = 'leaf' })
-    else
-      -- Branching node: combine children with separators
-      local sep_char = (node_type == 'row') and '|' or '/'
-      local num_children = #node[2]
-
-      local child_results = {}
-      for _ = 1, num_children do
-        table.insert(child_results, 1, table.remove(results))
-      end
-
-      local items = child_results[1].items
-
-      for i = 2, num_children do
-        local prev_res = child_results[i - 1] --[[@as table]]
-        local curr_res = child_results[i] --[[@as table]]
-
-        local sep = sep_char
-
-        if prev_res.type ~= 'leaf' and prev_res.type ~= node_type then
-          sep = ' ' .. sep
-        end
-
-        if curr_res.type ~= 'leaf' and curr_res.type ~= node_type then
-          sep = sep .. ' '
-        end
-
-        table.insert(items, sep)
-        vim.list_extend(items, curr_res.items)
-      end
-
-      table.insert(results, { items = items, type = node_type })
+    if node.type ~= 'leaf' and node.type ~= node_type then
+      sep = sep .. ' '
     end
-  end
 
-  local label = tostring(tabnr)
-  if is_current_tab then
-    label = hl('TabLineSel', label)
-  end
-
-  return ' ' .. label .. ' ' .. table.concat(results[#results].items, '')
+    table.insert(t, sep)
+    vim.list_extend(t, node)
+    t.type = node.type
+    return t
+  end)
+  res.type = node_type
+  return res
 end
 
 local function tab_layout()
+  local current_win = a.nvim_get_current_win()
+  local current_tab = a.nvim_get_current_tabpage()
+
   local bufname_counts = { ['init.lua'] = 1 } -- all init.lua gets modified
 
   for _, buf in ipairs(a.nvim_list_bufs()) do
@@ -100,21 +57,39 @@ local function tab_layout()
   local tabline = {}
   for _, tabid in ipairs(a.nvim_list_tabpages()) do
     local win_names = {}
+
+    -- First, for this tab get the names as displayed for each window
     for _, winid in ipairs(a.nvim_tabpage_list_wins(tabid)) do
       local buf = vim.fn.winbufnr(winid)
       local name, dir = mia.bufinfo.tabline(buf)
       name = name or vim.fn.bufname(buf)
 
+      -- if the file buffer is duplicated in name, indicate which with a prefix
+      -- init.lua -> mia➔init.lua for example.
       if dir and bufname_counts[name] > 1 then
         name = ('%s➔%s'):format(dir, name)
       end
+
+      -- highlight...
+      if tabid == current_tab and winid == current_win then
+        name = hl('TabLineWin', name)
+      elseif tabid == current_tab then
+        name = hl('TabLineSel', name)
+      end
+
       win_names[winid] = name
     end
 
-    table.insert(tabline, window_layout(win_names, tabid))
+    -- tab number label
+    local tabnr = a.nvim_tabpage_get_number(tabid)
+    table.insert(tabline, ' ' .. (tabid == current_tab and hl('TabLineSel', tabnr) or tabnr) .. ' ')
+
+    -- Get a pretty window layout
+    vim.list_extend(tabline, window_layout(vim.fn.winlayout(tabnr), win_names))
+    table.insert(tabline, ' ')
   end
 
-  return table.concat(tabline, ' %*')
+  return table.concat(tabline)
 end
 
 local function session()
@@ -134,7 +109,7 @@ local function tabline()
       hl('TabLineRecording', macro_status()),
       hl('TabLineFill', '%S '),
       hl('TabLineSession', session()),
-      ' %*',
+      ' ',
     })
   end)
   if not ok then
