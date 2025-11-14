@@ -80,8 +80,6 @@ function M.copy(val)
   return type(val) == 'table' and mia.tbl.copy(val) or val
 end
 
----@alias mia.commands table<string, mia.command.def>
-
 ---@param cmds mia.commands
 function M.commands(cmds)
   vim.iter(cmds):each(mia.command)
