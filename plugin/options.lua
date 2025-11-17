@@ -87,7 +87,7 @@ vim
   })
   :each(_set)
 
-if vim.fn.executable('ag') then
+if vim.fn.executable('ag') == 1 then
   vim.opt.grepprg = 'ag --nogroup --nocolor'
 end
 
