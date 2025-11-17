@@ -45,7 +45,10 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = function(ev)
     local bo = vim.bo[ev.buf]
     if bo.modifiable and bo.buftype == '' then
-      vim.cmd.lcd(gitdir(ev.match, ev.buf))
+      local ok, err = pcall(vim.cmd.lcd, gitdir(ev.match, ev.buf))
+      if not ok then
+        mia.err('autochdir lcd failed: ' .. err)
+      end
     end
   end,
 })
