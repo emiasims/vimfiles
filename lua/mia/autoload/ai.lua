@@ -59,7 +59,7 @@ function M.ask(opts)
   return job
 end
 
----@param opts { buf: number, adapter: string?, messages: mia.ai.messages }
+---@param opts { buf: integer, adapter: string?, messages: mia.ai.messages }
 ---@return Job job Plenary job
 function M.to_buf(opts)
   assert(opts.buf)

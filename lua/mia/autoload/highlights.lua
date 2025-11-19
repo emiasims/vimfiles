@@ -217,11 +217,11 @@ local function chunk_highlights(line_segment, segment_len, hls, open, close)
   return chunks_for_line
 end
 
----@param bufnr number|nil Buffer handle, defaults to current buffer if 0 or nil.
----@param start_row number 1-based start row of the range.
----@param start_col number 0-based start column of the range.
----@param end_row number 1-based end row of the range.
----@param end_col number 0-based end column of the range.
+---@param bufnr integer|nil Buffer handle, defaults to current buffer if 0 or nil.
+---@param start_row integer 1-based start row of the range.
+---@param start_col integer 0-based start column of the range.
+---@param end_row integer 1-based end row of the range.
+---@param end_col integer 0-based end column of the range.
 ---@return { [1]: string, [2]?: string|string[] }[][] Table of lines, each containing text chunks and optional highlight groups.
 function M.extract(bufnr, start_row, start_col, end_row, end_col, block)
   bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()

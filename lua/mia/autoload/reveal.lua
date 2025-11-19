@@ -57,11 +57,11 @@ local M = {}
 -- function that prints 10 lines, line by line
 
 ---@class mia.RevealOpts
----@field buf? number
+---@field buf? integer
 ---@field pos? table 0-indexed position
----@field ns? number extmark namespace
----@field speed? number characters per second
----@field dt? number miliseconds default 15
+---@field ns? integer extmark namespace
+---@field speed? integer characters per second
+---@field dt? integer miliseconds default 15
 ---@field hl_group? string Comment
 
 
