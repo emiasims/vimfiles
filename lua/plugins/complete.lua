@@ -1,6 +1,7 @@
 ---@type LazySpec
 return {
   'saghen/blink.cmp',
+  enable = mia.ide.enabled,
   dependencies = 'rafamadriz/friendly-snippets',
   event = { 'InsertEnter', 'CmdlineEnter' },
   version = '*',
@@ -27,6 +28,7 @@ return {
         },
         -- not necessary if not lazy loading codecompanion
         codecompanion = {
+          enabled = mia.ide.enabled,
           name = 'CodeCompanion',
           module = 'codecompanion.providers.completion.blink',
         },
