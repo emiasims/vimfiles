@@ -69,6 +69,7 @@ local function tab_layout()
       if dir and bufname_counts[name] > 1 then
         name = ('%s➔%s'):format(dir, name)
       end
+      name = name:gsub('%%', '%%%%')
 
       -- highlight...
       if tabid == current_tab and winid == current_win then
@@ -80,13 +81,24 @@ local function tab_layout()
       win_names[winid] = name
     end
 
-    -- tab number label
+    -- tab number label with highlighting and click labels
     local tabnr = a.nvim_tabpage_get_number(tabid)
-    table.insert(tabline, ' ' .. (tabid == current_tab and hl('TabLineSel', tabnr) or tabnr) .. ' ')
+    local label = tostring(tabnr)
+    if tabid == current_tab then
+      label = hl('TabLineSel', label)
+    end
+    local _hl = (tabid == current_tab) and hl('TabLineSel') or ''
+    table.insert(tabline,  (' %%%dT%s%s '):format(tabnr, _hl, label))
 
     -- Get a pretty window layout
-    vim.list_extend(tabline, window_layout(vim.fn.winlayout(tabnr), win_names))
-    table.insert(tabline, ' ')
+    local ok, layout = pcall(window_layout, vim.fn.winlayout(tabnr), win_names)
+    if not ok then
+      layout = { hl('Error', 'Error in g:tabline_err') }
+      vim.g.tabline_err = layout[1]
+    end
+    --- @cast layout string[]
+    vim.list_extend(tabline, layout)
+    table.insert(tabline, '%T ')
   end
 
   return table.concat(tabline)
