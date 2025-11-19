@@ -102,9 +102,14 @@ return mia.augroup('mia-autocmds', {
 
   [{ 'WinEnter', 'BufWinEnter' }] = {
     pattern = 'term://*',
-    callback = function()
+    callback = function(ev)
       if vim.b.last_mode == 't' then
-        vim.cmd.startinsert()
+        -- schedule avoids issues with opening terminals remotely or in sessions
+        vim.schedule(function()
+          if vim.api.nvim_get_current_buf() == ev.buf then
+            vim.cmd.startinsert()
+          end
+        end)
       end
     end,
   },
@@ -112,11 +117,6 @@ return mia.augroup('mia-autocmds', {
   TermOpen = {
     callback = function(ev)
       vim.b[ev.buf].last_mode = 't'
-      vim.schedule_wrap(function()
-        if ev.buf == vim.fn.bufnr() then
-          vim.cmd.startinsert()
-        end
-      end)
     end,
   },
 
