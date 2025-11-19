@@ -1,32 +1,48 @@
-local Config = { dir = vim.fn.stdpath('state') .. '/mia.session' }
+local M = {
+  dir = vim.fn.stdpath('state') .. '/mia/session',
+  _enabled = false --[[@as boolean]],
+}
+
+---@class mia.session
+---@field name string Display name of the session
+---@field file string The original file/buffer path identifying the session context
+---@field path string The filesystem path to the .vim session file
+---@field root? string Git root
+---@field mtime? integer Modification time
 
 local function expand(file)
-  return vim.fs.joinpath(Config.dir, file)
+  return vim.fs.joinpath(M.dir, file)
 end
 
-local M = {}
-
-local function build_sessinfo(buf)
+---@param buf integer | string
+---@param name? string
+---@return mia.session
+local function new_session_context(buf, name)
   local file = type(buf) == 'number' and vim.fn.bufname(buf) or buf --[[@as string]]
   file = vim.fn.fnamemodify(file, ':p')
   local root = vim.fs.root(file, '.git')
 
-  local name
-  if root then
-    name = vim.fs.relpath(vim.fs.dirname(root), file)
-  else
+  if not name and root then
+    name = vim.fs.relpath(vim.fs.dirname(root), file) --[[@as string]]
+    name = name:gsub('/', '➔', 1)
+  elseif not name then
     name = vim.fs.relpath('~', file)
     name = name and '~/' .. name
   end
+  name = name or file
+  local sess_filename = name:gsub('%%', '%%%%'):gsub('/', '%%') .. '.vim'
 
-  ---@class mia.session
-  local sess = {
+  return {
     file = file,
-    name = name or file,
+    name = name,
     root = root,
-    path = expand(file:gsub('%%', '%%%%'):gsub('/', '%%') .. '.vim'),
+    path = expand(sess_filename),
   }
-  return sess
+end
+
+local function mtime(path)
+  local stat = vim.uv.fs_stat(path)
+  return stat and stat.mtime.sec * 1000 + math.floor(stat.mtime.nsec / 1e6)
 end
 
 ---@param sess mia.session?
@@ -41,9 +57,11 @@ function M.mksession(sess)
   local lines = vim.fn.readfile(tmp)
   vim.fn.delete(tmp)
 
-  table.insert(lines, 2, ('lua vim.g.session=vim.json.decode([[%s]])'):format(vim.fn.json_encode(sess)))
+  sess.mtime = nil
+  table.insert(lines, 2, 'let g:session=' .. vim.fn.string(sess))
   vim.fn.writefile(lines, sess.path)
-  vim.system({ 'ln', '-sf', sess.path, expand('last-session.vim') })
+  sess.mtime = mtime(sess.path)
+
   vim.g.session = sess
   vim.v.this_session = sess.path
 end
@@ -52,98 +70,131 @@ function M.status()
   if vim.g.session then
     local name = vim.g.session.name
     if #name > (vim.o.columns * 0.2) then
+      local root = name:match('^.*➔') or ''
+      name = name:sub(#root + 1)
       name = name:gsub('([^/])[^/]*/', '%1/')
+      name = root .. name
     end
     return ('[%s: %s]'):format(M._enabled and 'S' or '$', name)
   end
 end
 
-function M.get()
+function M.get_sessinfo(sort)
   local sessions = {}
 
-  for f, ftype in vim.fs.dir(Config.dir) do
+  for f, ftype in vim.fs.dir(M.dir) do
     if ftype == 'file' and vim.endswith(f, '.vim') then
-      local fd = assert(io.open(expand(f), 'r'))
+      local path = expand(f)
+      local fd = assert(io.open(path, 'r'))
       fd:read('*l') ---@diagnostic disable-line: discard-returns
-      local info = fd:read('*l'):match('^lua vim.g.session=vim.json.decode%(%[%[(.*)%]%]%)$')
+      local line = fd:read('*l')
       fd:close()
 
-      info = info and vim.json.decode(info)
-      if info and vim.fn.filereadable(info.file) == 1 then
-        table.insert(sessions, info)
-      else
-        vim.fn.delete(f)
+      local sess = line and line:match('^let g:session=(.*)$')
+      if sess then
+        local parsed = vim.api.nvim_parse_expression(sess, '', false)
+        if parsed.error or parsed.ast.type ~= 'DictLiteral' then
+          vim.fn.delete(path)
+        else
+          local s = vim.api.nvim_eval(sess)
+          s.mtime = mtime(s.path)
+          table.insert(sessions, s)
+        end
       end
     end
   end
 
+  if sort then
+    table.sort(sessions, function(a, b)
+      return (b.mtime or -1) < (a.mtime or -1)
+    end)
+    return sessions
+  end
   return sessions
 end
 
 function M.list()
-  local sessions = M.get()
-  local chunks = { { 'Sessions:\n' } }
+  local sessions = M.get_sessinfo(true)
+  local chunks = { { 'Sessions:' } }
   for _, s in ipairs(sessions) do
+    table.insert(chunks, { '\n' })
     if s.path == vim.v.this_session then
-      table.insert(chunks, { ' > ' .. s.name .. '\n', 'WarningMsg' })
+      table.insert(chunks, { ' > ' .. s.name, 'WarningMsg' })
     else
-      table.insert(chunks, { '   ' .. s.name .. '\n' })
+      table.insert(chunks, { '   ' .. s.name })
     end
   end
-  chunks[#chunks][1] = chunks[#chunks][1]:sub(1, -2)
   vim.api.nvim_echo(chunks, false, {})
-  return sessions
 end
 
----@param sess string|mia.session?
-function M.lookup(sess)
-  if type(sess) == 'table' and sess.path and sess.root and sess.file and sess.name then
-    return vim.fn.filereadable(sess.path) == 1 and sess or nil
-  end
+---@param sess 'last'|string|integer|mia.session?
+function M.resolve(sess)
+  local sessions = M.get_sessinfo()
 
-  local info = M.get()
-  if not sess or sess == 'last' then
-    local last = vim.uv.fs_readlink(expand('last-session.vim'))
-    if last and vim.fn.filereadable(last) == 1 then
-      return vim.iter(info):find(function(s)
-        return s.path == last
-      end)
+  if not sess or type(sess) == 'number' then
+    local file_path = vim.fn.bufname(sess or vim.api.nvim_get_current_buf())
+    if file_path == '' then
+      return nil
     end
-
-  -- session object, verify with root and file
+    file_path = vim.fn.fnamemodify(file_path, ':p')
+    return vim.iter(sessions):find(function(s)
+      return s.file == file_path
+    end)
+  elseif sess == 'last' then
+    return M.get_sessinfo(true)[1]
   elseif type(sess) == 'table' then
-    return vim.iter(info):find(function(s)
+    return vim.iter(sessions):find(function(s)
       return s.file == sess.file and s.root == sess.root
     end)
-
-  -- name or path
   elseif type(sess) == 'string' then
-    return vim.iter(info):find(function(s)
-      return s.name == sess or s.file == sess
+    local path_from_str = vim.fn.fnamemodify(sess, ':p')
+    return vim.iter(sessions):find(function(s)
+      return s.name == sess or s.file == path_from_str or s.path == path_from_str
     end)
   end
 end
 
 ---@param sess? string|mia.session
 function M.load(sess)
-  sess = M.lookup(sess)
+  sess = M.resolve(sess)
   if sess then
+    M.disable()
+    mia.source.disable()
+    local ok, err = pcall(vim.cmd.source, vim.fn.fnameescape(sess.path))
+    mia.source.enable()
     M.enable()
-    vim.cmd.source(vim.fn.fnameescape(sess.path))
-    mia.info('Session loaded: ' .. sess.name)
+    if ok then
+      mia.info('Session loaded: ' .. sess.name)
+    else
+      mia.err('Session load failed: \n' .. err)
+    end
   else
     mia.err('Session not found')
   end
 end
 
----@param sess string|mia.session?
-function M.save(sess)
-  M.mksession(build_sessinfo(sess))
+---@param name string
+function M.save(name)
+  M.enable()
+  local old_sess = vim.g.session
+
+  local buf = old_sess and old_sess.file or vim.api.nvim_get_current_buf()
+  local new_sess = new_session_context(buf, name)
+  M.mksession(new_sess)
+
+  if old_sess and old_sess.path ~= new_sess.path then
+    vim.fn.delete(old_sess.path)
+    mia.info('Session renamed to: ' .. new_sess.name)
+  elseif old_sess then
+    mia.info('Session saved: ' .. new_sess.name)
+  else
+    mia.info('New session started: ' .. new_sess.name)
+  end
 end
 
 ---@param sess string|mia.session?
 function M.delete(sess)
-  sess = M.lookup(sess)
+  sess = M.resolve(sess)
   if not sess then
     return mia.err('Session not found')
   end
@@ -154,12 +205,9 @@ function M.delete(sess)
   vim.fn.delete(sess.path)
 end
 
-function M.name(name)
-  local sess = vim.g.session
-  if sess then
-    sess.name = name
-    M.mksession(sess)
-  end
+function M.close()
+  M.disable()
+  vim.g.session = nil
 end
 
 function M.disable()
@@ -170,82 +218,48 @@ function M.enable()
   M._enabled = true
 end
 
-function M.enter(buf, ...)
-  local sess = build_sessinfo(buf or vim.api.nvim_get_current_buf())
-  if M.lookup(sess) then
+function M.enter(buf)
+  local sess = M.resolve(buf)
+  if sess then
     M.load(sess)
   else
-    M.start(sess.file)
+    M.start()
   end
 end
 
-function M.start(buf, name)
-  M.enable()
+function M.start(name)
   if not vim.g.session then
-    local file = vim.fn.bufname(buf or vim.api.nvim_get_current_buf())
-    vim.g.session = build_sessinfo(file)
-    if name then
-      vim.g.session.name = name
+    M.close()
+    M.save(name)
+  else
+    mia.warn('Session already active: ' .. vim.g.session.name)
+  end
+end
+
+local function _clean()
+  M.close()
+  for name in vim.fs.dir(M.dir, { follow = false }) do
+    if vim.endswith(name, '.vim') then
+      vim.fn.delete(expand(name))
     end
   end
-
-  M.mksession(vim.g.session)
-  mia.info('New session started: ' .. vim.g.session.name)
 end
 
-function M.pick()
-  return Snacks.picker.pick('Sessions', {
-    sort = { fields = { 'time:desc' } },
-    matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
-    format = 'text',
-    items = M.get(),
-
-    transform = function(sess, ctx)
-      return {
-        time = vim.uv.fs_stat(sess.path).mtime.sec,
-        file = sess.path,
-        text = sess.name,
-        sess = sess,
-        name = sess.name,
-        -- TODO buffers saved, tabs
-      }
-    end,
-    confirm = function(picker, item, _)
-      picker:close()
-      if item then
-        M.load(item.file)
-      end
-    end,
-  })
-end
-
-function M.mini_starter_items(nrecent)
-  local last = M.lookup()
-  local pick = { action = 'Session pick', name = 'Pick Sessions', section = 'Sessions' }
-  if not last then
-    return pick
+function M.clean(force)
+  if force then
+    _clean()
+    return
   end
-  ---@diagnostic disable-next-line: cast-local-type
-  last = ('Last Session (%s)'):format(last.name)
-  return { { action = 'Session load', name = last, section = 'Sessions' }, pick }
-end
-
-function M.clean()
-  mia.err('Delete all sessions?')
-  vim.ui.input({ prompt = '[y/N] ' }, function(input)
+  vim.ui.input({ prompt = 'Delete all sessions? [y/N] ' }, function(input)
     if input and input:lower():find('^%s*y') then
-      for name in vim.fs.dir(Config.dir, { follow = false }) do
-        if vim.endswith(name, '.vim') then
-          vim.fn.delete(expand(name))
-        end
-      end
+      _clean()
     end
   end)
 end
 
 function M.setup()
   local list_complete = mia.command.wrap_complete(function()
-    return vim.iter(M.get()):map(mia.tbl.index('name')):totable()
+    return vim.iter(M.get_sessinfo()):map(mia.tbl.index('name')):totable()
   end)
 
   local tocmd = function(fn)
@@ -254,19 +268,17 @@ function M.setup()
     end
   end
 
-  vim.fn.mkdir(Config.dir, 'p')
+  vim.fn.mkdir(M.dir, 'p')
 
   mia.command('Session', {
     subcommands = {
       list = tocmd(M.list),
-      pick = tocmd(M.pick),
-      last = tocmd(M.last),
       clean = tocmd(M.clean),
+      close = tocmd(M.close),
       enter = { tocmd(M.enter), complete = 'buffer' },
       save = { tocmd(M.save), complete = list_complete },
       load = { tocmd(M.load), complete = list_complete },
       delete = { tocmd(M.delete), complete = list_complete },
-      name = { tocmd(M.name), complete = list_complete },
       stop = tocmd(M.disable),
       start = tocmd(M.start),
       quit = function()
@@ -281,15 +293,15 @@ function M.setup()
   local save_session = mia.F.eat(M.mksession)
   mia.augroup('mia-session', {
 
-    SessionLoadPost = function()
-      -- ftdetect the new files.
-      local ftdetect = mia.partial(vim.cmd.filetype, 'detect')
-      for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
-        if not vim.b[buf.bufnr].did_ftplugin then
-          vim.api.nvim_buf_call(buf.bufnr, ftdetect)
-        end
-      end
-    end,
+    -- SessionLoadPost = function()
+    --   -- ftdetect the new files.
+    --   local ftdetect = mia.partial(vim.cmd.filetype, 'detect')
+    --   for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
+    --     if not vim.b[buf.bufnr].did_ftplugin then
+    --       vim.api.nvim_buf_call(buf.bufnr, ftdetect)
+    --     end
+    --   end
+    -- end,
 
     -- saving
     FocusLost = save_session,
@@ -305,26 +317,13 @@ function M.setup()
 
     -- on vimenter, start a session or load one. Ensure the primary buffer is focused
     VimEnter = function()
-      local args = vim.fn.argv()
       vim.o.swapfile = false
-      if vim.g.session or vim.fn.argc() == 0 then
+      if vim.g.session or vim.fn.argc() ~= 1 then
         return
       end
 
-      M.enter(vim.fn.fnamemodify(args[1], ':p'))
-
-      if vim.fn.bufnr(args[1]) ~= vim.api.nvim_get_current_buf() then
-        -- ensure the primary buffer is focused
-        -- check in each tab if the buffer is open, if so, focus it
-        -- otherwise, start a new tab with it, keeping the window layout otherwise
-        local win = vim.fn.win_findbuf(vim.fn.bufnr(args[1]))
-        if #win > 0 then
-          vim.api.nvim_set_current_win(win[1])
-        else
-          vim.cmd.tabnew({ args[1], range = { 0 } })
-        end
-      end
-      vim.cmd.args(args)
+      -- terms dont load properly unless scheduled. idk why
+      vim.schedule(M.enter)
     end,
   })
 end

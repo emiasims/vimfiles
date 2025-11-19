@@ -261,11 +261,34 @@ M.picker_opts = {
           :totable()
       end,
     },
+    sessions = {
+    sort = { fields = { 'time:desc' } },
+    matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
+    format = 'text',
+    finder = function() return mia.session.get_sessinfo() end,
+
+    transform = function(sess, ctx)
+      return {
+        time = sess.mtime,
+        file = sess.path,
+        text = sess.name,
+        sess = sess,
+        name = sess.name,
+        -- TODO buffers saved, tabs
+      }
+    end,
+    confirm = function(picker, item, _)
+      picker:close()
+      if item then
+        mia.session.load(item.file)
+      end
+    end,
+  },
   },
 }
 
 M.lazy_opts = {
-  bigfile = { enabled = true },
+  bigfile = { enabled = false },
   dashboard = { enabled = false },
   explorer = { enabled = true },
   indent = { enabled = true, indent = { char = '╎' } },
