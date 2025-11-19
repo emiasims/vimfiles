@@ -8,9 +8,12 @@ local function _normalize(cmd, opts)
   elseif type(cmd) == 'string' then
     cmd = { command = cmd, group = mia.group }
   end
-  return vim.tbl_extend('keep', cmd, opts or {})
+  return vim.tbl_extend('force', cmd, opts or {})
 end
 
+---@param spec mia.augroup
+---@param opts aucmd.opts.create
+---@param event_override nil|string
 local function _process_augroup(spec, opts, event_override)
   --- spec is table of events. value can be
   --- string, function, table[1], table.command, table.callback
