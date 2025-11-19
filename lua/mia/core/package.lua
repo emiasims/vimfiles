@@ -20,7 +20,7 @@ local M = {
 ---@field loaded boolean
 ---@field mianame string
 ---@field modname string
----@field mtime number
+---@field mtime integer
 ---@field ismod boolean is a directory module or a file
 ---@field up_to_date boolean?
 local Spec = {}

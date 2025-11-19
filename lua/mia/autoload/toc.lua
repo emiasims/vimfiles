@@ -5,15 +5,15 @@ local ts = vim.treesitter
 ---@field node TSNode
 ---@field metadata vim.treesitter.query.TSMetadata
 ---@field match TSQueryMatch
----@field bufnr number
+---@field bufnr integer
 ---@field parser vim.treesitter.LanguageTree
 ---@field query vim.treesitter.Query
 
 ---@class ToCHeading
----@field bufnr number
----@field lnum number
+---@field bufnr integer
+---@field lnum integer
 ---@field text string Description
----@field end_lnum? number
+---@field end_lnum? integer
 ---@field type? string Single character
 ---@field module? string Defaults to the capture ID or metadata.module
 
@@ -22,7 +22,7 @@ local ts = vim.treesitter
 ---@type table<string, ToCProcessor>
 local processor = {}
 
----@param bufnr number
+---@param bufnr integer
 ---@param id integer
 ---@param node TSNode
 ---@param metadata vim.treesitter.query.TSMetadata

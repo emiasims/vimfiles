@@ -9,7 +9,7 @@ D = {  -- debug tools
     return debug.getinfo(2, 'S').source:sub(2)
   end,
 
-  ---@return fun(): (number, string, any)
+  ---@return fun(): (integer, string, any)
   iupvalues = function(fn)
     local i = 0
     return function()

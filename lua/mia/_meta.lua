@@ -2,8 +2,8 @@
 error('Cannot require a meta file')
 
 ---@alias cmd.callback fun(cmd: cmd.callback.arg)
----@alias cmd.complete fun(ArgLead: string, CmdLine: string, CursorPos: number): string[]
----@alias cmd.preview fun(opts: cmd.callback.arg, ns: number, buf: number): 0|1|2
+---@alias cmd.complete fun(ArgLead: string, CmdLine: string, CursorPos: integer): string[]
+---@alias cmd.preview fun(opts: cmd.callback.arg, ns: integer, buf: integer): 0|1|2
 
 ---@class cmd.callback.arg
 ---@field name string Command name
@@ -11,10 +11,10 @@ error('Cannot require a meta file')
 ---@field fargs string[] The args split by unescaped whitespace (when more than one argument is allowed), if any <f-args>
 ---@field nargs string Number of arguments |:command-nargs|
 ---@field bang boolean "true" if the command was executed with a ! modifier <bang>
----@field line1 number The starting line of the command range <line1>
----@field line2 number The final line of the command range <line2>
----@field range number The number of items in the command range: 0, 1, or 2 <range>
----@field count number Any count supplied <count>
+---@field line1 integer The starting line of the command range <line1>
+---@field line2 integer The final line of the command range <line2>
+---@field range integer The number of items in the command range: 0, 1, or 2 <range>
+---@field count integer Any count supplied <count>
 ---@field reg string The optional register, if specified <reg>
 ---@field mods string Command modifiers, if any <mods>
 ---@field smods vim.api.keyset.parse_cmd.mods Command modifiers in a structured format. Has the same structure as the "mods" key of |nvim_parse_cmd()|.
@@ -26,11 +26,11 @@ error('Cannot require a meta file')
 ---@field bang? cmd.callback|boolean
 ---@field desc? string
 ---@field nargs? 0 | 1 | '0' | '1' | '*' | '+' | '?'
----@field range? boolean | number | '%'
----@field count? boolean | number
+---@field range? boolean | integer | '%'
+---@field count? boolean | integer
 ---@field addr? cmd.opts.addr
 ---@field register? boolean
----@field buffer? boolean|number
+---@field buffer? boolean|integer
 ---@field keepscript? boolean
 ---@field force? boolean default true
 
@@ -93,7 +93,7 @@ error('Cannot require a meta file')
 ---@class aucmd.opts
 ---@field buffer? integer
 ---@field desc? string
----@field group? number|string
+---@field group? integer|string
 ---@field nested? boolean
 ---@field once? boolean
 ---@field pattern? string|string[]
@@ -103,11 +103,11 @@ error('Cannot require a meta file')
 ---@field command? string
 
 ---@class aucmd.callback.arg
----@field id number autocommand id
+---@field id integer autocommand id
 ---@field event aucmd.event name of the triggered event |autocmd-events|
----@field group? number autocommand group id, if any
+---@field group? integer autocommand group id, if any
 ---@field match string expanded value of <amatch>
----@field buf number expanded value of <abuf>
+---@field buf integer expanded value of <abuf>
 ---@field file string expanded value of <afile>
 ---@field data any arbitrary data passed from |nvim_exec_autocmds()|
 

@@ -36,7 +36,7 @@ local function _process_augroup(spec, opts, event_override)
   return spec
 end
 
----@param group string|number
+---@param group string|integer
 ---@param spec mia.augroup
 return function(group, spec, clear)
   if type(group) == 'string' then
