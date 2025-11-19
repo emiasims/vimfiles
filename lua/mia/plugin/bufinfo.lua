@@ -31,7 +31,10 @@ local git_info = function(gitroot, bufnr)
   return t
 end
 
-M.file_with_git = function(bufpath, bufnr, gitroot)
+---@type table<string, fun(bufname:string, bufnr:integer, gitroot?:string):table>
+local BT = {}
+
+BT.file_with_git = function(bufpath, bufnr, gitroot)
   local rel_path = vim.fs.relpath(gitroot, bufpath)
   local info = {
     type = 'file',
@@ -47,7 +50,7 @@ M.file_with_git = function(bufpath, bufnr, gitroot)
   return info
 end
 
-M.file_nogit = function(bufname, _)
+BT.file_nogit = function(bufname, _)
   local shortname = shorten_home(bufname)
   local info = {
     type = 'file',
@@ -62,7 +65,7 @@ M.file_nogit = function(bufname, _)
   return info
 end
 
-M.terminal = function(bufname, bufnr)
+BT.terminal = function(bufname, bufnr)
   local dir, pid, cmd = bufname:match('^term://(.*)/(%d+):(.*)$')
   local info = {
     type = 'terminal',
@@ -77,7 +80,7 @@ M.terminal = function(bufname, bufnr)
   return info
 end
 
-M.quickfix = function()
+BT.quickfix = function()
   local title = vim.fn.getqflist({ title = true }).title or ''
   return {
     type = 'quickfix',
@@ -87,7 +90,7 @@ M.quickfix = function()
   }
 end
 
-M.help = function(bufname)
+BT.help = function(bufname)
   local file = vim.fs.basename(bufname)
   return {
     type = 'help',
@@ -98,7 +101,7 @@ M.help = function(bufname)
   }
 end
 
-M.nofile = function(_, bufnr, gitroot)
+BT.nofile = function(_, bufnr, gitroot)
   if _G.Snacks then ---@diagnostic disable-line: unnecessary-if
     for _, explorer in ipairs(Snacks.picker.get({ source = 'explorer' })) do
       for _, w in ipairs(explorer.layout:get_wins()) do
@@ -134,23 +137,27 @@ M.get = function(bufnr)
 
   local bufinfo = {}
   if bufname == '' then
-    -- could be scratch or a directory
-    bufinfo = M.nofile(bufname, bufnr, gitroot)
+    bufinfo = BT.nofile(bufname, bufnr, gitroot)
   elseif buftype == '' and gitroot then
-    -- normal file with git repo
     vim.b[bufnr].workspace_folder = gitroot -- for copilot
-    bufinfo = M.file_with_git(bufname, bufnr, gitroot)
+    bufinfo = BT.file_with_git(bufname, bufnr, gitroot)
   elseif buftype == '' then
-    -- normal file
-    bufinfo = M.file_nogit(bufname, bufnr)
-  elseif M[buftype] then ---@diagnostic disable-line: unnecessary-if
-    -- other known buftypes
-    bufinfo = M[buftype](bufname, bufnr)
+    bufinfo = BT.file_nogit(bufname, bufnr)
+  else
+    bufinfo = BT[buftype](bufname, bufnr)
   end
 
   bufinfo.bufname = bufname
   bufinfo.bufnr = bufnr
   bufinfo.listed = vim.bo[bufnr].buflisted
+
+  if vim.b[bufnr].statusline then
+    bufinfo.statusline = vim.b[bufnr].statusline
+  elseif vim.b[bufnr].tabline then
+    bufinfo.tabline = vim.b[bufnr].tabline
+  elseif vim.b[bufnr].wintitle then
+    bufinfo.wintitle = vim.b[bufnr].wintitle
+  end
 
   return bufinfo
 end
