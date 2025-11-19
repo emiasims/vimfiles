@@ -11,7 +11,7 @@ function M.get(lang)
   return mia.restore_opt({ eventignore = { append = { 'SourceCmd' } } }, srcf)
 end
 
----@param ev nil|string|number|aucmd.callback.arg
+---@param ev nil|string|integer|aucmd.callback.arg
 function M.source(ev)
   local file, buf
   if type(ev) == 'string' then
@@ -51,7 +51,10 @@ end
 M.enable()
 
 function M.disable()
-  pcall(vim.api.nvim_del_augroup_by_name, 'mia-source')
+  local ok, err = pcall(vim.api.nvim_del_augroup_by_name, 'mia-source')
+  if not ok then
+    mia.err(err)
+  end
 end
 
 return M
