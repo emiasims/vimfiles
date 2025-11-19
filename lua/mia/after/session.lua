@@ -130,6 +130,9 @@ end
 ---@param sess 'last'|string|integer|mia.session?
 function M.resolve(sess)
   local sessions = M.get_sessinfo()
+  if not sess and vim.g.session then
+    return vim.g.session
+  end
 
   if not sess or type(sess) == 'number' then
     local file_path = vim.fn.bufname(sess or vim.api.nvim_get_current_buf())
@@ -199,8 +202,7 @@ function M.delete(sess)
     return mia.err('Session not found')
   end
   if sess.path == vim.v.this_session then
-    M.disable()
-    vim.g.session = nil
+    M.close()
   end
   vim.fn.delete(sess.path)
 end
@@ -291,17 +293,8 @@ function M.setup()
   })
 
   local save_session = mia.F.eat(M.mksession)
-  mia.augroup('mia-session', {
 
-    -- SessionLoadPost = function()
-    --   -- ftdetect the new files.
-    --   local ftdetect = mia.partial(vim.cmd.filetype, 'detect')
-    --   for _, buf in ipairs(vim.fn.getbufinfo({ buflisted = 1 })) do
-    --     if not vim.b[buf.bufnr].did_ftplugin then
-    --       vim.api.nvim_buf_call(buf.bufnr, ftdetect)
-    --     end
-    --   end
-    -- end,
+  mia.augroup('mia-session', {
 
     -- saving
     FocusLost = save_session,
@@ -326,6 +319,9 @@ function M.setup()
       vim.schedule(M.enter)
     end,
   })
+  if vim.g.session then
+    M.enable()
+  end
 end
 
 return M
