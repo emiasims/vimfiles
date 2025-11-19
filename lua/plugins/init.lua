@@ -4,6 +4,7 @@ vim.keymap.set('n', '\\-', '<Plug>FileBeagleOpenCurrentBufferDir', { silent = tr
 vim.g.loaded_netrwPlugin = 'v9999'
 vim.g.undotree_DiffAutoOpen = 0
 vim.g.undotree_HighlightChangedText = 0
+vim.g.undotree_StatusLine = 0
 
 vim.g.gutentags_cache_dir = vim.fn.stdpath('data') .. '/tags'
 vim.g.gutentags_ctags_exclude = { 'data' }
