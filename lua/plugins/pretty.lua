@@ -99,6 +99,7 @@ return {
           stlInsertMode = { bg = colors.sky, fg = colors.base, bold = true },
           stlVisualMode = { bg = colors.yellow, fg = colors.base, bold = true },
           stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
+          stlHover = { bg = stl.surface0, fg = colors.mauve, bold = true },
 
           FlashBackdrop = { link = 'CommentSansItalic' },
 
