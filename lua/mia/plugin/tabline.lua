@@ -1,11 +1,6 @@
 local a = vim.api
 
-local function hl(group, text)
-  if not text then
-    return '%#' .. group .. '#'
-  end
-  return ('%%#%s#%s%%*'):format(group, text or '')
-end
+local hl = mia.line_utils.hl
 
 local function window_layout(layout, names)
   local node_type = layout[1]
@@ -71,14 +66,24 @@ local function tab_layout()
       end
       name = name:gsub('%%', '%%%%')
 
+      ---@type mia.line.spec
+      local spec = { [1] = name }
+
       -- highlight...
       if tabid == current_tab and winid == current_win then
-        name = hl('TabLineWin', name)
+        spec.hl = 'TabLineWin'
       elseif tabid == current_tab then
-        name = hl('TabLineSel', name)
+        spec.hl = 'TabLineSel'
+      end
+      local _winid = winid -- capture for closure
+
+      spec.on_click = function(_, _, button, _)
+        if button == 'l' then
+          a.nvim_set_current_win(_winid)
+        end
       end
 
-      win_names[winid] = name
+      win_names[winid] = spec
     end
 
     -- tab number label with highlighting and click labels
@@ -101,7 +106,7 @@ local function tab_layout()
     table.insert(tabline, '%T ')
   end
 
-  return table.concat(tabline)
+  return tabline
 end
 
 local function session()
@@ -110,20 +115,18 @@ end
 
 local function macro_status()
   local reg = vim.fn.reg_recording()
-  return reg ~= '' and ('[q:%s]'):format(reg)
+  return reg ~= '' and ('[q:%s]'):format(reg) or nil
 end
 
 local function tabline()
-  local ok, res = pcall(function()
-    return table.concat({
-      tab_layout(),
-      hl('TabLineFill', '%= '),
-      hl('TabLineRecording', macro_status()),
-      hl('TabLineFill', '%S '),
-      hl('TabLineSession', session()),
-      ' ',
-    })
-  end)
+  local ok, res = pcall(mia.line_utils.resolve, 'tabline', {
+    tab_layout,
+    { '%= ', hl = 'TabLineFill' },
+    { macro_status, hl = 'TabLineRecording' },
+    { '%S ', hl = 'TabLineFill' },
+    { session, hl = 'TabLineSession' },
+    ' ',
+  })
   if not ok then
     return 'Error: ' .. res
   end
@@ -136,4 +139,5 @@ return setmetatable({
   win_layout = window_layout,
   tab_layout = tab_layout,
   tabline = tabline,
+  test = tabline,
 }, { __call = tabline })

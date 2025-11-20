@@ -1,23 +1,3 @@
-local modecolors = {
-  n = { color = 'stlNormalMode', abbrev = 'n' },
-  i = { color = 'stlInsertMode', abbrev = 'i' },
-  v = { color = 'stlVisualMode', abbrev = 'v' },
-  V = { color = 'stlVisualMode', abbrev = 'V' },
-  [''] = { color = 'stlVisualMode', abbrev = 'B' },
-  R = { color = 'stlReplaceMode', abbrev = 'R' },
-  s = { color = 'stlSelectMode', abbrev = 's' },
-  S = { color = 'stlSelectMode', abbrev = 'S' },
-  [''] = { color = 'stlSelectMode', abbrev = 'S' },
-  c = { color = 'stlTerminalMode', abbrev = 'c' },
-  t = { color = 'stlTerminalMode', abbrev = 't' },
-  ['-'] = { color = 'stlNormalMode', abbrev = '-' },
-  ['!'] = { color = 'stlNormalMode', abbrev = '!' },
-}
-
-local function mode_info()
-  return modecolors[vim.api.nvim_get_mode().mode:sub(1, 1)] or { color = 'stlNormalMode', abbrev = '-' }
-end
-
 local function buf_info()
   local winid = vim.g.statusline_winid or vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_win_get_buf(winid)
@@ -53,65 +33,57 @@ local function node_tree()
   return '%@v:lua.mia.statusline.inspect@%<%(' .. nodes .. '%)%X'
 end
 
-local function inspect(...)
-  local line = vim.api.nvim_eval_statusline(mia.statusline(), {}).str:gsub('➜', '\n')
-  local col = vim.str_byteindex(line, 'utf-8', vim.fn.getmousepos().screencol)
-  local node_ix = #line:sub(col):gsub('[^\n]', '')
-
-  -- get matching clicked node
-  -- left click selects the node
-  -- right click inspects highlighting that node
-
-  local node = vim.treesitter.get_node({ ignore_injections = false }) --[[@as TSNode]]
-  for _ = 1, node_ix do
-    node = node:parent() --[[@as TSNode]]
+local function new_node_tree()
+  if not mia.treesitter.has_parser() then
+    return '🚫🌴'
   end
-  local sr, sc, er, ec = node:range()
 
-  local mouse = select(3, ...) -- :h 'stl' , see @ execute function label
-  if mouse == 'l' then
-    local cmd = ('%dG%d|v%dG%d|'):format(sr + 1, sc + 1, er + 1, ec)
-    vim.cmd.normal({ cmd, bang = true })
-  elseif mouse == 'r' then
-    local cmd = ('%dG%d|'):format(sr + 1, sc + 1)
-    vim.cmd.normal({ cmd, bang = true })
-    vim.treesitter.inspect_tree({})
-  else
-    mia.warn('No action for mouse click: ' .. mouse)
-  end
-end
-
-local function spacer(text, skipnil)
-  if text then
-    return ' ' .. text .. ' '
-  end
-  return skipnil and '' or ' '
-end
-
-local function hl(group, text)
-  if not group or not text or text == '' then
-    return text and ' ' .. text .. ' ' or ''
-  end
-  return ('%%#%s#%s%%*'):format(group, text)
-end
-
-local function active()
-  local ok, res = pcall(function()
-    local mode = mode_info()
-    local desc, title = buf_info()
-    return table.concat({
-      hl(mode.color, spacer(mode.abbrev)),
-      hl('stlDescription', spacer(desc)),
-      spacer(title), -- StatusLine is default
-      hl('stlModified', '%m'),
-      hl('Added', spacer(mia.spinner.status(5), true)),
-      hl('stlErrorInfo', spacer(peek(), true)),
-      '%=',
-      hl('stlNodeTree', node_tree()),
-      hl('stlTypeInfo', ' %y '),
-      hl(mode.color, spacer(cursor_info())),
+  local node = vim.treesitter.get_node({ ignore_injections = false })
+  local spec = {}
+  while node do
+    local _node = node -- capture for closure
+    table.insert(spec, {
+      node:type(),
+      on_click = function(_, _, mouse, _)
+        local sr, sc, er, ec = _node:range()
+        if mouse == 'l' then
+          local cmd = ('%dG%d|v%dG%d|'):format(sr + 1, sc + 1, er + 1, ec)
+          vim.cmd.normal({ cmd, bang = true })
+        elseif mouse == 'r' then
+          local cmd = ('%dG%d|'):format(sr + 1, sc + 1)
+          vim.cmd.normal({ cmd, bang = true })
+          vim.treesitter.inspect_tree({})
+        else
+          mia.warn('No action for mouse click: ' .. mouse)
+        end
+      end,
     })
-  end)
+    node = node:parent()
+  end
+
+  if #spec > 1 then
+    spec = vim.iter(spec):rev():totable()
+    spec.sep = '➜'
+    return spec
+  end
+  return ''
+end
+
+local active = function()
+  local mode = mia.line_utils.mode_info()
+  local desc, title = buf_info()
+  local ok, res = pcall(mia.line_utils.resolve,'statusline', {
+    { mode.abbrev, hl = mode.color, pad = true },
+    { desc, hl = 'stlDescription', pad = true },
+    { title, pad = true },
+    { '%m', hl = 'stlModified' },
+    { mia.spinner.status(5), hl = 'Added', pad = true },
+    { peek, hl = 'stlErrorInfo', pad = true },
+    { '%=%<' },
+    { new_node_tree, hl = 'stlNodeTree' },
+    { ' %y ', hl = 'stlTypeInfo' },
+    { cursor_info, hl = mode.color, pad = true },
+  })
   if not ok then
     return 'Error: ' .. res
   end
@@ -123,6 +95,8 @@ vim.go.laststatus = 3
 
 return setmetatable({
   buf_info = buf_info,
+  peek = peek,
+  cursor_info = cursor_info,
+  node_tree = node_tree,
   active = active,
-  inspect = inspect,
 }, { __call = active })
