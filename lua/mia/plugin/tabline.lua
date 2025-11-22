@@ -72,11 +72,9 @@ local function tab_layout()
       -- highlight...
       if tabid == current_tab and winid == current_win then
         spec.hl = 'TabLineWin'
-      elseif tabid == current_tab then
-        spec.hl = 'TabLineSel'
       end
-      local _winid = winid -- capture for closure
 
+      local _winid = winid -- capture for closure
       spec.on_click = function(_, _, button, _)
         if button == 'l' then
           a.nvim_set_current_win(_winid)
@@ -86,31 +84,37 @@ local function tab_layout()
       win_names[winid] = spec
     end
 
-    -- tab number label with highlighting and click labels
-    local tabnr = a.nvim_tabpage_get_number(tabid)
-    local label = tostring(tabnr)
-    if tabid == current_tab then
-      label = hl('TabLineSel', label)
-    end
-    local _hl = (tabid == current_tab) and hl('TabLineSel') or ''
-    table.insert(tabline,  (' %%%dT%s%s '):format(tabnr, _hl, label))
-
     -- Get a pretty window layout
+    local tabnr = a.nvim_tabpage_get_number(tabid)
     local ok, layout = pcall(window_layout, vim.fn.winlayout(tabnr), win_names)
     if not ok then
       layout = { hl('Error', 'Error in g:tabline_err') }
       vim.g.tabline_err = layout[1]
     end
-    --- @cast layout string[]
-    vim.list_extend(tabline, layout)
-    table.insert(tabline, '%T ')
+
+    table.insert(tabline, {
+      { ('%%%dT%d'):format(tabnr, tabnr), pad = true },
+      layout,
+      '%T ',
+      hl = tabid == current_tab and 'TabLineSel',
+    })
   end
 
   return tabline
 end
 
 local function session()
-  return vim.g.session and mia.session.status() or nil
+  if not vim.g.session then
+    return
+  end
+  return {
+    ' ' .. mia.session.status(),
+    on_click = function(_, _, button, _)
+      if button == 'l' then
+        mia.session.pick()
+      end
+    end,
+  }
 end
 
 local function macro_status()
