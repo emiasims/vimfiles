@@ -294,6 +294,7 @@ M.lazy_opts = {
   indent = { enabled = true, indent = { char = '╎' } },
   input = { enabled = true },
   notifier = {
+    margin = { bottom = 1 },
     enabled = true,
     style = 'history',
     top_down = false,
