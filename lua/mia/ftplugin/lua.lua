@@ -35,6 +35,6 @@ return {
       },
       -- default = 'G[~]',
     },
-    { 'as', { 'text.before("--as$")', '[[@as]]<Left><Left>' }, mode = 'ia' },
+    { 'as', { 'text.before("%-%-as$")', '[[@as]]<Left><Left>' }, mode = 'ia' },
   },
 }
