@@ -22,9 +22,11 @@ local start_scanner = function(opts)
 
   local scan = function()
     local update_ok = pcall(function()
-      local row, col, _mopts =
-        unpack(vim.api.nvim_buf_get_extmark_by_id(buf, ns, mopts.id, { details = true }))
-      local dx = math.random(2, speed * 2 - 2)
+      local mark = vim.api.nvim_buf_get_extmark_by_id(buf, ns, mopts.id, { details = true })
+      local row, col = mark[1], mark[2]
+      local _mopts = mark[3] --[[@as vim.api.keyset.extmark_details]]
+
+      local dx = math.random(2, math.ceil(speed * 2 - 2))
       mopts.end_row = _mopts.end_row
       mopts.end_col = _mopts.end_col
       local ok = pcall(update, row, col + dx)
@@ -38,7 +40,7 @@ local start_scanner = function(opts)
     return not update_ok
   end
 
-  local timer = vim.uv.new_timer()
+  local timer = assert(vim.uv.new_timer())
   local start = vim.uv.now()
   local cb = function()
     if vim.uv.now() - start >= opts.timeout or scan() then
@@ -63,7 +65,7 @@ local M = {}
 ---@field speed? integer characters per second
 ---@field dt? integer miliseconds default 15
 ---@field hl_group? string Comment
-
+---@field timeout? integer miliseconds
 
 local function normalize_opts(opts)
   opts = opts or {}
@@ -71,6 +73,7 @@ local function normalize_opts(opts)
   if not opts.buf then
     opts.buf = vim.api.nvim_get_current_buf()
     opts.pos = opts.pos or vim.api.nvim_win_get_cursor(0)
+    opts.pos[1] = opts.pos[1] - 1
   end
   if opts.buf and not opts.pos then
     local win = vim.fn.bufwinid(opts.buf)
@@ -109,8 +112,8 @@ function M.track(opts)
   return start_scanner(opts)
 end
 
------@param text string|string[]
------@param opts mia.RevealOpts
+---@param text string|string[]
+---@param opts mia.RevealOpts
 function M.text(text, opts)
   if type(text) == 'string' then
     text = vim.split(text, '\n')
