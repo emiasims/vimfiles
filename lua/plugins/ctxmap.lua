@@ -91,7 +91,14 @@ return {
       { '<BS>', { 'autopair.in_pair', '<BS><Del>' } },
       { '<BS>', { 'autopair.in_nlpair', '<C-o>vwhobld' }, clear = false },
     },
-    { ' ', { 'cmd.start', 'lua ' }, mode = 'c' },
+    {
+      ' ',
+      {
+        { 'cmd.start', 'lua ' },
+        { 'require("blink.cmp").is_visible()', '<Cmd>lua require("blink.cmp").hide()<CR> ' },
+      },
+      mode = 'c',
+    },
     { -- cmdline start abbreviations, space special
       mode = 'ca',
       ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
