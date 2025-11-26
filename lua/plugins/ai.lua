@@ -19,6 +19,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
     'nvim-treesitter/nvim-treesitter',
+    'ravitemer/codecompanion-history.nvim',
     {
       'ravitemer/mcphub.nvim',
       enabled = mia.ide.enabled,
@@ -81,6 +82,11 @@ return {
         description = 'Call tools and resources from the MCP Servers',
         opts = { user_approval = true },
       },
+    },
+    extensions = {
+      history = {
+        enabled = true,
+      }
     },
   },
   config = function(_, opts)
