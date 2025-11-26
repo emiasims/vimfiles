@@ -61,10 +61,8 @@ function G.P1(...)
 end
 
 function G.put(vals)
-  if type(vals) ~= 'table' then
-    vals = { vals }
-  end
-  vim.api.nvim_put(vals, 'l', true, false)
+  local lines = vim.split(vim.inspect(vals), '\n')
+  vim.api.nvim_put(lines, 'l', true, false)
 end
 
 G.keys = vim.tbl_keys
