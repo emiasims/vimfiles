@@ -1,34 +1,26 @@
 local M = {}
 
 local modecolors = {
-  n = { color = 'stlNormalMode', abbrev = 'n' },
-  i = { color = 'stlInsertMode', abbrev = 'i' },
-  v = { color = 'stlVisualMode', abbrev = 'v' },
-  V = { color = 'stlVisualMode', abbrev = 'V' },
-  [''] = { color = 'stlVisualMode', abbrev = 'B' },
-  R = { color = 'stlReplaceMode', abbrev = 'R' },
-  s = { color = 'stlSelectMode', abbrev = 's' },
-  S = { color = 'stlSelectMode', abbrev = 'S' },
-  [''] = { color = 'stlSelectMode', abbrev = 'S' },
-  c = { color = 'stlTerminalMode', abbrev = 'c' },
-  t = { color = 'stlTerminalMode', abbrev = 't' },
-  ['-'] = { color = 'stlNormalMode', abbrev = '-' },
-  ['!'] = { color = 'stlNormalMode', abbrev = '!' },
+  n = { hl = 'stlNormalMode', abbrev = 'n' },
+  i = { hl = 'stlInsertMode', abbrev = 'i' },
+  v = { hl = 'stlVisualMode', abbrev = 'v' },
+  V = { hl = 'stlVisualMode', abbrev = 'V' },
+  [''] = { hl = 'stlVisualMode', abbrev = 'B' },
+  R = { hl = 'stlReplaceMode', abbrev = 'R' },
+  s = { hl = 'stlSelectMode', abbrev = 's' },
+  S = { hl = 'stlSelectMode', abbrev = 'S' },
+  [''] = { hl = 'stlSelectMode', abbrev = 'S' },
+  c = { hl = 'stlTerminalMode', abbrev = 'c' },
+  t = { hl = 'stlTerminalMode', abbrev = 't' },
+  ['-'] = { hl = 'stlNormalMode', abbrev = '-' },
+  ['!'] = { hl = 'stlNormalMode', abbrev = '!' },
 }
 
 function M.mode_info()
-  return modecolors[vim.api.nvim_get_mode().mode:sub(1, 1)] or { color = 'stlNormalMode', abbrev = '-' }
+  return modecolors[vim.api.nvim_get_mode().mode:sub(1, 1)] or { hl = 'stlNormalMode', abbrev = '-' }
 end
 
-function M.modechar()
-  return M.mode_info().abbrev
-end
-
-function M.modehl()
-  return M.mode_info().color
-end
-
-function M.hl(group, text)
+function hl(group, text)
   if not text then
     return '%#' .. group .. '#'
   end
@@ -37,7 +29,7 @@ end
 
 vim.o.mousemoveevent = true
 local pos
-function M.mousepos()
+function mousepos()
   if not vim.in_fast_event() then
     pos = vim.fn.getmousepos()
   end
@@ -45,11 +37,11 @@ function M.mousepos()
 end
 
 --- assumes laststatus=3
-function M.mouse_on_line(name)
+function mouse_on_line(name)
   if name == 'statusline' then
-    return M.mousepos().screenrow == vim.o.lines - vim.o.cmdheight
+    return mousepos().screenrow == vim.o.lines - vim.o.cmdheight
   elseif name == 'tabline' then
-    return M.mousepos().screenrow == 1
+    return mousepos().screenrow == 1
   end
 end
 
@@ -111,12 +103,11 @@ local function _flatten(spec)
 end
 
 --- @param spec mia.line.flat_spec[]
---- @param hl_key boolean?
 local function _resolve(spec)
   return vim
     .iter(spec)
     :map(function(t)
-      return t.hl and M.hl(t.hl, t[1]) or t[1]
+      return t.hl and hl(t.hl, t[1]) or t[1]
     end)
     :join()
 end
@@ -141,7 +132,7 @@ local function _add_hover_hls(name, flat_spec)
   })
   local hls = stl_spec.highlights
 
-  local mouse_col = M.mousepos().screencol
+  local mouse_col = mousepos().screencol
   local mouse_byte = vim.str_byteindex(stl_spec.str, 'utf-16', mouse_col, false)
 
   for i = 2, #hls do
@@ -164,7 +155,6 @@ local function _add_hover_hls(name, flat_spec)
 
   if hover_ix then
     local hover = flat_spec[hover_ix] --[[@as mia.line.flat_spec]]
-    -- hover.hl = nil
     hover.hl = 'stlHover'
     hover[1] = '%3@v:lua.mia.line_utils._click@' .. hover[1] .. '%X'
     M._click = hover.on_click
@@ -190,12 +180,14 @@ end
 function M.resolve(name, spec)
   local flat_spec = _flatten(vim.deepcopy(spec))
 
-  if M.mouse_on_line(name) then
+  if mouse_on_line(name) then
     _add_hover_hls(name, flat_spec)
   end
 
   -- Resolve final flat spec
   return _resolve(flat_spec)
 end
+
+M.flatten = _flatten
 
 return M
