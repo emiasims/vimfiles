@@ -69,11 +69,11 @@ local function new_node_tree()
   return ''
 end
 
-local active = function()
+local function active()
   local mode = mia.line_utils.mode_info()
   local desc, title = buf_info()
-  local ok, res = pcall(mia.line_utils.resolve,'statusline', {
-    { mode.abbrev, hl = mode.color, pad = true },
+  return {
+    { mode.abbrev, hl = mode.hl, pad = true },
     { desc, hl = 'stlDescription', pad = true },
     { title, pad = true },
     { '%m', hl = 'stlModified' },
@@ -82,8 +82,12 @@ local active = function()
     { '%=%<' },
     { new_node_tree, hl = 'stlNodeTree' },
     { ' %y ', hl = 'stlTypeInfo' },
-    { cursor_info, hl = mode.color, pad = true },
-  })
+    { cursor_info, hl = mode.hl, pad = true },
+  }
+end
+
+local function statusline()
+  local ok, res = pcall(mia.line_utils.resolve,'statusline', active)
   if not ok then
     return 'Error: ' .. res
   end
@@ -99,4 +103,4 @@ return setmetatable({
   cursor_info = cursor_info,
   node_tree = node_tree,
   active = active,
-}, { __call = active })
+}, { __call = statusline })

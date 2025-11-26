@@ -1,17 +1,17 @@
 local a = vim.api
 
-local hl = mia.line_utils.hl
-
-local function window_layout(layout, names)
+---@param layout vim.fn.winlayout.ret
+---@param win_specs table<number, mia.line.spec>
+local function window_layout(layout, win_specs)
   local node_type = layout[1]
 
   if node_type == 'leaf' then
-    return { names[layout[2]], type = 'leaf' }
+    return { win_specs[layout[2] --[[@as number]] ], type = 'leaf' }
   end
 
   -- First do it recursively..
   local it = vim.iter(layout[2]):map(function(_layout)
-    return window_layout(_layout, names)
+    return window_layout(_layout, win_specs)
   end)
 
   -- now join with separator logic:
@@ -38,20 +38,30 @@ local function window_layout(layout, names)
   return res
 end
 
+local clickable_window = function(winid)
+  return function(_, _, button, _)
+    if button == 'l' then
+      a.nvim_set_current_win(winid)
+    end
+  end
+end
+
 local function tab_layout()
   local current_win = a.nvim_get_current_win()
   local current_tab = a.nvim_get_current_tabpage()
 
   local bufname_counts = { ['init.lua'] = 1 } -- all init.lua gets modified
-
   for _, buf in ipairs(a.nvim_list_bufs()) do
     local name = vim.fs.basename(vim.fn.bufname(buf))
     bufname_counts[name] = bufname_counts[name] and bufname_counts[name] + 1 or 1
   end
 
+  ---@type mia.line.spec[]
   local tabline = {}
   for _, tabid in ipairs(a.nvim_list_tabpages()) do
-    local win_names = {}
+
+    ---@type table<number, mia.line.spec>
+    local win_specs = {}
 
     -- First, for this tab get the names as displayed for each window
     for _, winid in ipairs(a.nvim_tabpage_list_wins(tabid)) do
@@ -66,35 +76,19 @@ local function tab_layout()
       end
       name = name:gsub('%%', '%%%%')
 
-      ---@type mia.line.spec
-      local spec = { [1] = name }
+      win_specs[winid] = {
+        name,
+        hl = winid == current_win and 'TabLineWin' or nil,
+        on_click = winid ~= current_win and clickable_window(winid) or nil,
+      }
 
-      -- highlight...
-      if tabid == current_tab and winid == current_win then
-        spec.hl = 'TabLineWin'
-      end
-
-      local _winid = winid -- capture for closure
-      spec.on_click = function(_, _, button, _)
-        if button == 'l' then
-          a.nvim_set_current_win(_winid)
-        end
-      end
-
-      win_names[winid] = spec
     end
 
-    -- Get a pretty window layout
     local tabnr = a.nvim_tabpage_get_number(tabid)
-    local ok, layout = pcall(window_layout, vim.fn.winlayout(tabnr), win_names)
-    if not ok then
-      layout = { hl('Error', 'Error in g:tabline_err') }
-      vim.g.tabline_err = layout[1]
-    end
 
     table.insert(tabline, {
       { ('%%%dT%d'):format(tabnr, tabnr), pad = true },
-      layout,
+      window_layout(vim.fn.winlayout(tabnr), win_specs),
       '%T ',
       hl = tabid == current_tab and 'TabLineSel',
     })
@@ -108,7 +102,7 @@ local function session()
     return
   end
   return {
-    ' ' .. mia.session.status(),
+    mia.session.status() .. '  ',
     on_click = function(_, _, button, _)
       if button == 'l' then
         mia.session.pick()
@@ -122,15 +116,18 @@ local function macro_status()
   return reg ~= '' and ('[q:%s]'):format(reg) or nil
 end
 
-local function tabline()
-  local ok, res = pcall(mia.line_utils.resolve, 'tabline', {
+local function definition()
+  return {
     tab_layout,
-    { '%= ', hl = 'TabLineFill' },
-    { macro_status, hl = 'TabLineRecording' },
-    { '%S ', hl = 'TabLineFill' },
-    { session, hl = 'TabLineSession' },
-    ' ',
-  })
+    '%=',
+    { macro_status, hl = 'TabLineRecording', pad = true },
+    ' %S ',
+    { session, hl = 'TabLineSession', pad = true},
+  }
+end
+
+local function tabline()
+  local ok, res = pcall(mia.line_utils.resolve, 'tabline', definition)
   if not ok then
     return 'Error: ' .. res
   end
@@ -140,8 +137,8 @@ end
 vim.o.tabline = '%!v:lua.mia.tabline()'
 
 return setmetatable({
+  definition = definition,
   win_layout = window_layout,
   tab_layout = tab_layout,
   tabline = tabline,
-  test = tabline,
 }, { __call = tabline })
