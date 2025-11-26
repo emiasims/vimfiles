@@ -46,4 +46,13 @@ return {
       { 'lg', 'LazyGit', mode = 'ca', ctx = 'cmd.start' },
     },
   },
+  {
+    'lewis6991/gitsigns.nvim',
+    event = { 'TextChanged', 'SafeState' },
+    opts = { attach_to_untracked = true },
+    keys = {
+      { ']c', 'Gitsigns next_hunk' },
+      { '[c', 'Gitsigns prev_hunk' },
+    },
+  },
 }
