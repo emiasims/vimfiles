@@ -101,6 +101,14 @@ BT.help = function(bufname)
   }
 end
 
+BT.nowrite = function(bufname, _)
+  return {
+    type = 'nowrite',
+    statusline = { '[NoWrite]', bufname },
+    tabline = { ('[nowrite:%s]'):format(vim.fs.basename(bufname)) },
+  }
+end
+
 BT.nofile = function(_, bufnr, gitroot)
   if _G.Snacks then ---@diagnostic disable-line: unnecessary-if
     for _, explorer in ipairs(Snacks.picker.get({ source = 'explorer' })) do
