@@ -19,7 +19,11 @@ return mia.augroup(mia.group, {
   WinEnter = 'setlocal cursorline',
   WinLeave = 'setlocal nocursorline',
 
-  BufWritePre = 'call mkdir(expand("<afile>:p:h"), "p")',
+  BufWritePre = function(ev)
+    if vim.bo[ev.buf].buftype == '' and ev.file and not ev.file:match('%a+:') then
+      vim.fn.mkdir(vim.fn.expand('<afile>:p:h'), 'p')
+    end
+  end,
 
   [{ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }] = 'if &nu | set rnu   | endif',
   [{ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }] = 'if &nu | set nornu | endif',
