@@ -105,7 +105,7 @@ local function session()
     mia.session.status() .. '  ',
     on_click = function(_, _, button, _)
       if button == 'l' then
-        mia.session.pick()
+        vim.cmd.Pick('sessions')
       end
     end,
   }
@@ -121,7 +121,7 @@ local function definition()
     tab_layout,
     '%=',
     { macro_status, hl = 'TabLineRecording', pad = true },
-    ' %S ',
+    { '%S', pad = true },
     { session, hl = 'TabLineSession', pad = true},
   }
 end
