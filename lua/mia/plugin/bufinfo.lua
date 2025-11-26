@@ -34,59 +34,47 @@ end
 ---@type table<string, fun(bufname:string, bufnr:integer, gitroot?:string):table>
 local BT = {}
 
-BT.file_with_git = function(bufpath, bufnr, gitroot)
-  local rel_path = vim.fs.relpath(gitroot, bufpath)
-  local info = {
-    type = 'file',
-    path = bufpath,
-    relative_path = rel_path,
-    file = vim.fs.basename(rel_path),
-    dir = vim.fs.dirname(rel_path),
-    root = git_info(gitroot, bufnr),
-  }
-  info.tabline = { info.file, vim.fs.basename(vim.fs.dirname(info.path)) }
-  info.statusline = { ('(%s)%s/'):format(info.root.branch, info.dir), info.file }
-  info.wintitle = { info.relative_path, info.root.short }
-  return info
-end
+BT.file = function(bufname, bufnr, gitroot)
+  local path, root
+  if gitroot then
+    path = vim.fs.relpath(gitroot, bufname)
+    root = git_info(gitroot, bufnr)
+  end
 
-BT.file_nogit = function(bufname, _)
-  local shortname = shorten_home(bufname)
-  local info = {
+  path = path or shorten_home(bufname)
+  local dir, file = vim.fs.dirname(path), vim.fs.basename(path)
+
+  return {
     type = 'file',
-    path = bufname,
-    relative_path = shortname,
-    file = vim.fs.basename(shortname),
-    dir = vim.fs.dirname(shortname),
+    desc = root and ('(%s)%s/'):format(root.branch, dir) or (dir .. '/'),
+    name = file,
+    tab_hint = vim.fs.basename(vim.fs.dirname(bufname)),
+    wintitle = { path, root and root.short },
+    root = root,
   }
-  info.tabline = { info.file, vim.fs.basename(vim.fs.dirname(info.path)) }
-  info.statusline = { info.dir .. '/', info.file }
-  info.wintitle = { info.relative_path }
-  return info
 end
 
 BT.terminal = function(bufname, bufnr)
   local dir, pid, cmd = bufname:match('^term://(.*)/(%d+):(.*)$')
-  local info = {
+  local title = vim.b[bufnr].term_title or ''
+  return {
     type = 'terminal',
-    title = vim.b[bufnr].term_title or '', -- set by terminal
-    dir = dir,
+    desc = cmd,
+    name = title,
+    tab_name = ('[%s:%s]'):format(cmd, title:sub(1, 20)),
+    wintitle = { 'cmd: ' .. cmd, title },
     pid = pid,
-    cmd = cmd,
+    dir = dir,
   }
-  info.tabline = { ('[%s:%s]'):format(info.cmd, info.title:sub(1, 20)) }
-  info.statusline = { info.cmd, info.title }
-  info.wintitle = { 'cmd: ' .. info.cmd, info.title }
-  return info
 end
 
 BT.quickfix = function()
   local title = vim.fn.getqflist({ title = true }).title or ''
   return {
     type = 'quickfix',
-    title = title,
-    tabline = { '[quickfix]' },
-    statusline = { '[Quickfix]', title }
+    desc = '[Quickfix]',
+    name = title,
+    tab_name = '[quickfix]',
   }
 end
 
@@ -94,18 +82,20 @@ BT.help = function(bufname)
   local file = vim.fs.basename(bufname)
   return {
     type = 'help',
-    file = file,
-    statusline = { '[Help]', file },
-    tabline = { ('[help:%s]'):format(file) },
+    desc = '[Help]',
+    name = file,
+    tab_name = ('[help:%s]'):format(file),
     wintitle = { file },
   }
 end
 
 BT.nowrite = function(bufname, _)
+  local file = vim.fs.basename(bufname)
   return {
     type = 'nowrite',
-    statusline = { '[NoWrite]', bufname },
-    tabline = { ('[nowrite:%s]'):format(vim.fs.basename(bufname)) },
+    desc = '[NoWrite]',
+    name = bufname,
+    tab_name = ('[nowrite:%s]'):format(file),
   }
 end
 
@@ -117,9 +107,11 @@ BT.nofile = function(_, bufnr, gitroot)
           local cwd = explorer:cwd()
           return {
             type = 'directory',
+            desc = ('[Explorer]%s/'):format(cwd),
+            name = '⤬',
+            hl = 'Special',
+            tab_name = ('[dir:%s]'):format(vim.fs.basename(cwd)),
             cwd = cwd,
-            tabline = { ('[dir:%s]'):format(vim.fs.basename(cwd)) },
-            statusline = { ('[Explorer]%s/'):format(cwd), '⤬', 'Special' },
           }
         end
       end
@@ -129,9 +121,11 @@ BT.nofile = function(_, bufnr, gitroot)
   local cwd = gitroot and git_info(gitroot).short or shorten_home(vim.fn.getcwd())
   return {
     type = 'scratch',
+    desc = ('[Scratch]%s/'):format(cwd),
+    name = '⤬',
+    hl = 'Special',
+    tab_name = '[Scratch]',
     cwd = cwd,
-    statusline = { ('[Scratch]%s/'):format(cwd), '⤬', 'Special' },
-    tabline = { '[Scratch]' },
   }
 end
 
@@ -141,14 +135,14 @@ M.get = function(bufnr)
   local bufname = vim.api.nvim_buf_get_name(bufnr)
   local gitroot = vim.fs.root(bufname, '.git')
 
-  local bufinfo = {}
+  local bufinfo
   if bufname == '' then
     bufinfo = BT.nofile(bufname, bufnr, gitroot)
-  elseif buftype == '' and gitroot then
-    vim.b[bufnr].workspace_folder = gitroot -- for copilot
-    bufinfo = BT.file_with_git(bufname, bufnr, gitroot)
   elseif buftype == '' then
-    bufinfo = BT.file_nogit(bufname, bufnr)
+    if gitroot then
+      vim.b[bufnr].workspace_folder = gitroot
+    end
+    bufinfo = BT.file(bufname, bufnr, gitroot)
   else
     bufinfo = BT[buftype](bufname, bufnr)
   end
@@ -158,9 +152,9 @@ M.get = function(bufnr)
   bufinfo.listed = vim.bo[bufnr].buflisted
 
   if vim.b[bufnr].statusline then
-    bufinfo.statusline = vim.b[bufnr].statusline
+    bufinfo.desc, bufinfo.name, bufinfo.hl = unpack(vim.b[bufnr].statusline)
   elseif vim.b[bufnr].tabline then
-    bufinfo.tabline = vim.b[bufnr].tabline
+    bufinfo.tab_name, bufinfo.tab_hint = unpack(vim.b[bufnr].tabline)
   elseif vim.b[bufnr].wintitle then
     bufinfo.wintitle = vim.b[bufnr].wintitle
   end
