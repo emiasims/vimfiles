@@ -188,11 +188,6 @@ return {
     event = 'VeryLazy',
     opts = { enable_named_colors = false },
   },
-  {
-    'lewis6991/gitsigns.nvim',
-    event = { 'TextChanged', 'SafeState' },
-    opts = { attach_to_untracked = true },
-  },
   { 'nvim-mini/mini.cursorword', event = 'VeryLazy', config = true },
   { 'rktjmp/lush.nvim',          lazy = true,        cmd = 'Lushify' },
 }
