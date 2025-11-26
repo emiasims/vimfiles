@@ -83,4 +83,22 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    require('codecompanion').setup(opts)
+    local requests = {}
+    vim.api.nvim_create_autocmd({ 'User' }, {
+      pattern = 'CodeCompanionRequest*',
+      group = vim.api.nvim_create_augroup('mia-codecompanion-spin', { clear = true }),
+      callback = function(ev)
+        local eid = ev.data.id
+        if ev.match == 'CodeCompanionRequestStarted' then
+          requests[eid] = mia.spinner.add(function()
+            return requests[eid] == nil
+          end)
+        elseif ev.match == 'CodeCompanionRequestFinished' then
+          requests[eid] = nil
+        end
+      end,
+    })
+  end,
 }
