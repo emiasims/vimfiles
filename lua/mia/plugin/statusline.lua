@@ -1,8 +1,8 @@
 local function buf_info()
   local winid = vim.g.statusline_winid or vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_win_get_buf(winid)
-  local desc, title = unpack(mia.bufinfo(bufnr).statusline)
-  return desc, title:gsub('%%', '%%%%')
+  local desc, title, hl = unpack(mia.bufinfo(bufnr).statusline)
+  return desc, title:gsub('%%', '%%%%'), hl
 end
 
 local function peek()
@@ -66,11 +66,11 @@ end
 
 local function active()
   local mode = mia.line_utils.mode_info()
-  local desc, title = buf_info()
+  local desc, title, title_hl = buf_info()
   return {
     { mode.abbrev, hl = mode.hl, pad = true },
     { desc, hl = 'stlDescription', pad = true },
-    { title, pad = true },
+    { title, hl = title_hl, pad = true },
     { '%m', hl = 'stlModified' },
     { mia.spinner.status(5), hl = 'Added', pad = true },
     { peek, hl = 'stlErrorInfo', pad = true },

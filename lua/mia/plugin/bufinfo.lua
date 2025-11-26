@@ -119,22 +119,20 @@ BT.nofile = function(_, bufnr, gitroot)
             type = 'directory',
             cwd = cwd,
             tabline = { ('[dir:%s]'):format(vim.fs.basename(cwd)) },
-            statusline = { cwd .. '/', '[Explorer]' },
+            statusline = { ('[Explorer]%s/'):format(cwd), '⤬', 'Special' },
           }
         end
       end
     end
   end
 
-  local info = { type = 'scratch' }
-  if gitroot then
-    info.cwd = git_info(gitroot).short
-  else
-    info.cwd = shorten_home(vim.fn.getcwd())
-  end
-  info.statusline = { info.cwd .. '/', '[Scratch]' }
-  info.tabline = { '[Scratch]' }
-  return info
+  local cwd = gitroot and git_info(gitroot).short or shorten_home(vim.fn.getcwd())
+  return {
+    type = 'scratch',
+    cwd = cwd,
+    statusline = { ('[Scratch]%s/'):format(cwd), '⤬', 'Special' },
+    tabline = { '[Scratch]' },
+  }
 end
 
 M.get = function(bufnr)
