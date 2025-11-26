@@ -25,15 +25,23 @@ local function cursor_info()
   return '%2p%% ☰ ' .. ('%sl/%sL '):format(width, width) .. ': %02c'
 end
 
-local function node_tree()
-  if not mia.treesitter.has_parser() then
-    return '🚫🌴'
+local function clickable_node(node)
+  local sr, sc, er, ec = node:range()
+  return function(_, _, mouse, _)
+    if mouse == 'l' then
+      local cmd = ('%dG%d|v%dG%d|'):format(sr + 1, sc + 1, er + 1, ec)
+      vim.cmd.normal({ cmd, bang = true })
+    elseif mouse == 'r' then
+      local cmd = ('%dG%d|'):format(sr + 1, sc + 1)
+      vim.cmd.normal({ cmd, bang = true })
+      vim.treesitter.inspect_tree({})
+    else
+      mia.warn('No action for mouse click: ' .. mouse)
+    end
   end
-  local nodes = table.concat(vim.iter(mia.treesitter.nodelist_atcurs()):rev():totable(), '➜')
-  return '%@v:lua.mia.statusline.inspect@%<%(' .. nodes .. '%)%X'
 end
 
-local function new_node_tree()
+local function node_tree()
   if not mia.treesitter.has_parser() then
     return '🚫🌴'
   end
@@ -41,22 +49,9 @@ local function new_node_tree()
   local node = vim.treesitter.get_node({ ignore_injections = false })
   local spec = {}
   while node do
-    local _node = node -- capture for closure
     table.insert(spec, {
       node:type(),
-      on_click = function(_, _, mouse, _)
-        local sr, sc, er, ec = _node:range()
-        if mouse == 'l' then
-          local cmd = ('%dG%d|v%dG%d|'):format(sr + 1, sc + 1, er + 1, ec)
-          vim.cmd.normal({ cmd, bang = true })
-        elseif mouse == 'r' then
-          local cmd = ('%dG%d|'):format(sr + 1, sc + 1)
-          vim.cmd.normal({ cmd, bang = true })
-          vim.treesitter.inspect_tree({})
-        else
-          mia.warn('No action for mouse click: ' .. mouse)
-        end
-      end,
+      on_click = clickable_node(node),
     })
     node = node:parent()
   end
@@ -80,14 +75,14 @@ local function active()
     { mia.spinner.status(5), hl = 'Added', pad = true },
     { peek, hl = 'stlErrorInfo', pad = true },
     { '%=%<' },
-    { new_node_tree, hl = 'stlNodeTree' },
+    { node_tree, hl = 'stlNodeTree' },
     { ' %y ', hl = 'stlTypeInfo' },
     { cursor_info, hl = mode.hl, pad = true },
   }
 end
 
 local function statusline()
-  local ok, res = pcall(mia.line_utils.resolve,'statusline', active)
+  local ok, res = pcall(mia.line_utils.resolve, 'statusline', active)
   if not ok then
     return 'Error: ' .. res
   end
