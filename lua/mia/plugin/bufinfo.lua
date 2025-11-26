@@ -31,7 +31,17 @@ local git_info = function(gitroot, bufnr)
   return t
 end
 
----@type table<string, fun(bufname:string, bufnr:integer, gitroot?:string):table>
+--- @class mia.bufinfo
+--- @field type 'file'|'terminal'|'quickfix'|'help'|'nowrite'|'directory'|'scratch'|string
+--- @field desc string Display description
+--- @field name string Display name
+--- @field tab_name? string Tabline name if different
+--- @field tab_hint? string Tabline hint for disambiguation
+--- @field wintitle? table<number, string> Wintitle lines
+--- @field hl? string Highlight group for name in statusline
+--- @field root? { path: string, short: string } Git root info if applicable
+
+---@type table<string, fun(bufname:string, bufnr:integer, gitroot?:string):mia.bufinfo>
 local BT = {}
 
 BT.file = function(bufname, bufnr, gitroot)
@@ -99,6 +109,16 @@ BT.nowrite = function(bufname, _)
   }
 end
 
+BT.acwrite = function(bufname, _)
+  local file = vim.fs.basename(bufname)
+  return {
+    type = 'acwrite',
+    desc = '[AcWrite]',
+    name = bufname,
+    tab_name = ('[acwrite:%s]'):format(file),
+  }
+end
+
 BT.nofile = function(_, bufnr, gitroot)
   if _G.Snacks then ---@diagnostic disable-line: unnecessary-if
     for _, explorer in ipairs(Snacks.picker.get({ source = 'explorer' })) do
@@ -129,8 +149,8 @@ BT.nofile = function(_, bufnr, gitroot)
   }
 end
 
-M.get = function(bufnr)
-  bufnr = tonumber(bufnr or 0) --[[@as integer]]
+--- @return mia.bufinfo
+local function _get(bufnr)
   local buftype = vim.bo[bufnr].buftype
   local bufname = vim.api.nvim_buf_get_name(bufnr)
   local gitroot = vim.fs.root(bufname, '.git')
@@ -162,7 +182,24 @@ M.get = function(bufnr)
   return bufinfo
 end
 
+--- @return mia.bufinfo
+function M.get(bufnr)
+  local ok, info = pcall(_get, tonumber(bufnr or 0))
+  if not ok then
+    return {
+      type = 'error',
+      desc = '[Error]',
+      name = 'bufinfo error',
+      hl = 'Error',
+      tab_name = '[%bufinfo error%]',
+      error = info
+    }
+  end
+  return info --[[@as mia.bufinfo]]
+end
+
 return setmetatable(M, {
+  --- @return mia.bufinfo
   __call = function(_, bufnr)
     return vim.b[bufnr].bufinfo or M.get(bufnr)
   end,
