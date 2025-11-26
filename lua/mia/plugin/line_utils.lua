@@ -83,8 +83,8 @@ local function _flatten(spec)
     if spec.pad then
       node[1] = ' ' .. node[1] .. ' '
     end
-    node.hl = spec.hl
-    node.on_click = spec.on_click
+    node.hl = node.hl or spec.hl
+    node.on_click = node.on_click or spec.on_click
     return { node }
   end
 
