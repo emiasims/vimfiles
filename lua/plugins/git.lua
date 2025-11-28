@@ -51,8 +51,9 @@ return {
     event = { 'TextChanged', 'SafeState' },
     opts = { attach_to_untracked = true },
     keys = {
-      { ']c', 'Gitsigns next_hunk' },
-      { '[c', 'Gitsigns prev_hunk' },
+      { ']c', '<Cmd>Gitsigns next_hunk<Cr>' },
+      { '[c', '<Cmd>Gitsigns prev_hunk<Cr>' },
+      { 'gsh', '<Cmd>Gitsigns stage_hunk<Cr>' },
     },
   },
 }
