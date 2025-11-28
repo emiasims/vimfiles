@@ -34,6 +34,15 @@ return {
   },
   opts = {
     adapters = {
+      http = {
+        copilot = function()
+          return require('codecompanion.adapters').extend('copilot', {
+            schema = {
+              model = { default = 'gpt-5-mini' },
+            },
+          })
+        end,
+      },
       acp = {
         gemini_cli = function()
           return require('codecompanion.adapters').extend('gemini_cli', {
@@ -55,7 +64,7 @@ return {
     },
     strategies = {
       chat = {
-        adapter = 'gemini',
+        adapter = 'copilot',
         slash_commands = {
           file = { opts = { provider = 'snacks' } },
           symbols = { opts = { provider = 'snacks' } },
@@ -86,7 +95,7 @@ return {
     extensions = {
       history = {
         enabled = true,
-      }
+      },
     },
   },
   config = function(_, opts)
