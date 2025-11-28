@@ -5,6 +5,8 @@ local M = {
   bin = vim.fs.joinpath(datapath, 'venv/bin'),
   prog = vim.fs.joinpath(datapath, 'venv/bin/python'),
 }
+-- TODO https://github.com/neovim/nvim-lspconfig/issues/500
+-- Set venv / pythonpath for pyls or something
 
 vim.g.python3_host_prog = M.prog
 

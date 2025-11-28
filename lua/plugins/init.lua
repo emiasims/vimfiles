@@ -41,4 +41,5 @@ return {
   'ludovicchabant/vim-gutentags',
 
   'JuliaEditorSupport/julia-vim',
+  'lewis6991/async.nvim',
 }
