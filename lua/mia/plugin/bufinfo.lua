@@ -35,6 +35,7 @@ end
 --- @field type 'file'|'terminal'|'quickfix'|'help'|'nowrite'|'directory'|'scratch'|string
 --- @field desc string Display description
 --- @field name string Display name
+--- @field cwd? string Current working directory if applicable
 --- @field tab_name? string Tabline name if different
 --- @field tab_hint? string Tabline hint for disambiguation
 --- @field wintitle? table<number, string> Wintitle lines
@@ -151,6 +152,9 @@ end
 
 --- @return mia.bufinfo
 local function _get(bufnr)
+  if bufnr == 0 then
+    bufnr = vim.api.nvim_get_current_buf()
+  end
   local buftype = vim.bo[bufnr].buftype
   local bufname = vim.api.nvim_buf_get_name(bufnr)
   local gitroot = vim.fs.root(bufname, '.git')
@@ -171,12 +175,12 @@ local function _get(bufnr)
   bufinfo.bufnr = bufnr
   bufinfo.listed = vim.bo[bufnr].buflisted
 
-  if vim.b[bufnr].statusline then
-    bufinfo.desc, bufinfo.name, bufinfo.hl = unpack(vim.b[bufnr].statusline)
-  elseif vim.b[bufnr].tabline then
-    bufinfo.tab_name, bufinfo.tab_hint = unpack(vim.b[bufnr].tabline)
-  elseif vim.b[bufnr].wintitle then
-    bufinfo.wintitle = vim.b[bufnr].wintitle
+  local update = vim.b[bufnr].update_bufinfo
+  if update then
+    if type(update) == 'function' then
+      update = update(vim.deepcopy(bufinfo))
+    end
+    bufinfo = vim.tbl_extend('force', bufinfo, update or {}) --[[@as mia.bufinfo]]
   end
 
   return bufinfo
