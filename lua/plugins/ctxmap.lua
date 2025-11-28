@@ -133,6 +133,7 @@ return {
       { 'mf', 'edit ~/.config/nvim/lua/mia/<C-z>', eat = ' ' },
       { 'T', 'execute "term fish"|startinsert' },
       { 'term', 'term fish' },
+      { 'res', 'restart Session load last' },
 
       { 'js', 'Job start' },
       { 'jw', 'Job watch' },
