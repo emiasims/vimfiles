@@ -22,6 +22,7 @@ vim
     sessionoptions = { 'help', 'winsize', 'terminal', 'tabpages', 'skiprtp' },
     smoothscroll = true,
 
+    synmaxcol = 200,
     report = 0,
     path = { '.', '**' },
     virtualedit = 'block',
@@ -36,7 +37,7 @@ vim
     swapfile = false,
     shada = { "'300", '<500', 's100', 'h' },
     textwidth = 99,
-    softtabstop = 2,
+    softtabstop = -1,
     tabstop = 2,
     shiftwidth = 2,
     matchtime = 3,
@@ -44,7 +45,7 @@ vim
     whichwrap = 'b,s,[,]',
     spellsuggest = { 'best', '10' },
     switchbuf = 'useopen',
-    diffopt = { 'algorithm:histogram', 'filler', 'closeoff' },
+    diffopt = { 'algorithm:histogram', 'linematch:60', 'closeoff' },
     -- completeopt = { 'menuone', 'noselect', 'noinsert' },
     completeopt = { 'menu', 'menuone', 'noselect' },
     clipboard = 'unnamed',
@@ -60,7 +61,7 @@ vim
     foldlevelstart = 99,
     jumpoptions = 'stack',
 
-    listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '•' },
+    listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '⣿' },
     fillchars = { vert = '┃', fold = ' ' },
 
     undofile = true,
@@ -78,6 +79,7 @@ vim
     cursorline = true,
     list = true,
     termguicolors = true,
+    title = true,
 
     wrap = false,
     shell = 'bash',
