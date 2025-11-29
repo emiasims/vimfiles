@@ -5,6 +5,18 @@ local api = vim.api
 
 local Source = {}
 
+--- @class mia.hl.region
+--- @field source 'treesitter'|'lsp'|'syntax'
+--- @field group string
+--- @field open integer 0-based start column
+--- @field close integer 0-based end column
+--- @field priority integer
+--- @field conceal? string character used for conceal
+
+--- @param bufnr integer
+--- @param start_row integer 1-based
+--- @param end_row integer 1-based
+--- @return nil|fun(text: string, lnum: integer): mia.hl.region[]
 function Source.ts(bufnr, start_row, end_row)
   local ok, parser = pcall(ts.get_parser, bufnr)
   if not ok or not parser then
@@ -23,6 +35,7 @@ function Source.ts(bufnr, start_row, end_row)
         local sr, sc, er, ec = ts.get_node_range(node)
         if sr <= lnum - 1 and er >= lnum - 1 then
           table.insert(highlights, {
+            source = 'treesitter',
             group = '@' .. name,
             open = (sr < lnum - 1) and 0 or sc,
             close = (er > lnum - 1) and cols or ec, -- FIXME
@@ -36,6 +49,8 @@ function Source.ts(bufnr, start_row, end_row)
   end
 end
 
+--- @param bufnr integer
+--- @return nil|fun(_, lnum: integer): mia.hl.region[]
 function Source.lsp(bufnr)
   local ft = vim.bo[bufnr].filetype
   local priority = vim.highlight.priorities.semantic_tokens
@@ -58,6 +73,7 @@ function Source.lsp(bufnr)
           :totable()
         for _, token in ipairs(tokens) do
           table.insert(highlights, {
+            source = 'lsp',
             group = typestr:format(token.type),
             open = token.start_col,
             close = token.end_col,
@@ -66,6 +82,7 @@ function Source.lsp(bufnr)
 
           for mod in pairs(token.modifiers or {}) do
             table.insert(highlights, {
+              source = 'lsp',
               group = modstr:format(mod),
               open = token.start_col,
               close = token.end_col,
@@ -73,6 +90,7 @@ function Source.lsp(bufnr)
             })
 
             table.insert(highlights, {
+              source = 'lsp',
               group = typemodstr:format(token.type, mod),
               open = token.start_col,
               close = token.end_col,
@@ -86,14 +104,60 @@ function Source.lsp(bufnr)
   end
 end
 
-function Source.syntax(bufnr, _, _)
+--- @param bufnr integer
+--- @return nil|fun(_, lnum: integer): mia.hl.region[]
+function Source.syntax(bufnr)
+  if vim.bo[bufnr].syntax == '' then
+    return
+  end
+
+  local priority = vim.highlight.priorities.syntax
+
+  return function(_, lnum)
+    local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, true)[1]
+    local len = line and #line or 0
+    local highlights = {}
+    local current_group = nil
+    local start_col = 0
+
+    for col = 1, len do
+      local syn_id = vim.fn.synID(lnum, col, 1)
+      local group = vim.fn.synIDattr(vim.fn.synIDtrans(syn_id), 'name')
+
+      if group ~= current_group then
+        if current_group and current_group ~= '' then
+          table.insert(highlights, {
+            source = 'syntax',
+            group = current_group,
+            open = start_col,
+            close = col - 1,
+            priority = priority,
+          })
+        end
+        current_group = group
+        start_col = col - 1
+      end
+    end
+
+    if current_group and current_group ~= '' then
+      table.insert(highlights, {
+        source = 'syntax',
+        group = current_group,
+        open = start_col,
+        close = len,
+        priority = priority,
+      })
+    end
+
+    return highlights
+  end
 end
 
 local function setup_collect(bufnr, start_row, end_row)
   local sources = {}
   table.insert(sources, Source.ts(bufnr, start_row, end_row) or nil)
-  table.insert(sources, Source.lsp(bufnr, start_row, end_row) or nil)
-  table.insert(sources, Source.syntax(bufnr, start_row, end_row) or nil)
+  table.insert(sources, Source.lsp(bufnr) or nil)
+  table.insert(sources, Source.syntax(bufnr) or nil)
   if #sources > 0 then
     return function(...)
       local highlights = {}
@@ -222,12 +286,13 @@ end
 ---@param start_col integer 0-based start column of the range.
 ---@param end_row integer 1-based end row of the range.
 ---@param end_col integer 0-based end column of the range.
+---@param block boolean Use block selection
 ---@return { [1]: string, [2]?: string|string[] }[][] Table of lines, each containing text chunks and optional highlight groups.
 function M.extract(bufnr, start_row, start_col, end_row, end_col, block)
   bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
 
   if start_col == nil or end_row == nil then
-    start_col, end_row, end_col = 0, start_row, math.huge
+    start_col, end_row, end_col = 0, start_row, math.huge --[[@as integer]]
   end
 
   -- FIXME oob error
@@ -270,9 +335,25 @@ function M.extract(bufnr, start_row, start_col, end_row, end_col, block)
   return start_row == end_row and highlights[1] or highlights
 end
 
--- P(M.extract(2, 3, 0, 4, 4, true))
--- P(M.extract(2, 3, 0, 4, math.huge))
--- P(M.extract(2, 3, 0, 3, math.huge))
--- P(M.extract(2, 251, 0, 251, 61))
+--- @return { tressitter?: mia.hl.region[], lsp?: mia.hl.region[], syntax?: mia.hl.region[] }
+function M.at_cursor()
+  local bufnr = api.nvim_get_current_buf()
+  local row, col = unpack(api.nvim_win_get_cursor(0))
+  local line = api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
+  local collect = assert(setup_collect(bufnr, row, row))
+  local hls = collect(line, row)
+  return vim
+    .iter(hls)
+    :flatten(1)
+    :filter(function(hl)
+      return hl.open <= col and hl.close >= col
+    end)
+    :fold({}, function(t, hl)
+      t[hl.source] = t[hl.source] or {}
+      table.insert(t[hl.source], hl)
+      hl.source = nil
+      return t
+    end)
+end
 
 return M
