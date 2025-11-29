@@ -13,19 +13,10 @@ mia.keymap({
     '<F9>',
     desc = 'Print highlight group list at cursor',
     function()
-      local ts_ok, captures = pcall(vim.treesitter.get_captures_at_cursor)
-      if ts_ok and #captures > 0 then
-        mia.info('ts captures: ' .. table.concat(captures, ', '))
-      end
-
-      local lsp_ok, tokens = pcall(vim.lsp.semantic_tokens.get_at_pos)
-      if lsp_ok and #tokens > 0 then
-        tokens = vim.iter(tokens):map(mia.tbl.index('type')):join(', ')
-        mia.info('semantic tokens: ' .. tokens)
-      end
-
-      if (not ts_ok or #captures == 0) or (not lsp_ok or #tokens == 0) then
-        vim.fn.SynStack()
+      local highlights = mia.highlights.at_cursor()
+      for src, hls in pairs(highlights) do
+        local groups = vim.iter(hls):map(mia.tbl.index('group')):join(', ')
+        mia.info(src .. ': ' .. groups)
       end
     end,
   },
