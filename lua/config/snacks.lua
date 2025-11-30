@@ -299,7 +299,7 @@ M.lazy_opts = {
     style = 'history',
     top_down = false,
   },
-  quickfile = { enabled = true },
+  quickfile = { enabled = false },
   scope = { enabled = true },
   statuscolumn = { enabled = true },
   words = { enabled = false }, -- ??
