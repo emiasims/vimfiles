@@ -123,3 +123,5 @@ vim.schedule(function()
     pattern = { ['/doc/[^/]*%.txt$'] = is_help },
   })
 end)
+
+require('vim._extui').enable({})
