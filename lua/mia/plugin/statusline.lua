@@ -57,7 +57,7 @@ local function node_tree()
     node = node:parent()
   end
 
-  if #spec > 1 then
+  if #spec > 0 then
     spec = vim.iter(spec):rev():totable()
     spec.sep = '➜'
     return spec
