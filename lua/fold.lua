@@ -1,6 +1,55 @@
+local ts = vim.treesitter
+local api = vim.api
+
 local M = {}
 local Cache = {}
 M._cache = Cache
+
+function M.highlights(lnum, bufnr)
+  vim.validate('lnum', lnum, 'number')
+  vim.validate('bufnr', bufnr, 'number')
+
+  local ok, parser = pcall(ts.get_parser, bufnr)
+  if not ok then
+    return { { vim.fn.foldtext() or '', 'Folded' } }
+  end
+
+  local query = ts.query.get(parser:lang(), 'highlights')
+  if not query then
+    return { { vim.fn.foldtext() or '', 'Folded' } }
+  end
+
+  local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
+  if not line or line:match('^%s*$') then
+    return { { vim.fn.foldtext() or '', 'Folded' } }
+  end
+
+  return mia.highlights.extract(bufnr, lnum)
+end
+
+---@param foldtext { [1]: string, [2]?: string|string[] }[][] Chunks
+function M.add_suffix(foldtext)
+  if type(foldtext) == 'string' then
+    foldtext = { { foldtext, 'Folded' } }
+  end
+  table.insert(foldtext, { ' ⋯ ', 'Comment' })
+
+  local suffix = ('%s lines %s'):format(vim.v.foldend - vim.v.foldstart, ('|'):rep(vim.v.foldlevel))
+  local sufWidth = vim.fn.strdisplaywidth(suffix)
+  local vtWidth = 0
+  for _, chunk in ipairs(foldtext) do
+    vtWidth = vtWidth + vim.fn.strdisplaywidth(chunk[1])
+  end
+
+  local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+  local target = wininfo.width - wininfo.textoff - sufWidth
+
+  if vtWidth < target then
+    suffix = (' '):rep(target - vtWidth) .. suffix
+  end
+  table.insert(foldtext, { suffix, 'Comment' })
+  return foldtext
+end
 
 -- would love this to be cached with vim.treesitter._fold
 function M.text(lnum, bufnr)
@@ -43,10 +92,12 @@ function M.text(lnum, bufnr)
 
   local cache = Cache[bufnr]
   if not cache[lnum] then
-    local text = require('mia.fold.text')
-    local ft = vim.bo[vim.api.nvim_get_current_buf()].filetype
-    local fn = text[ft] or text.default
-    cache[lnum] = fn(lnum, bufnr)
+    local foldtext = vim.b[bufnr]._foldtext
+    if foldtext then
+      cache[lnum] = M.add_suffix(foldtext(lnum, bufnr))
+    else
+      cache[lnum] = M.add_suffix(M.highlights(lnum, bufnr))
+    end
   end
   return cache[lnum] or '...'
 end
@@ -78,5 +129,23 @@ mia.keymap({
   desc = 'Clear fold cache and recompute folds as normal',
 })
 fold = M
+
+mia.augroup('mia-fold', {
+  FileType = {
+    pattern = '*',
+    callback = function(ev)
+      local ft = ev.match
+      local ffoldtext = api.nvim_get_runtime_file(vim.fs.joinpath('fold', ft, 'text.lua'), false)[1]
+      if ffoldtext then
+        vim.b[ev.buf]._foldtext = dofile(ffoldtext) -- TODO cache
+      end
+
+      local ffoldexpr = api.nvim_get_runtime_file(vim.fs.joinpath('fold', ft, 'expr.lua'), false)[1]
+      if ffoldexpr then
+        vim.b[ev.buf]._foldexpr = dofile(ffoldexpr)
+      end
+    end,
+  },
+})
 
 return M
