@@ -1,4 +1,4 @@
-return mia.augroup(mia.group, {
+mia.augroup(mia.group, {
   -- OG
   BufWinLeave = "if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif",
   BufWinEnter = "if empty(&buftype) && &modifiable && !empty(expand('%')) | silent! loadview | endif",

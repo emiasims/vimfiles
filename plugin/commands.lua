@@ -158,8 +158,6 @@ local M = {
   end,
 
   Move = { on_call('file_move').cmd, nargs = '+', complete = 'file', bang = true },
-  UpdateMeta = on_call('metagen').write,
-  SudoEdit = { on_call('sudo').edit, complete = 'file', nargs = '?' },
   Repl = { on_call('repl').cmd, nargs = '?', complete = 'filetype', bar = true },
   ReplModeLine = { on_call('repl').send_modeline, bar = true },
   Job = {

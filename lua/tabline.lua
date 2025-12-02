@@ -102,8 +102,15 @@ local function session()
   if not vim.g.session then
     return
   end
+  local name = vim.g.session.name
+  if #name > (vim.o.columns * 0.2) then
+    local root = name:match('^.*➔') or ''
+    name = name:sub(#root + 1)
+    name = name:gsub('([^/])[^/]*/', '%1/')
+    name = root .. name
+  end
   return {
-    mia.session.status() .. '  ',
+    ('[%s: %s]  '):format(M._enabled and 'S' or '$', name),
     on_click = function(_, _, button, _)
       if button == 'l' then
         vim.cmd.Pick('sessions')
@@ -128,14 +135,15 @@ local function definition()
 end
 
 local function tabline()
-  local ok, res = pcall(mia.line_utils.resolve, 'tabline', definition)
+  local ok, res = pcall(mia.line.resolve, 'tabline', definition)
   if not ok then
     return 'Error: ' .. res
   end
   return res
 end
 
-vim.o.tabline = '%!v:lua.mia.tabline()'
+vim.o.tabline = '%!v:lua.tabline()'
+_G.tabline = tabline
 
 return setmetatable({
   definition = definition,

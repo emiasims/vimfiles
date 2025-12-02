@@ -156,7 +156,7 @@ local function _add_hover_hls(name, flat_spec)
   if hover_ix then
     local hover = flat_spec[hover_ix] --[[@as mia.line.flat_spec]]
     hover.hl = 'stlHover'
-    hover[1] = '%3@v:lua.mia.line_utils._click@' .. hover[1] .. '%X'
+    hover[1] = '%3@v:lua.mia.line._click@' .. hover[1] .. '%X'
     M._click = hover.on_click
   end
 end

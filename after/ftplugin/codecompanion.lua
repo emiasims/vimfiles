@@ -1,5 +1,3 @@
--- vim.b.tabline = 
-
 local this_buf = vim.api.nvim_get_current_buf()
 --- @param info mia.bufinfo
 --- @return mia.bufinfo
@@ -17,3 +15,5 @@ vim.b.update_bufinfo = function(info)
     tab_name = chat.title or ('[' .. chat.adapter.formatted_name .. ']'),
   }
 end
+
+vim.wo.conceallevel = 0

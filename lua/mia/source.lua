@@ -48,11 +48,10 @@ end
 function M.enable()
   mia.augroup('mia-source', { SourceCmd = M.source }, true)
 end
-M.enable()
 
-function M.disable()
+function M.disable(ignore)
   local ok, err = pcall(vim.api.nvim_del_augroup_by_name, 'mia-source')
-  if not ok then
+  if not ok and not ignore then
     mia.err(err)
   end
 end
