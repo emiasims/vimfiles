@@ -1,77 +1,14 @@
-local M = {}
-
 local ts = vim.treesitter
 local api = vim.api
 
-function M.extract(lnum, bufnr)
-  lnum = lnum or vim.v.foldstart
-  bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
-
-  local ok, parser = pcall(ts.get_parser, bufnr)
-  if not ok then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local query = ts.query.get(parser:lang(), 'highlights')
-  if not query then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local tree = parser:parse({ lnum - 1, lnum })[1]
-
-  local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
-  if not line or line:match('^%s*$') then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  return mia.highlights.extract(bufnr, lnum)
-end
-
-function M.default(foldtext, bufnr)
-  if type(foldtext) ~= 'table' then
-    foldtext = M.extract(foldtext, bufnr)
-  end
-
-  if type(foldtext) == 'string' then
-    foldtext = { { foldtext, 'Folded' } }
-  end
-  table.insert(foldtext, { ' ⋯ ', 'Comment' })
-
-  local suffix = ('%s lines %s'):format(vim.v.foldend - vim.v.foldstart, ('|'):rep(vim.v.foldlevel))
-  local sufWidth = vim.fn.strdisplaywidth(suffix)
-  local vtWidth = 0
-  for _, chunk in ipairs(foldtext) do
-    vtWidth = vtWidth + vim.fn.strdisplaywidth(chunk[1])
-  end
-
-  local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
-  local target = wininfo.width - wininfo.textoff - sufWidth
-
-  if vtWidth < target then
-    suffix = (' '):rep(target - vtWidth) .. suffix
-  end
-  table.insert(foldtext, { suffix, 'Comment' })
-  return foldtext
-end
-
-function M.help(lnum, bufnr)
-  lnum = lnum or vim.v.foldstart
-  if lnum > 1 then
-    lnum = lnum + 1
-  end
-  return M.default(M.extract(lnum, bufnr))
-end
-
-function M.python(lnum, bufnr)
-  lnum = lnum or vim.v.foldstart
-  bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
-  local foldtext = M.extract()
+return function(lnum, bufnr)
+  local foldtext = fold.highlights(lnum, bufnr)
   local text = vim.fn.getbufoneline(bufnr, lnum) --[[@as string]]
 
   -- Process decorated functions
   if text:match('^%s*@') then
     local pos = { lnum - 1, #vim.fn.getbufline(bufnr, lnum)[1] - 1 }
-    local decorator = vim.treesitter.get_node({ bufnr = bufnr, pos = pos })
+    local decorator = ts.get_node({ bufnr = bufnr, pos = pos })
     while decorator and decorator:type() ~= 'decorated_definition' do
       decorator = decorator:parent()
     end
@@ -80,7 +17,7 @@ function M.python(lnum, bufnr)
     end
 
     local line = decorator:field('definition')[1]:start()
-    local new_foldtext = M.extract(line + 1)
+    local new_foldtext = fold.highlights(line + 1, bufnr)
     while #new_foldtext > 0 and new_foldtext[1][1]:match('^%s+$') do
       table.remove(new_foldtext, 1)
     end
@@ -90,7 +27,7 @@ function M.python(lnum, bufnr)
     -- Process decorated functions
   elseif text:match('^%s*class') then
     local pos = { lnum - 1, #vim.fn.getbufline(bufnr, lnum)[1] - 1 }
-    local class = vim.treesitter.get_node({ bufnr = bufnr, pos = pos })
+    local class = ts.get_node({ bufnr = bufnr, pos = pos })
     while class and class:type() ~= 'class_definition' do
       class = class:parent()
     end
@@ -102,7 +39,7 @@ function M.python(lnum, bufnr)
     for node in class:field('body')[1]:iter_children() do
       if
         node:type() == 'function_definition'
-        and vim.treesitter.get_node_text(node:field('name')[1], bufnr):match('__init__')
+        and ts.get_node_text(node:field('name')[1], bufnr):match('__init__')
       then
         params = node:field('parameters')[1]
         break
@@ -117,9 +54,7 @@ function M.python(lnum, bufnr)
       end
     end
 
-    -- local it_ft = vim.iter(require('mia.fold').ts_chunks(params, bufnr))
-    -- local it_ft = vim.iter(P(require('mia.fold').ts_chunks(params:start() + 1, bufnr)))
-    local it_ft = vim.iter(M.extract(params:start() + 1, bufnr))
+    local it_ft = vim.iter(fold.highlights(params:start() + 1, bufnr))
     local open = it_ft:find(matcher('('))
     local close = it_ft:rfind(matcher(')'))
     if not (open and close) then
@@ -140,11 +75,11 @@ function M.python(lnum, bufnr)
     table.insert(foldtext, close)
     table.insert(foldtext, semi)
   elseif text:match('^%s*"""%s*$') then
-    local nb = vim.api.nvim_buf_call(bufnr, function()
+    local nb = api.nvim_buf_call(bufnr, function()
       return vim.fn.nextnonblank(lnum + 1)
     end)
     local docline = vim.fn.getbufline(bufnr, nb)[1]:match('^%s*(%S.*)')
-    local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+    local wininfo = vim.fn.getwininfo(api.nvim_get_current_win())[1]
     local target = wininfo.width - wininfo.textoff - 11 - 15
     docline = table.concat(
       vim.iter(docline:gmatch('%S*')):fold({ len = 0, text = {} }, function(t, s)
@@ -163,7 +98,5 @@ function M.python(lnum, bufnr)
     table.insert(foldtext, { docline, 'String' })
   end
 
-  return M.default(foldtext)
+  return foldtext
 end
-
-return M
