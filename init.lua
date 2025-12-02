@@ -32,11 +32,12 @@ require('lazy').setup({
   }
 })
 
+-- auto tracking
+require('session')
+
 -- set up UI
 require('statusline')
 require('tabline')
 -- require('winbar')
 require('wincolors')
 require('fold')
-
-require('session')
