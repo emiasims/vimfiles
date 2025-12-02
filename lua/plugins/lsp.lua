@@ -2,9 +2,6 @@ local lsp = mia.on.call('vim.lsp.buf')
 
 ---@type LazySpec
 return {
-
-  'Bilal2453/luvit-meta',
-  { 'lewis6991/nvim-test', lazy = true },
   {
     'folke/lazydev.nvim',
     ft = 'lua', -- only load on lua files
@@ -12,9 +9,7 @@ return {
       library = {
         'mia',
         'lazy.nvim',
-        'luvit-meta/library',
-        { path = 'mini.notify', words = { 'MiniNotify' } },
-        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
       },
     },
   },
@@ -40,7 +35,32 @@ return {
         vimls = true,
         julials = true,
         taplo = true,
-        emmylua_ls = true,
+        -- emmylua_ls = true,
+        lua_ls = {
+          cmd = { 'lua-language-server' },
+          filetypes = { 'lua' },
+          root_markers = { { '.luarc.json', '.luarc.jsonc' }, '.git' },
+          settings = {
+            Lua = {
+              workspace = { checkThirdParty = false },
+              telemetry = { enable = false },
+              hint = { enable = true },
+              format = {
+                enable = true,
+                defaultConfig = { -- must be strings
+                  indent_size = '2',
+                  quote_style = 'single',
+                  -- call_arg_parentheses = 'remove',
+                  trailing_table_separator = 'smart',
+                  align_continuous_assign_statement = 'false',
+                  align_continuous_rect_table_field = 'false',
+                  align_array_table = 'false',
+                  space_before_inline_comment = '2',
+                },
+              },
+            },
+          },
+        },
 
         ruff = {
           settings = { organizeImports = false },
@@ -56,73 +76,17 @@ return {
       },
     },
 
-    config = function(cfg)
+    config = function(_, opts)
       local lsp_status = require('lsp-status')
       lsp_status.register_progress()
 
       vim.diagnostic.config({ virtual_text = false, signs = true, underline = true })
-      ---@cast cfg.opts {setup: table<string, any>}
-      for server, config in pairs(cfg.opts.setup) do
+      for server, config in pairs(opts.setup) do
         if type(config) == 'table' then
           vim.lsp.config(server, config)
         end
       end
-      vim.lsp.enable(vim.tbl_keys(cfg.opts.setup))
+      vim.lsp.enable(vim.tbl_keys(opts.setup))
     end,
-  },
-
-  {
-    'williamboman/mason.nvim',
-    enabled = mia.ide.enabled,
-    build = ':MasonUpdate',
-    lazy = true,
-    config = true,
-    dependencies = {
-      'jose-elias-alvarez/null-ls.nvim',
-      'williamboman/mason-lspconfig.nvim',
-
-      {
-        'stevearc/conform.nvim',
-        opts = {
-          formatters_by_ft = {
-            lua = { 'stylua' },
-            python = { 'isort', 'black' },
-            markdown = { 'prettier', 'inject' },
-          },
-        },
-        ---@param c {opts: conform.setupOpts}
-        config = function(c)
-          require('conform').setup(c.opts)
-          mia.fmtexpr = mia.restore_opt( --
-            { eventignore = 'all' },
-            function()
-              require('conform').formatexpr()
-              vim.schedule_wrap(vim.cmd.doautocmd)('TextChanged')
-            end
-          )
-
-          vim.o.formatexpr = 'v:lua.mia.fmtexpr()'
-        end,
-      },
-
-      {
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
-        opts = {
-          ensure_installed = {
-            'basedpyright',
-            'clangd',
-            'emmylua_ls',
-            'debugpy',
-            'ruff',
-            'black',
-            'isort',
-            'stylua',
-            'vimls',
-            'pylsp',
-            'jsonls',
-          },
-        },
-      },
-    },
   },
 }
