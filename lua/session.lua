@@ -66,19 +66,6 @@ function M.mksession(sess)
   vim.v.this_session = sess.path
 end
 
-function M.status()
-  if vim.g.session then
-    local name = vim.g.session.name
-    if #name > (vim.o.columns * 0.2) then
-      local root = name:match('^.*➔') or ''
-      name = name:sub(#root + 1)
-      name = name:gsub('([^/])[^/]*/', '%1/')
-      name = root .. name
-    end
-    return ('[%s: %s]'):format(M._enabled and 'S' or '$', name)
-  end
-end
-
 function M.get_sessinfo(sort)
   local sessions = {}
 
@@ -162,9 +149,7 @@ function M.load(sess)
   sess = M.resolve(sess)
   if sess then
     M.disable()
-    mia.source.disable()
     local ok, err = pcall(vim.cmd.source, vim.fn.fnameescape(sess.path))
-    mia.source.enable()
     M.enable()
     if ok then
       mia.info('Session loaded: ' .. sess.name)
@@ -323,5 +308,6 @@ function M.setup()
     M.enable()
   end
 end
+M.setup()
 
 return M

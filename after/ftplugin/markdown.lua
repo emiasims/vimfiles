@@ -1,6 +1,5 @@
----@type mia.ftplugin
-return {
-  opts = {
+vim
+  .iter({
     spell = true,
     shiftwidth = 2,
     softtabstop = 1,
@@ -30,10 +29,16 @@ return {
       '^\\s*[-+*]\\s\\+', -- Bullet points
       '\\%([.\\]\\s\\+\\)\\?', -- Optional checkbox
     }),
+  })
+  :each(function(k, v)
+    vim.opt_local[k] = v
+  end)
+
+mia.keymap({
+  { 'gO', '<Cmd>lvimgrep /^#/ %|lopen<Cr>', silent = true },
+  { '<leader>J', 'vipJgqip' },
+  {
+    '<leader>K',
+    'vipJ:let store_reg = @/ \\| .s/[.!?]\\zs\\s\\+\\ze\\u/\\r/geI \\| let @/ = store_reg \\| unl store_reg<CR>',
   },
-  keys = {
-    { 'gO', '<Cmd>lvimgrep /^#/ %|lopen<Cr>', silent = true },
-    { '<leader>J', 'vipJgqip' },
-    { '<leader>K', 'vipJ:let store_reg = @/ \\| .s/[.!?]\\zs\\s\\+\\ze\\u/\\r/geI \\| let @/ = store_reg \\| unl store_reg<CR>' },
-  }
-}
+})

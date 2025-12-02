@@ -151,8 +151,9 @@ return {
     config = function()
       local Starter = require('mini.starter')
       local cfgdir = vim.fn.stdpath('config')
+      local session = require('session')
       local items = {
-        vim.iter(mia.session.get_sessinfo(true))
+        vim.iter(session.get_sessinfo(true))
           :slice(1, 3)
           :map(function(s)
             return { action = 'Session load ' .. s.name, name = s.name, section = 'Sessions' }

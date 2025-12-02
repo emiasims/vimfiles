@@ -90,7 +90,6 @@ function M.winleave(window)
   vim.api.nvim_win_set_hl_ns(window, M.ns)
 end
 
-
 function M.winenter(window)
   vim.api.nvim_win_set_hl_ns(window, 0)
 end

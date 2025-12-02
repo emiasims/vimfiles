@@ -43,9 +43,7 @@ local function do_keymap(spec, opts)
   for m in parse(spec, opts) do
     local ok, err = pcall(vim.keymap.set, m.mode, m.lhs, m.dotrhs or m.rhs, m.opts)
     if not ok then
-      mia.log.error({ 'keymap', m.mode }, '%s, err = %s', m, err)
-    else
-      mia.log.info({ 'keymap', m.mode }, '%s', m)
+      mia.error('Failed to set keymap: %s\n%s', vim.inspect(m, { newline = '', indent = '' }), err)
     end
   end
 end
@@ -64,9 +62,7 @@ local function remap(spec)
   for map in parse(spec) do
     local mode = map.mode
     local m, a = mode:sub(1, 1), mode:sub(2) == 'a'
-    local name = ('keymap %s:%s'):format(mode, map.rhs)
-    mia.stash[name] = mia.stash[name] or vim.fn.maparg(map.rhs --[[@as string]], m, a, true)
-    local km = mia.stash[name]
+    local km = vim.fn.maparg(map.rhs --[[@as string]], m, a, true)
     vim.keymap.set(mode, map.lhs, '<Nop>')
     local newkm = vim.fn.maparg(map.lhs, m, a, true)
     km.lhs = newkm.lhs

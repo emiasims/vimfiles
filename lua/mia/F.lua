@@ -1,7 +1,11 @@
-local F = {
-  partial = mia.partial,
-  const = mia.const,
-}
+local F = { partial = mia.partial }
+
+function F.const(val, skip_copy)
+  val = skip_copy and val or vim.deepcopy(val)
+  return function()
+    return val
+  end
+end
 
 function F.eat(n, fn)
   if type(n) == 'function' then

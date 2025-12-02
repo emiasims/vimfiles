@@ -61,23 +61,22 @@ function M.expr()
   return expr['default']()
 end
 
-function M.setup()
-  vim.o.foldmethod = 'expr'
-  vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-  vim.o.foldtext = 'v:lua.mia.fold.text()'
-  mia.keymap({
-    'zx',
-    function()
-      local bn = vim.api.nvim_get_current_buf()
-      local expr = require('vim.treesitter._fold').foldexpr
-      local foldCache = mia.debug.get_upvalue('foldinfos', expr)
-      Cache[bn] = nil
-      foldCache[bn] = nil
-      return 'zx'
-    end,
-    expr = true,
-    desc = 'Clear fold cache and recompute folds as normal',
-  })
-end
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldtext = 'v:lua.fold.text()'
+mia.keymap({
+  'zx',
+  function()
+    local bn = vim.api.nvim_get_current_buf()
+    local expr = require('vim.treesitter._fold').foldexpr
+    local foldCache = mia.debug.get_upvalue('foldinfos', expr)
+    Cache[bn] = nil
+    foldCache[bn] = nil
+    return 'zx'
+  end,
+  expr = true,
+  desc = 'Clear fold cache and recompute folds as normal',
+})
+fold = M
 
 return M
