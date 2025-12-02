@@ -13,27 +13,11 @@ vim.g.gutentags_ctags_exclude = { 'data' }
 return {
   'tpope/vim-repeat',
   'gregorias/coop.nvim',
-  { 'tpope/vim-abolish', cmd = { 'Subvert', 'Abolish' }, keys = 'cr' },
-  {
-    'tpope/vim-commentary',
-    lazy = false,
-    keys = { { 'cgc', '<Plug>ChangeCommentary' } },
-  },
-  {
-    'tpope/vim-speeddating',
-    event = 'VeryLazy',
-    -- makes sure these are properly set, if a map for <C-a> or <C-x> is made ahead of loading
-    keys = {
-      { '<Plug>SpeedDatingFallbackUp', '<C-a>' },
-      { '<Plug>SpeedDatingFallbackDown', '<C-x>' },
-    },
-    config = function()
-      vim.cmd.delcommand('SpeedDatingFormat')  -- want :S ➜ Subvert
-    end,
-  },
+  'tpope/vim-speeddating',
   { 'tommcdo/vim-exchange', keys = { 'cx', 'cxx', 'cxc', { 'X', mode = 'x' } } },
   { 'wellle/targets.vim', event = 'ModeChanged *:*o*' },
   { 'tommcdo/vim-lion', keys = { 'gl', 'gL' } },
+  { 'lewis6991/nvim-test', lazy = true },
   'mbbill/undotree',
 
   'nvim-lua/popup.nvim',
@@ -42,4 +26,6 @@ return {
 
   'JuliaEditorSupport/julia-vim',
   'lewis6991/async.nvim',
+
+  { 'nvim-mini/mini.cursorword', event = 'VeryLazy', config = true },
 }
