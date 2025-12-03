@@ -5,6 +5,11 @@ mia.command('Pick', {
   callback = function(cmd)
     local opts = { source = cmd.fargs[1] }
 
+    if opts.source == 'resume' then
+      Snacks.picker.resume()
+      return
+    end
+
     for i = 2, #cmd.fargs do
       local k, v = cmd.fargs[i]:match('^(%w+)=(.*)$') -- escaping ws works
       if not k then
