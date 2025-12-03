@@ -205,6 +205,10 @@ function M.enable()
   M._enabled = true
 end
 
+function M.is_enabled()
+  return M._enabled
+end
+
 function M.enter(buf)
   local sess = M.resolve(buf)
   if sess then

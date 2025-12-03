@@ -29,7 +29,7 @@ require('lazy').setup({
         'rplugin',
       },
     },
-  }
+  },
 })
 
 -- auto tracking
@@ -41,3 +41,4 @@ require('tabline')
 -- require('winbar')
 require('wincolors')
 require('fold')
+

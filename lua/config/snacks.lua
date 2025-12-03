@@ -265,7 +265,7 @@ M.picker_opts = {
     sort = { fields = { 'time:desc' } },
     matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
     format = 'text',
-    finder = function() return mia.session.get_sessinfo() end,
+    finder = function() return require('session').get_sessinfo() end,
 
     transform = function(sess, ctx)
       return {
@@ -280,7 +280,7 @@ M.picker_opts = {
     confirm = function(picker, item, _)
       picker:close()
       if item then
-        mia.session.load(item.file)
+        require('session').load(item.file)
       end
     end,
   },
