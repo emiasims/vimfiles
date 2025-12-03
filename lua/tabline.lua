@@ -110,7 +110,7 @@ local function session()
     name = root .. name
   end
   return {
-    ('[%s: %s]  '):format(M._enabled and 'S' or '$', name),
+    ('[%s: %s]  '):format(require('session').is_enabled() and 'S' or '$', name),
     on_click = function(_, _, button, _)
       if button == 'l' then
         vim.cmd.Pick('sessions')
