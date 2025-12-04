@@ -4,6 +4,7 @@ local ts = vim.treesitter
 local api = vim.api
 
 local Source = {}
+M._sources = Source
 
 --- @class mia.hl.region
 --- @field source 'treesitter'|'lsp'|'syntax'
@@ -12,6 +13,11 @@ local Source = {}
 --- @field close integer 0-based end column
 --- @field priority integer
 --- @field conceal? string character used for conceal
+
+local function hl_exists(name)
+  local hl = api.nvim_get_hl(0, { name = name, create = false })
+  return not vim.tbl_isempty(hl)
+end
 
 --- @param bufnr integer
 --- @param start_row integer 1-based
@@ -31,12 +37,18 @@ function Source.ts(bufnr, start_row, end_row)
       local highlights = {}
       local cols = #text
       for id, node, metadata in query:iter_captures(root, bufnr, lnum - 1, lnum) do
-        local name = query.captures[id]
+        local name = '@' .. query.captures[id]
+        if not hl_exists(name) then
+          local langname = name .. '.' .. parser:lang()
+          if hl_exists(langname) then
+            name = langname
+          end
+        end
         local sr, sc, er, ec = ts.get_node_range(node)
         if sr <= lnum - 1 and er >= lnum - 1 then
           table.insert(highlights, {
             source = 'treesitter',
-            group = '@' .. name,
+            group = name,
             open = (sr < lnum - 1) and 0 or sc,
             close = (er > lnum - 1) and cols or ec, -- FIXME
             priority = tonumber(metadata.priority or vim.highlight.priorities.treesitter),
