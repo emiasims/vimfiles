@@ -281,21 +281,22 @@ function M.setup()
     nargs = '*',
   })
 
-  local save_session = mia.F.eat(M.mksession)
+  ---@param ev aucmd.callback.arg
+  local save_session = function(ev)
+    if vim.bo[ev.buf].buftype == '' and vim.bo[ev.buf].modifiable and vim.fn.mode() ~= 'c' then
+      local ok, err = pcall(M.mksession)
+      if not ok then
+        mia.err(('Failed to save session in event "%s":\n%s'):format(ev.event, err))
+        mia.err(vim.api.nvim_get_mode())
+      end
+    end
+  end
 
   mia.augroup('mia-session', {
-
-    -- saving
     FocusLost = save_session,
     VimLeavePre = save_session,
     VimSuspend = save_session,
-
-    ---@param ev aucmd.callback.arg
-    BufEnter = function(ev)
-      if vim.bo[ev.buf].buftype == '' and vim.bo[ev.buf].modifiable then
-        M.mksession()
-      end
-    end,
+    BufEnter = save_session,
 
     -- on vimenter, start a session or load one. Ensure the primary buffer is focused
     VimEnter = function()
