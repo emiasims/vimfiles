@@ -13,7 +13,7 @@ mia.keymap({
     '<F9>',
     desc = 'Print highlight group list at cursor',
     function()
-      local highlights = mia.highlights.at_cursor()
+      local highlights = mia.highlight.at_cursor()
       for src, hls in pairs(highlights) do
         local groups = vim.iter(hls):map(mia.tbl.index('group')):join(', ')
         mia.info(src .. ': ' .. groups)

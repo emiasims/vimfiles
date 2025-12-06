@@ -62,6 +62,7 @@ BT.file = function(bufname, bufnr, gitroot)
     tab_hint = vim.fs.basename(vim.fs.dirname(bufname)),
     wintitle = { path, root and root.short },
     root = root,
+    cwd = dir,
   }
 end
 
@@ -75,7 +76,7 @@ BT.terminal = function(bufname, bufnr)
     tab_name = ('[%s:%s]'):format(cmd, title:sub(1, 20)),
     wintitle = { 'cmd: ' .. cmd, title },
     pid = pid,
-    dir = dir,
+    cwd = dir,
   }
 end
 
@@ -205,6 +206,7 @@ end
 return setmetatable(M, {
   --- @return mia.bufinfo
   __call = function(_, bufnr)
-    return vim.b[bufnr].bufinfo or M.get(bufnr)
+    bufnr = bufnr ~= 0 and bufnr or vim.api.nvim_get_current_buf()
+    return vim.b[bufnr].bufinfo or M.get(bufnr) --[[@as mia.bufinfo]]
   end,
 })

@@ -24,7 +24,7 @@ function M.highlights(lnum, bufnr)
     return { { vim.fn.foldtext() or '', 'Folded' } }
   end
 
-  return mia.highlights.extract(bufnr, lnum)
+  return mia.highlight.extract(bufnr, lnum)
 end
 
 ---@param foldtext { [1]: string, [2]?: string|string[] }[][] Chunks

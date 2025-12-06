@@ -20,7 +20,7 @@ function M.mode_info()
   return modecolors[vim.api.nvim_get_mode().mode:sub(1, 1)] or { hl = 'stlNormalMode', abbrev = '-' }
 end
 
-function hl(group, text)
+local function hl(group, text)
   if not text then
     return '%#' .. group .. '#'
   end
@@ -29,7 +29,7 @@ end
 
 vim.o.mousemoveevent = true
 local pos
-function mousepos()
+local function mousepos()
   if not vim.in_fast_event() then
     pos = vim.fn.getmousepos()
   end
@@ -37,7 +37,7 @@ function mousepos()
 end
 
 --- assumes laststatus=3
-function mouse_on_line(name)
+local function mouse_on_line(name)
   if name == 'statusline' then
     return mousepos().screenrow == vim.o.lines - vim.o.cmdheight
   elseif name == 'tabline' then
@@ -109,7 +109,7 @@ local function _resolve(spec)
     :map(function(t)
       return t.hl and hl(t.hl, t[1]) or t[1]
     end)
-    :join()
+    :join('')
 end
 
 local function _add_hover_hls(name, flat_spec)
