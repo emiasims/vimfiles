@@ -67,8 +67,8 @@ nnoremap [q <Cmd>execute v:count1 . 'cprevious'<CR>
 nnoremap ]q <Cmd>execute v:count1 . 'cnext'<CR>
 nnoremap [L <Cmd>lfirst<CR>
 nnoremap ]L <Cmd>llast<CR>
-nnoremap [<Space> <Cmd>put!=repeat(nr2char(10), v:count1)\|silent! ']+1\|call repeat#set("[ ")<CR>
-nnoremap ]<Space> <Cmd>put =repeat(nr2char(10), v:count1)\|silent! '[-1\|call repeat#set("] ")<CR>
+nnoremap [<Space> <Cmd>silent! put!=repeat(nr2char(10), v:count1)\|silent! ']+1\|call repeat#set("[ ")<CR>
+nnoremap ]<Space> <Cmd>silent! put =repeat(nr2char(10), v:count1)\|silent! '[-1\|call repeat#set("] ")<CR>
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
