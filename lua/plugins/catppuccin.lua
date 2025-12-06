@@ -102,6 +102,10 @@ return { -- Colorscheme: catppuccin macchiato
         stlReplaceMode = { bg = colors.blue, fg = colors.base, bold = true },
         stlHover = { bg = stl.surface0, fg = colors.mauve, bold = true },
 
+        WinBar = { bg = stl.crust },
+        WinBarDir = { fg = colors.blue, bg = stl.crust },
+        WinBarSeparator = { fg = colors.overlay0, bg = stl.crust },
+
         FlashBackdrop = { link = 'CommentSansItalic' },
 
         FloatBorder = { link = 'WinSeparator', force = true },

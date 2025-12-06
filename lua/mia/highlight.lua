@@ -14,7 +14,7 @@ M._sources = Source
 --- @field priority integer
 --- @field conceal? string character used for conceal
 
-local function hl_exists(name)
+function M.exists(name)
   local hl = api.nvim_get_hl(0, { name = name, create = false })
   return not vim.tbl_isempty(hl)
 end
@@ -38,9 +38,9 @@ function Source.ts(bufnr, start_row, end_row)
       local cols = #text
       for id, node, metadata in query:iter_captures(root, bufnr, lnum - 1, lnum) do
         local name = '@' .. query.captures[id]
-        if not hl_exists(name) then
+        if not M.exists(name) then
           local langname = name .. '.' .. parser:lang()
-          if hl_exists(langname) then
+          if M.exists(langname) then
             name = langname
           end
         end
@@ -298,7 +298,7 @@ end
 ---@param start_col integer 0-based start column of the range.
 ---@param end_row integer 1-based end row of the range.
 ---@param end_col integer 0-based end column of the range.
----@param block boolean Use block selection
+---@param block? boolean Use block selection
 ---@return { [1]: string, [2]?: string|string[] }[][] Table of lines, each containing text chunks and optional highlight groups.
 function M.extract(bufnr, start_row, start_col, end_row, end_col, block)
   bufnr = bufnr ~= 0 and bufnr or api.nvim_get_current_buf()
