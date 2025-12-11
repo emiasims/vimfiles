@@ -15,6 +15,7 @@ snoremap <Esc> <C-c>
 inoremap jk <C-]><Esc>
 snoremap jk <Esc>
 nnoremap Y y$
+xnoremap Y "+y
 
 nnoremap <C-m> <Nop>
 nnoremap <Cr> za
@@ -122,8 +123,50 @@ else
   nnoremap <silent> <Esc>[1;5C <Cmd>call <SID>winresize(0, -v:count1)<CR>
 endif
 
+nnoremap <F3> <Cmd>messages clear<Bar>echohl Type<Bar>echo "Messages cleared."<Bar>echohl None<Cr>
+nnoremap <F4> <Cmd>messages<Cr>
+nnoremap <F5> <Cmd>update<Bar>mkview<Bar>edit<Bar>TSBufEnable highlight<Cr>
+nnoremap <F6> <Cmd>UndotreeToggle<Cr>
+nnoremap \gt <Cmd>exe "tabmove +" .. v:count1<Cr>
+nnoremap \gT <Cmd>exe "tabmove -" .. v:count1<Cr>
+nnoremap <F8> <Cmd>update<Bar>so%<Cr>
+
+if has('nvim')
+  " save mode but keep n vs t mode
+  tnoremap <Plug>(termLeave) <C-\><C-n><Cmd>let b:last_mode = 'n'<Cr>
+  tnoremap <Plug>(term2nmode) <C-\><C-n><Cmd>let b:last_mode = 't'<Cr>
+  tnoremap <C-[> <C-[>
+  tnoremap <C-Space> <Space>
+  tnoremap <S-Space> <Space>
+  tmap <C-h> <Plug>(term2nmode)<C-h>
+  tmap <C-j> <Plug>(term2nmode)<C-j>
+  tmap <C-k> <Plug>(term2nmode)<C-k>
+  tmap <C-l> <Plug>(term2nmode)<C-l>
+  tmap <C-^> <Plug>(term2nmode)<C-^>
+  tmap <C-\> <Plug>(term2nmode)<C-w>p
+  tmap <Esc> <Plug>(termLeave)
+  tmap <M-n> <Plug>(termLeave)
+
+  inoreabbrev nvim. vim.api.nvim_
+  cnoreabbrev nvim. vim.api.nvim_
+  inoreabbrev =nvim. =vim.api.nvim_
+endif
+
 onoremap ar a]
 onoremap ir i]
 
 nnoremap ]s m`]s
 nnoremap [s m`[s
+
+xnoremap gs :s//g<Left><Left>
+cnoremap ! <C-]>!
+inoremap <C-i> <C-i>
+nnoremap <C-;> g;
+nnoremap <C-,> g,
+inoremap . .<C-]>
+cnoremap . .<C-]>
+cnoremap <C-t> <Home>tab split<Bar><End>
+nnoremap <MiddleMouse> "*p
+xnoremap <MiddleMouse> "*p
+nnoremap <BS> "*
+xnoremap <BS> "*
