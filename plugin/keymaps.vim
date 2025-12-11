@@ -78,7 +78,7 @@ cnoremap <C-x> <C-a>
 
 nnoremap c* <Cmd>let @/='\<'.expand('<cword>').'\>'<Cr>m`cgn
 nnoremap c. <Cmd>let @/='\<'.escape(@", '\').'\>'<Cr>m`cgn<C-a><Esc>
-nnoremap d. <Cmd>let @/='\<'.escape(@", '\').'\>'<Cr><Cr>m`dgn
+nnoremap d. <Cmd>let @/='\<'.escape(@", '\').'\>'<Cr>m`dgn
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
