@@ -85,6 +85,7 @@ do -- setup treesitter window context updates
   end
 
   local function attach(ev)
+    vim.wo.winbar = ''
     if
       not api.nvim_win_get_config(0).zindex -- Not a floating window
       and vim.bo[ev.buf].buftype == '' -- Normal buffer
@@ -104,7 +105,10 @@ do -- setup treesitter window context updates
     CursorMoved = update_context,
     WinResized = update_context,
     WinEnter = update_context,
-    OptionSet = { pattern = '*number', callback = update_context },
+    OptionSet = {
+      { pattern = '*number', callback = update_context },
+      { pattern = 'buftype', callback = attach }
+    },
   })
 end
 
