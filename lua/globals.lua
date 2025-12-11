@@ -29,8 +29,15 @@ G.T = setmetatable({}, {
     return function(...)
       vim.uv.update_time()
       local t1 = vim.uv.now()
-      for _ = 1, key do
-        select(1, ...)(select(2, ...))
+      local f = select(1, ...)
+      if type(f) == 'function' then
+        for _ = 1, key do
+          f(select(2, ...))
+        end
+      else
+        for _ = 1, key do
+          vim.cmd(f) -- TODO parse first
+        end
       end
       vim.uv.update_time()
       local dt = (vim.uv.now() - t1)
