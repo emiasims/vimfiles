@@ -38,10 +38,16 @@ end
 
 --- assumes laststatus=3
 local function mouse_on_line(name)
+  local mouse = mousepos()
   if name == 'statusline' then
-    return mousepos().screenrow == vim.o.lines - vim.o.cmdheight
+    return mouse.screenrow == vim.o.lines - vim.o.cmdheight
   elseif name == 'tabline' then
-    return mousepos().screenrow == 1
+    return mouse.screenrow == 1
+  elseif name == 'winbar' then
+    local info = vim.fn.getwininfo(vim.g.statusline_winid)[1]
+    return mouse.screenrow == info.winrow
+        and mouse.screencol >= info.wincol
+        and mouse.screencol < info.wincol + info.width
   end
 end
 
@@ -105,15 +111,18 @@ end
 --- @param spec mia.line.flat_spec[]
 local function _resolve(spec)
   return vim
-    .iter(spec)
-    :map(function(t)
-      return t.hl and hl(t.hl, t[1]) or t[1]
-    end)
-    :join('')
+      .iter(spec)
+      :map(function(t)
+        return t.hl and hl(t.hl, t[1]) or t[1]
+      end)
+      :join('')
 end
 
+--- This is insane.
 local function _add_hover_hls(name, flat_spec)
-  -- Build clickable regions
+  -- Build clickable regions - mark them with unique highlight groups
+  -- For the eval_statusline call, they must exist.
+  -- The highlighted ranges will be used to detect what the mouse is over
   local hover_spec = vim.deepcopy(flat_spec)
   for i, item in ipairs(hover_spec) do
     if item.on_click then
@@ -124,37 +133,47 @@ local function _add_hover_hls(name, flat_spec)
     end
   end
 
-  local click_stl = _resolve(hover_spec)
-
-  local stl_spec = vim.api.nvim_eval_statusline(click_stl, {
-    use_tabline = (name == 'tabline'),
-    highlights = true,
-  })
-  local hls = stl_spec.highlights
-
-  local mouse_col = mousepos().screencol
-  local mouse_byte = vim.str_byteindex(stl_spec.str, 'utf-16', mouse_col, false)
-
-  for i = 2, #hls do
-    hls[i - 1].xend = hls[i].start
+  -- setup line appropriate options
+  local opts = { highlights = true }
+  if name == 'tabline' then
+    opts.use_tabline = true
+  elseif name == 'winbar' then
+    opts.use_winbar = true
+    opts.winid = vim.g.statusline_winid
   end
-  hls[#hls].xend = stl_spec.width
+
+  -- evaluate statusline to get highlight ranges
+  local click_stl = _resolve(hover_spec)
+  local stl_spec = vim.api.nvim_eval_statusline(click_stl, opts)
+  local hls = stl_spec.highlights  --[[@as {group: string, start: integer, endcol:integer}[] ]]
+  for i = 2, #hls do  -- add endcols
+    hls[i - 1].endcol = hls[i].start
+  end
+  hls[#hls].endcol = stl_spec.width
 
   -- find the smallest region that contains mouse_byte and is clickable
   --- @type integer?
   local hover_ix
+  local mouse_col = mousepos().screencol - 1
+  if name == 'winbar' then
+    local wininfo = vim.fn.getwininfo(vim.g.statusline_winid)[1]
+    mouse_col = mouse_col - wininfo.wincol + 1
+  end
+  local mouse_byte = vim.str_byteindex(stl_spec.str, 'utf-16', mouse_col, false)
   for _, grp in ipairs(hls) do
-    local click_ix = grp.group:match('^Clickable(%d+)$')
-    if click_ix and mouse_byte >= grp.start and mouse_byte < grp.xend then
-      hover_ix = tonumber(click_ix) --[[@as integer]]
-    end
+    -- Breaking at the first clickable group prevents nesting.
+    -- So, only stop if we've passed the mouse position.
     if grp.start > mouse_byte then
       break
+    end
+    local click_ix = grp.group:match('^Clickable(%d+)$')
+    if click_ix and mouse_byte >= grp.start and mouse_byte < grp.endcol then
+      hover_ix = tonumber(click_ix)  --[[@as integer]]
     end
   end
 
   if hover_ix then
-    local hover = flat_spec[hover_ix] --[[@as mia.line.flat_spec]]
+    local hover = flat_spec[hover_ix]  --[[@as mia.line.flat_spec]]
     hover.hl = 'stlHover'
     hover[1] = '%3@v:lua.mia.line._click@' .. hover[1] .. '%X'
     M._click = hover.on_click
@@ -174,7 +193,7 @@ end
 --- @field sep? string Separator to use for nested specs
 --- @field on_click? fun(nclicks: integer, button: 'l'|'r'|'m'|string) Mouse click handler if any
 
---- @param name string
+--- @param name 'statusline'|'tabline'|'winbar'
 --- @param spec mia.line.spec[]
 --- @return string
 function M.resolve(name, spec)
