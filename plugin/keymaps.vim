@@ -77,8 +77,8 @@ cnoremap <C-x> <C-a>
 " inoreabbrev -> ➜
 
 nnoremap c* <Cmd>let @/='\<'.expand('<cword>').'\>'<Cr>m`cgn
-nnoremap c. <Cmd>let @/='\V'.escape(@", '\')<Cr>m`cgn<C-a><Esc>
-nnoremap d. <Cmd>let @/='\V'.escape(@", '\')<Cr><Cr>m`dgn
+nnoremap c. <Cmd>let @/='\<'.escape(@", '\').'\>'<Cr>m`cgn<C-a><Esc>
+nnoremap d. <Cmd>let @/='\<'.escape(@", '\').'\>'<Cr><Cr>m`dgn
 
 nnoremap <expr> >> "\<Esc>" . repeat('>>', v:count1)
 nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
@@ -100,32 +100,26 @@ nnoremap g<Cr> i<Cr><Esc>l
 nnoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 onoremap <expr> gp '`['.strpart(getregtype(), 0, 1).'`]'
 
-nnoremap <Plug>(SynStack) :<C-u>call SynStack()<CR>
-function! SynStack()
-  let group = synIDattr(synID(line('.'), col('.'), 1), 'name')
-  let glist = map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-  " let hlgroup = synIDattr(synIDtrans(hlID(group)), 'name')
-  let hlgroup = '	Highlighting: ' . synIDattr(synID(line("."), col("."), 1), "name") . ' ➤ '
-        \ . synIDattr(synID(line("."), col("."), 0), "name") . ' ➤ '
-        \ . synIDattr(synIDtrans(synID(line("."), col("."), 1)), "name")
-  echo group glist hlgroup
-endfunc
-
 onoremap <silent>ai <Cmd>call textobjects#indent(0)<CR>
 onoremap <silent>ii <Cmd>call textobjects#indent(1)<CR>
 xnoremap <silent>ai <Cmd>call textobjects#indent(0)<CR><Esc>gv
 xnoremap <silent>ii <Cmd>call textobjects#indent(1)<CR><Esc>gv
 
+function! s:winresize(vert, diff) abort
+  let diff = winnr() == winnr(a:vert ? 'j' : 'l') ? a:diff : -a:diff
+  execute (a:vert ? '' : 'vert ') .. 'resize ' .. (diff > 0 ? '+' : '') .. diff
+endfunction
+
 if has('nvim')
-  nnoremap <silent> <C-Up>    <Cmd>call winresize#go(1, v:count1)<CR>
-  nnoremap <silent> <C-Down>  <Cmd>call winresize#go(1, -v:count1)<CR>
-  nnoremap <silent> <C-Left>  <Cmd>call winresize#go(0, v:count1)<CR>
-  nnoremap <silent> <C-Right> <Cmd>call winresize#go(0, -v:count1)<CR>
+  nnoremap <silent> <C-Up>    <Cmd>call <SID>winresize(1, v:count1)<CR>
+  nnoremap <silent> <C-Down>  <Cmd>call <SID>winresize(1, -v:count1)<CR>
+  nnoremap <silent> <C-Left>  <Cmd>call <SID>winresize(0, v:count1)<CR>
+  nnoremap <silent> <C-Right> <Cmd>call <SID>winresize(0, -v:count1)<CR>
 else
-  nnoremap <silent> <Esc>[1;5A <Cmd>call winresize#go(1, v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5B <Cmd>call winresize#go(1, -v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5D <Cmd>call winresize#go(0, v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5C <Cmd>call winresize#go(0, -v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5A <Cmd>call <SID>winresize(1, v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5B <Cmd>call <SID>winresize(1, -v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5D <Cmd>call <SID>winresize(0, v:count1)<CR>
+  nnoremap <silent> <Esc>[1;5C <Cmd>call <SID>winresize(0, -v:count1)<CR>
 endif
 
 onoremap ar a]
