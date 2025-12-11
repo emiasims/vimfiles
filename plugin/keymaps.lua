@@ -1,14 +1,4 @@
--- extracts defaults and remaps
-mia.keymap.remap({ { '<F2>', 'gx' } })
-
 mia.keymap({
-  { '<F3>', '<Cmd>messages clear|echohl Type|echo "Messages cleared."|echohl None<Cr>' },
-  { '<F4>', '<Cmd>messages<Cr>' },
-  { '<F5>', '<Cmd>update|mkview|edit|TSBufEnable highlight<Cr>' },
-  { '<F6>', '<Cmd>UndotreeToggle<Cr>' },
-  { '\\gt', '<Cmd>exe "tabmove +" .. v:count1<Cr>' },
-  { '\\gT', '<Cmd>exe "tabmove -" .. v:count1<Cr>' },
-  { '<F8>', '<Cmd>update|so%<Cr>' },
   {
     '<F9>',
     desc = 'Print highlight group list at cursor',
@@ -29,63 +19,25 @@ mia.keymap({
   },
 })
 
-mia.keymap({
-  mode = 't',
-  { '<Plug>(termLeave)', '<C-\\><C-n>' .. "<cmd>let b:last_mode = 'n'<Cr>", silent = true },
-  { '<Plug>(term2nmode)', "<C-\\><C-n><cmd>let b:last_mode = 't'<Cr>", silent = true },
-  { '<C-[>', '<C-[>' },
-  { '<C-Space>', '<Space>' },
-  { '<S-Space>', '<Space>' },
-})
-
-mia.keymap({
-  mode = 't',
-  remap = true,
-  { '<C-h>', '<Plug>(term2nmode)<C-h>' },
-  { '<C-j>', '<Plug>(term2nmode)<C-j>' },
-  { '<C-k>', '<Plug>(term2nmode)<C-k>' },
-  { '<C-l>', '<Plug>(term2nmode)<C-l>' },
-  { '<C-^>', '<Plug>(term2nmode)<C-^>' },
-  { '<C-\\>', '<Plug>(term2nmode)<C-w>p' },
-  { '<Esc>', '<Plug>(termLeave)' },
-  { '<M-n>', '<Plug>(termLeave)' },
-})
-
-local diagnostic_jump = function(forward)
-  if forward then
-    vim.diagnostic.jump({ count = vim.v.count1, float = true })
-  else
-    vim.diagnostic.jump({ count = -vim.v.count1, float = true })
+local function lazy(str)
+  local fn
+  return function()
+    if not fn then
+      fn = assert(loadstring('return ' .. str))
+    end
+    return fn()
   end
 end
 
 mia.keymap({
-  { 'gO', mia.toc.show, silent = true, desc = 'Show table of contents' },
-  { '\\d', mia.partial(vim.diagnostic.open_float, { focusable = false }), desc = 'Open diagnostic float' },
-  { '[d', mia.partial(diagnostic_jump, false), desc = 'Prev. diagnostic jump' },
-  { ']d', mia.partial(diagnostic_jump, true), desc = 'Prev. diagnostic jump' },
-  { '<C-h>', mia.on.call('vim.lsp.buf').signature_help, mode = 'i', desc = 'Show signature help' },
-  { 'gxl', mia.repl.send_line, dotrepeat = true, desc = 'Send line to REPL' },
-  { 'gx', mia.repl.send_motion, expr = true, dotrepeat = true, desc = 'Send motion to REPL' },
-  { 'gx', mia.repl.send_visual, mode = 'x', desc = 'Send visual selection to REPL' },
-})
-
--- misc
-mia.keymap({
-  { 'gs', ':s//g<Left><Left>', mode = 'x' },
-  { '!', '<C-]>!', mode = 'c' },
-  { '<C-i>', '<C-i>' },
-  { '<C-;>', 'g;' },
-  { '<C-,>', 'g,' },
-  { '.', '.<C-]>', mode = 'i' },
-  { '.', '.<C-]>', mode = 'c' },
-  { '<C-t>', '<Home>tab split|<End>', mode = 'c' },
-  { { '<MiddleMouse>', '"*p' }, { '<BS>', '"*' }, mode = { 'n', 'x' } },
-
-  { 'nvim.', 'vim.api.nvim_', mode = { 'ia', 'ca' } },
-  { '=nvim.', '=vim.api.nvim_', mode = 'ca' },
-
-  { 'Y', '"+y', mode = 'x' },
+  { 'gO', lazy('mia.toc.show()'), silent = true, desc = 'Show table of contents' },
+  { '\\d', lazy('vim.diagnostic.open_float({ focusable = false })'), desc = 'Open diagnostic float' },
+  { '[d', lazy('vim.diagnostic.jump({count=-vim.v.count1, float=true})'), desc = 'Previous diagnostic' },
+  { ']d', lazy('vim.diagnostic.jump({count=vim.v.count1, float=true})'), desc = 'Next diagnostic' },
+  { '<C-h>', lazy('vim.lsp.buf.signature_help()'), mode = 'i', desc = 'Show signature help' },
+  { 'gxl', lazy('mia.repl.send_line()'), dotrepeat = true, desc = 'Send line to REPL' },
+  { 'gx', lazy('mia.repl.send_motion()'), expr = true, dotrepeat = true, desc = 'Send motion to REPL' },
+  { 'gx', lazy('mia.repl.send_visual()'), mode = 'x', desc = 'Send visual selection to REPL' },
 })
 
 -- big funcs
