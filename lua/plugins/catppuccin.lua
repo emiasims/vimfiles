@@ -117,10 +117,6 @@ return { -- Colorscheme: catppuccin macchiato
   },
 
   config = function(_, opts)
-    if not vim.fn.has('vim_starting') then
-      vim.cmd.highlight('clear')
-    end
-
     require('catppuccin').setup(opts)
     require('catppuccin').load('macchiato')
   end,
