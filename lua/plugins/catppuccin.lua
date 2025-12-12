@@ -63,7 +63,7 @@ return { -- Colorscheme: catppuccin macchiato
         ['@text.strike'] = { fg = colors.none },
         ['@text.uri'] = { style = { 'italic' } }, -- underline = false didn't work?
 
-        -- ['@method'] = { link = '@lsp.type.method' },
+        ['@macro'] = { link = 'Macro' },
 
         CommentSansItalic = { fg = colors.overlay0 },
 
