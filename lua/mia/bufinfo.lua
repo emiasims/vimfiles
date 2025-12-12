@@ -203,6 +203,21 @@ function M.get(bufnr)
   return info --[[@as mia.bufinfo]]
 end
 
+do -- set up autocmds
+  local function update_bufinfo(ev)
+    vim.b[ev.buf].bufinfo = M.get(ev.buf)
+  end
+
+  mia.augroup('mia.bufinfo', {
+    BufEnter = update_bufinfo,
+    BufFilePost = update_bufinfo,
+    TermEnter = update_bufinfo,
+    TermRequest = update_bufinfo,
+    OptionSet = { pattern = 'buftype', callback = update_bufinfo }
+  })
+
+end
+
 return setmetatable(M, {
   --- @return mia.bufinfo
   __call = function(_, bufnr)
