@@ -1,6 +1,17 @@
-local M = {}
-
 local api = vim.api
+
+local function attach(winid)
+  winid = winid or api.nvim_get_current_win()
+  if not (winid and api.nvim_win_is_valid(winid)) then
+    return
+  end
+  local buf = api.nvim_win_get_buf(winid)
+  if not buf then
+    return
+  end
+  vim.wo[winid].winbar = '%!v:lua.winbar()'
+  vim.b[buf].winbar_attached = true
+end
 
 do -- setup treesitter window context updates
 
@@ -84,7 +95,7 @@ do -- setup treesitter window context updates
     end
   end
 
-  local function attach(ev)
+  local function au_attach(ev)
     vim.wo.winbar = ''
     if
       not api.nvim_win_get_config(0).zindex -- Not a floating window
@@ -92,13 +103,12 @@ do -- setup treesitter window context updates
       and api.nvim_buf_get_name(ev.buf) ~= '' -- Has a file name
       and not vim.wo[0].diff -- Not in diff mode
     then
-      vim.wo.winbar = '%!v:lua.winbar()'
-      vim.b.winbar_attached = true
+      attach()
     end
   end
 
   mia.augroup('mia.winbar', {
-    BufWinEnter = attach,
+    BufWinEnter = au_attach,
     WinScrolled = update_context,
     BufEnter = update_context,
     VimResized = update_context,
@@ -107,7 +117,7 @@ do -- setup treesitter window context updates
     WinEnter = update_context,
     OptionSet = {
       { pattern = '*number', callback = update_context },
-      { pattern = 'buftype', callback = attach }
+      { pattern = 'buftype', callback = au_attach }
     },
   })
 end
@@ -147,14 +157,13 @@ local function definition()
   }
 end
 
-local function winbar()
-  local ok, res = pcall(mia.line.resolve, 'winbar', definition, true)
-  if ok then
-    return res
-  else
-    mia.err_once(res)
-  end
+function _G.winbar()
+  return mia.line.render(definition, 'winbar')
 end
-_G.winbar = winbar
 
-return M
+return {
+  context = treesitter_context,
+  bufinfo = bufinfo,
+  definition = _G.winbar,
+  attach = attach,
+}
