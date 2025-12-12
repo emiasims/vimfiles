@@ -65,7 +65,7 @@ local function node_tree()
   return ''
 end
 
-local function active()
+local function definition()
   local mode = mia.line.mode_info()
   local desc, title, title_hl = buf_info()
   return {
@@ -82,22 +82,16 @@ local function active()
   }
 end
 
-local function statusline()
-  local ok, res = pcall(mia.line.resolve, 'statusline', active)
-  if not ok then
-    return 'Error: ' .. res
-  end
-  return res
+function _G.statusline()
+  return mia.line.render(definition, 'statusline')
 end
-
 vim.go.statusline = '%!v:lua.statusline()'
 vim.go.laststatus = 3
-_G.statusline = statusline
 
-return setmetatable({
+return {
   buf_info = buf_info,
   peek = peek,
   cursor_info = cursor_info,
   node_tree = node_tree,
-  active = active,
-}, { __call = statusline })
+  definition = _G.statusline,
+}

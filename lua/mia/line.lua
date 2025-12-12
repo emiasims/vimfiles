@@ -46,8 +46,8 @@ local function mouse_on_line(name)
   elseif name == 'winbar' then
     local info = vim.fn.getwininfo(vim.g.statusline_winid)[1]
     return mouse.screenrow == info.winrow
-        and mouse.screencol >= info.wincol
-        and mouse.screencol < info.wincol + info.width
+      and mouse.screencol >= info.wincol
+      and mouse.screencol < info.wincol + info.width
   end
 end
 
@@ -107,15 +107,16 @@ local function _flatten(spec)
 
   return res
 end
+M.flatten = _flatten
 
 --- @param spec mia.line.flat_spec[]
-local function _resolve(spec)
+local function join_flat_spec(spec)
   return vim
-      .iter(spec)
-      :map(function(t)
-        return t.hl and hl(t.hl, t[1]) or t[1]
-      end)
-      :join('')
+    .iter(spec)
+    :map(function(t)
+      return t.hl and hl(t.hl, t[1]) or t[1]
+    end)
+    :join('')
 end
 
 --- This is insane.
@@ -143,10 +144,10 @@ local function _add_hover_hls(name, flat_spec)
   end
 
   -- evaluate statusline to get highlight ranges
-  local click_stl = _resolve(hover_spec)
+  local click_stl = join_flat_spec(hover_spec)
   local stl_spec = vim.api.nvim_eval_statusline(click_stl, opts)
-  local hls = stl_spec.highlights  --[[@as {group: string, start: integer, endcol:integer}[] ]]
-  for i = 2, #hls do  -- add endcols
+  local hls = stl_spec.highlights --[[@as {group: string, start: integer, endcol:integer}[] ]]
+  for i = 2, #hls do -- add endcols
     hls[i - 1].endcol = hls[i].start
   end
   hls[#hls].endcol = stl_spec.width
@@ -168,16 +169,27 @@ local function _add_hover_hls(name, flat_spec)
     end
     local click_ix = grp.group:match('^Clickable(%d+)$')
     if click_ix and mouse_byte >= grp.start and mouse_byte < grp.endcol then
-      hover_ix = tonumber(click_ix)  --[[@as integer]]
+      hover_ix = tonumber(click_ix) --[[@as integer]]
     end
   end
 
   if hover_ix then
-    local hover = flat_spec[hover_ix]  --[[@as mia.line.flat_spec]]
+    local hover = flat_spec[hover_ix] --[[@as mia.line.flat_spec]]
     hover.hl = 'stlHover'
     hover[1] = '%3@v:lua.mia.line._click@' .. hover[1] .. '%X'
     M._click = hover.on_click
   end
+end
+
+local function _render(name, spec)
+  local flat_spec = _flatten(vim.deepcopy(spec))
+
+  if mouse_on_line(name) then
+    _add_hover_hls(name, flat_spec)
+  end
+
+  -- Resolve final flat spec
+  return join_flat_spec(flat_spec)
 end
 
 --- @class mia.line.flat_spec
@@ -193,20 +205,15 @@ end
 --- @field sep? string Separator to use for nested specs
 --- @field on_click? fun(nclicks: integer, button: 'l'|'r'|'m'|string) Mouse click handler if any
 
---- @param name 'statusline'|'tabline'|'winbar'
 --- @param spec mia.line.spec[]
+--- @param name 'statusline'|'tabline'|'winbar'
 --- @return string
-function M.resolve(name, spec)
-  local flat_spec = _flatten(vim.deepcopy(spec))
-
-  if mouse_on_line(name) then
-    _add_hover_hls(name, flat_spec)
+function M.render(spec, name)
+  local ok, res = pcall(_render, name, spec)
+  if not ok then
+    return 'Error: ' .. res
   end
-
-  -- Resolve final flat spec
-  return _resolve(flat_spec)
+  return res
 end
-
-M.flatten = _flatten
 
 return M

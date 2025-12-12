@@ -1,4 +1,4 @@
-local a = vim.api
+local api = vim.api
 
 ---@param layout vim.fn.winlayout.ret
 ---@param win_specs table<number, mia.line.spec>
@@ -41,30 +41,30 @@ end
 local clickable_window = function(winid)
   return function(_, _, button, _)
     if button == 'l' then
-      a.nvim_set_current_win(winid)
+      api.nvim_set_current_win(winid)
     end
   end
 end
 
 local function tab_layout()
-  local current_win = a.nvim_get_current_win()
-  local current_tab = a.nvim_get_current_tabpage()
+  local current_win = api.nvim_get_current_win()
+  local current_tab = api.nvim_get_current_tabpage()
 
   local bufname_counts = { ['init.lua'] = 1 } -- all init.lua gets modified
-  for _, buf in ipairs(a.nvim_list_bufs()) do
+  for _, buf in ipairs(api.nvim_list_bufs()) do
     local name = vim.fs.basename(vim.fn.bufname(buf))
     bufname_counts[name] = bufname_counts[name] and bufname_counts[name] + 1 or 1
   end
 
   ---@type mia.line.spec[]
   local tabline = {}
-  for _, tabid in ipairs(a.nvim_list_tabpages()) do
+  for _, tabid in ipairs(api.nvim_list_tabpages()) do
 
     ---@type table<number, mia.line.spec>
     local win_specs = {}
 
     -- First, for this tab get the names as displayed for each window
-    for _, winid in ipairs(a.nvim_tabpage_list_wins(tabid)) do
+    for _, winid in ipairs(api.nvim_tabpage_list_wins(tabid)) do
       local buf = vim.fn.winbufnr(winid)
       local info = mia.bufinfo(buf)
       local name, dir = info.tab_name or info.name, info.tab_hint
@@ -85,7 +85,7 @@ local function tab_layout()
 
     end
 
-    local tabnr = a.nvim_tabpage_get_number(tabid)
+    local tabnr = api.nvim_tabpage_get_number(tabid)
 
     table.insert(tabline, {
       { ('%%%dT%d'):format(tabnr, tabnr), pad = true },
@@ -134,20 +134,13 @@ local function definition()
   }
 end
 
-local function tabline()
-  local ok, res = pcall(mia.line.resolve, 'tabline', definition)
-  if not ok then
-    return 'Error: ' .. res
-  end
-  return res
+function _G.tabline()
+  return mia.line.render(definition, 'tabline')
 end
-
 vim.o.tabline = '%!v:lua.tabline()'
-_G.tabline = tabline
 
-return setmetatable({
-  definition = definition,
+return {
   win_layout = window_layout,
   tab_layout = tab_layout,
-  tabline = tabline,
-}, { __call = tabline })
+  definition = definition,
+}
