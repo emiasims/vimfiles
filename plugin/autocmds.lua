@@ -1,59 +1,11 @@
 mia.augroup(mia.group, {
-  -- OG
-  BufWinLeave = "if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif",
-  BufWinEnter = "if empty(&buftype) && &modifiable && !empty(expand('%')) | silent! loadview | endif",
-
-  [{ 'WinEnter', 'FocusGained' }] = 'silent! checktime',
-
-  [{ 'WinLeave', 'BufLeave', 'FocusLost' }] = "if &buftype == '' && &modifiable | silent! lockmarks update | endif",
-
-  BufWritePost = { 'if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif', nested = true },
-
-  BufReadPost = [[if &ft !~ '^git\c' && ! &diff && line("'\"") > 0 && line("'\"") <= line("$") | execute 'normal! g`"zvzz' | endif]],
-
-  InsertLeave = {
-    "if &paste | setlocal nopaste | echo 'nopaste' | endif",
-    'if &diff | diffupdate | endif',
-  },
-
-  WinEnter = 'setlocal cursorline',
-  WinLeave = 'setlocal nocursorline',
-
-  BufWritePre = function(ev)
-    if vim.bo[ev.buf].buftype == '' and ev.file and not ev.file:match('%a+:') then
-      vim.fn.mkdir(vim.fn.expand('<afile>:p:h'), 'p')
-    end
-  end,
-
-  [{ 'BufEnter', 'FocusGained', 'InsertLeave', 'WinEnter' }] = 'if &nu | set rnu   | endif',
-  [{ 'BufLeave', 'FocusLost', 'InsertEnter', 'WinLeave' }] = 'if &nu | set nornu | endif',
-
-  FileType = {
-    -- qfreplace = 'setlocal nofoldenable',
-    -- sh = 'let b:is_bash=1|let g:sh_fold_enabled=5',
-    { 'setlocal nofoldenable', pattern = 'qfreplace' },
-    { 'let b:is_bash=1|let g:sh_fold_enabled=5', pattern = 'sh' },
-  },
-
-  BufRead = 'if empty(&filetype) | set commentstring=#%s | endif',
-
-  -- neovim
-
-  -- Shares cmdline, search, and input histories, registers,
+  -- Shares cmdline, search, and input histories, registers
   FocusGained = 'rshada',
   FocusLost = 'wshada',
 
   -- cursor color macro recording
   RecordingEnter = 'hi! link CursorLine CursorLRecording',
   RecordingLeave = 'hi! link CursorLine CursorLBase',
-
-  -- BufInfo
-  [{ 'BufEnter', 'BufFilePost', 'TermEnter', 'TermRequest' }] = {
-    desc = 'Set workspace folder',
-    callback = function(ev)
-      vim.b[ev.buf].bufinfo = mia.bufinfo.get(ev.buf)
-    end,
-  },
 
   TextYankPost = {
     {
@@ -71,9 +23,9 @@ mia.augroup(mia.group, {
           local un = tonumber(vim.fn.getreginfo('"').points_to)
           local i, reg, last = 1, vim.fn.getreginfo('1'), vim.fn.getreginfo('0')
           repeat
-            ---@diagnostic disable-next-line: param-type-not-match
+            ---@diagnostic disable-next-line: param-type-mismatch
             vim.fn.setreg(i, last.regcontents, last.regtype .. (un == i and 'u' or ''))
-            ---@diagnostic disable-next-line: param-type-not-match
+            ---@diagnostic disable-next-line: param-type-mismatch
             i, reg, last = i + 1, vim.fn.getreginfo(i + 1), reg
           until i > 9
             -- if its empty, we can stop there. Don't need to save it

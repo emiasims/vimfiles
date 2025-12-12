@@ -1,6 +1,3 @@
-if has('nvim')
-  finish
-endif
 augroup vimrc_general
   autocmd!
   au BufWinLeave * if empty(&buftype) && &modifiable && !empty(expand('%')) | mkview | endif
@@ -15,7 +12,7 @@ augroup vimrc_general
 
   " When editing a file, always jump to the last known cursor position, if valid.
   autocmd BufReadPost *
-        \ if &ft !~ '^git\c' && ! &diff && line("'\"") > 0 && line("'\"") <= line("$")
+        \  if &ft !~ '^git\c' && ! &diff && line("'\"") > 0 && line("'\"") <= line("$")
         \|   execute 'normal! g`"zvzz'
         \| endif
 
@@ -26,7 +23,10 @@ augroup vimrc_general
   autocmd WinEnter * setlocal cursorline
   autocmd WinLeave * setlocal nocursorline
 
-  autocmd BufWritePre * call mkdir(expand("<afile>:p:h"), "p")
+  autocmd BufWritePre *
+        \  if &buftype == '' && expand('<afile>:p') =~# '^' .. escape($HOME, '\') .. '/'
+        \|   call mkdir(expand("<afile>:p:h"), "p")
+        \| endif
 
   autocmd BufEnter,FocusGained,InsertLeave,WinEnter * if &nu | set rnu   | endif
   autocmd BufLeave,FocusLost,InsertEnter,WinLeave   * if &nu | set nornu | endif
