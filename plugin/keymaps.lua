@@ -1,21 +1,11 @@
 mia.keymap({
+  { '<F9>', '<Cmd>Inspect<Cr>', desc = 'Inspect highlight groups' },
   {
-    '<F9>',
-    desc = 'Print highlight group list at cursor',
-    function()
-      local highlights = mia.highlight.at_cursor()
-      for src, hls in pairs(highlights) do
-        local groups = vim.iter(hls):map(mia.tbl.index('group')):join(', ')
-        mia.info(src .. ': ' .. groups)
-      end
-    end,
-  },
-  {
-    desc = 'Toggle inlay hints',
     '<F10>',
     function()
       vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
     end,
+    desc = 'Toggle inlay hints',
   },
 })
 
