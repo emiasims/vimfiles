@@ -60,7 +60,7 @@ do -- setup treesitter window context updates
     end
 
     -- add highlighted context
-    vim.iter(mia.highlight.extract(bufnr, sr + 1, sc, er + 1, ec)[1]):each(function(chunk)
+    vim.iter(mia.highlight.extract(bufnr, sr + 1)):each(function(chunk)
       table.insert(ctx, { text = chunk[1], hl = chunk[2] })
     end)
 
@@ -132,7 +132,7 @@ local function treesitter_context()
     :map(function(item)
       local hl = item.hl
       if type(hl) == 'table' then
-        hl = vim.iter(hl):rev():find(mia.highlight.exists)
+        hl = hl[#hl]
       end
       return { item.text, hl = hl, on_click = item.on_click }
     end)
