@@ -8,22 +8,6 @@ M._cache = Cache
 function M.highlights(lnum, bufnr)
   vim.validate('lnum', lnum, 'number')
   vim.validate('bufnr', bufnr, 'number')
-
-  local ok, parser = pcall(ts.get_parser, bufnr)
-  if not ok then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local query = ts.query.get(parser:lang(), 'highlights')
-  if not query then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
-  local line = api.nvim_buf_get_lines(bufnr, lnum - 1, lnum, false)[1]
-  if not line or line:match('^%s*$') then
-    return { { vim.fn.foldtext() or '', 'Folded' } }
-  end
-
   return mia.highlight.extract(bufnr, lnum)
 end
 
@@ -128,7 +112,7 @@ mia.keymap({
   expr = true,
   desc = 'Clear fold cache and recompute folds as normal',
 })
-fold = M
+_G.fold = M
 
 mia.augroup('mia-fold', {
   FileType = {
