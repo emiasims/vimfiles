@@ -29,12 +29,12 @@ do -- setup treesitter window context updates
     end
 
     local bufnr = api.nvim_win_get_buf(winid)
-    local sr, sc, er, ec = unpack(ctx_ranges[#ctx_ranges])
+    local row = ctx_ranges[#ctx_ranges][1]
 
     -- set up statuscolumn first
     local statuscolumn = api.nvim_eval_statusline(vim.wo[winid].statuscolumn, {
       winid = winid,
-      use_statuscol_lnum = sr + 1,
+      use_statuscol_lnum = row + 1,
       highlights = true,
     })
     local ctx = {}
@@ -55,12 +55,12 @@ do -- setup treesitter window context updates
       table.insert(ctx, 1, {
         text = '' .. indicator .. text,
         hl = ctx[1].hl,
-        on_click = function() end,
+        on_click = function() mia.warn('NYI') end,
       })
     end
 
     -- add highlighted context
-    vim.iter(mia.highlight.extract(bufnr, sr + 1)):each(function(chunk)
+    vim.iter(mia.highlight.extract(bufnr, row + 1)):each(function(chunk)
       table.insert(ctx, { text = chunk[1], hl = chunk[2] })
     end)
 
