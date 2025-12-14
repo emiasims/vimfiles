@@ -1,13 +1,6 @@
 local ts = vim.treesitter
 local api = vim.api
 
-local function resolve_hl(name)
-  if name then
-    local hlid = api.nvim_get_hl_id_by_name(name)
-    return vim.fn.synIDattr(vim.fn.synIDtrans(hlid), 'name')
-  end
-end
-
 -- gives complete highlight info in the range for a single row
 ---@return {hl_groups:{hl_group:string,hl_group_link?:string,ns_id?:integer,source:string,priority:integer,conceal?:string}[],buffer:integer,col:integer,row:integer,text:string}[]
 local function inspect_range(bufnr, lnum, start_col, end_col)
@@ -19,12 +12,14 @@ local function inspect_range(bufnr, lnum, start_col, end_col)
 
   local items = {}
   local function add(sr, sc, er, ec, hl, source, priority, conceal)
+    local hlid = api.nvim_get_hl_id_by_name(hl)
+    local link = vim.fn.synIDattr(vim.fn.synIDtrans(hlid), 'name')
     table.insert(items, {
       sc = math.max(start_col, sr < lnum and 0 or sc),
       ec = math.min(end_col, er > lnum and #line or ec),
       data = {
         hl_group = hl,
-        hl_group_link = resolve_hl(hl),
+        hl_group_link = link ~= '' and link or nil,
         source = source,
         priority = priority or vim.highlight.priorities[source],
         conceal = conceal,
@@ -140,6 +135,7 @@ end
 local function extract_range(bufnr, lnum, start_col, end_col)
   local segments = inspect_range(bufnr, lnum, start_col, end_col)
   local chunks = {}
+
   for _, segment in ipairs(segments) do
     local chunk = { segment.text, {} }
     local hl_groups = segment.hl_groups
@@ -147,7 +143,11 @@ local function extract_range(bufnr, lnum, start_col, end_col)
       return a.priority < b.priority
     end)
     for _, hl in ipairs(hl_groups) do
-      table.insert(chunk[2], hl.hl_group_link or hl.hl_group)
+      local name = hl.hl_group_link or hl.hl_group
+      local resolved = api.nvim_get_hl(0, { name = name, create = false })
+      if not vim.tbl_isempty(resolved) then
+        table.insert(chunk[2], name)
+      end
     end
     table.insert(chunks, chunk)
   end
