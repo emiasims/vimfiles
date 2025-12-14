@@ -1,3 +1,5 @@
+local api = vim.api
+
 local M = {}
 
 local modecolors = {
@@ -17,7 +19,7 @@ local modecolors = {
 }
 
 function M.mode_info()
-  return modecolors[vim.api.nvim_get_mode().mode:sub(1, 1)] or { hl = 'stlNormalMode', abbrev = '-' }
+  return modecolors[api.nvim_get_mode().mode:sub(1, 1)] or { hl = 'stlNormalMode', abbrev = '-' }
 end
 
 local function hl(group, text)
@@ -129,7 +131,7 @@ local function _add_hover_hls(name, flat_spec)
     if item.on_click then
       item.hl = 'Clickable' .. i
       if vim.fn.hlexists(item.hl) ~= 1 then
-        vim.api.nvim_set_hl(0, item.hl, { bold = true })
+        api.nvim_set_hl(0, item.hl, { bold = true })
       end
     end
   end
@@ -145,8 +147,8 @@ local function _add_hover_hls(name, flat_spec)
 
   -- evaluate statusline to get highlight ranges
   local click_stl = join_flat_spec(hover_spec)
-  local stl_spec = vim.api.nvim_eval_statusline(click_stl, opts)
-  local hls = stl_spec.highlights --[[@as {group: string, start: integer, endcol:integer}[] ]]
+  local stl_spec = api.nvim_eval_statusline(click_stl, opts)
+  local hls = stl_spec.highlights --[[@as {groups: string[], start: integer, endcol:integer}[] ]]
   for i = 2, #hls do -- add endcols
     hls[i - 1].endcol = hls[i].start
   end
@@ -154,7 +156,7 @@ local function _add_hover_hls(name, flat_spec)
 
   -- find the smallest region that contains mouse_byte and is clickable
   --- @type integer?
-  local hover_ix
+  local hover_item_ix
   local mouse_col = mousepos().screencol - 1
   if name == 'winbar' then
     local wininfo = vim.fn.getwininfo(vim.g.statusline_winid)[1]
@@ -162,23 +164,37 @@ local function _add_hover_hls(name, flat_spec)
   end
   local mouse_byte = vim.str_byteindex(stl_spec.str, 'utf-16', mouse_col, false)
   for _, grp in ipairs(hls) do
-    -- Breaking at the first clickable group prevents nesting.
-    -- So, only stop if we've passed the mouse position.
+    -- breaking at the first clickable group prevents nesting.
+    -- so, only stop if we've passed the mouse position.
     if grp.start > mouse_byte then
       break
     end
-    local click_ix = grp.group:match('^Clickable(%d+)$')
+    local click_ix = grp.groups[#grp.groups]:match('^Clickable(%d+)$')
     if click_ix and mouse_byte >= grp.start and mouse_byte < grp.endcol then
-      hover_ix = tonumber(click_ix) --[[@as integer]]
+      hover_item_ix = tonumber(click_ix) --[[@as integer]]
     end
   end
 
-  if hover_ix then
-    local hover = flat_spec[hover_ix] --[[@as mia.line.flat_spec]]
-    hover.hl = 'stlHover'
-    hover[1] = '%3@v:lua.mia.line._click@' .. hover[1] .. '%X'
-    M._click = hover.on_click
+  if not hover_item_ix then
+    return
   end
+
+  local hover_item = flat_spec[hover_item_ix] --[[@as mia.line.flat_spec]]
+
+  local hover_hl = hover_item.hl_hover or 'Bold'
+  if hover_item.hl then
+    local hl_info = api.nvim_get_hl(0, { name = hover_item.hl, link = false, create = false }) --[[@as table]]
+    local hover_info = api.nvim_get_hl(0, { name = hover_hl, link = false, create = false })
+    local blend = vim.tbl_deep_extend('force', hl_info, hover_info)
+    api.nvim_set_hl(0, 'stlHover', blend)
+    hover_item.hl = 'stlHover'
+  else
+    hover_item.hl = hover_hl
+  end
+
+  hover_item.hl = 'stlHover'
+  hover_item[1] = '%3@v:lua.mia.line._click@' .. hover_item[1] .. '%X'
+  M._click = hover_item.on_click
 end
 
 local function _render(name, spec)
@@ -198,9 +214,12 @@ end
 --- @field on_click? function Mouse click handler
 --- @field hl_hover? string Highlight group name for hover state
 
---- @class mia.line.spec
---- @field [number] string|mia.line.spec|mia.line.spec[]|fun(): string|mia.line.spec|mia.line.spec[]?  Text to display
+--- @alias mia.line.spec mia.line.base_spec | string | number | fun():(mia.line.spec|mia.line.spec[]|nil)
+
+--- @class mia.line.base_spec
+--- @field [integer] mia.line.spec|mia.line.spec[] Text to display
 --- @field hl? string|fun(): string  Highlight group name
+--- @field hl_hover? string Highlight group name for hover state
 --- @field pad? boolean If true, pad text with spaces on both sides
 --- @field sep? string Separator to use for nested specs
 --- @field on_click? fun(nclicks: integer, button: 'l'|'r'|'m'|string) Mouse click handler if any
