@@ -132,7 +132,7 @@ end
 
 -- gives the visible highlights in the range in chunks
 --- @return { [1]: string, [2]?: string|string[] }[][] Table of lines, each containing text chunks and optional highlight groups.
-local function extract_range(bufnr, lnum, start_col, end_col)
+local function extract_range(bufnr, lnum, start_col, end_col, get_hl_info)
   local segments = inspect_range(bufnr, lnum, start_col, end_col)
   local chunks = {}
 
@@ -146,7 +146,7 @@ local function extract_range(bufnr, lnum, start_col, end_col)
       local name = hl.hl_group_link or hl.hl_group
       local resolved = api.nvim_get_hl(0, { name = name, create = false })
       if not vim.tbl_isempty(resolved) then
-        table.insert(chunk[2], name)
+        table.insert(chunk[2], get_hl_info and resolved or name)
       end
     end
     table.insert(chunks, chunk)
