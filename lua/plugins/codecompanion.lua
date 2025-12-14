@@ -95,6 +95,9 @@ return {
     extensions = {
       history = {
         enabled = true,
+        opts = {
+          delete_on_clearing_chat = true
+        },
       },
     },
   },
