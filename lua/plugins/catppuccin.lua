@@ -64,6 +64,7 @@ return { -- Colorscheme: catppuccin macchiato
         ['@text.uri'] = { style = { 'italic' } }, -- underline = false didn't work?
 
         ['@macro'] = { link = 'Macro' },
+        ['@variable.builtin'] = { link = 'Special' },
 
         CommentSansItalic = { fg = colors.overlay0 },
 
