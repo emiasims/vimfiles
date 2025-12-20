@@ -62,7 +62,7 @@ return {
         },
       },
     },
-    strategies = {
+    interactions = {
       chat = {
         adapter = 'copilot',
         slash_commands = {
