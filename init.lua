@@ -3,6 +3,8 @@ vim.loader.enable()
 require('globals')
 _G.mia = require('mia')
 
+require('options')
+
 -- install lazy.nvim pack
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.uv.fs_stat(lazypath) then
