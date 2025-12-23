@@ -19,6 +19,7 @@
   "mason-tool-installer.nvim": { "branch": "main", "commit": "517ef5994ef9d6b738322664d5fdd948f0fdeb46" },
   "mason.nvim": { "branch": "main", "commit": "57e5a8addb8c71fb063ee4acda466c7cf6ad2800" },
   "mcphub.nvim": { "branch": "main", "commit": "5193329d510a68f1f5bf189960642c925c177a3a" },
+  "mini.cmdline": { "branch": "main", "commit": "1f86d4b3e23f35baf1f20f6b6d13cca133f20c43" },
   "mini.cursorword": { "branch": "main", "commit": "dda0f57d55bb1fa19423b7201b2ba892c7d2bb3c" },
   "mini.doc": { "branch": "main", "commit": "eb61bebe1d2b96835b1b67bb6e600cfc69ae4ad2" },
   "mini.starter": { "branch": "main", "commit": "8ee6ce6a4c9be47682516908557cc062c4d595a2" },
