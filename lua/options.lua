@@ -64,6 +64,7 @@ vim
     listchars = { nbsp = '⊗', tab = '▷‒', extends = '»', precedes = '«', trail = '⣿' },
     fillchars = { vert = '┃', fold = ' ' },
     winborder = 'rounded',
+    pumborder = 'rounded',
 
     undofile = true,
     shiftround = true,
