@@ -18,6 +18,8 @@ return {
       ['<Plug>(miaCmpSuggest)'] = { 'show', 'show_documentation', 'hide_documentation' },
     },
 
+    cmdline = { enabled = false },
+
     sources = {
       default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'codecompanion' },
       providers = {
