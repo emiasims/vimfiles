@@ -14,7 +14,6 @@ local function attach(winid)
 end
 
 do -- setup treesitter window context updates
-
   local ctx_level = { '⠂', '⠢', '⠦', '⠶', '⠷', '⢷', '⣷', '⣿' }
 
   local function update_window_context(winid)
@@ -117,7 +116,7 @@ do -- setup treesitter window context updates
     WinEnter = update_context,
     OptionSet = {
       { pattern = '*number', callback = update_context },
-      { pattern = 'buftype', callback = au_attach }
+      { pattern = 'buftype', callback = au_attach },
     },
   })
 end

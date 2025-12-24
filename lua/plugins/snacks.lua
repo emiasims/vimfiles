@@ -42,7 +42,7 @@ return {
           return require('config.snacks').put_register()
         end,
       },
-      desc = 'Pick register & put'
+      desc = 'Pick register & put',
     },
   },
   keys = {

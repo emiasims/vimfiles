@@ -7,7 +7,7 @@ return {
       library = {
         'mia',
         'lazy.nvim',
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
       },
     },
   },

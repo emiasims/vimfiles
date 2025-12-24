@@ -9,4 +9,3 @@ return {
     { 'gsh', '<Cmd>Gitsigns stage_hunk<Cr>' },
   },
 }
-

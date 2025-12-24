@@ -6,7 +6,7 @@ local function window_layout(layout, win_specs)
   local node_type = layout[1]
 
   if node_type == 'leaf' then
-    return { win_specs[layout[2] --[[@as number]] ], type = 'leaf' }
+    return { win_specs[layout[2]], type = 'leaf' }
   end
 
   -- First do it recursively..
@@ -59,7 +59,6 @@ local function tab_layout()
   ---@type mia.line.spec[]
   local tabline = {}
   for _, tabid in ipairs(api.nvim_list_tabpages()) do
-
     ---@type table<number, mia.line.spec>
     local win_specs = {}
 
@@ -82,7 +81,6 @@ local function tab_layout()
         hl = winid == current_win and 'TabLineWin' or nil,
         on_click = winid ~= current_win and clickable_window(winid) or nil,
       }
-
     end
 
     local tabnr = api.nvim_tabpage_get_number(tabid)
@@ -130,7 +128,7 @@ local function definition()
     '%=',
     { macro_status, hl = 'TabLineRecording', pad = true },
     { '%S', pad = true },
-    { session, hl = 'TabLineSession', pad = true},
+    { session, hl = 'TabLineSession', pad = true },
   }
 end
 

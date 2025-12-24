@@ -1,4 +1,4 @@
 return {
-  "garymjr/nvim-snippets",
-  event = "InsertEnter",
+  'garymjr/nvim-snippets',
+  event = 'InsertEnter',
 }

@@ -37,7 +37,6 @@ return {
           ret:sub(en + 1),
           vim.keycode('<Cmd>set nopaste<Cr><C-g>u'),
         })
-
       end
     end
     -- Note: workspace_folder is used, set by mia.autocmds

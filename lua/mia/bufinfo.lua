@@ -197,7 +197,7 @@ function M.get(bufnr)
       name = 'bufinfo error',
       hl = 'Error',
       tab_name = '[%bufinfo error%]',
-      error = info
+      error = info,
     }
   end
   return info --[[@as mia.bufinfo]]
@@ -213,9 +213,8 @@ do -- set up autocmds
     BufFilePost = update_bufinfo,
     TermEnter = update_bufinfo,
     TermRequest = update_bufinfo,
-    OptionSet = { pattern = 'buftype', callback = update_bufinfo }
+    OptionSet = { pattern = 'buftype', callback = update_bufinfo },
   })
-
 end
 
 return setmetatable(M, {

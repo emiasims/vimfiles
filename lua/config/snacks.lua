@@ -189,7 +189,7 @@ M.picker_opts = {
   layouts = {
     -- sidebar, but in floating windows.
     pseudo_sidebar = { --[[@as snacks.picker.layout.Config]]
-      layout = {  ---@diagnostic disable-line: missing-fields
+      layout = { ---@diagnostic disable-line: missing-fields
         box = 'horizontal',
         backdrop = false,
         row = 1,
@@ -267,28 +267,30 @@ M.picker_opts = {
       end,
     },
     sessions = {
-    sort = { fields = { 'time:desc' } },
-    matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
-    format = 'text',
-    finder = function() return require('session').get_sessinfo() end,
+      sort = { fields = { 'time:desc' } },
+      matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
+      format = 'text',
+      finder = function()
+        return require('session').get_sessinfo()
+      end,
 
-    transform = function(sess, ctx)
-      return {
-        time = sess.mtime,
-        file = sess.path,
-        text = sess.name,
-        sess = sess,
-        name = sess.name,
-        -- TODO buffers saved, tabs
-      }
-    end,
-    confirm = function(picker, item, _)
-      picker:close()
-      if item then
-        require('session').load(item.file)
-      end
-    end,
-  },
+      transform = function(sess, ctx)
+        return {
+          time = sess.mtime,
+          file = sess.path,
+          text = sess.name,
+          sess = sess,
+          name = sess.name,
+          -- TODO buffers saved, tabs
+        }
+      end,
+      confirm = function(picker, item, _)
+        picker:close()
+        if item then
+          require('session').load(item.file)
+        end
+      end,
+    },
   },
 }
 

@@ -96,7 +96,7 @@ return {
       history = {
         enabled = true,
         opts = {
-          delete_on_clearing_chat = true
+          delete_on_clearing_chat = true,
         },
       },
     },
