@@ -100,7 +100,7 @@ function M.opfunc(type)
 end
 
 function M.send_motion()
-  vim.o.opfunc = "v:lua.mia.repl.opfunc"
+  vim.o.opfunc = 'v:lua.mia.repl.opfunc'
   return 'g@'
 end
 

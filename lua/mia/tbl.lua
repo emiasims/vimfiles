@@ -1,4 +1,3 @@
-
 local M = {
   ---Shallow copy
   copy = function(t)
@@ -90,7 +89,6 @@ local M = {
   isarr = function(t)
     return #t == vim.tbl_count(t)
   end,
-
 }
 
 function M.categorize(t, k, preserve_ix)
@@ -107,12 +105,11 @@ function M.categorize(t, k, preserve_ix)
   return cats
 end
 
-
 M.todict = M.rawset
 
 function M.update(t1, t2, shallow)
   for k, v in pairs(t2) do
-    if type(v) == 'table' and type(t1[k]) == "table" and not shallow then
+    if type(v) == 'table' and type(t1[k]) == 'table' and not shallow then
       M.update(t1[k], v)
     end
     t1[k] = v

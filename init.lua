@@ -43,4 +43,3 @@ require('tabline')
 require('winbar')
 require('wincolors')
 require('fold')
-

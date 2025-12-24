@@ -111,15 +111,12 @@ error('Cannot require a meta file')
 ---@field file string expanded value of <afile>
 ---@field data any arbitrary data passed from |nvim_exec_autocmds()|
 
-
 ---@class mia.autocmd.spec: aucmd.opts.create
 ---@field [1]? aucmd.event|aucmd.event[]
 ---@field [2]? string|aucmd.callback
 ---@field event? aucmd.event|aucmd.event[]
 
-
 ---@alias mia.commands table<string, mia.command|cmd.opts.create|cmd.callback|string>
-
 
 ---@class mia.command.def: cmd.opts.create
 ---@field [1]? string|cmd.callback
