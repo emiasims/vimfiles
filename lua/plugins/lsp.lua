@@ -1,5 +1,3 @@
-local lsp = mia.on.call('vim.lsp.buf')
-
 ---@type LazySpec
 return {
   {
@@ -21,10 +19,10 @@ return {
     dependencies = { 'mason.nvim', 'wbthomason/lsp-status.nvim' },
 
     keys = {
-      { 'gd', lsp.definition, desc = 'Goto Definition' },
-      { 'gr', lsp.references, desc = 'Goto References' },
-      { 'K', lsp.hover, desc = 'Show help' },
-      { '\\ca', lsp.code_action, desc = 'Code Action' },
+      { 'gd', '<Cmd>lua vim.lsp.buf.definition()<Cr>', desc = 'Goto Definition' },
+      { 'gr', '<Cmd>lua vim.lsp.buf.references()<Cr>', desc = 'Goto References' },
+      { 'K', '<Cmd>lua vim.lsp.buf.hover()<Cr>', desc = 'Show help' },
+      { '\\ca', '<Cmd>lua vim.lsp.buf.code_action()<Cr>', desc = 'Code Action' },
     },
 
     opts = {
