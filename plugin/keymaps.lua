@@ -1,33 +1,17 @@
 mia.keymap({
   { '<F9>', '<Cmd>Inspect<Cr>', desc = 'Inspect highlight groups' },
-  {
-    '<F10>',
-    function()
-      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-    end,
-    desc = 'Toggle inlay hints',
-  },
+  { '<F10>', '<Cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<Cr>' },
 })
 
-local function lazy(str)
-  local fn
-  return function()
-    if not fn then
-      fn = assert(loadstring('return ' .. str))
-    end
-    return fn()
-  end
-end
-
 mia.keymap({
-  { 'gO', lazy('mia.toc.show()'), silent = true, desc = 'Show table of contents' },
-  { '\\d', lazy('vim.diagnostic.open_float({ focusable = false })'), desc = 'Open diagnostic float' },
-  { '[d', lazy('vim.diagnostic.jump({count=-vim.v.count1, float=true})'), desc = 'Previous diagnostic' },
-  { ']d', lazy('vim.diagnostic.jump({count=vim.v.count1, float=true})'), desc = 'Next diagnostic' },
-  { '<C-h>', lazy('vim.lsp.buf.signature_help()'), mode = 'i', desc = 'Show signature help' },
-  { 'gxl', lazy('mia.repl.send_line()'), dotrepeat = true, desc = 'Send line to REPL' },
-  { 'gx', lazy('mia.repl.send_motion()'), expr = true, dotrepeat = true, desc = 'Send motion to REPL' },
-  { 'gx', lazy('mia.repl.send_visual()'), mode = 'x', desc = 'Send visual selection to REPL' },
+  { 'gO', '<Cmd>lua mia.toc.show()<Cr>', silent = true },
+  { '\\d', '<Cmd>lua vim.diagnostic.open_float({ focusable = false })<Cr>' },
+  { '[d', '<Cmd>lua vim.diagnostic.jump({count=-vim.v.count1, float=true})<Cr>' },
+  { ']d', '<Cmd>lua vim.diagnostic.jump({count=vim.v.count1, float=true})<Cr>' },
+  { '<C-h>', '<Cmd>lua vim.lsp.buf.signature_help()<Cr>', mode = 'i' },
+  { 'gxl', '<Cmd>lua mia.repl.send_line()<Cr>', dotrepeat = true },
+  { 'gx', '<Cmd>lua mia.repl.send_motion()<Cr>', expr = true, dotrepeat = true },
+  { 'gx', '<Cmd>lua mia.repl.send_visual()<Cr>', mode = 'x' },
 })
 
 -- big funcs
