@@ -19,7 +19,6 @@ local M = vim._defer_require('mia', {
   venv = ..., --- @module 'mia.venv'
   repl = ..., --- @module 'mia.repl'
   ide = ..., --- @module 'mia.ide'
-  job = ..., --- @module 'mia.job'
   source = ..., --- @module 'mia.source'
 })
 

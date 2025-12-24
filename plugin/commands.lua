@@ -160,15 +160,6 @@ local M = {
   Move = { on_call('file_move').cmd, nargs = '+', complete = 'file', bang = true },
   Repl = { on_call('repl').cmd, nargs = '?', complete = 'filetype', bar = true },
   ReplModeLine = { on_call('repl').send_modeline, bar = true },
-  Job = {
-    subcommands = {
-      start = on_call('job').start,
-      refresh = on_call('job').refresh,
-      watch = on_call('job').watch,
-    },
-    nargs = '+',
-    bar = true,
-  },
 }
 
 return mia.commands(M)
