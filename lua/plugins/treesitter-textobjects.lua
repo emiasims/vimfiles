@@ -23,6 +23,7 @@ return {
     local move = require('nvim-treesitter-textobjects.move')
     local sel = require('nvim-treesitter-textobjects.select')
 
+    -- stylua: ignore start
     mia.keymap({
       { '<leader>a', function() swap.swap_next('@parameter.inner', 'textobjects') end },
       { '<leader>A', function() swap.swap_previous('@parameter.inner', 'textobjects') end },
@@ -46,6 +47,7 @@ return {
       { 'ac', function() sel.select_textobject('@class.outer', 'textobjects') end },
       { 'ic', function() sel.select_textobject('@class.inner', 'textobjects') end },
     })
+    -- stylua: ignore end
 
     mia.keymap({
       'dsf',
