@@ -135,10 +135,6 @@ return {
       { 'term', 'term fish' },
       { 'res', 'restart Session load last' },
 
-      { 'js', 'Job start' },
-      { 'jw', 'Job watch' },
-      { 'jr', 'Job refresh' },
-
       { 'tc', 'TabCopy' },
       { 'tsl', 'TabSlice' },
       { 'tsp', 'tab split' },
