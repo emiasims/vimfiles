@@ -102,6 +102,7 @@ return {
     },
   },
   config = function(_, opts)
+    require('nvim-treesitter').install('yaml')
     require('codecompanion').setup(opts)
     local requests = {}
     vim.api.nvim_create_autocmd({ 'User' }, {
