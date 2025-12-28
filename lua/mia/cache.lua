@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 
 function M.file(filepath)
   ---@diagnostic disable: need-check-nil
