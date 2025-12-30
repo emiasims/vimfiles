@@ -293,6 +293,10 @@ M.picker_opts = {
         end
       end,
     },
+    -- filter excludes some paths and bc it merges via tbl_extend, setting to nil
+    -- doesn't remove the filter. And setting to true says to use only those dirs.
+    ---@diagnostic disable-next-line: assign-type-mismatch
+    recent = { filter = false },
   },
 }
 
