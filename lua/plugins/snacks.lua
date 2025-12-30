@@ -1,3 +1,4 @@
+---@type LazySpec
 return {
   'folke/snacks.nvim',
   priority = 1000,
@@ -48,7 +49,7 @@ return {
   keys = {
     { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
     { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
-    { 'gr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
+    { 'grr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
     { 'gI', '<Cmd>Pick lsp_implementations<Cr>', desc = 'Goto Implementation' },
     { 'gy', '<Cmd>Pick lsp_type_definitions<Cr>', desc = 'Goto T[y]pe Definition' },
     { '<C-g><C-o>', '<Cmd>Pick jumps<Cr>', desc = 'Pick jumps' },
