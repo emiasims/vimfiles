@@ -28,10 +28,10 @@ require('lazy').setup({
         'tohtml',
         'tutor',
         'zipPlugin',
-        'rplugin',
       },
     },
   },
+  profiling = { loader = true, require = true },
 })
 
 -- auto tracking
