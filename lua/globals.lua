@@ -1,8 +1,6 @@
-local G = {}
-
 --- Print inspected values
 ---@param ... any
-function G.P(...)
+function _G.P(...)
   local v = select('#', ...) > 1 and { ... } or ...
   print(vim.inspect(v))
   return ...
@@ -10,13 +8,13 @@ end
 
 --- Notify inspected values
 ---@param ... any
-function G.N(...)
+function _G.N(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify(vim.inspect(v))
   return ...
 end
 
-G.T = setmetatable({}, {
+_G.T = setmetatable({}, {
   __call = function(self, ...)
     self[1](...)
   end,
@@ -61,22 +59,16 @@ G.T = setmetatable({}, {
 
 --- Print inspected values once
 ---@param ... any
-function G.P1(...)
+function _G.P1(...)
   local v = select(2, ...) and { ... } or ...
   vim.notify_once(vim.inspect(v))
   return v
 end
 
-function G.put(vals)
+function _G.put(vals)
   local lines = vim.split(vim.inspect(vals), '\n')
   vim.api.nvim_put(lines, 'l', true, false)
 end
 
-G.keys = vim.tbl_keys
-G.vals = vim.tbl_values
-
-for name, func in pairs(G) do
-  _G[name] = func
-end
-
-return G
+_G.keys = vim.tbl_keys
+_G.vals = vim.tbl_values
