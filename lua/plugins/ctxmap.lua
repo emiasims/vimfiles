@@ -126,6 +126,7 @@ return {
       { 'cclear', 'Cclearquickfix' },
       { 'lcle', 'Lclearloclist' },
       { 'lclear', 'Lclearloclist' },
+      { 'lf', 'luafile%' },
       { 'w2', 'w' },
       { 'dws', 'mkview | silent! %s/\\s\\+$// | loadview | update' },
       { 'eh', 'edit <C-r>=expand("%:h")<Cr>/', eat = ' ' },
