@@ -208,7 +208,7 @@ do -- set up autocmds
     vim.b[ev.buf].bufinfo = M.get(ev.buf)
   end
 
-  mia.augroup('mia.bufinfo', {
+  mia.augroup('bufinfo', {
     BufEnter = update_bufinfo,
     BufFilePost = update_bufinfo,
     TermEnter = update_bufinfo,

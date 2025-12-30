@@ -68,7 +68,7 @@ mia.command('Pick', {
 })
 
 local MacroReg = mia.cache.file('macro_reg')
-mia.augroup('mia-snacks', {
+mia.augroup('snacks', {
   TextYankPost = function()
     MacroReg[vim.v.event.regname] = nil
   end,

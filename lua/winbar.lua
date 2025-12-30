@@ -106,7 +106,7 @@ do -- setup treesitter window context updates
     end
   end
 
-  mia.augroup('mia.winbar', {
+  mia.augroup('winbar', {
     BufWinEnter = au_attach,
     WinScrolled = update_context,
     BufEnter = update_context,

@@ -16,7 +16,7 @@ return {
     local ts = require('nvim-treesitter')
     ts.install({ 'bash', 'c', 'cpp', 'javascript', 'lua', 'python', 'regex', 'luap' })
 
-    mia.augroup('mia.treesitter', {
+    mia.augroup('treesitter', {
       FileType = function(ev)
         local lang = vim.treesitter.language.get_lang(ev.match) or ev.match
         if vim.tbl_contains(ts.get_available(), lang) then

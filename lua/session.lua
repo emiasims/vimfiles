@@ -292,7 +292,7 @@ function M.setup()
     end
   end
 
-  mia.augroup('mia-session', {
+  mia.augroup('session', {
     FocusLost = save_session,
     VimLeavePre = save_session,
     VimSuspend = save_session,
