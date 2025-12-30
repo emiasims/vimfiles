@@ -2,6 +2,7 @@
 return {
   'stevearc/conform.nvim',
   dependencies = { 'mason.nvim' },
+  keys = { 'gq' },
   opts = {
     formatters_by_ft = {
       lua = { 'stylua', lsp_format = 'never' },
