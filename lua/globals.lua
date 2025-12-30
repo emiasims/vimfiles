@@ -70,5 +70,30 @@ function _G.put(vals)
   vim.api.nvim_put(lines, 'l', true, false)
 end
 
-_G.keys = vim.tbl_keys
-_G.vals = vim.tbl_values
+---@param t table
+---@return any[]
+function _G.keys(t, mt_keys)
+  local keys = vim.tbl_keys(t)
+  if mt_keys then
+    local mt = getmetatable(t)
+    while mt do
+      vim.list_extend(keys, vim.tbl_keys(mt))
+      mt = getmetatable(mt)
+    end
+  end
+  return keys
+end
+
+---@param t table
+---@return any[]
+function _G.values(t, mt_values)
+  local vals = vim.tbl_values(t)
+  if mt_values then
+    local mt = getmetatable(t)
+    while mt do
+      vim.list_extend(vals, vim.tbl_values(mt))
+      mt = getmetatable(mt)
+    end
+  end
+  return vals
+end
