@@ -1,7 +1,8 @@
 ---@type LazySpec
 return {
   'lewis6991/gitsigns.nvim',
-  event = { 'TextChanged', 'SafeState' },
+  event = 'VeryLazy',
+  cmd = 'Gitsigns',
   opts = { attach_to_untracked = true },
   keys = {
     { ']c', '<Cmd>Gitsigns next_hunk<Cr>' },
