@@ -3,7 +3,7 @@
 (string [ "\"" "'" "[[" ] @comment  [ "\"" "'" "]]" ] @comment)
 
 ((identifier) @module.builtin
-  (#any-of? @module.builtin "vim"  "mia" "P" "N" "P1" "T" "put" "keys" "vals"))
+  (#any-of? @module.builtin "vim"  "mia" "P" "N" "P1" "T" "put" "keys" "values"))
 
 (dot_index_expression
   table: (identifier) @_G (#eq? @_G "_G")
