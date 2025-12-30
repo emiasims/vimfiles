@@ -21,7 +21,7 @@ local function inspect_range(bufnr, lnum, start_col, end_col)
         hl_group = hl,
         hl_group_link = link ~= '' and link or nil,
         source = source,
-        priority = priority or vim.highlight.priorities[source],
+        priority = tonumber(priority or vim.highlight.priorities[source]) or 100,
         conceal = conceal,
       },
     })
