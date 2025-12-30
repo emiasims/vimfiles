@@ -114,7 +114,7 @@ mia.keymap({
 })
 _G.fold = M
 
-mia.augroup('mia-fold', {
+mia.augroup('fold', {
   FileType = {
     pattern = '*',
     callback = function(ev)
