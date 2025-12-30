@@ -29,8 +29,10 @@ mia.command('Pick', {
 
   -- arglead, cmdline, cursorpos
   complete = function(arglead, cmdline, _)
-    if cmdline == 'Pick ' then
-      return vim.tbl_keys(Snacks.picker.config.get().sources --[[@as table]])
+    local source = cmdline:match('Pick ([%w_]*)$')
+    if source then
+      local sources = vim.tbl_keys(Snacks.picker.config.get().sources)
+      return source == '' and sources or vim.fn.matchfuzzy(sources, source, { matchseq = true })
     end
 
     local opts = Snacks.picker.config.get({ source = cmdline:match('Pick (%S+)') })
