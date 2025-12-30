@@ -9,7 +9,7 @@ return {
     {
       'nvim-treesitter/nvim-treesitter-context',
       lazy = true,
-      opts = { enable = false },
+      opts = { enable = false, mode = 'topline' }, -- used in winbar
     },
   },
   config = function()
