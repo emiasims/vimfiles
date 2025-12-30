@@ -16,6 +16,8 @@ return {
       ['<C-d>'] = { 'scroll_documentation_down', 'fallback' },
       ['<Plug>(miaCmpConfirm)'] = { 'select_and_accept' },
       ['<Plug>(miaCmpSuggest)'] = { 'show', 'show_documentation', 'hide_documentation' },
+      ['<C-p>'] = { 'show', 'select_prev', 'fallback_to_mappings' },
+      ['<C-n>'] = { 'show', 'select_next', 'fallback_to_mappings' },
     },
 
     cmdline = { enabled = false },
