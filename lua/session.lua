@@ -150,9 +150,9 @@ function M.load(sess)
   if sess then
     M.disable()
     local ok, err = pcall(vim.cmd.source, vim.fn.fnameescape(sess.path))
-    M.enable()
     if ok then
       mia.info('Session loaded: ' .. sess.name)
+      M.enable()
     else
       mia.err('Session load failed: \n' .. err)
     end
