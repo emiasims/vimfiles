@@ -146,9 +146,7 @@ function M.start(filetype)
   if cfg.cmd[filetype] == 'function' then
     bufnr = cfg.cmd[filetype]()
     if not bufnr then
-      vim.api.nvim_err_writeln(
-        ('Repl setup function for "%s" must return terminal buffer number'):format(filetype)
-      )
+      vim.api.nvim_err_writeln(('Repl setup function for "%s" must return terminal buffer number'):format(filetype))
       return
     end
   else

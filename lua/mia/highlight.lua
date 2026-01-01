@@ -50,13 +50,7 @@ local function inspect_range(bufnr, lnum, start_col, end_col)
     ns_map[id] = name
   end
 
-  local extmarks = api.nvim_buf_get_extmarks(
-    bufnr,
-    -1,
-    { lnum, start_col },
-    { lnum, end_col },
-    { details = true }
-  )
+  local extmarks = api.nvim_buf_get_extmarks(bufnr, -1, { lnum, start_col }, { lnum, end_col }, { details = true })
   for _, item in ipairs(extmarks) do
     local _, sr, sc, details = unpack(item)
     if details.hl_group then

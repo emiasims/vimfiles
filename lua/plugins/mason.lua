@@ -53,6 +53,6 @@ return {
         end)
       end)
 
-      vim.lsp.enable(servers)
+    vim.lsp.enable(servers)
   end,
 }
