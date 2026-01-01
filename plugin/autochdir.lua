@@ -39,10 +39,8 @@ local function gitdir(path, bufnr)
   return vim.fn.fnamemodify(path, ':p:h')
 end
 
-vim.api.nvim_create_autocmd('BufEnter', {
-  group = vim.api.nvim_create_augroup('mia-chdir', { clear = true }),
-  desc = ':lcd into git dir',
-  callback = function(ev)
+mia.augroup('autochdir', {
+  BufEnter = function(ev)
     local bo = vim.bo[ev.buf]
     if bo.modifiable and bo.buftype == '' then
       local ok, err = pcall(vim.cmd.lcd, gitdir(ev.match, ev.buf))
@@ -51,9 +49,10 @@ vim.api.nvim_create_autocmd('BufEnter', {
       end
     end
   end,
+  VimLeavePre = "autocmd VimLeavePre * exec 'silent! lcd ' .. getcwd(-1, -1)",
 })
 
-vim.api.nvim_create_user_command('FixAutochdir', function()
+mia.command('FixAutochdir', function()
   vim.b.autochdir = nil
   vim.cmd.lcd(gitdir(vim.fn.expand('%:p'), vim.fn.bufnr()))
-end, {})
+end)
