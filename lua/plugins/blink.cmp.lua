@@ -6,22 +6,24 @@ return {
   event = { 'InsertEnter', 'CmdlineEnter' },
   version = '*',
 
-  keys = {
-    { '<S-Space>', '<C-e><Cmd>lua require("blink.cmp").show_and_insert_or_accept_single()<Cr>', mode = 'c' },
-  },
-
   -- wildchar does weird things with blink and also popup menus
   ctxmap = {
     {
       '<Tab>',
       {
         { 'blink_visible', '<C-n>', remap = true },
-        { 'fn.pumvisible()', '<C-n>' },
+        { 'pumvisible', '<C-n>' },
       },
       mode = 'c',
-      default = 'vim.fn.wildtrigger()',
+      default = vim.fn.wildtrigger,
     },
     { '<S-Tab>', { 'blink_visible', '<C-p>', remap = true }, mode = 'c' },
+    {
+      '<S-Space>',
+      { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+      default = '<Cmd>lua require("blink.cmp").show()<Cr>',
+      mode = 'c',
+    },
   },
 
   ---@module 'blink.cmp'
@@ -43,6 +45,8 @@ return {
         preset = 'none',
         ['<C-n>'] = { 'select_next', 'fallback' },
         ['<C-p>'] = { 'select_prev', 'fallback' },
+        ['<C-y>'] = { 'select_and_accept', 'fallback' },
+        ['<C-e>'] = { 'cancel', 'fallback' },
       },
     },
 
