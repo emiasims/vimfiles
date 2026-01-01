@@ -12,7 +12,7 @@ return {
       '<Tab>',
       {
         { 'blink_visible', '<C-n>', remap = true },
-        { 'pumvisible', '<C-n>' },
+        { 'fn.pumvisible()', '<C-n>' },
       },
       mode = 'c',
       default = vim.fn.wildtrigger,
