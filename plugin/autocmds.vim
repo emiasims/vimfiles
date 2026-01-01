@@ -5,7 +5,7 @@ augroup vimrc_general
 
   autocmd WinEnter,FocusGained * silent! checktime
 
-  autocmd WinLeave,BufLeave,FocusLost * if &buftype == '' && &modifiable | silent! lockmarks update | endif
+  autocmd WinLeave,BufLeave,FocusLost * if &buftype == '' && &modifiable && filereadable(bufname('%')) | silent! lockmarks update | endif
 
   " Update filetype on save if empty
   autocmd BufWritePost * ++nested if empty(&filetype) | unlet! b:ftdetect | filetype detect | endif
