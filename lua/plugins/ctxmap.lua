@@ -95,7 +95,7 @@ return {
       ' ',
       {
         { 'cmd.start', 'lua ' },
-        { 'require("blink.cmp").is_visible()', '<Cmd>lua require("blink.cmp").hide()<CR> ' },
+        { 'blink_visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' },
       },
       mode = 'c',
     },
