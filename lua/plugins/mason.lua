@@ -53,6 +53,14 @@ return {
         end)
       end)
 
+    mia.augroup('lsp', {
+      LspAttach = function(ev)
+        if vim.fn.hasmapto('<C-h>', 'i') == 0 then
+          mia.keymap({ '<C-h>', '<Cmd>lua vim.lsp.buf.signature_help()<Cr>', mode = 'i', buffer = ev.buf })
+        end
+      end,
+    })
+
     vim.lsp.enable(servers)
   end,
 }
