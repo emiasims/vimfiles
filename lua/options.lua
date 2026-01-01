@@ -44,7 +44,6 @@ vim
     breakat = '   ;:,!?',
     whichwrap = 'b,s,[,]',
     spellsuggest = { 'best', '10' },
-    switchbuf = 'useopen',
     diffopt = { 'algorithm:histogram', 'linematch:60', 'closeoff' },
     -- completeopt = { 'menuone', 'noselect', 'noinsert' },
     completeopt = { 'menu', 'menuone', 'noselect' },
