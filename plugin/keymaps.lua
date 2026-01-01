@@ -10,7 +10,6 @@ mia.keymap({
   { '\\d', '<Cmd>lua vim.diagnostic.open_float({ focusable = false })<Cr>' },
   { '[d', '<Cmd>lua vim.diagnostic.jump({count=-vim.v.count1, float=true})<Cr>' },
   { ']d', '<Cmd>lua vim.diagnostic.jump({count=vim.v.count1, float=true})<Cr>' },
-  { '<C-h>', '<Cmd>lua vim.lsp.buf.signature_help()<Cr>', mode = 'i' },
   { 'gxl', '<Cmd>lua mia.repl.send_line()<Cr>', dotrepeat = true },
   { 'gx', '<Cmd>lua mia.repl.send_motion()<Cr>', expr = true, dotrepeat = true },
   { 'gx', '<Cmd>lua mia.repl.send_visual()<Cr>', mode = 'x' },
