@@ -1,3 +1,5 @@
+mia.keymap.remap({ '<F2>', 'gx' }) -- get gx from defaults and map to <F2>
+
 mia.keymap({
   { '<F9>', '<Cmd>Inspect<Cr>', desc = 'Inspect highlight groups' },
   { '<F10>', '<Cmd>lua vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())<Cr>' },
