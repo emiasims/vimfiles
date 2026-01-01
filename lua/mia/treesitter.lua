@@ -36,9 +36,7 @@ end
 function M.print_matches(query, opts)
   query, opts = get_query_and_opts(query, opts)
   local i = 0
-  for pat, match, md in
-    query:iter_matches(opts.node, opts.bufnr, opts.range[1], opts.range[2], { all = true })
-  do
+  for pat, match, md in query:iter_matches(opts.node, opts.bufnr, opts.range[1], opts.range[2], { all = true }) do
     i = i + 1
     P(string.format('Match: %s, id: %s', i, pat))
     for mid, nodes in pairs(match) do

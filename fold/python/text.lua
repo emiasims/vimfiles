@@ -37,10 +37,7 @@ return function(lnum, bufnr)
 
     local params
     for node in class:field('body')[1]:iter_children() do
-      if
-        node:type() == 'function_definition'
-        and ts.get_node_text(node:field('name')[1], bufnr):match('__init__')
-      then
+      if node:type() == 'function_definition' and ts.get_node_text(node:field('name')[1], bufnr):match('__init__') then
         params = node:field('parameters')[1]
         break
       end
