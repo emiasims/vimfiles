@@ -218,6 +218,16 @@ function M.enter(buf)
   end
 end
 
+function M.renew()
+  if not vim.g.session then
+    return
+  end
+  vim.cmd.tabonly({ mods = { emsg_silent = true } })
+  vim.cmd.wincmd({ 'o', mods = { emsg_silent = true } })
+  vim.cmd.buffer(vim.g.session.file)
+  vim.cmd.CloseHiddenBuffers()
+end
+
 function M.start(name)
   if not vim.g.session then
     M.close()
@@ -270,6 +280,7 @@ function M.setup()
       save = { tocmd(M.save), complete = list_complete },
       load = { tocmd(M.load), complete = list_complete },
       delete = { tocmd(M.delete), complete = list_complete },
+      renew = M.renew,
       stop = tocmd(M.disable),
       start = tocmd(M.start),
       quit = function()

@@ -111,6 +111,7 @@ return {
       ctx = 'cmd.start',
       { 'sq', 'Session quit' },
       { 'qq', 'Session quit' },
+      { 'sr', 'Session renew' },
 
       { 'he', 'help' },
       { 'eft', 'EditFtplugin' },
