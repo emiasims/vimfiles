@@ -94,20 +94,13 @@ function M.winenter(window)
   vim.api.nvim_win_set_hl_ns(window, 0)
 end
 
-local gid = vim.api.nvim_create_augroup('mia-colors', { clear = true })
-vim.api.nvim_create_autocmd({ 'WinEnter', 'WinLeave' }, {
-  group = gid,
-  callback = function(ev)
-    M[ev.event:lower()](vim.api.nvim_get_current_win())
-  end,
-})
-
-vim.api.nvim_create_autocmd('ColorScheme', {
-  group = gid,
-  callback = function(ev)
+mia.augroup('colors', {
+  WinLeave = function() M.winleave(vim.api.nvim_get_current_win()) end,
+  WinEnter = function() M.winenter(vim.api.nvim_get_current_win()) end,
+  ColorScheme = function()
     if M.ns then
       local hls = vim.api.nvim_get_hl(M.ns, {})
-      for name, hl in pairs(hls) do
+      for name, _ in pairs(hls) do
         vim.api.nvim_set_hl(M.ns, name, {})
       end
       M.ns = nil
