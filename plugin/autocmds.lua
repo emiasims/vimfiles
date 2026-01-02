@@ -7,6 +7,25 @@ mia.augroup(mia.group, {
   RecordingEnter = 'hi! link CursorLine CursorLRecording',
   RecordingLeave = 'hi! link CursorLine CursorLBase',
 
+  -- if a file is in my dotfiles, make bufinfo aware of it
+  BufReadPre = function(ev)
+    vim.system(
+      { 'git', 'cfg', 'ls-files', '--exclude-standard' },
+      { text = true },
+      vim.schedule_wrap(function(obj)
+        if obj.code == 0 then
+          -- files are relative to home
+          local files = vim.split(obj.stdout, '\n', { plain = true })
+          local fname = vim.fn.fnamemodify(ev.file, ':p:~'):sub(3)
+          if vim.tbl_contains(files, fname) then
+            vim.b[ev.buf].git_dir = vim.env.HOME .. '/.cfg'
+            vim.b[ev.buf].bufinfo = mia.bufinfo.get(ev.buf)
+          end
+        end
+      end)
+    )
+  end,
+
   TextYankPost = {
     {
       desc = 'Highlight yanked text briefly',

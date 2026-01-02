@@ -18,22 +18,27 @@ end
 ---@param name? string
 ---@return mia.session
 local function new_session_context(buf, name)
-  local file = type(buf) == 'number' and vim.fn.bufname(buf) or buf --[[@as string]]
-  file = vim.fn.fnamemodify(file, ':p')
-  local root = vim.fs.root(file, '.git')
+  local bufname --[[@as string]]
+  if type(buf) == 'number' then
+    bufname = vim.api.nvim_buf_get_name(buf)
+  else
+    bufname = vim.fn.fnamemodify(buf --[[@as string]], ':p')
+    buf = vim.fn.bufnr(bufname)
+  end
 
+  local root = mia.bufinfo.get(buf).root
   if not name and root then
-    name = vim.fs.relpath(vim.fs.dirname(root), file) --[[@as string]]
+    name = vim.fs.relpath(vim.fs.dirname(root), bufname) --[[@as string]]
     name = name:gsub('/', '➔', 1)
   elseif not name then
-    name = vim.fs.relpath('~', file)
+    name = vim.fs.relpath('~', bufname)
     name = name and '~/' .. name
   end
-  name = name or file
+  name = name or bufname
   local sess_filename = name:gsub('%%', '%%%%'):gsub('/', '%%') .. '.vim'
 
   return {
-    file = file,
+    file = bufname,
     name = name,
     root = root,
     path = expand(sess_filename),

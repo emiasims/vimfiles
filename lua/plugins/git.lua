@@ -32,4 +32,26 @@ return {
       clear = false,
     },
   },
+  config = function()
+    mia.augroup('fugitive', {
+      BufEnter = {
+        pattern = 'fugitive://*',
+        callback = function()
+          vim.b.update_bufinfo = function(info)
+            local git_dir, object, path = info.bufname:match('^fugitive://(.-)//(%x+)/(.*)$')
+            if object then
+              return {
+                type = 'fugitive',
+                desc = ('(fugitive:%s)%s/'):format(info.git.head, vim.fs.dirname(path)),
+                cwd = vim.fs.dirname(path),
+                name = vim.fs.basename(path),
+              }
+            end
+            mia.err_once(('bufname parsing failed for: "%s"'):format(info.bufname))
+            return {}
+          end
+        end,
+      },
+    })
+  end,
 }

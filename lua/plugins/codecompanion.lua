@@ -13,6 +13,7 @@ return {
       { 'cca', 'CodeCompanionActions' },
       { 'cch', 'CodeCompanionChat' },
       { 'ccc', 'CodeCompanionCmd' },
+      { 'chg', 'CodeCompanionChat adapter=gemini' },
     },
   },
   keys = { { '<C-c>', '<Plug>(cc-stop)', ft = 'codecompanion' } },
@@ -105,9 +106,8 @@ return {
     require('nvim-treesitter').install('yaml')
     require('codecompanion').setup(opts)
     local requests = {}
-    vim.api.nvim_create_autocmd({ 'User' }, {
-      pattern = 'CodeCompanionRequest*',
-      group = vim.api.nvim_create_augroup('mia-codecompanion-spin', { clear = true }),
+    mia.augroup('codecompanion', {
+      User = { pattern = 'CodeCompanionRequest*',
       callback = function(ev)
         local eid = ev.data.id
         if ev.match == 'CodeCompanionRequestStarted' then
@@ -117,7 +117,20 @@ return {
         elseif ev.match == 'CodeCompanionRequestFinished' then
           requests[eid] = nil
         end
-      end,
+      end },
+      FileType = {
+        pattern = 'codecompanion',
+        callback = function(ev)
+          vim.wo.conceallevel = 0
+          local chat = require('codecompanion').buf_get_chat(ev.buf)
+          vim.b.update_bufinfo = {
+            type = 'CodeChat',
+            name = (chat.title or chat.adapter.formatted_name),
+            tab_name = chat.title or ('[' .. chat.adapter.formatted_name .. ']'),
+          }
+        end
+      }
     })
+
   end,
 }
