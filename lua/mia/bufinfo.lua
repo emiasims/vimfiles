@@ -57,7 +57,7 @@ local BT = {
       git = git_info(git_dir)
     end
 
-    local root = check_root(bufname)
+    local root = git and git.path or check_root(bufname)
     local path = bufname
     root = root or (git and git.path or vim.fs.dirname(path))
 
