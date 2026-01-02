@@ -2,8 +2,22 @@ local function buf_info()
   local winid = vim.g.statusline_winid or vim.api.nvim_get_current_win()
   local bufnr = vim.api.nvim_win_get_buf(winid)
   local info = mia.bufinfo(bufnr)
-  local desc, title, hl = info.desc, info.name, info.hl
-  return desc, title:gsub('%%', '%%%%'), hl
+  local desc, hl
+  local name = info.name
+  if info.type == 'file' then
+    desc = info.dir .. '/'
+    if info.git then
+      desc = '(' .. info.git.head .. ')' .. desc
+    end
+  else
+    desc = ('[%s]'):format(info.type)
+    if info.dir then
+      desc = desc .. info.dir .. '/'
+    end
+    hl = info.hl or 'Special'
+    name = name or '⤬'
+  end
+  return desc, name:gsub('%%', '%%%%'), hl
 end
 
 local function peek()

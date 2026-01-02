@@ -66,14 +66,25 @@ local function tab_layout()
     for _, winid in ipairs(api.nvim_tabpage_list_wins(tabid)) do
       local buf = vim.fn.winbufnr(winid)
       local info = mia.bufinfo(buf)
-      local name, dir = info.tab_name or info.name, info.tab_hint
-      name = name or vim.fn.bufname(buf)
 
-      -- if the file buffer is duplicated in name, indicate which with a prefix
-      -- init.lua -> mia➔init.lua for example.
-      if dir and bufname_counts[name] > 1 then
-        name = ('%s➔%s'):format(dir, name)
+      local name = info.tab_name
+      if not name and info.type ~= 'file' then
+        local fmt = (info.name and '[%s:%s]' or '[%s]')
+        name = fmt:format(info.type, info.name)
+      elseif not name then -- is file
+        name = info.name
+        local path = vim.split(info.bufname, '/', { plain = true })
+        local ix = #path - 1
+        local dir = path[ix] -- # TODO loop and make, e.g nvim/lua➔init.lua
+        bufname_counts[name] = bufname_counts[name] or 1
+
+        -- if the file buffer is duplicated in name, indicate which with a prefix
+        -- init.lua -> mia➔init.lua for example.
+        if dir and bufname_counts[name] > 1 then
+          name = ('%s➔%s'):format(dir, name)
+        end
       end
+
       name = name:gsub('%%', '%%%%')
 
       win_specs[winid] = {

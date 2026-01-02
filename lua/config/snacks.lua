@@ -77,6 +77,27 @@ mia.augroup('snacks', {
   RecordingLeave = function()
     MacroReg[vim.v.event.regname] = true
   end,
+  FileType = {
+    pattern = 'snacks_*',
+    callback = function(ev)
+      local name = ev.match:sub(8)
+      if name == 'layout_box' then
+        local rel_path = vim.fs.relpath('~', vim.fn.getcwd())
+        -- the only time I see a 'layout_box' with my config is for snacks explorer
+        -- everything else is a floating window, which won't be on the tabline.
+        vim.b.update_bufinfo = {
+          type = 'dir',
+          name = rel_path and '~/' .. rel_path or vim.fn.getcwd(),
+          dir = false,
+        }
+      else
+        vim.b.update_bufinfo = {
+          type = 'snacks',
+          name = ev.match:sub(8), -- snacks_
+        }
+      end
+    end
+  }
 })
 
 function M.get_regitem(reg)

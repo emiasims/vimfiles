@@ -56,5 +56,14 @@ return {
       { '<Plug>(CopilotPrevious)', vim.fn['copilot#Previous'] },
       { '<Plug>(CopilotSuggest)', vim.fn['copilot#Suggest'] },
     })
+
+    mia.augroup('copilot', {
+      User = {
+        BufInfo = function(ev)
+          vim.b.workspace_folder = ev.data.root
+        end
+      }
+    })
+
   end,
 }

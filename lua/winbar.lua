@@ -144,7 +144,7 @@ local function bufinfo()
   if not info then
     return
   end
-  return info.cwd .. '/' .. info.name
+  return info.dir .. '/' .. info.name
 end
 
 local function definition()
