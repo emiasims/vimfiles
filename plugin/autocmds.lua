@@ -7,6 +7,20 @@ mia.augroup(mia.group, {
   RecordingEnter = 'hi! link CursorLine CursorLRecording',
   RecordingLeave = 'hi! link CursorLine CursorLBase',
 
+  -- autochdir - vimleavepre fixes restart issue
+  VimLeavePre = "autocmd VimLeavePre * exec 'silent! lcd ' .. getcwd(-1, -1)",
+  User = {
+    BufInfo = function()
+      local root = mia.bufinfo().root
+      if root and root ~= vim.fn.getcwd() then
+        local ok, err = pcall(vim.cmd.lcd, root)
+        if not ok then
+          mia.err('autochdir lcd failed: ' .. err)
+        end
+      end
+    end,
+  },
+
   -- if a file is in my dotfiles, make bufinfo aware of it
   BufReadPre = function(ev)
     vim.system(
