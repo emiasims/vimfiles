@@ -62,6 +62,7 @@ mia.augroup(mia.group, {
             i, reg, last = i + 1, vim.fn.getreginfo(i + 1), reg
           until i > 9
             -- if its empty, we can stop there. Don't need to save it
+            or last.regcontents == nil
             or (#last.regcontents == 1 and last.regcontents[1]:match('^%s*$'))
             -- if the next register is the same as this one, don't need to save it
             or vim.deep_equal(reg.regcontents, last.regcontents)
