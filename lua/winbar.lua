@@ -9,7 +9,8 @@ local function attach(winid)
   if not buf then
     return
   end
-  vim.wo[winid].winbar = '%!v:lua.winbar()'
+  local type = vim.bo[buf].buftype == 'terminal' and 'termbar' or 'winbar'
+  vim.wo[winid].winbar = '%!v:lua.' .. type .. '()'
   vim.b[buf].winbar_attached = true
 end
 
@@ -94,11 +95,12 @@ do -- setup treesitter window context updates
     end
   end
 
+  local bt_allowed = { [''] = true, ['terminal'] = true }
   local function au_attach(ev)
     vim.wo.winbar = ''
     if
       not api.nvim_win_get_config(0).zindex -- Not a floating window
-      and vim.bo[ev.buf].buftype == '' -- Normal buffer
+      and bt_allowed[vim.bo[ev.buf].buftype]
       and api.nvim_buf_get_name(ev.buf) ~= '' -- Has a file name
       and not vim.wo[0].diff -- Not in diff mode
     then
@@ -156,13 +158,44 @@ local function definition()
   }
 end
 
+local function termbar_def()
+  local winid = vim.g.statusline_winid or api.nvim_get_current_win()
+  local bufnr = api.nvim_win_get_buf(winid)
+  return {
+    ' ',
+    vim
+      .iter(api.nvim_list_bufs())
+      :map(function(buf)
+        local info = mia.bufinfo(buf)
+        return info and info.pid and info
+      end)
+      :map(function(info)
+        return {
+          info.type .. ':' .. info.bufnr,
+          hl = bufnr == info.bufnr and 'Directory' or 'Comment',
+          on_click = bufnr ~= info.bufnr and function()
+            api.nvim_set_current_win(winid)
+            api.nvim_set_current_buf(info.bufnr)
+          end,
+        }
+      end):totable(),
+      ' ',
+      sep = ' ',
+  }
+end
+
 function _G.winbar()
   return mia.line.render(definition, 'winbar')
+end
+
+function _G.termbar()
+  return mia.line.render(termbar_def, 'winbar')
 end
 
 return {
   context = treesitter_context,
   bufinfo = bufinfo,
   definition = _G.winbar,
+  term_def = termbar_def,
   attach = attach,
 }
