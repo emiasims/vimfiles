@@ -42,6 +42,8 @@ local clickable_window = function(winid)
   return function(_, _, button, _)
     if button == 'l' then
       api.nvim_set_current_win(winid)
+    elseif button == 'r' then
+      api.nvim_win_close(winid, false)
     end
   end
 end
