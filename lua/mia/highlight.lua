@@ -32,10 +32,11 @@ local function inspect_range(bufnr, lnum, start_col, end_col)
   if ok and parser then
     parser:for_each_tree(function(_, tree)
       local query = ts.query.get(tree:lang(), 'highlights')
-      if not query then
+      local parsed = tree:parse()[1]
+      if not (query and parsed) then
         return
       end
-      local root = tree:parse()[1]:root()
+      local root = parsed:root()
       for id, node, metadata in query:iter_captures(root, bufnr, lnum, lnum + 1) do
         local sr, sc, er, ec = node:range()
         local name = '@' .. query.captures[id] .. '.' .. tree:lang()
