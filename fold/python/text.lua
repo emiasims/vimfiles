@@ -13,7 +13,7 @@ return function(lnum, bufnr)
       decorator = decorator:parent()
     end
     if not decorator then
-      return M.default(foldtext)
+      return foldtext
     end
 
     local line = decorator:field('definition')[1]:start()
@@ -32,7 +32,7 @@ return function(lnum, bufnr)
       class = class:parent()
     end
     if not class then
-      return M.default(foldtext)
+      return foldtext
     end
 
     local params
@@ -43,7 +43,7 @@ return function(lnum, bufnr)
       end
     end
     if not params then
-      return M.default(foldtext)
+      return foldtext
     end
     local matcher = function(char)
       return function(chunk)
@@ -55,7 +55,7 @@ return function(lnum, bufnr)
     local open = it_ft:find(matcher('('))
     local close = it_ft:rfind(matcher(')'))
     if not (open and close) then
-      return M.default(foldtext)
+      return foldtext
     end
 
     if it_ft:peek() and it_ft:peek()[1] == 'self' then
