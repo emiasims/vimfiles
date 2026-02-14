@@ -47,9 +47,7 @@ local function mouse_on_line(name)
     return mouse.screenrow == 1
   elseif name == 'winbar' then
     local info = vim.fn.getwininfo(vim.g.statusline_winid)[1]
-    return mouse.screenrow == info.winrow
-      and mouse.screencol >= info.wincol
-      and mouse.screencol < info.wincol + info.width
+    return mouse.winid == vim.g.statusline_winid and mouse.screenrow == info.winrow
   end
 end
 
@@ -121,7 +119,7 @@ local function join_flat_spec(spec)
     :join('')
 end
 
---- This is insane.
+--- This is insane. Enjoy.
 local function _add_hover_hls(name, flat_spec)
   -- Build clickable regions - mark them with unique highlight groups
   -- For the eval_statusline call, they must exist.
