@@ -19,17 +19,29 @@ mia.keymap({
 mia.keymap({
   {
     'zk',
-    desc = 'Move to the TOP of the previous fold',
+    desc = 'Move upwards to the START of the previous fold',
     function()
-      local start = vim.fn.line('.')
-      if vim.v.count1 > 1 then
-        vim.cmd.normal({ (vim.v.count1 - 1) .. 'zk', bang = true })
-      else
+      local function start_of_fold(lnum)
+        local closed = vim.fn.foldclosed(lnum)
+        return closed ~= -1 and closed or lnum
+      end
+
+      local function start_of_prev_fold(lnum)
+        lnum = start_of_fold(lnum)
+        repeat
+          lnum = start_of_fold(lnum - 1)
+        until lnum <= 1 or vim.fn.foldlevel(lnum) > vim.fn.foldlevel(lnum - 1)
+        return lnum
+      end
+
+      local lnum = vim.fn.line('.')
+      for _ = 1, vim.v.count1 do
+        lnum = start_of_prev_fold(lnum)
+      end
+
+      if lnum ~= vim.fn.line('.') then
         vim.cmd.normal('m`')
-        vim.cmd.normal({ '[z', bang = true, mods = { keepjumps = true } })
-        if start == vim.fn.line('.') then
-          vim.cmd.normal({ 'zk[z', bang = true, mods = { keepjumps = true } })
-        end
+        vim.api.nvim_win_set_cursor(0, { lnum, 0 })
       end
     end,
   },
