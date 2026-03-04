@@ -317,7 +317,7 @@ function M.setup()
     -- on vimenter, start a session or load one. Ensure the primary buffer is focused
     VimEnter = function()
       vim.o.swapfile = false
-      if vim.g.session or vim.fn.argc() ~= 1 then
+      if vim.g.session or vim.fn.argc() ~= 1 or vim.fn.expand('%:p'):match('^/tmp/') then
         return
       end
 
