@@ -129,7 +129,7 @@ return {
       { 'lclear', 'Lclearloclist' },
       { 'lf', 'luafile%' },
       { 'w2', 'w' },
-      { 'dws', 'mkview | silent! %s/\\s\\+$// | loadview | update' },
+      { 'dws', 'mkview | silent! %s/\\v(\\s+|\\r)$// | loadview | update' },
       { 'eh', 'edit <C-r>=expand("%:h")<Cr>/', eat = ' ' },
       { 'mh', 'Move <C-r>=expand("%:h")<Cr>/', eat = '%s' },
       { 'mf', 'edit ~/.config/nvim/lua/mia/<C-z>', eat = ' ' },
