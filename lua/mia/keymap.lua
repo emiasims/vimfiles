@@ -1,7 +1,8 @@
 local function dotrepeat(rhs, lhs)
   if type(rhs) == 'string' then
     assert(lhs)
-    return ('%s<Cmd>call repeat#set(%s, v:count)<Cr>'):format(rhs, lhs)
+    lhs = vim.fn.escape(lhs, '"')
+    return ('%s<Cmd>call repeat#set("%s", v:count)<Cr>'):format(rhs, lhs)
   end
   return function()
     vim.fn['repeat#set'](lhs, vim.v.count)
