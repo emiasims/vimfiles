@@ -10,9 +10,7 @@ local function window_layout(layout, win_specs)
   end
 
   -- First do it recursively..
-  local it = vim.iter(layout[2]):map(function(_layout)
-    return window_layout(_layout, win_specs)
-  end)
+  local it = vim.iter(layout[2]):map(function(_layout) return window_layout(_layout, win_specs) end)
 
   -- now join with separator logic:
   -- add padding that separates units within the window layout.
@@ -135,19 +133,35 @@ local function macro_status()
   return reg ~= '' and ('[q:%s]'):format(reg) or nil
 end
 
+local oc_status
+local function opencode()
+  if not package.loaded['opencode'] then
+    return
+  end
+  oc_status = oc_status or require('opencode.status')
+  return {
+    oc_status.statusline_icon() .. '  ',
+    hl = ({
+      idle = nil,
+      error = 'Error',
+      responding = 'Character',
+      requesting_permission = 'Todo',
+    })[oc_status.status],
+  }
+end
+
 local function definition()
   return {
     tab_layout,
     '%=',
     { macro_status, hl = 'TabLineRecording', pad = true },
     { '%S', pad = true },
+    opencode,
     { session, hl = 'TabLineSession', pad = true },
   }
 end
 
-function _G.tabline()
-  return mia.line.render(definition, 'tabline')
-end
+function _G.tabline() return mia.line.render(definition, 'tabline') end
 vim.o.tabline = '%!v:lua.tabline()'
 
 return {
