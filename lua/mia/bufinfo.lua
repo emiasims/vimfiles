@@ -1,15 +1,17 @@
 local M = {}
 
-local CONFIG = vim.fs.dirname(vim.fn.stdpath('config'))
+local DOTFILES = vim.fs.root(vim.uv.fs_realpath(vim.fn.stdpath('config')), '.git')
 
 ---@type string[]
 local special_roots = {
   vim.env.VIMRUNTIME,
-  vim.fs.joinpath(CONFIG, 'kitty'),
-  vim.fs.joinpath(CONFIG, 'fish'),
-  vim.fs.joinpath(CONFIG, 'zsh'),
-  vim.fs.joinpath(CONFIG, 'opencode'),
   vim.fn.stdpath('config') .. '/mia_plugins',
+  vim.fs.joinpath(DOTFILES, 'fish', 'fish'),
+  vim.fs.joinpath(DOTFILES, 'git'),
+  vim.fs.joinpath(DOTFILES, 'kitty'),
+  vim.fs.joinpath(DOTFILES, 'lazygit'),
+  vim.fs.joinpath(DOTFILES, 'mise'),
+  vim.fs.joinpath(DOTFILES, 'nvim', 'nvim'),
 }
 
 --- @return string
@@ -68,7 +70,7 @@ local BT = {
       git = git_info(git_dir)
     end
 
-    local root = git and git.path or check_root(bufname)
+    local root = check_root(bufname)
     local path = bufname
     root = root or (git and git.path or vim.fs.dirname(path))
 
@@ -85,7 +87,7 @@ local BT = {
     local dir, pid, cmd = bufname:match('^term://(.*)/(%d+):(.*)$')
     local title = vim.trim(vim.b[bufnr].term_title or '')
     return {
-      type = vim.split(cmd, ' ')[1],  -- # FIXME type = cmd is dumb.
+      type = vim.split(cmd, ' ')[1], -- # FIXME type = cmd is dumb.
       name = title,
       tab_name = ('[%s:%s]'):format(cmd, title:sub(1, 20)),
       pid = pid,
