@@ -153,11 +153,18 @@ end
 
 mia.augroup('bufinfo', {
   BufEnter = update_bufinfo,
+  BufWinEnter = update_bufinfo,
   BufFilePost = update_bufinfo,
   TermEnter = update_bufinfo,
   TermRequest = update_bufinfo,
   OptionSet = { pattern = 'buftype', callback = update_bufinfo },
 })
+
+vim.defer_fn(function()
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    update_bufinfo({ buf = b })
+  end
+end, 5) -- ew FIXME.
 
 return setmetatable(M, {
   __call = function(_, bufnr)
