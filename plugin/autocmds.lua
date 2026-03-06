@@ -103,8 +103,10 @@ mia.augroup(mia.group, {
   },
 
   TermOpen = {
-    callback = function(ev)
-      vim.b[ev.buf].last_mode = 't'
+    callback = function()
+      vim.b.last_mode = 't'
+      vim.wo.number = false
+      vim.wo.relativenumber = false
     end,
   },
 
