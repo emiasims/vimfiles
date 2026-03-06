@@ -21,8 +21,8 @@ local M = {
       local path = vim.fn.expand('%:p')
       local bn = vim.fn.bufnr()
       -- vim
-      vim.cmd.buffer({ '#', mods = { emsg_silent = true } })
       vim.cmd.argdelete({ '%', mods = { emsg_silent = true } })
+      vim.cmd.buffer({ '#', mods = { emsg_silent = true } })
       vim.fn.delete(path)
       vim.cmd.bwipeout(bn)
     end,
