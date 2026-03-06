@@ -53,6 +53,14 @@ end
 
 local BT = {
 
+  tmpfile = function(bufname, bufnr)
+    return {
+      type = 'tmpfile',
+      name = vim.fs.basename(bufname),
+      dir = vim.fs.dirname(bufname),
+    }
+  end,
+
   file = function(bufname, bufnr)
     local git
     local git_dir = lookup_git_dir(bufnr)
@@ -75,9 +83,9 @@ local BT = {
 
   terminal = function(bufname, bufnr)
     local dir, pid, cmd = bufname:match('^term://(.*)/(%d+):(.*)$')
-    local title = vim.b[bufnr].term_title or ''
+    local title = vim.trim(vim.b[bufnr].term_title or '')
     return {
-      type = cmd,
+      type = vim.split(cmd, ' ')[1],  -- # FIXME type = cmd is dumb.
       name = title,
       tab_name = ('[%s:%s]'):format(cmd, title:sub(1, 20)),
       pid = pid,
@@ -114,6 +122,8 @@ function M.get(bufnr_)
     local bufinfo
     if bufname == '' then
       bufinfo = BT.nofile(bufname, bufnr)
+    elseif buftype == '' and vim.fs.relpath(vim.uv.os_tmpdir() or '/tmp', bufname) then
+      bufinfo = BT.tmpfile(bufname, bufnr)
     elseif buftype == '' then
       bufinfo = BT.file(bufname, bufnr)
     elseif BT[buftype] then
