@@ -132,7 +132,7 @@ return {
       { 'dws', 'mkview | silent! %s/\\v(\\s+|\\r)$// | loadview | update' },
       { 'eh', 'edit <C-r>=expand("%:h")<Cr>/', eat = ' ' },
       { 'mh', 'Move <C-r>=expand("%:h")<Cr>/', eat = '%s' },
-      { 'mf', 'edit ~/.config/nvim/lua/mia/<C-z>', eat = ' ' },
+      { 'mf', 'edit <C-r>=stdpath("config")<Cr>/lua/mia/<C-z>', eat = ' ' },
       { 'T', 'execute v:lua.mia.termopen()|startinsert' },
       { 'term', 'term fish' },
       { 'res', 'restart Session load last' },
