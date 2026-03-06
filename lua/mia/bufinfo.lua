@@ -1,11 +1,14 @@
 local M = {}
 
+local CONFIG = vim.fs.dirname(vim.fn.stdpath('config'))
+
 ---@type string[]
 local special_roots = {
   vim.env.VIMRUNTIME,
-  vim.env.HOME .. '/.config/kitty',
-  vim.env.HOME .. '/.config/fish',
-  vim.env.HOME .. '/.config/zsh',
+  vim.fs.joinpath(CONFIG, 'kitty'),
+  vim.fs.joinpath(CONFIG, 'fish'),
+  vim.fs.joinpath(CONFIG, 'zsh'),
+  vim.fs.joinpath(CONFIG, 'opencode'),
   vim.fn.stdpath('config') .. '/mia_plugins',
 }
 
