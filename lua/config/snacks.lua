@@ -281,10 +281,13 @@ M.picker_opts = {
     config_files = {
       format = 'file',
       finder = function()
+        local real = vim.uv.fs_realpath(vim.fn.stdpath('config'))
+        local dotfiles = real and vim.fs.dirname(vim.fs.dirname(real)) or (vim.env.HOME .. '/dotfiles')
         return vim
-          .iter(vim.fn.systemlist('git cfg ls-files --exclude-standard'))
+          .iter(vim.fn.systemlist('git -C ' .. dotfiles .. ' ls-files --exclude-standard'))
+          :filter(function(item) return not item:match('^nvim/') end)
           :map(function(item)
-            return { file = item, cwd = vim.env.HOME, text = item }
+            return { file = vim.fs.joinpath(dotfiles, item), text = item }
           end)
           :totable()
       end,
