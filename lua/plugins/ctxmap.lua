@@ -104,7 +104,7 @@ return {
       ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
       { 'eq', 'vsp|TSEditQuery' },
       { 'eqa', 'vsp|TSEditQueryUserAfter' },
-      { 'T', 'execute "term"<Left>' },
+      { 'T', 'vsplit|term' },
     },
     { -- cmdline start abbreviations
       mode = 'ca',
@@ -133,7 +133,7 @@ return {
       { 'eh', 'edit <C-r>=expand("%:h")<Cr>/', eat = ' ' },
       { 'mh', 'Move <C-r>=expand("%:h")<Cr>/', eat = '%s' },
       { 'mf', 'edit ~/.config/nvim/lua/mia/<C-z>', eat = ' ' },
-      { 'T', 'execute "term fish"|startinsert' },
+      { 'T', 'execute v:lua.mia.termopen()|startinsert' },
       { 'term', 'term fish' },
       { 'res', 'restart Session load last' },
 

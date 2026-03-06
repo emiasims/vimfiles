@@ -20,6 +20,7 @@ local M = vim._defer_require('mia', {
   repl = ..., --- @module 'mia.repl'
   ide = ..., --- @module 'mia.ide'
   source = ..., --- @module 'mia.source'
+  termopen = ..., --- @module 'mia.termopen'
 })
 
 M.ns = vim.api.nvim_create_namespace('mia-general')
