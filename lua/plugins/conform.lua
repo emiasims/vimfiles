@@ -6,7 +6,7 @@ return {
   opts = {
     formatters_by_ft = {
       lua = { 'stylua', lsp_format = 'never' },
-      python = { 'isort', 'black' },
+      python = { lsp_format = 'prefer' },
       markdown = { 'prettier', 'inject' },
     },
   },
