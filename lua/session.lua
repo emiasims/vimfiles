@@ -1,6 +1,10 @@
 local M = {
   dir = vim.fn.stdpath('state') .. '/mia/session',
+  debounce = 5000,
+  stale_age = 15 * 24 * 60 * 60 * 1000, -- 15 days
+
   _enabled = false --[[@as boolean]],
+  _timer = nil --[[@as uv.uv_timer_t?]],
 }
 
 ---@class mia.session
@@ -8,11 +12,10 @@ local M = {
 ---@field file string The original file/buffer path identifying the session context
 ---@field path string The filesystem path to the .vim session file
 ---@field root? string Git root
+---@field auto? boolean Whether the session was auto-started on VimEnter
 ---@field mtime? integer Modification time
 
-local function expand(file)
-  return vim.fs.joinpath(M.dir, file)
-end
+local function expand(file) return vim.fs.joinpath(M.dir, file) end
 
 ---@param buf integer | string
 ---@param name? string
@@ -63,7 +66,7 @@ function M.mksession(sess)
   vim.fn.delete(tmp)
 
   sess.mtime = nil
-  table.insert(lines, 2, 'let g:session=' .. vim.fn.string(sess))
+  table.insert(lines, 2, '" mia.session=' .. vim.json.encode(sess))
   vim.fn.writefile(lines, sess.path)
   sess.mtime = mtime(sess.path)
 
@@ -82,24 +85,24 @@ function M.get_sessinfo(sort)
       local line = fd:read('*l')
       fd:close()
 
-      local sess = line and line:match('^let g:session=(.*)$')
-      if sess then
-        local parsed = vim.api.nvim_parse_expression(sess, '', false)
-        if parsed.error or parsed.ast.type ~= 'DictLiteral' then
-          vim.fn.delete(path)
-        else
-          local s = vim.api.nvim_eval(sess)
-          s.mtime = mtime(s.path)
-          table.insert(sessions, s)
+      local json = line and line:match('^" mia%.session=(.*)$')
+      local sess
+      if json then
+        local ok, decoded = pcall(vim.json.decode, json)
+        if ok then
+          sess = decoded
         end
+      end
+      if sess then
+        sess.path = path -- ensure path matches actual file on disk
+        sess.mtime = mtime(path)
+        table.insert(sessions, sess)
       end
     end
   end
 
   if sort then
-    table.sort(sessions, function(a, b)
-      return (b.mtime or -1) < (a.mtime or -1)
-    end)
+    table.sort(sessions, function(a, b) return (b.mtime or -1) < (a.mtime or -1) end)
     return sessions
   end
   return sessions
@@ -132,20 +135,16 @@ function M.resolve(sess)
       return nil
     end
     file_path = vim.fn.fnamemodify(file_path, ':p')
-    return vim.iter(sessions):find(function(s)
-      return s.file == file_path
-    end)
+    return vim.iter(sessions):find(function(s) return s.file == file_path end)
   elseif sess == 'last' then
     return M.get_sessinfo(true)[1]
   elseif type(sess) == 'table' then
-    return vim.iter(sessions):find(function(s)
-      return s.file == sess.file and s.root == sess.root
-    end)
+    return vim.iter(sessions):find(function(s) return s.file == sess.file and s.root == sess.root end)
   elseif type(sess) == 'string' then
     local path_from_str = vim.fn.fnamemodify(sess, ':p')
-    return vim.iter(sessions):find(function(s)
-      return s.name == sess or s.file == path_from_str or s.path == path_from_str
-    end)
+    return vim
+      .iter(sessions)
+      :find(function(s) return s.name == sess or s.file == path_from_str or s.path == path_from_str end)
   end
 end
 
@@ -156,6 +155,8 @@ function M.load(sess)
     M.disable()
     local ok, err = pcall(vim.cmd.source, vim.fn.fnameescape(sess.path))
     if ok then
+      vim.g.session = vim.g.session or sess
+      vim.v.this_session = sess.path
       mia.info('Session loaded: ' .. sess.name)
       M.enable()
     else
@@ -166,13 +167,15 @@ function M.load(sess)
   end
 end
 
----@param name string
-function M.save(name)
+---@param name? string
+---@param auto? boolean
+function M.save(name, auto)
   M.enable()
   local old_sess = vim.g.session
 
   local buf = old_sess and old_sess.file or vim.api.nvim_get_current_buf()
   local new_sess = new_session_context(buf, name)
+  new_sess.auto = auto and true or nil
   M.mksession(new_sess)
 
   if old_sess and old_sess.path ~= new_sess.path then
@@ -202,24 +205,16 @@ function M.close()
   vim.g.session = nil
 end
 
-function M.disable()
-  M._enabled = false
-end
-
-function M.enable()
-  M._enabled = true
-end
-
-function M.is_enabled()
-  return M._enabled
-end
+function M.disable() M._enabled = false end
+function M.enable() M._enabled = true end
+function M.is_enabled() return M._enabled end
 
 function M.enter(buf)
   local sess = M.resolve(buf)
   if sess then
     M.load(sess)
   else
-    M.start()
+    M.start(nil, true)
   end
 end
 
@@ -233,10 +228,10 @@ function M.renew()
   vim.cmd.CloseHiddenBuffers()
 end
 
-function M.start(name)
+function M.start(name, auto)
   if not vim.g.session then
     M.close()
-    M.save(name)
+    M.save(name, auto)
   else
     mia.warn('Session already active: ' .. vim.g.session.name)
   end
@@ -263,15 +258,83 @@ function M.clean(force)
   end)
 end
 
+--- Check if a file is visible in any window across all tabs.
+---@param file string
+---@return boolean
+local function is_file_visible(file)
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      if vim.api.nvim_buf_get_name(buf) == file then
+        return true
+      end
+    end
+  end
+  return false
+end
+
+--- Delete sessions older than M.stale_age or whose source file no longer exists.
+function M.prune()
+  local now = os.time() * 1000
+  local pruned = 0
+  for _, s in ipairs(M.get_sessinfo()) do
+    local age = s.mtime and (now - s.mtime) or math.huge
+    local file_gone = not vim.uv.fs_stat(s.file)
+    if age > M.stale_age or file_gone then
+      vim.fn.delete(s.path)
+      pruned = pruned + 1
+    end
+  end
+  if pruned > 0 then
+    mia.info('Pruned %d stale session(s)', pruned)
+  end
+end
+
+--- Handle stale auto-session cleanup on exit.
+--- Returns true if the normal save should be skipped.
+---@return boolean
+function M._check_stale_on_exit()
+  local sess = vim.g.session
+  if not sess or not sess.auto or not M._enabled then
+    return false
+  end
+
+  if is_file_visible(sess.file) then
+    return false
+  end
+
+  local ntabs = #vim.api.nvim_list_tabpages()
+  if ntabs == 1 then
+    -- single tab, source file not visible: silently delete
+    vim.fn.delete(sess.path)
+    M.close()
+    return true
+  end
+
+  -- multiple tabs: prompt
+  local choice = vim.fn.confirm(
+    ('Session source file not visible: %s'):format(sess.name),
+    '&Save and quit\n&Delete session and quit\n&Open source file and quit',
+    2
+  )
+  if choice == 2 then
+    vim.fn.delete(sess.path)
+    M.close()
+    return true
+  elseif choice == 3 then
+    vim.cmd('0tabnew ' .. vim.fn.fnameescape(sess.file))
+    return false -- fall through to normal save
+  end
+  return false -- choice 1 or ESC: save normally
+end
+
 function M.setup()
-  local list_complete = mia.command.wrap_complete(function()
-    return vim.iter(M.get_sessinfo()):map(mia.tbl.index('name')):totable()
-  end)
+  local list_complete = mia.command.wrap_complete(
+    function() return vim.iter(M.get_sessinfo()):map(mia.tbl.index('name')):totable() end
+  )
 
   local tocmd = function(fn)
-    return function(o)
-      return fn(o.args ~= '' and o.args or nil)
-    end
+    return function(o) return fn(o.args ~= '' and o.args or nil) end
   end
 
   vim.fn.mkdir(M.dir, 'p')
@@ -297,32 +360,70 @@ function M.setup()
     nargs = '*',
   })
 
-  ---@param ev aucmd.callback.arg
-  local save_session = function(ev)
-    if vim.bo[ev.buf].buftype == '' and vim.bo[ev.buf].modifiable and vim.fn.mode() ~= 'c' then
-      local ok, err = pcall(M.mksession)
-      if not ok then
-        mia.err(('Failed to save session in event "%s":\n%s'):format(ev.event, err))
-        mia.err(vim.api.nvim_get_mode())
-      end
+  local function cancel_timer()
+    if M._timer then
+      M._timer:stop()
     end
   end
 
-  mia.augroup('session', {
-    FocusLost = save_session,
-    VimLeavePre = save_session,
-    VimSuspend = save_session,
-    BufEnter = save_session,
+  --- Save immediately, cancelling any pending debounce timer.
+  local function save_now()
+    if vim.fn.getcmdwintype() ~= '' then
+      -- can't save sessions when cmdwin is open
+      M._timer:start(M.debounce, 0, vim.schedule_wrap(save_now))
+      return
+    end
+    cancel_timer()
+    local ok, err = pcall(M.mksession)
+    if not ok then
+      mia.err('Failed to save session:\n' .. err)
+    end
+  end
 
-    -- on vimenter, start a session or load one. Ensure the primary buffer is focused
+  --- Start or restart the debounce timer.
+  local function save_debounced()
+    if not M._timer then
+      M._timer = vim.uv.new_timer()
+    end
+    M._timer:start(M.debounce, 0, vim.schedule_wrap(save_now))
+  end
+
+  mia.augroup('session', {
+    -- movement: debounced save
+    BufEnter = function(ev)
+      if M._enabled and vim.bo[ev.buf].buftype == '' and vim.bo[ev.buf].modifiable then
+        save_debounced()
+      end
+    end,
+
+    -- layout changes: immediate save
+    WinNew = save_now,
+    WinClosed = save_now,
+    TabNew = save_now,
+    TabClosed = save_now,
+
+    -- critical: immediate save
+    FocusLost = save_now,
+    VimSuspend = save_now,
+    VimLeavePre = function()
+      if not M._check_stale_on_exit() then
+        save_now()
+      end
+    end,
+
+    -- on vimenter, start a session or load one
     VimEnter = function()
       vim.o.swapfile = false
       if vim.g.session or vim.fn.argc() ~= 1 or vim.fn.expand('%:p'):match('^/tmp/') then
+        vim.schedule(M.prune)
         return
       end
 
       -- terms dont load properly unless scheduled. idk why
-      vim.schedule(M.enter)
+      vim.schedule(function()
+        M.enter()
+        M.prune()
+      end)
     end,
   })
   if vim.g.session then
