@@ -15,6 +15,27 @@ mia.keymap({
   { 'gx', '<Cmd>lua mia.repl.send_visual()<Cr>', mode = 'x' },
 })
 
+local function next_term(reverse)
+  return function()
+    local term_bufs = vim.tbl_filter(function(b)
+      return vim.bo[b].buftype == 'terminal'
+    end, vim.api.nvim_list_bufs())
+    table.insert(term_bufs, term_bufs[1]) -- wrap around
+    local it = vim.iter(term_bufs)
+    if reverse then
+      it:rev()
+    end
+    it:find(vim.api.nvim_get_current_buf())
+    return '<Cmd>:b' .. it:next() .. '<Cr>'
+  end
+end
+
+mia.keymap({
+  mode = 't',
+  { '<C-t>', next_term(false), desc = 'Next terminal', expr = true },
+  { '<C-r>', next_term(true), desc = 'Prev terminal', expr = true },
+})
+
 -- big funcs
 mia.keymap({
   {
