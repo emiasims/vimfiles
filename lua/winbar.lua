@@ -60,9 +60,9 @@ do -- setup treesitter window context updates
     end
 
     -- add highlighted context
-    vim.iter(mia.highlight.extract(bufnr, row + 1)):each(function(chunk)
-      table.insert(ctx, { text = chunk[1], hl = chunk[2] })
-    end)
+    vim
+      .iter(mia.highlight.extract(bufnr, row + 1))
+      :each(function(chunk) table.insert(ctx, { text = chunk[1], hl = chunk[2] }) end)
 
     vim.w[winid].winbar_ctx = ctx
   end
@@ -146,14 +146,19 @@ local function bufinfo()
   if not info then
     return
   end
-  return info.dir .. '/' .. info.name
+
+  return {
+    { vim.fs.basename(info.root):upper(), hl = 'Directory' },
+    { '❱' , pad = true },
+    { vim.fs.relpath(info.root, info.bufname), hl = 'Comment' },
+  }
 end
 
 local function definition()
   return {
     treesitter_context,
     '%=',
-    { bufinfo, hl = 'Comment' },
+    bufinfo,
     ' ',
   }
 end
@@ -178,19 +183,16 @@ local function termbar_def()
             api.nvim_set_current_buf(info.bufnr)
           end,
         }
-      end):totable(),
-      ' ',
-      sep = ' ',
+      end)
+      :totable(),
+    ' ',
+    sep = ' ',
   }
 end
 
-function _G.winbar()
-  return mia.line.render(definition, 'winbar')
-end
+function _G.winbar() return mia.line.render(definition, 'winbar') end
 
-function _G.termbar()
-  return mia.line.render(termbar_def, 'winbar')
-end
+function _G.termbar() return mia.line.render(termbar_def, 'winbar') end
 
 return {
   context = treesitter_context,
