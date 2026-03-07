@@ -125,4 +125,9 @@ vim.schedule(function()
   })
 end)
 
-require('vim._extui').enable({})
+local ok, ui2 = pcall(require, 'vim._core.ui2')
+if ok then
+  ui2.enable({})
+elseif pcall(require, 'vim._extui') then
+  require('vim._extui').enable({})
+end
