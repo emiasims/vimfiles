@@ -8,8 +8,7 @@ return {
     { 'nvim-treesitter/nvim-treesitter-textobjects' },
     {
       'nvim-treesitter/nvim-treesitter-context',
-      lazy = true,
-      opts = { enable = false, mode = 'topline' }, -- used in winbar
+      opts = { enable = true, multiwindow = true, mode = 'topline' },
     },
   },
   config = function()
