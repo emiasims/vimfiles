@@ -12,6 +12,7 @@ local special_roots = {
   vim.fs.joinpath(DOTFILES, 'lazygit'),
   vim.fs.joinpath(DOTFILES, 'mise'),
   vim.fs.joinpath(DOTFILES, 'nvim', 'nvim'),
+  vim.fs.joinpath(DOTFILES, 'opencode', 'opencode'),
 }
 
 --- @return string
