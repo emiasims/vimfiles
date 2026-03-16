@@ -107,5 +107,5 @@ return {
   peek = peek,
   cursor_info = cursor_info,
   node_tree = node_tree,
-  definition = _G.statusline,
+  definition = definition,
 }
