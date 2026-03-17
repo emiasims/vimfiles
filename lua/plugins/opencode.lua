@@ -22,5 +22,4 @@ return {
     { '<C-.>', function() require('opencode').toggle() end },
     { 'go', function() require('opencode').command('@this') end },
   },
-  -- opts = {},
 }
