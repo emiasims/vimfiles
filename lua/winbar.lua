@@ -52,11 +52,11 @@ local def = {
         hl = '@dark',
       },
       '%=',
-      info and {
+      info and info.root and {
         { vim.fs.basename(info.root):upper(), hl = 'Directory' },
         { '❱', pad = true },
         { vim.fs.relpath(info.root, info.bufname), hl = 'Comment' },
-      } or nil,
+      },
       ' ',
     }
   end,
