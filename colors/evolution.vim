@@ -50,7 +50,7 @@ highlight Question         ctermfg=187  guifg=#d5c4a1 ctermbg=NONE guibg=NONE   
 highlight WarningMsg       ctermfg=167  guifg=#D84A44 ctermbg=234  guibg=#1d2021 cterm=NONE      gui=NONE
 highlight TabLine          ctermfg=102  guifg=#948774 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
 highlight TabLineFill      ctermfg=102  guifg=#948774 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
-highlight TabLineSel       ctermfg=187  guifg=#d5c4a1 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
+highlight TabLineSel       ctermfg=65   guifg=#91ba93 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
 highlight Cursor           ctermfg=234  guifg=#1d2021 ctermbg=187  guibg=#d5c4a1 cterm=NONE      gui=NONE
 highlight CursorColumn     ctermfg=NONE guifg=NONE    ctermbg=235  guibg=#282828 cterm=NONE      gui=NONE
 highlight CursorLineNr     ctermfg=73   guifg=#72b7b5 ctermbg=234  guibg=#1d2021 cterm=NONE      gui=NONE
@@ -155,19 +155,20 @@ highlight StatusLineNC        ctermfg=102 guifg=#948774 ctermbg=237 guibg=#3c383
 highlight StatusLineTerm      ctermfg=73  guifg=#72b7b5 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
 highlight StatusLineTermNC    ctermfg=187 guifg=#d5c4a1 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
 
-highlight stlModified         ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=bold gui=bold
-highlight stlTypeInfo         ctermfg=73  guifg=#6fa3a6 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
-highlight stlDirInfo          ctermfg=116 guifg=#84d4d2 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
-highlight stlErrorInfo        ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight StatusLineModified     ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=bold gui=bold
+highlight StatusLineTypeInfo     ctermfg=73  guifg=#6fa3a6 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
+highlight StatusLineDirInfo      ctermfg=116 guifg=#84d4d2 ctermbg=237 guibg=#3c3836 cterm=NONE gui=NONE
+highlight StatusLineErrorInfo    ctermfg=167 guifg=#d84a44 ctermbg=235 guibg=#282828 cterm=NONE gui=NONE
 
-highlight stlNormalMode       ctermfg=172 guifg=#d79921 ctermbg=239 guibg=#504945 cterm=bold gui=bold
-highlight stlInsertMode       ctermfg=234 guifg=#1d2021 ctermbg=65  guibg=#679a69 cterm=bold gui=bold
-highlight stlVisualMode       ctermfg=234 guifg=#1d2021 ctermbg=173 guibg=#c7743e cterm=NONE gui=NONE
-highlight stlReplaceMode      ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
-highlight stlSelectMode       ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
-highlight stlTerminalMode     ctermfg=139 guifg=#b48ead ctermbg=239 guibg=#504945 cterm=NONE gui=NONE
+highlight StatusLineMode_n ctermfg=172 guifg=#d79921 ctermbg=239 guibg=#504945 cterm=bold gui=bold
+highlight StatusLineMode_i ctermfg=234 guifg=#1d2021 ctermbg=65  guibg=#679a69 cterm=bold gui=bold
+highlight StatusLineMode_v ctermfg=234 guifg=#1d2021 ctermbg=173 guibg=#c7743e cterm=NONE gui=NONE
+highlight StatusLineMode_r ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
+highlight StatusLineMode_t ctermfg=139 guifg=#b48ead ctermbg=239 guibg=#504945 cterm=NONE gui=NONE
+highlight StatusLineMode_c ctermfg=139 guifg=#b48ead ctermbg=239 guibg=#504945 cterm=NONE gui=NONE
+highlight StatusLineMode_other ctermfg=234 guifg=#1d2021 ctermbg=73  guibg=#6fa3a6 cterm=NONE gui=NONE
 
-highlight TabLineWin       ctermfg=65   guifg=#91ba93 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
+highlight TabLineWin       ctermfg=187  guifg=#d5c4a1 ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
 highlight TabLineNumber    ctermfg=139  guifg=#b48ead ctermbg=237 guibg=#3c3836 cterm=NONE      gui=NONE
 highlight TabLineSelNumber ctermfg=172  guifg=#d79921 ctermbg=237 guibg=#3c3836 cterm=bold      gui=bold
 
