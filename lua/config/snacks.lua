@@ -55,9 +55,7 @@ mia.command('Pick', {
     elseif opt == 'finder' then
       return vim
         .iter(Snacks.picker.config.get().sources)
-        :map(function(_, v)
-          return type(v.finder) == 'string' and v.finder or nil
-        end)
+        :map(function(_, v) return type(v.finder) == 'string' and v.finder or nil end)
         :totable()
     elseif opt == 'layout' then
       return vim.tbl_keys(Snacks.picker.config.get().layouts)
@@ -71,12 +69,8 @@ mia.command('Pick', {
 
 local MacroReg = mia.cache.file('macro_reg')
 mia.augroup('snacks', {
-  TextYankPost = function()
-    MacroReg[vim.v.event.regname] = nil
-  end,
-  RecordingLeave = function()
-    MacroReg[vim.v.event.regname] = true
-  end,
+  TextYankPost = function() MacroReg[vim.v.event.regname] = nil end,
+  RecordingLeave = function() MacroReg[vim.v.event.regname] = true end,
   FileType = {
     pattern = 'snacks_*',
     callback = function(ev)
@@ -96,8 +90,8 @@ mia.augroup('snacks', {
           name = ev.match:sub(8), -- snacks_
         }
       end
-    end
-  }
+    end,
+  },
 })
 
 function M.get_regitem(reg)
@@ -190,9 +184,7 @@ function M.put_register(opts)
     on_close = function(picker)
       vim.api.nvim_buf_clear_namespace(buf.nr, ns, 0, -1)
       if buf.undo then
-        vim.api.nvim_buf_call(buf.nr, function()
-          vim.cmd.undo({ bang = true })
-        end)
+        vim.api.nvim_buf_call(buf.nr, function() vim.cmd.undo({ bang = true }) end)
       end
     end,
 
@@ -202,6 +194,9 @@ function M.put_register(opts)
     end,
   }, opts))
 end
+
+local real = vim.uv.fs_realpath(vim.fn.stdpath('config'))
+local dotfiles = real and vim.fs.dirname(vim.fs.dirname(real)) or (vim.env.HOME .. '/dotfiles')
 
 ---@module 'snacks'
 ---@type snacks.picker.Config
@@ -217,9 +212,7 @@ M.picker_opts = {
         backdrop = false,
         row = 1,
         width = 0,
-        height = function()
-          return vim.o.lines - 3
-        end,
+        height = function() return vim.o.lines - 3 end,
         {
           box = 'vertical',
           width = 50,
@@ -272,33 +265,21 @@ M.picker_opts = {
       finder = function()
         return vim
           .iter(vim.api.nvim_get_runtime_file('prompts/*.*', true))
-          :map(function(item)
-            return { file = item, text = item }
-          end)
+          :map(function(item) return { file = item, text = item } end)
           :totable()
       end,
     },
     config_files = {
-      format = 'file',
-      finder = function()
-        local real = vim.uv.fs_realpath(vim.fn.stdpath('config'))
-        local dotfiles = real and vim.fs.dirname(vim.fs.dirname(real)) or (vim.env.HOME .. '/dotfiles')
-        return vim
-          .iter(vim.fn.systemlist('git -C ' .. dotfiles .. ' ls-files --exclude-standard'))
-          :filter(function(item) return not item:match('^nvim/') end)
-          :map(function(item)
-            return { file = vim.fs.joinpath(dotfiles, item), text = item }
-          end)
-          :totable()
-      end,
+      finder = 'files',
+      cwd = dotfiles,
+      dirs = { dotfiles },
+      exclude = { 'nvim/nvim', 'package.conf' },
     },
     sessions = {
       sort = { fields = { 'time:desc' } },
       matcher = { frecency = true, sort_empty = true, cwd_bonus = false },
       format = 'text',
-      finder = function()
-        return require('session').get_sessinfo()
-      end,
+      finder = function() return require('session').get_sessinfo() end,
 
       transform = function(sess, ctx)
         return {
