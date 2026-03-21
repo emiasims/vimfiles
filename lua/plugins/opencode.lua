@@ -13,9 +13,9 @@ return {
       ctx = 'vim.b.bufinfo.type == "opencode"',
       { '<C-[>', function() require('opencode').command('session.half.page.up') end },
       { '<C-]>', function() require('opencode').command('session.half.page.down') end },
-      { '<C-c>', '<Nop>', desc = 'Disable Ctrl-C in opencode session' },
-      { '<Esc>', '<Esc>', desc = 'Make esc usable in opencode' },
       { '<C-.>', function() require('opencode').toggle() end },
+      { '<C-c>', '<C-\\><C-c>' },
+      { '<Esc>', '<C-\\><Esc>' },
     },
   },
   keys = {
