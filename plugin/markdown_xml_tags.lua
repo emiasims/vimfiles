@@ -30,14 +30,15 @@ M['textDocument/semanticTokens/full'] = function(params, handler)
 
   for i, line in ipairs(lines) do
     local row = i - 1
-    local s, e = line:find('^%s*</?[%w%-]+>')
-    if s then
+    local s, e = line:find('</?[^>]+>')
+    while s do
       local col = s - 1
       local len = e - s + 1
       local dl = row - prev_line
       local dc = dl == 0 and (col - prev_char) or col
       vim.list_extend(tokens, { dl, dc, len, 0, 0 })
       prev_line, prev_char = row, col
+      s, e = line:find('</?[%w%-]+>', e)
     end
   end
 
@@ -46,7 +47,7 @@ M['textDocument/semanticTokens/full'] = function(params, handler)
 end
 
 --- @param bufnr integer
-local function attach_mock_lsp(bufnr)
+local function attach_xml_highlighter(bufnr)
   local id = vim.lsp.start({
     name = 'markdown_tags_lsp',
     root_dir = vim.fn.getcwd(),
@@ -75,5 +76,5 @@ vim.api.nvim_set_hl(0, "@lsp.type.tag", { link = "Tag" })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'markdown',
-  callback = function(args) attach_mock_lsp(args.buf) end,
+  callback = function(args) attach_xml_highlighter(args.buf) end,
 })
