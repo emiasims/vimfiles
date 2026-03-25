@@ -166,6 +166,7 @@ nnoremap <C-,> g,
 inoremap . .<C-]>
 cnoremap . .<C-]>
 cnoremap <C-t> <Home>tab split<Bar><End>
+cnoremap <C-s> <Home>vsplit<Bar><End>
 nnoremap <MiddleMouse> "*p
 xnoremap <MiddleMouse> "*p
 nnoremap <BS> "*
