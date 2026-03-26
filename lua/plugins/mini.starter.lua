@@ -24,7 +24,7 @@ return {
       { section = 'Pick', name = 'Help tags', action = 'Pick help' },
       { section = 'Pick', name = 'Recent files', action = 'Pick recent' },
       { section = 'Pick', name = 'Vim files', action = 'Pick files cwd=' .. cfgdir },
-      { section = 'Pick', name = 'Dot files', action = 'Pick config_files' },
+      { section = 'Pick', name = 'Dot files', action = 'Pick files cwd=~/dotfiles' },
 
       { section = 'Plugin', name = 'Pick', action = 'Pick files cwd=' .. cfgdir .. '/lua/plugins' },
       { section = 'Plugin', name = 'Lazy', action = 'Lazy' },

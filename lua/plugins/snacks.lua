@@ -31,7 +31,7 @@ return {
       { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/mia_plugins' },
       { 'evs', 'Pick files cwd=<C-r>=stdpath("data")<Cr>/lazy' },
       { 'evr', 'Pick files cwd=$VIMRUNTIME' },
-      { 'ecf', 'Pick config_files' },
+      { 'ecf', 'Pick files cwd=~/dotfiles' },
       { 'gst', 'Pick git_status' },
       { 'ep', 'Pick prompts' },
     },

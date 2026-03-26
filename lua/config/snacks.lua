@@ -195,9 +195,6 @@ function M.put_register(opts)
   }, opts))
 end
 
-local real = vim.uv.fs_realpath(vim.fn.stdpath('config'))
-local dotfiles = real and vim.fs.dirname(vim.fs.dirname(real)) or (vim.env.HOME .. '/dotfiles')
-
 ---@module 'snacks'
 ---@type snacks.picker.Config
 M.picker_opts = {
@@ -268,12 +265,6 @@ M.picker_opts = {
           :map(function(item) return { file = item, text = item } end)
           :totable()
       end,
-    },
-    config_files = {
-      finder = 'files',
-      cwd = dotfiles,
-      dirs = { dotfiles },
-      exclude = { 'nvim/nvim', 'package.conf' },
     },
     sessions = {
       sort = { fields = { 'time:desc' } },
