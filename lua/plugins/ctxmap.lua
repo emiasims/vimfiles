@@ -137,8 +137,11 @@ return {
       { 'term', 'term fish' },
       { 'res', 'restart Session load last' },
 
-      { 'tc', 'TabCopy' },
-      { 'tsl', 'TabSlice' },
+      { 'wc', 'vnew | r# | setlocal | buftype=nofile | let &ft=getbufvar("#", "&ft")' },
+      { 'tc', 'let s=&ssop | set ssop=blank,help,folds,winsize,localoptions | let f=tempname() | exe "mksession " . f | tabnew | exe "source " . f | call delete(f) | let &ssop=s' },
+      { 'tmp', 'let w=bufnr()|let w=win_getid()|tabprev|vsplit|exe "b" . b|call win_execute(w, "close")|unlet! b w' },
+      { 'tmn', 'let b=bufnr()|let w=win_getid()|tabnext|topleft vsplit|exe "b" . b|call win_execute(w, "close")|unlet! b w' },
+      { 'tsl', 'wincmd T' },
       { 'tsp', 'tab split' },
     },
   },
