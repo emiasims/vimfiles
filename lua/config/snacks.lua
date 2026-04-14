@@ -24,7 +24,10 @@ mia.command('Pick', {
       end
     end
 
-    Snacks.picker.pick(opts)
+    local p = Snacks.picker.pick(opts)
+    if p then
+      vim.wait(5000, function() return p.shown end, 10)
+    end
   end,
 
   -- arglead, cmdline, cursorpos
