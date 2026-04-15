@@ -19,19 +19,7 @@ require('lazy').setup({
   rocks = { enabled = false },
   dev = { path = vim.fn.stdpath('config') .. '/mia_plugins' },
   ui = { border = 'rounded' },
-  performance = {
-    rtp = {
-      disabled_plugins = {
-        'gzip',
-        'netrwPlugin',
-        'tarPlugin',
-        'tohtml',
-        'tutor',
-        'zipPlugin',
-      },
-    },
-  },
-  profiling = { loader = true, require = true },
+  profiling = { loader = true, require = false },
 })
 
 -- auto tracking
