@@ -1,19 +1,32 @@
 local M = {}
 
-mia.command('Pick', {
-  nargs = '+',
-  callback = function(cmd)
-    local opts = { source = cmd.fargs[1] }
-
-    if opts.source == 'resume' then
-      Snacks.picker.resume()
-      return
+local function build_completions(source)
+  local opts = Snacks.picker.config.get({ source = source })
+  local skip = { enabled = true, source = true }
+  local completions = { cwd = 'dir' } ---@type table<string|number, any>
+  for k, v in pairs(opts) do
+    if not skip[k] and type(v) ~= 'table' then
+      completions[k] = type(v) == 'boolean' and { 'true', 'false' } or true
     end
+  end
+  completions.focus = { 'input', 'list' }
+  completions.layout = function() return vim.tbl_keys(Snacks.picker.config.get().layouts) end
+  completions.finder = function()
+    return vim
+      .iter(Snacks.picker.config.get().sources)
+      :map(function(_, v) return type(v.finder) == 'string' and v.finder or nil end)
+      :totable()
+  end
+  return completions
+end
 
-    for i = 2, #cmd.fargs do
-      local k, v = cmd.fargs[i]:match('^(%w+)=(.*)$') -- escaping ws works
+local function pick_callback(source)
+  return function(o)
+    local opts = { source = source }
+    for _, arg in ipairs(o.fargs) do
+      local k, v = arg:match('^(%w+)=(.*)$')
       if not k then
-        error('Invalid argument: ' .. cmd.fargs[i])
+        error('Invalid argument: ' .. arg)
       end
       if v == 'true' then
         opts[k] = true
@@ -23,50 +36,23 @@ mia.command('Pick', {
         opts[k] = vim.fn.expandcmd(v)
       end
     end
-
     local p = Snacks.picker.pick(opts)
     if p then
       vim.wait(5000, function() return p.shown end, 10)
     end
-  end,
+  end
+end
 
-  -- arglead, cmdline, cursorpos
-  complete = function(arglead, cmdline, _)
-    local source = cmdline:match('Pick ([%w_]*)$')
-    if source then
-      local sources = vim.tbl_keys(Snacks.picker.config.get().sources)
-      return source == '' and sources or vim.fn.matchfuzzy(sources, source, { matchseq = true })
-    end
-
-    local opts = Snacks.picker.config.get({ source = cmdline:match('Pick (%S+)') })
-
-    local opt = arglead:match('^(%w+)=')
-    if not opt then
-      local ret = { 'cwd=' }
-      local skip = { enabled = true, source = true }
-
-      for k, v in pairs(opts) do
-        if not skip[k] and type(v) ~= 'table' then
-          table.insert(ret, k .. '=')
-        end
-      end
-      return ret
-    end
-
-    if opt == 'focus' then
-      return { 'input', 'list' }
-    elseif opt == 'finder' then
-      return vim
-        .iter(Snacks.picker.config.get().sources)
-        :map(function(_, v) return type(v.finder) == 'string' and v.finder or nil end)
-        :totable()
-    elseif opt == 'layout' then
-      return vim.tbl_keys(Snacks.picker.config.get().layouts)
-    elseif opt == 'cwd' then
-      return vim.fn.getcompletion(arglead:sub(#opt + 2), 'dir', true)
-    elseif type(opts[opt]) == 'boolean' then
-      return { 'true', 'false' }
-    end
+mia.command('Pick', {
+  nargs = '+',
+  desc = 'Snacks picker',
+  subcommands = function()
+    local cmds = vim
+      .iter(Snacks.picker.config.get().sources)
+      :map(function(name) return name, { pick_callback(name), complete = build_completions(name) } end)
+      :fold({}, rawset)
+    cmds.resume = Snacks.picker.resume
+    return cmds
   end,
 })
 
