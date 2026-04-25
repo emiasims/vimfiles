@@ -15,3 +15,13 @@ vim.b.update_bufinfo = {
 vim.bo.filetype = 'markdown.prompt'
 
 -- add completion: @filepath
+
+local pmfile = vim
+  .iter(vim.fs.dir('.'))
+  :filter(function(_, type) return type == 'file' end)
+  :filter(function(name) return name:match('^PM%..*%.md') end)
+  :next()
+
+if pmfile then
+  vim.cmd.vsplit(pmfile)
+end
