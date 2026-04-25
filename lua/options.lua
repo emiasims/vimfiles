@@ -125,9 +125,5 @@ vim.schedule(function()
   })
 end)
 
-local ok, ui2 = pcall(require, 'vim._core.ui2')
-if ok then
-  ui2.enable({})
-elseif pcall(require, 'vim._extui') then
-  require('vim._extui').enable({})
-end
+-- wtf. not working on restart without defer. why?
+vim.defer_fn(function() require('vim._core.ui2').enable({}) end, 500)
