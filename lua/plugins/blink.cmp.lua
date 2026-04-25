@@ -19,8 +19,20 @@ return {
     },
     { '<S-Tab>', { 'blink_visible', '<C-p>', remap = true }, mode = 'c' },
     {
+      '<C-.>',
+      {
+        { 'blink_visible', '<C-y><Cmd>lua vim.defer_fn(require("blink.cmp").show, 1)<Cr>', remap = true },
+        { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+      },
+      default = '<Cmd>lua require("blink.cmp").show()<Cr>',
+      mode = { 'i', 'c' },
+    },
+    {
       '<S-Space>',
-      { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+      {
+        { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+        { 'blink_visible', '<C-y><Cmd>lua vim.schedule(require("blink.cmp").show)<Cr>', remap = true },
+      },
       default = '<Cmd>lua require("blink.cmp").show()<Cr>',
       mode = 'c',
     },
