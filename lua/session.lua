@@ -210,10 +210,11 @@ function M.enable() M._enabled = true end
 function M.is_enabled() return M._enabled end
 
 function M.enter(buf)
-  local sess = M.resolve(buf)
+  local sess = M.resolve(buf or vim.api.nvim_get_current_buf())
   if sess then
     M.load(sess)
   else
+    M.close()
     M.start(nil, true)
   end
 end
@@ -421,7 +422,12 @@ function M.setup()
 
       -- terms dont load properly unless scheduled. idk why
       vim.schedule(function()
-        M.enter()
+        if not vim.g.session then
+          -- FIXME: nvim init.lua, open session|options. save options session. restart.
+          -- loads init.lua session after options session, expect options sess
+          -- additionally: :Session enter not working as expected.
+          M.enter()
+        end
         M.prune()
       end)
     end,
