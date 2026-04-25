@@ -1,10 +1,6 @@
 ---@meta _
 error('Cannot require a meta file')
 
----@alias cmd.callback fun(cmd: cmd.callback.arg)
----@alias cmd.complete fun(ArgLead: string, CmdLine: string, CursorPos: integer): string[]
----@alias cmd.preview fun(opts: cmd.callback.arg, ns: integer, buf: integer): 0|1|2
-
 ---@class cmd.callback.arg
 ---@field name string Command name
 ---@field args string The args passed to the command, if any <args>
@@ -19,9 +15,13 @@ error('Cannot require a meta file')
 ---@field mods string Command modifiers, if any <mods>
 ---@field smods vim.api.keyset.parse_cmd.mods Command modifiers in a structured format. Has the same structure as the "mods" key of |nvim_parse_cmd()|.
 
+---@class cmd.complete.spec
+---@field [integer] string
+---@field [string] cmd.opts.complete|cmd.complete|string[]
+
 ---@class cmd.opts.create
 ---@field callback string|cmd.callback
----@field complete? cmd.complete|cmd.opts.complete|table
+---@field complete? cmd.complete|cmd.opts.complete|cmd.complete.spec
 ---@field preview? cmd.preview
 ---@field bang? cmd.callback|boolean
 ---@field desc? string
@@ -88,6 +88,20 @@ error('Cannot require a meta file')
 ---|'user' user names
 ---|'var' user variables
 
+---@alias mia.commands table<string, mia.command|cmd.opts.create|cmd.callback|string>
+
+---@class mia.command.def: cmd.opts.create
+---@field [1]? string|cmd.callback
+---@field callback? cmd.callback
+---@field command? string
+---@field bang? cmd.callback|boolean
+---@field subcommands? mia.command.subcommands
+
+---@class mia.command
+
+---@class mia.cmd.callback.arg
+---@field cmdline? boolean Whether or not it was called as a :command
+
 ---@alias aucmd.callback fun(cmd: aucmd.callback.arg): boolean?
 
 ---@class aucmd.opts
@@ -115,19 +129,3 @@ error('Cannot require a meta file')
 ---@field [1]? aucmd.event|aucmd.event[]
 ---@field [2]? string|aucmd.callback
 ---@field event? aucmd.event|aucmd.event[]
-
----@alias mia.commands table<string, mia.command|cmd.opts.create|cmd.callback|string>
-
----@class mia.command.def: cmd.opts.create
----@field [1]? string|cmd.callback
----@field callback? cmd.callback
----@field command? string
----@field bang? cmd.callback|boolean
----@field subcommands? table<string, mia.command.create>
-
----@alias mia.command.create mia.command|cmd.opts.create|cmd.callback|string
-
----@class mia.command:
-
----@class mia.cmd.callback.arg
----@field cmdline? boolean Whether or not it was called as a :command
