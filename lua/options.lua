@@ -56,7 +56,7 @@ vim
     showbreak = '↘',
     wildmode = { 'longest:full', 'full' },
     wildignorecase = true,
-    conceallevel = 2,
+    conceallevel = 1,
     foldlevelstart = 99,
     jumpoptions = 'stack',
 

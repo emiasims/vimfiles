@@ -161,5 +161,5 @@ if has('patch-7.4.1570')
 endif
 
 if has('conceal') && v:version >= 703
-  set conceallevel=2
+  set conceallevel=1
 endif

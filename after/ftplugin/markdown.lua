@@ -8,7 +8,7 @@ vim
     formatoptions = '12crqno',
     comments = { 'n:>', 'b:*', 'b:-' },
     wrap = true,
-    conceallevel = 2,
+    conceallevel = 1,
     breakindent = true,
     breakindentopt = { 'min:50', 'shift:2' },
     commentstring = '<!--%s-->',
