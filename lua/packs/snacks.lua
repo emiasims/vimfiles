@@ -1,4 +1,4 @@
-local M = {}
+vim.pack.add({ 'https://github.com/folke/snacks.nvim' }, { load = true })
 
 local function build_completions(source)
   local opts = Snacks.picker.config.get({ source = source })
@@ -83,7 +83,7 @@ mia.augroup('snacks', {
   },
 })
 
-function M.get_regitem(reg)
+local function get_regitem(reg)
   local info = vim.fn.getreginfo(reg)
 
   if not MacroReg[reg] and info.regcontents and table.concat(info.regcontents, '\n'):match('%S') then
@@ -101,8 +101,8 @@ function M.get_regitem(reg)
 end
 
 local ns = vim.api.nvim_create_namespace('snacks_put_register')
-function M.put_register(opts)
-  opts = opts or {}
+local function put_register(_opts)
+  _opts = _opts or {}
 
   local buf = {
     nr = vim.api.nvim_get_current_buf(),
@@ -115,7 +115,7 @@ function M.put_register(opts)
     preview = 'none',
     items = vim
       .iter(('*"+0123456789abcdefghijklmnopqrstuvwxyz-/#=_'):gmatch('.'))
-      :map(M.get_regitem)
+      :map(get_regitem)
       :fold({}, function(items, item)
         if #items == 0 or item.content ~= items[#items].content or item.type ~= items[#items].type then
           table.insert(items, item)
@@ -181,12 +181,12 @@ function M.put_register(opts)
       picker:close()
       vim.api.nvim_put(item.data.content, item.data.type, true, false)
     end,
-  }, opts))
+  }, _opts))
 end
 
 ---@module 'snacks'
 ---@type snacks.picker.Config
-M.picker_opts = {
+local picker_opts = {
   enabled = true,
   layout = 'pseudo_sidebar',
 
@@ -221,12 +221,6 @@ M.picker_opts = {
     },
   },
   sources = {
-    cmd_complete = {
-      preview = 'none',
-      finder = function(opts, ctx)
-        -- cmdcmplete & cmdcompletetype
-      end,
-    },
     dirs = {
       preview = 'directory',
       finder = function(opts, ctx)
@@ -261,7 +255,7 @@ M.picker_opts = {
       format = 'text',
       finder = function() return require('session').get_sessinfo() end,
 
-      transform = function(sess, ctx)
+      transform = function(sess, _)
         return {
           time = sess.mtime,
           file = sess.path,
@@ -285,7 +279,7 @@ M.picker_opts = {
   },
 }
 
-M.lazy_opts = {
+require('snacks').setup({
   bigfile = { enabled = false },
   dashboard = { enabled = false },
   explorer = { enabled = true },
@@ -302,7 +296,53 @@ M.lazy_opts = {
   statuscolumn = { enabled = true },
   words = { enabled = false }, -- ??
 
-  picker = M.picker_opts,
-}
+  picker = picker_opts,
+})
 
-return M
+mia.keymap({
+  { 'gd', '<Cmd>Pick lsp_definitions<Cr>', desc = 'Goto Definition' },
+  { 'gD', '<Cmd>Pick lsp_declarations<Cr>', desc = 'Goto Declaration' },
+  { 'grr', '<Cmd>Pick lsp_references<Cr>', nowait = true, desc = 'References' },
+  { 'gI', '<Cmd>Pick lsp_implementations<Cr>', desc = 'Goto Implementation' },
+  { 'gy', '<Cmd>Pick lsp_type_definitions<Cr>', desc = 'Goto T[y]pe Definition' },
+  { '<C-g><C-o>', '<Cmd>Pick jumps<Cr>', desc = 'Pick jumps' },
+  { 'z-', '<Cmd>Pick spelling<Cr>', desc = 'Pick spelling' },
+})
+
+local ctx = require('ctxmap.keymap')
+
+ctx.sets({
+  mode = 'ca',
+  ctx = 'cmd.start',
+  { 'p', 'Pick smart' },
+  { 'pi', 'Pick' },
+  { 'pp', 'Pick pickers' },
+  { 'f', 'Pick files' },
+  { 'fh', 'Pick files cwd=%:h' },
+  { 'u', 'Pick undo' },
+  { 'l', 'Pick buffers' },
+  { 'pr', 'Pick resume' },
+  { 'mr', 'Pick recent' },
+  { 'A', 'Pick grep' },
+  { 'h', 'Pick help' },
+  { 'n', 'Pick notifications' },
+  { 'ex', 'Pick explorer' },
+  { 'hi', 'Pick highlights' },
+  { 'em', 'Pick icons' },
+  { 't', 'Pick lsp_symbols' },
+  { 'ps', 'Pick lsp_symbols' },
+  { 'pws', 'Pick lsp_workspace_symbols' },
+  { 'ev', 'Pick files cwd=<C-r>=stdpath("config")<Cr>' },
+  { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/mia_plugins' },
+  { 'evs', 'Pick files cwd=<C-r>=stdpath("data")<Cr>/lazy' },
+  { 'evr', 'Pick files cwd=$VIMRUNTIME' },
+  { 'ecf', 'Pick files cwd=~/dotfiles' },
+  { 'gst', 'Pick git_status' },
+  { 'ep', 'Pick prompts' },
+})
+
+ctx.set('n', '<C-p>', {
+  { 'opt.buftype() == "" and opt.modifiable()', function()
+    return put_register()
+  end },
+}, { desc = 'Pick register & put' })

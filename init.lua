@@ -1,31 +1,11 @@
 vim.loader.enable()
 
 require('globals')
-_G.mia = require('mia')
+_G.mia = require('mia')  -- opinionated conveniences
+require('options')       -- global opts
+require('packs')         -- plugins
+require('session')       -- auto-managed
 
-require('options')
-
--- install lazy.nvim pack
-local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
-if not vim.uv.fs_stat(lazypath) then
-  vim.pack.add({ 'https://github.com/folke/lazy.nvim.git' }, { confirm = false })
-  vim.fn.rename(vim.fn.stdpath('data') .. '/site/pack/core/opt/lazy.nvim', lazypath)
-end
-vim.opt.rtp:prepend(lazypath)
-
-require('lazy').setup({
-  spec = { import = 'plugins' },
-  change_detection = { notify = false },
-  rocks = { enabled = false },
-  dev = { path = vim.fn.stdpath('config') .. '/mia_plugins' },
-  ui = { border = 'rounded' },
-  profiling = { loader = true, require = false },
-})
-
--- auto tracking
-require('session')
-
--- set up UI
 require('statusline')
 require('tabline')
 require('winbar')
