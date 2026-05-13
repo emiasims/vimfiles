@@ -1,4 +1,5 @@
--- vim.pack.add({ 'https://github.com/emiasims/ctx.map' }, { load = true }) -- TODO
+vim.cmd.packadd('ctxmap.nvim')
+-- stimpack.add({ 'https://github.com/emiasims/ctx.map' }, { load = true }) -- TODO
 
 mia.keymap({
   { '<F1>', '<Plug>(ctxmap-debug)', mode = { 'n', 't', '!' } },
@@ -6,7 +7,9 @@ mia.keymap({
   { 'g$', '$', mode = { 'n', 'x', 'o' } },
 })
 
-require('ctxmap').setup({
+local ctx = require('ctxmap')
+
+ctx.setup({
   fix_abbr_expansion = true,
   contexts = {
     ws_precursor = 'text.before("^%s*$")',
@@ -32,33 +35,31 @@ require('ctxmap').setup({
   },
 })
 
-local ctx = require('ctxmap.keymap')
-
-ctx.set({ 'n', 'x', 'o' }, '0', {
+ctx.keymap.set({ 'n', 'x', 'o' }, '0', {
   { 'text.before("^%s+$")', '0' },
   { 'opt.wrap', 'g^' },
 }, { default = '0^' })
 
-ctx.set({ 'n', 'o' }, '$', { 'opt.wrap', 'g$' })
+ctx.keymap.set({ 'n', 'o' }, '$', { 'opt.wrap', 'g$' })
 
-ctx.set('x', '$', { 'opt.wrap', 'g$h' }, { default = '$h' })
+ctx.keymap.set('x', '$', { 'opt.wrap', 'g$h' }, { default = '$h' })
 
-ctx.set('n', '<C-h>', { 'win.left', 'gT9<C-w>l' }, { default = '<C-w>h' })
+ctx.keymap.set('n', '<C-h>', { 'win.left', 'gT9<C-w>l' }, { default = '<C-w>h' })
 
-ctx.set('n', '<C-l>', { 'win.right', 'gt9<C-w>h' }, { default = '<C-w>l' })
+ctx.keymap.set('n', '<C-l>', { 'win.right', 'gt9<C-w>h' }, { default = '<C-w>l' })
 
-ctx.set('i', '<Esc>', {
+ctx.keymap.set('i', '<Esc>', {
   { 'fn.pumvisible()', '<C-e>' },
   { 'blink_visible', '<C-e>', remap = true },
 })
 
-ctx.set('i', '<Cr>', {
+ctx.keymap.set('i', '<Cr>', {
   { 'blink_visible', '<Plug>(miaCmpConfirm)' },
   { 'fn.pumvisible()', '<C-y>' },
   { 'autopair.in_pair', '<Cr><C-c>O' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   mode = { 'i', 's' },
   ctx = 'autopair.allowed',
   { '(', '()<C-]><C-g>U<Left>' },
@@ -66,7 +67,7 @@ ctx.sets({
   { '{', '{}<C-]><C-g>U<Left>' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   mode = { 'i', 's' },
   ctx = 'autopair.complete',
   { ')', '<C-]><C-g>U<Right>' },
@@ -76,22 +77,22 @@ ctx.sets({
   { "'", '<C-]><C-g>U<Right>' },
 })
 
-ctx.set({ 'i', 's' }, '"', { 'autopair.quote_allowed', '""<C-]><C-g>U<Left>' }, { clear = false })
+ctx.keymap.set({ 'i', 's' }, '"', { 'autopair.quote_allowed', '""<C-]><C-g>U<Left>' }, { clear = false })
 
-ctx.set({ 'i', 's' }, "'", { 'autopair.quote_allowed', "''<C-]><C-g>U<Left>" }, { clear = false })
+ctx.keymap.set({ 'i', 's' }, "'", { 'autopair.quote_allowed', "''<C-]><C-g>U<Left>" }, { clear = false })
 
-ctx.set({ 'i', 's' }, ' ', { 'autopair.in_pair', '  <C-g>U<Left>' })
+ctx.keymap.set({ 'i', 's' }, ' ', { 'autopair.in_pair', '  <C-g>U<Left>' })
 
-ctx.set({ 'i', 's' }, '<BS>', { 'autopair.in_pair', '<BS><Del>' })
+ctx.keymap.set({ 'i', 's' }, '<BS>', { 'autopair.in_pair', '<BS><Del>' })
 
-ctx.set({ 'i', 's' }, '<BS>', { 'autopair.in_nlpair', '<C-o>vwhobld' }, { clear = false })
+ctx.keymap.set({ 'i', 's' }, '<BS>', { 'autopair.in_nlpair', '<C-o>vwhobld' }, { clear = false })
 
-ctx.set('c', ' ', {
+ctx.keymap.set('c', ' ', {
   { 'cmd.start', 'lua ' },
   { 'blink_visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   mode = 'ca',
   ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
   { 'eq', 'vsp|TSEditQuery' },
@@ -99,7 +100,7 @@ ctx.sets({
   { 'T', 'vsplit|term' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   mode = 'ca',
   ctx = 'cmd.start',
   { 'sq', 'Session quit' },

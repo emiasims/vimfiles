@@ -1,29 +1,33 @@
-vim.pack.add({
-  { src = 'https://github.com/saghen/blink.cmp', version = '*' },
+stimpack.add({
+  'https://github.com/saghen/blink.lib',
+  'https://github.com/saghen/blink.cmp',
   'https://github.com/rafamadriz/friendly-snippets',
   'https://github.com/garymjr/nvim-snippets',
-}, { load = true })
+})
 
-local ctx = require('ctxmap.keymap')
+local ctx = require('ctxmap')
 
-ctx.set('c', '<Tab>', {
+ctx.keymap.set('c', '<Tab>', {
   { 'blink_visible', '<C-n>', remap = true },
   { 'fn.pumvisible()', '<C-n>' },
 }, { default = vim.fn.wildtrigger })
 
-ctx.set('c', '<S-Tab>', { 'blink_visible', '<C-p>', remap = true })
+ctx.keymap.set('c', '<S-Tab>', { 'blink_visible', '<C-p>', remap = true })
 
-ctx.set({ 'i', 'c' }, '<C-.>', {
+ctx.keymap.set({ 'i', 'c' }, '<C-.>', {
   { 'blink_visible', '<C-y><Cmd>lua vim.defer_fn(require("blink.cmp").show, 1)<Cr>', remap = true },
   { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
 }, { default = '<Cmd>lua require("blink.cmp").show()<Cr>' })
 
-ctx.set('c', '<S-Space>', {
+ctx.keymap.set('c', '<S-Space>', {
   { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
   { 'blink_visible', '<C-y><Cmd>lua vim.schedule(require("blink.cmp").show)<Cr>', remap = true },
 }, { default = '<Cmd>lua require("blink.cmp").show()<Cr>' })
 
-require('blink.cmp').setup({
+local cmp = require('blink.cmp')
+cmp.build():wait(60000) ---@diagnostic disable-line: undefined-field
+
+cmp.setup({
   keymap = {
     preset = 'default',
     ['<C-Space>'] = {},

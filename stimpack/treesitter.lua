@@ -1,8 +1,8 @@
-vim.pack.add({
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
+stimpack.add({
+  'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/nvim-treesitter/nvim-treesitter-context',
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter-textobjects', version = 'main' },
-}, { load = true })
+  'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+})
 
 mia.augroup('treesitter-pack', {
   PackChanged = function(ev)

@@ -1,4 +1,4 @@
-vim.pack.add({ 'https://github.com/folke/lazydev.nvim' }, { load = true })
+stimpack.add({ 'https://github.com/folke/lazydev.nvim' })
 
 require('lazydev').setup({
   library = {

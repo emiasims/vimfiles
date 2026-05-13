@@ -1,15 +1,15 @@
-vim.pack.add({ 'https://github.com/nickjvandyke/opencode.nvim' }, { load = true })
+stimpack.add({ 'https://github.com/nickjvandyke/opencode.nvim' })
 
-local ctx = require('ctxmap.keymap')
+local ctx = require('ctxmap')
 
-ctx.sets({
+ctx.keymap.sets({
   mode = 'ca',
   ctx = 'cmd.start',
   { 'oc', 'lua require("opencode").select()' },
   { 'ai', 'lua require("opencode").ask("@this: ", { submit = true })' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   mode = 't',
   ctx = 'vim.b.bufinfo.type == "opencode"',
   { '<C-[>', function() require('opencode').command('session.half.page.up') end },

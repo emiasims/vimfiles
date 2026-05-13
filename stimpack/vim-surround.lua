@@ -1,5 +1,5 @@
 vim.g.surround_no_mappings = 1
-vim.pack.add({ 'https://github.com/tpope/vim-surround' }, { load = true })
+stimpack.add({ 'https://github.com/tpope/vim-surround' })
 
 mia.keymap({
   { 'Z', '<Plug>VSurround', mode = 'x' },

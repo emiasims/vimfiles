@@ -1,10 +1,8 @@
-vim.pack.add({
-  'https://github.com/tpope/vim-fugitive',
-}, { load = true })
+stimpack.add({ 'https://github.com/tpope/vim-fugitive' }, { start = true })
 
-local ctx = require('ctxmap.keymap')
+local ctx = require('ctxmap')
 
-ctx.sets({
+ctx.keymap.sets({
   ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
   mode = 'ca',
   { 'gau', 'Git add --update' },
@@ -15,7 +13,7 @@ ctx.sets({
   { 'gaup', 'Git add --update --patch' },
 })
 
-ctx.sets({
+ctx.keymap.sets({
   ctx = 'cmd.start',
   mode = 'ca',
   clear = false,

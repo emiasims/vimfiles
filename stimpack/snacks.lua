@@ -1,4 +1,4 @@
-vim.pack.add({ 'https://github.com/folke/snacks.nvim' }, { load = true })
+stimpack.add({ 'https://github.com/folke/snacks.nvim' })
 
 local function build_completions(source)
   local opts = Snacks.picker.config.get({ source = source })
@@ -38,7 +38,7 @@ local function pick_callback(source)
     end
     local p = Snacks.picker.pick(opts)
     if p then
-      vim.wait(5000, function() return p.shown end, 10)
+      vim.wait(5000, function() return p.shown or p.closed or false end, 10)
     end
   end
 end
@@ -309,9 +309,9 @@ mia.keymap({
   { 'z-', '<Cmd>Pick spelling<Cr>', desc = 'Pick spelling' },
 })
 
-local ctx = require('ctxmap.keymap')
+local ctx = require('ctxmap')
 
-ctx.sets({
+ctx.keymap.sets({
   mode = 'ca',
   ctx = 'cmd.start',
   { 'p', 'Pick smart' },
@@ -341,7 +341,7 @@ ctx.sets({
   { 'ep', 'Pick prompts' },
 })
 
-ctx.set('n', '<C-p>', {
+ctx.keymap.set('n', '<C-p>', {
   { 'opt.buftype() == "" and opt.modifiable()', function()
     return put_register()
   end },

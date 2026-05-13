@@ -1,7 +1,7 @@
-vim.pack.add({
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter-textobjects', version = 'main' },
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
-}, { load = true })
+stimpack.add({
+  'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  'https://github.com/nvim-treesitter/nvim-treesitter',
+})
 
 local opts = {
   move = { set_jumps = true },

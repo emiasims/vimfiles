@@ -1,4 +1,4 @@
-vim.pack.add({ { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' } }, { load = true })
+stimpack.add({ { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' } }, { start = true })
 
 -- --------------------------------------------------------------------------
 -- Name        Latte      Frappe   **Macchiato   Mocha      Usage
@@ -111,9 +111,8 @@ local function custom_highlights(colors)
   }
 end
 
-
 require('catppuccin').setup({
   integrations = { snacks = true, notify = true },
-  custom_highlights = custom_highlights
+  custom_highlights = custom_highlights,
 })
 require('catppuccin').load('macchiato')
