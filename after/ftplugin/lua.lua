@@ -15,9 +15,9 @@ mia.keymap.set({
     :totable(),
 })
 
-local ctxmap = require('ctxmap').keymap
-ctxmap.set('n', '~', {
+local ctx = require('ctxmap')
+ctx.keymap.set('n', '~', {
   { 'ts.is_node("false")', 'ciwtrue<Esc>`[' },
   { 'ts.is_node("true")', 'ciwfalse<Esc>`[' },
 }, { buffer = true })
-ctxmap.set('ia', 'as', { 'text.before("%-%-as$")', '[[@as]]<Left><Left>' }, { buffer = true })
+ctx.keymap.set('ia', 'as', { 'text.before("%-%-as$")', '[[@as]]<Left><Left>' }, { buffer = true })
