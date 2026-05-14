@@ -1,3 +1,16 @@
+function! s:default(cmd, ...) abort
+  for arg in a:000
+    if arg !~# '^<\%(buffer\|silent\|expr\|nowait\|script\|unique\)>$'
+      if maparg(arg, a:cmd[0]) == ''
+        execute a:cmd .. ' ' .. join(a:000, ' ')
+      endif
+      return
+    endif
+  endfor
+endfunction
+
+command! -nargs=+ Default call s:default(<f-args>)
+
 nnoremap <Space> :
 xnoremap <Space> :
 nnoremap ! :!
@@ -8,8 +21,8 @@ if !has('nvim')
   inoremap [32;5u <Space>
 endif
 
+Default inoremap <Esc> <C-c>
 inoremap <C-c> <Esc>
-inoremap <Esc> <C-c>
 snoremap <C-c> <Esc>
 snoremap <Esc> <C-c>
 inoremap jk <C-]><Esc>
@@ -25,18 +38,18 @@ nnoremap zO zCzO
 nnoremap zV zMzv
 nnoremap ZQ <Cmd>qall!<CR>
 
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
+Default nnoremap <C-h> <C-w>h
+Default nnoremap <C-j> <C-w>j
+Default nnoremap <C-k> <C-w>k
+Default nnoremap <C-l> <C-w>l
 
-nnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
-xnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
-onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '^'
+Default nnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
+Default xnoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '0^'
+Default onoremap <expr> 0 getline('.')[: col('.') - 2] =~ '^\s*$' ? '0' : '^'
 
-nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
-xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
-onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
+Default nnoremap <expr> $ (v:count > 0 ? 'j$' : '$')
+Default xnoremap <expr> $ (v:count > 0 ? 'j$h' : '$h')
+Default onoremap <expr> $ (v:count > 0 ? 'j$' : '$')
 
 inoremap <C-w> <C-g>u<C-w><C-g>u
 inoremap <C-u> <C-g>u<C-u><C-g>u
