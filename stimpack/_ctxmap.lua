@@ -13,7 +13,6 @@ ctx.setup({
   fix_abbr_expansion = true,
   contexts = {
     ws_precursor = 'text.before("^%s*$")',
-    blink_visible = 'require("blink.cmp").is_visible()',
     cmd_start_sp = 'cmd.start(lhs, map) and abbr.trigger(" ")',
     autopair = {
       allowed = 'text.after("%W") or text.eol()',
@@ -45,19 +44,14 @@ ctx.keymap.set({ 'n', 'o' }, '$', { 'opt.wrap', 'g$' })
 ctx.keymap.set('x', '$', { 'opt.wrap', 'g$h' }, { default = '$h' })
 
 ctx.keymap.set('n', '<C-h>', { 'win.left', 'gT9<C-w>l' }, { default = '<C-w>h' })
-
 ctx.keymap.set('n', '<C-l>', { 'win.right', 'gt9<C-w>h' }, { default = '<C-w>l' })
 
-ctx.keymap.set('i', '<Esc>', {
-  { 'fn.pumvisible()', '<C-e>' },
-  { 'blink_visible', '<C-e>', remap = true },
-})
+ctx.keymap.set('i', '<Esc>', { 'fn.pumvisible()', '<C-e>' })
+ctx.keymap.set('i', '<Cr>', { 'fn.pumvisible()', '<C-y>' })
 
-ctx.keymap.set('i', '<Cr>', {
-  { 'blink_visible', '<Plug>(miaCmpConfirm)' },
-  { 'fn.pumvisible()', '<C-y>' },
-  { 'autopair.in_pair', '<Cr><C-c>O' },
-})
+
+-- autopairs
+ctx.keymap.add('i', '<Cr>', { 'autopair.in_pair', '<Cr><C-c>O' })
 
 ctx.keymap.sets({
   mode = { 'i', 's' },
@@ -78,19 +72,15 @@ ctx.keymap.sets({
 })
 
 ctx.keymap.set({ 'i', 's' }, '"', { 'autopair.quote_allowed', '""<C-]><C-g>U<Left>' }, { clear = false })
-
 ctx.keymap.set({ 'i', 's' }, "'", { 'autopair.quote_allowed', "''<C-]><C-g>U<Left>" }, { clear = false })
-
 ctx.keymap.set({ 'i', 's' }, ' ', { 'autopair.in_pair', '  <C-g>U<Left>' })
-
-ctx.keymap.set({ 'i', 's' }, '<BS>', { 'autopair.in_pair', '<BS><Del>' })
-
-ctx.keymap.set({ 'i', 's' }, '<BS>', { 'autopair.in_nlpair', '<C-o>vwhobld' }, { clear = false })
-
-ctx.keymap.set('c', ' ', {
-  { 'cmd.start', 'lua ' },
-  { 'blink_visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' },
+ctx.keymap.set({ 'i', 's' }, '<BS>', {
+  { 'autopair.in_pair', '<BS><Del>' },
+  { 'autopair.in_nlpair', '<C-o>vwhobld' },
 })
+
+-- cmdline abbreviations
+ctx.keymap.set('c', ' ', { 'cmd.start', 'lua ' })
 
 ctx.keymap.sets({
   mode = 'ca',
