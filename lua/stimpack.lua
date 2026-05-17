@@ -40,10 +40,10 @@ local packs = vim
       name = f:match('^stimpack/([^/]*)%.lua$'),
       co = coroutine.create(function()
         local fn, err = loadfile(f)
-        if not fn then
-          error(err)
-        end
-        fn()
+        if not fn then errmsg(err) end
+        local ok
+        ok, err = pcall(fn --[[@as function]])
+        if not ok then errmsg(err) end
       end),
     }
   end)
