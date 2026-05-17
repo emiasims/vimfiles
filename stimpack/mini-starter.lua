@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/nvim-mini/mini.starter' })
+stimpack.add({ 'nvim-mini/mini.starter' })
 
 if vim.fn.argc() > 0 then
   return

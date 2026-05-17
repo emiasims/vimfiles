@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/folke/snacks.nvim' })
+stimpack.add({ 'folke/snacks.nvim' })
 
 local function build_completions(source)
   local opts = Snacks.picker.config.get({ source = source })

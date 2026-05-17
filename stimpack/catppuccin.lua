@@ -1,4 +1,4 @@
-stimpack.add({ { src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' } }, { start = true })
+stimpack.add({ { src = 'catppuccin/nvim', name = 'catppuccin' } }, { start = true })
 
 -- --------------------------------------------------------------------------
 -- Name        Latte      Frappe   **Macchiato   Mocha      Usage

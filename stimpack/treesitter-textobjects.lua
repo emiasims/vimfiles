@@ -1,6 +1,6 @@
 stimpack.add({
-  'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
-  'https://github.com/nvim-treesitter/nvim-treesitter',
+  'nvim-treesitter/nvim-treesitter-textobjects',
+  'nvim-treesitter/nvim-treesitter',
 })
 
 local opts = {

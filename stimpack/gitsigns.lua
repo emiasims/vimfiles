@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/lewis6991/gitsigns.nvim' })
+stimpack.add({ 'lewis6991/gitsigns.nvim' })
 
 require('gitsigns').setup({ attach_to_untracked = true })
 

@@ -1,7 +1,7 @@
 stimpack.add({
-  'https://github.com/nvim-treesitter/nvim-treesitter',
-  'https://github.com/nvim-treesitter/nvim-treesitter-context',
-  'https://github.com/nvim-treesitter/nvim-treesitter-textobjects',
+  'nvim-treesitter/nvim-treesitter',
+  'nvim-treesitter/nvim-treesitter-context',
+  'nvim-treesitter/nvim-treesitter-textobjects',
 })
 
 mia.augroup('treesitter-pack', {

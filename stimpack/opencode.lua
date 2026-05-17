@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/nickjvandyke/opencode.nvim' })
+stimpack.add({ 'nickjvandyke/opencode.nvim' })
 
 local ctx = require('ctxmap')
 

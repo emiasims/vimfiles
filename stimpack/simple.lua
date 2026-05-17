@@ -7,21 +7,21 @@ vim.g.gutentags_cache_dir = vim.fn.stdpath('data') .. '/tags'
 vim.g.gutentags_ctags_exclude = { 'data' }
 
 stimpack.add({
-  'https://github.com/tpope/vim-repeat',
-  'https://github.com/tpope/vim-speeddating',
-  'https://github.com/tommcdo/vim-exchange',
-  'https://github.com/tommcdo/vim-lion',
-  'https://github.com/lewis6991/nvim-test',
-  'https://github.com/nvim-lua/popup.nvim',
-  'https://github.com/nvim-lua/plenary.nvim',
-  'https://github.com/JuliaEditorSupport/julia-vim',
-  'https://github.com/lewis6991/async.nvim',
-  'https://github.com/wellle/targets.vim',
-  'https://github.com/mbbill/undotree',
-  'https://github.com/ludovicchabant/vim-gutentags',
-  'https://github.com/kdheepak/lazygit.nvim',
-  'https://github.com/nvim-mini/mini.cursorword',
-  'https://github.com/brenoprata10/nvim-highlight-colors',
+  'tpope/vim-repeat',
+  'tpope/vim-speeddating',
+  'tommcdo/vim-exchange',
+  'tommcdo/vim-lion',
+  'lewis6991/nvim-test',
+  'nvim-lua/popup.nvim',
+  'nvim-lua/plenary.nvim',
+  'JuliaEditorSupport/julia-vim',
+  'lewis6991/async.nvim',
+  'wellle/targets.vim',
+  'mbbill/undotree',
+  'ludovicchabant/vim-gutentags',
+  'kdheepak/lazygit.nvim',
+  'nvim-mini/mini.cursorword',
+  'brenoprata10/nvim-highlight-colors',
 })
 
 local ctx = require('ctxmap')

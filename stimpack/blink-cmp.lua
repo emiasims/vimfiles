@@ -1,8 +1,8 @@
 stimpack.add({
-  'https://github.com/saghen/blink.lib',
-  'https://github.com/saghen/blink.cmp',
-  'https://github.com/rafamadriz/friendly-snippets',
-  'https://github.com/garymjr/nvim-snippets',
+  'saghen/blink.lib',
+  'saghen/blink.cmp',
+  'rafamadriz/friendly-snippets',
+  'garymjr/nvim-snippets',
 })
 
 local ctx = require('ctxmap')

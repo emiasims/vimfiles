@@ -1,5 +1,5 @@
 vim.o.wildmode = 'noselect:lastused,full'
-stimpack.add({'https://github.com/nvim-mini/mini.cmdline' })
+stimpack.add({'nvim-mini/mini.cmdline' })
 
 require('mini.cmdline').setup({
   autocomplete = {

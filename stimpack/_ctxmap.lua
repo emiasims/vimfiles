@@ -1,5 +1,5 @@
 vim.cmd.packadd('ctxmap.nvim')
--- stimpack.add({ 'https://github.com/emiasims/ctx.map' }, { load = true }) -- TODO
+-- stimpack.add({ 'emiasims/ctx.map' }, { load = true }) -- TODO
 
 mia.keymap({
   { '<F1>', '<Plug>(ctxmap-debug)', mode = { 'n', 't', '!' } },

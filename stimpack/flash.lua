@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/folke/flash.nvim' })
+stimpack.add({ 'folke/flash.nvim' })
 
 require('flash').setup({
   search = { multi_window = false, wrap = false },

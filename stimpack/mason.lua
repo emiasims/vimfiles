@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/williamboman/mason.nvim' })
+stimpack.add({ 'williamboman/mason.nvim' })
 
 mia.augroup('mason-pack', {
   PackChanged = function(ev)

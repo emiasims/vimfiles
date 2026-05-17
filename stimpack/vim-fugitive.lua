@@ -1,4 +1,4 @@
-stimpack.add({ 'https://github.com/tpope/vim-fugitive' }, { start = true })
+stimpack.add({ 'tpope/vim-fugitive' }, { start = true })
 
 local ctx = require('ctxmap')
 
