@@ -47,7 +47,6 @@ vim
     diffopt = { 'algorithm:histogram', 'linematch:60', 'closeoff' },
     -- completeopt = { 'menuone', 'noselect', 'noinsert' },
     completeopt = { 'menu', 'menuone', 'noselect' },
-    clipboard = 'unnamed',
     shortmess = 'aAoOTIcF',
     scrolloff = 4,
     sidescrolloff = 2,
@@ -124,6 +123,9 @@ vim.schedule(function()
     pattern = { ['/doc/[^/]*%.txt$'] = is_help },
   })
 end)
+
+-- slow loading wsl clipboard? faster with this
+vim.schedule(function() vim.opt.clipboard = 'unnamed' end)
 
 -- wtf. not working on restart without defer. why?
 vim.defer_fn(function() require('vim._core.ui2').enable({}) end, 500)
