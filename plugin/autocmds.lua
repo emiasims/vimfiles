@@ -118,4 +118,13 @@ mia.augroup(mia.group, {
       vim.api.nvim_buf_set_mark(0, '`', pos[1], pos[2], {})
     end,
   },
+
+  BufNewFile = {
+    pattern = 'opencode.json',
+    desc = 'Opencode skeleton',
+    callback = function()
+      vim.api.nvim_buf_set_lines(0, 0, -1, false, { '{', '  "$schema": "https://opencode.ai/config.json",', '}' })
+      mia.info('Loaded skeleton')
+    end,
+  }
 }, true)
