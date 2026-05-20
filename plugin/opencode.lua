@@ -10,7 +10,7 @@ local cwd = vim.fn.has('mac') == 1
 vim.b.update_bufinfo = { type = 'prompt', root = cwd }
 vim.bo.filetype = 'markdown.prompt'
 
--- add completion: @filepath
+vim.keymap.set('i', '@', '@<C-x><C-f>', { buffer = true })
 
 local pmfile = vim
   .iter(vim.fs.dir('.'))
