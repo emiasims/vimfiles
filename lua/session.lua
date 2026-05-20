@@ -415,7 +415,7 @@ function M.setup()
     -- on vimenter, start a session or load one
     VimEnter = function()
       vim.o.swapfile = false
-      if vim.g.session or vim.fn.argc() ~= 1 or vim.fn.expand('%:p'):match('^/tmp/') then
+      if vim.g.session or vim.fn.argc() ~= 1 or mia.is_tmpf(1) then
         vim.schedule(M.prune)
         return
       end

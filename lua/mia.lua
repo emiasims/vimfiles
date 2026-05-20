@@ -178,4 +178,15 @@ M.reg = setmetatable({}, {
   end,
 })
 
+function M.is_tmpf(bufnr)
+  local bufname = vim.api.nvim_buf_get_name(bufnr or 0)
+  -- linux (/tmp, /var/tmp) and macOS (/var/folders) + resolved symlinks
+  return bufname:match('^/tmp/')
+      or bufname:match('^/var/tmp/')
+      or bufname:match('^/var/folders/')
+      or bufname:match('^/private/tmp/')
+      or bufname:match('^/private/var/tmp/')
+      or bufname:match('^/private/var/folders/') ~= nil
+end
+
 return M

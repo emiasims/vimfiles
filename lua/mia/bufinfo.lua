@@ -125,7 +125,7 @@ function M.get(bufnr_)
     local bufinfo
     if bufname == '' then
       bufinfo = BT.nofile(bufname, bufnr)
-    elseif buftype == '' and vim.fs.relpath(vim.uv.os_tmpdir() or '/tmp', bufname) then
+    elseif buftype == '' and mia.is_tmpf(bufnr) then
       bufinfo = BT.tmpfile(bufname, bufnr)
     elseif buftype == '' then
       bufinfo = BT.file(bufname, bufnr)

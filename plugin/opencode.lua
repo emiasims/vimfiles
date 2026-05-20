@@ -1,17 +1,13 @@
-if not (vim.env.OPENCODE and vim.env.OPENCODE_PID) then
+if not (vim.env.OPENCODE and vim.env.OPENCODE_PID and mia.is_tmpf(1)) then
   return
 end
 
-local a1 = vim.fn.argv()[1]
--- somtimes I nest things. whatever don't judge me
-if not (vim.fn.argc() == 1 and a1 and a1:find('^/tmp/.*%.md$')) then
-  return
-end
+local pid = vim.env.OPENCODE_PID
+local cwd = vim.fn.has('mac') == 1
+  and vim.fn.system({'lsof', '-a', '-p', pid, '-d', 'cwd', '-Fn'}):match('\nn([^\n]+)')
+  or vim.fn.resolve('/proc/' .. pid .. '/cwd')
 
-vim.b.update_bufinfo = {
-  type = 'prompt',
-  root = vim.fn.resolve('/proc/' .. vim.env.OPENCODE_PID .. '/cwd'),
-}
+vim.b.update_bufinfo = { type = 'prompt', root = cwd }
 vim.bo.filetype = 'markdown.prompt'
 
 -- add completion: @filepath
