@@ -9,6 +9,8 @@ local cwd = vim.fn.has('mac') == 1
 
 vim.b.update_bufinfo = { type = 'prompt', root = cwd }
 vim.bo.filetype = 'markdown.prompt'
+vim.wo.foldlevel = 99
+vim.cmd('normal! G$')
 
 vim.keymap.set('i', '@', '@<C-x><C-f>', { buffer = true })
 
