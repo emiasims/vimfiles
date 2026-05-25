@@ -333,7 +333,7 @@ ctx.keymap.sets({
   { 'ps', 'Pick lsp_symbols' },
   { 'pws', 'Pick lsp_workspace_symbols' },
   { 'ev', 'Pick files cwd=<C-r>=stdpath("config")<Cr>' },
-  { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/mia_plugins' },
+  { 'evp', 'Pick files cwd=<C-r>=stdpath("config")<Cr>/pack/mia' },
   { 'evs', 'Pick files cwd=<C-r>=stdpath("data")<Cr>/lazy' },
   { 'evr', 'Pick files cwd=$VIMRUNTIME' },
   { 'ecf', 'Pick files cwd=~/dotfiles' },

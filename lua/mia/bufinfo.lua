@@ -5,7 +5,7 @@ local DOTFILES = vim.fs.root(vim.uv.fs_realpath(vim.fn.stdpath('config')), '.git
 ---@type string[]
 local special_roots = {
   vim.env.VIMRUNTIME,
-  vim.fn.stdpath('config') .. '/mia_plugins',
+  vim.fn.stdpath('config') .. '/pack/mia',
   vim.fs.joinpath(DOTFILES, 'fish', 'fish'),
   vim.fs.joinpath(DOTFILES, 'git'),
   vim.fs.joinpath(DOTFILES, 'kitty'),
