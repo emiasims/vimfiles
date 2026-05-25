@@ -1,6 +1,9 @@
-local function errmsg(a1, ...)
-  a1 = 'stimpack: ' .. a1
-  mia.err(a1, ...)
+local function errmsg(ok, a1, ...)
+  if ok then
+    return
+  end
+  local msg = ('stimpack: ' .. a1):format(...)
+  vim.notify(msg, vim.log.levels.ERROR)
 end
 
 _G.stimpack = {}
@@ -19,16 +22,12 @@ local function install(packs)
   end
   local specs = vim.iter(packs):map(function(e) return e.specs end):flatten():totable()
   local ok, err = pcall(vim.pack.add, specs, { load = true, confirm = false })
-  if not ok then
-    errmsg('%s', err)
-  end
+  errmsg(ok, err)
 
   local success
   vim.iter(packs):filter(function(p) return coroutine.status(p.co) ~= 'dead' end):each(function(p)
     ok, success, err = pcall(coroutine.resume, p.co)
-    if not ok then
-      errmsg('error resuming packs.%s: %s', p.name, success or err)
-    end
+    errmsg(ok, 'error resuming packs.%s: %s', p.name, success or err)
   end)
 end
 
@@ -40,29 +39,26 @@ local packs = vim
       name = f:match('^stimpack/([^/]*)%.lua$'),
       co = coroutine.create(function()
         local fn, err = loadfile(f)
-        if not fn then errmsg(err) end
-        local ok
-        ok, err = pcall(fn --[[@as function]])
-        if not ok then errmsg(err) end
+        errmsg(fn, err)
+        local ok, _err = pcall(fn --[[@as function]])
+        errmsg(ok, _err)
       end),
     }
   end)
   :map(function(p)
     local ok, success, yield = pcall(coroutine.resume, p.co)
-    if not (ok and success) then
-      errmsg('error in packs.%s: %s', p.name, success or yield)
-      return
-    elseif yield then
+    errmsg(ok and success, 'error in packs.%s: %s', p.name, success or yield)
+    if ok and success and yield then
       return { start = yield.start, specs = yield.specs, path = p.path, name = p.name, co = p.co }
     end
   end)
-  :fold({ now = {}, later = {} }, function(t, p)
-    table.insert(t[p.start and 'now' or 'later'], p)
+  :fold({ start = {}, after_draw = {} }, function(t, p)
+    table.insert(t[p.start and 'start' or 'after_draw'], p)
     return t
   end)
 
-install(packs.now)
+install(packs.start)
 
 vim.api.nvim_create_autocmd('UIEnter', {
-  callback = vim.schedule_wrap(function() install(packs.later) end),
+  callback = vim.schedule_wrap(function() install(packs.after_draw) end),
 })
