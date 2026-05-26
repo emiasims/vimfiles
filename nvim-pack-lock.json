@@ -5,7 +5,7 @@
       "src": "https://github.com/lewis6991/async.nvim"
     },
     "blink.cmp": {
-      "rev": "2ef3db111181c5eef22a462aa0122349a6027f28",
+      "rev": "0593548ee0b0978abf303d30f449234e07f951d1",
       "src": "https://github.com/saghen/blink.cmp"
     },
     "blink.lib": {
@@ -13,11 +13,11 @@
       "src": "https://github.com/saghen/blink.lib"
     },
     "catppuccin": {
-      "rev": "426dbebe06b5c69fd846ceb17b42e12f890aedf1",
+      "rev": "8edd468af4d63212b84d69b2ddb5ffc9023ef5eb",
       "src": "https://github.com/catppuccin/nvim"
     },
     "conform.nvim": {
-      "rev": "dca1a190aa85f9065979ef35802fb77131911106",
+      "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
       "src": "https://github.com/stevearc/conform.nvim"
     },
     "flash.nvim": {
@@ -45,19 +45,19 @@
       "src": "https://github.com/kdheepak/lazygit.nvim"
     },
     "mason.nvim": {
-      "rev": "e54f5bf5f12c560da31c17eee5b3e1bd369f3ff9",
+      "rev": "bb639d4bf385a4d89f478b83af4d770be05ab7eb",
       "src": "https://github.com/williamboman/mason.nvim"
     },
     "mini.cmdline": {
-      "rev": "26f5ad15fc28058c111be450ae5aadf800257306",
+      "rev": "0afaf26d4d12030b0f75c7c4584dae883a195ef3",
       "src": "https://github.com/nvim-mini/mini.cmdline"
     },
     "mini.cursorword": {
-      "rev": "52eacb10266b8ce07c052e3c80a706d29eb74006",
+      "rev": "a01471856e462144ea53972f22a67e790be68ee6",
       "src": "https://github.com/nvim-mini/mini.cursorword"
     },
     "mini.starter": {
-      "rev": "35b018a035794e341ac01cb2091bbd71b3f823d0",
+      "rev": "a7d8b353cf120fee32bb5d88e7a9de5eaec746e7",
       "src": "https://github.com/nvim-mini/mini.starter"
     },
     "nvim-highlight-colors": {
@@ -85,7 +85,7 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
     },
     "opencode.nvim": {
-      "rev": "a89f9b90e2709f7350743bf2d38e80bc4fd5379d",
+      "rev": "1f6442f4b0bb140ac3e87a37c53729a72605a1c3",
       "src": "https://github.com/nickjvandyke/opencode.nvim"
     },
     "otter.nvim": {
@@ -105,7 +105,7 @@
       "src": "https://github.com/quarto-dev/quarto-nvim"
     },
     "snacks.nvim": {
-      "rev": "ad9ede6a9cddf16cedbd31b8932d6dcdee9b716e",
+      "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
       "src": "https://github.com/folke/snacks.nvim"
     },
     "targets.vim": {
