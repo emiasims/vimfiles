@@ -1,4 +1,5 @@
-stimpack.add({ 'folke/snacks.nvim' })
+stimpack.add({ 'folke/snacks.nvim' }, { start = true })
+-- start provides notify and statuscolumn
 
 local function build_completions(source)
   local opts = Snacks.picker.config.get({ source = source })
@@ -342,7 +343,5 @@ ctx.keymap.sets({
 })
 
 ctx.keymap.set('n', '<C-p>', {
-  { 'opt.buftype() == "" and opt.modifiable()', function()
-    return put_register()
-  end },
+  { 'opt.buftype() == "" and opt.modifiable()', put_register },
 }, { desc = 'Pick register & put' })
