@@ -6,13 +6,23 @@ local function errmsg(ok, a1, ...)
   vim.notify(msg, vim.log.levels.ERROR)
 end
 
+local function resolve(spec)
+  if type(spec) == 'string' and not spec:find '://' and not spec:find '^/' then
+    return 'https://github.com/' .. spec
+  elseif type(spec) == 'table' and spec.src and not spec.src:find '://' and not spec.src:find '^/' then
+    return vim.tbl_extend('force', spec, { src = 'https://github.com/' .. spec.src })
+  end
+  return spec
+end
+
 _G.stimpack = {}
 function stimpack.add(specs, opts)
   local start = opts and opts.start or false
+  local resolved = vim.tbl_map(resolve, specs)
   if coroutine.running() then
-    coroutine.yield({ specs = specs, start = start })
+    coroutine.yield({ specs = resolved, start = start })
   else
-    vim.pack.add(specs, { load = true, confirm = false })
+    vim.pack.add(resolved, { load = true, confirm = false })
   end
 end
 
