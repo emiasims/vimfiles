@@ -17,6 +17,7 @@ local special_roots = {
 
 --- @return string
 local function check_root(bufname)
+  if bufname:match('pack/mia/opt') then return end
   for _, root in ipairs(special_roots) do
     if vim.fs.relpath(root, bufname) then
       return root
