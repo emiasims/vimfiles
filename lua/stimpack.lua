@@ -15,6 +15,13 @@ local function resolve(spec)
   return spec
 end
 
+-- must match how vim.pack derives names, or manifest keys won't line up
+-- with vim.pack.get()
+local function spec_name(spec)
+  local src = type(spec) == 'table' and (spec.name or spec.src) or spec
+  return (src:match('[^/]+$'):gsub('%.git$', ''))
+end
+
 _G.stimpack = {}
 function stimpack.add(specs, opts)
   local start = opts and opts.start or false
@@ -46,7 +53,8 @@ local packs = vim
   :map(function(f)
     return {
       path = f,
-      name = f:match('^stimpack/([^/]*)%.lua$'),
+      -- unanchored: nvim_get_runtime_file returns absolute paths
+      name = f:match('stimpack/([^/]*)%.lua$'),
       co = coroutine.create(function()
         local fn, err = loadfile(f)
         errmsg(fn, err)
@@ -67,8 +75,30 @@ local packs = vim
     return t
   end)
 
+local manifest = {}
+for _, phase in ipairs({ 'start', 'after_draw' }) do
+  for _, p in ipairs(packs[phase]) do
+    for _, spec in ipairs(p.specs) do
+      manifest[spec_name(spec)] = { path = p.path, start = phase == 'start' }
+    end
+  end
+end
+
+function stimpack.manifest()
+  return manifest
+end
+
+-- UIEnter never fires in a headless nvim, so out-of-process tooling
+-- (stimpack_ui's update child) needs a way to load the deferred packs
+local flushed = false
+function stimpack.flush()
+  if flushed then return end
+  flushed = true
+  install(packs.after_draw)
+end
+
 install(packs.start)
 
 vim.api.nvim_create_autocmd('UIEnter', {
-  callback = vim.schedule_wrap(function() install(packs.after_draw) end),
+  callback = vim.schedule_wrap(stimpack.flush),
 })
