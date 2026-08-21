@@ -126,16 +126,17 @@ function! s:winresize(vert, diff) abort
 endfunction
 
 if has('nvim')
-  nnoremap <silent> <C-Up>    <Cmd>call <SID>winresize(1, v:count1)<CR>
-  nnoremap <silent> <C-Down>  <Cmd>call <SID>winresize(1, -v:count1)<CR>
-  nnoremap <silent> <C-Left>  <Cmd>call <SID>winresize(0, v:count1)<CR>
-  nnoremap <silent> <C-Right> <Cmd>call <SID>winresize(0, -v:count1)<CR>
+  let s:pre = has('mac') ? '<D-' : '<C-'
+  let [s:up, s:down, s:left, s:right] = ['Up>', 'Down>', 'Left>', 'Right>']
 else
-  nnoremap <silent> <Esc>[1;5A <Cmd>call <SID>winresize(1, v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5B <Cmd>call <SID>winresize(1, -v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5D <Cmd>call <SID>winresize(0, v:count1)<CR>
-  nnoremap <silent> <Esc>[1;5C <Cmd>call <SID>winresize(0, -v:count1)<CR>
+  let s:pre = has('mac') ? '<Esc>[1;9' : '<Esc>[1;5'
+  let [s:up, s:down, s:left, s:right] = ['A', 'B', 'D', 'C']
 endif
+
+exe 'nnoremap <silent> ' s:pre .. s:up ' <Cmd>call <SID>winresize(1, v:count1)<CR>'
+exe 'nnoremap <silent> ' s:pre .. s:down ' <Cmd>call <SID>winresize(1, -v:count1)<CR>'
+exe 'nnoremap <silent> ' s:pre .. s:left ' <Cmd>call <SID>winresize(0, v:count1)<CR>'
+exe 'nnoremap <silent> ' s:pre .. s:right ' <Cmd>call <SID>winresize(0, -v:count1)<CR>'
 
 nnoremap <F3> <Cmd>messages clear<Bar>echohl Type<Bar>echo "Messages cleared."<Bar>echohl None<Cr>
 nnoremap <F4> <Cmd>messages<Cr>
