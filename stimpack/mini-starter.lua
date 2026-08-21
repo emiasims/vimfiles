@@ -1,8 +1,4 @@
-if vim.fn.argc() > 0 then
-  return
-end
-
-stimpack.add({ 'nvim-mini/mini.starter'}, { start = true })
+stimpack.add({ 'nvim-mini/mini.starter'}, { start = vim.fn.argc() == 0 })
 
 local Starter = require('mini.starter')
 local cfgdir = vim.fn.stdpath('config')
