@@ -99,12 +99,13 @@ nnoremap <expr> << "\<Esc>" . repeat('<<', v:count1)
 xnoremap < <gv
 xnoremap > >gv
 
-xnoremap <M-j> <Cmd>move '>+1<CR>gv=gv
-xnoremap <M-k> <Cmd>move '<-2<CR>gv=gv
+" xmap needs : because '> is written on leaving the mode.
+xnoremap <M-j> :move '>+1<CR>gv=gv
+xnoremap <M-k> :move '<-2<CR>gv=gv
 nnoremap <M-j> <Cmd>move .+1<CR>==
 nnoremap <M-k> <Cmd>move .-2<CR>==
-inoremap <M-j> <Cmd>move .+1<CR>==gi
-inoremap <M-k> <Cmd>move .-2<CR>==gi
+inoremap <M-j> <Cmd>move .+1\|normal! ==<Cr>
+inoremap <M-k> <Cmd>move .-2\|normal! ==<Cr>
 
 nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap`]p
