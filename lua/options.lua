@@ -80,6 +80,7 @@ vim
     list = true,
     termguicolors = true,
     title = true,
+    titlestring = 'nvim %f',
 
     wrap = false,
     shell = 'bash',
