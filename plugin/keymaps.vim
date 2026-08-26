@@ -57,6 +57,12 @@ inoremap <M-u> <C-k>*
 cnoremap <M-u> <C-k>*
 tnoremap <expr> <M-u> digraph_get('*' .. nr2char(getchar()))
 
+if has('mac')
+  inoremap <D-u> <C-k>*
+  cnoremap <D-u> <C-k>*
+  tnoremap <expr> <D-u> digraph_get('*' .. nr2char(getchar()))
+endif
+
 nnoremap <silent> <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 xnoremap <silent> <expr> j (v:count > 4 ? "m'" . v:count . 'j' : 'gj')
 nnoremap <silent> <expr> k (v:count > 4 ? "m'" . v:count . 'k' : 'gk')
@@ -106,6 +112,15 @@ nnoremap <M-j> <Cmd>move .+1<CR>==
 nnoremap <M-k> <Cmd>move .-2<CR>==
 inoremap <M-j> <Cmd>move .+1\|normal! ==<Cr>
 inoremap <M-k> <Cmd>move .-2\|normal! ==<Cr>
+
+if has('mac')
+  xnoremap <D-k> :move '<-2<CR>gv=gv
+  xnoremap <D-j> :move '>+1<cr>gv=gv
+  nnoremap <D-j> <Cmd>move .+1<CR>==
+  nnoremap <D-k> <Cmd>move .-2<CR>==
+  inoremap <D-j> <Cmd>move .+1\|normal! ==<Cr>
+  inoremap <D-k> <Cmd>move .-2\|normal! ==<Cr>
+endif
 
 nnoremap <expr> ~ getline('.')[col('.') - 1] =~# '\a' ? '~' : 'w~'
 nnoremap cp yap`]p
