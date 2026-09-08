@@ -42,4 +42,6 @@ mia.keymap({
     '<leader>K',
     'vipJ:let store_reg = @/ \\| .s/[.!?]\\zs\\s\\+\\ze\\u/\\r/geI \\| let @/ = store_reg \\| unl store_reg<CR>',
   },
+  { '<!', '<!----><C-g>U<Left><C-g>U<Left><C-g>U<Left>', mode = 'ia' },
+  { '!', '!<C-]>', mode = 'i' },
 })
