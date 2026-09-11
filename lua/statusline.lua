@@ -79,6 +79,10 @@ local function node_tree()
   return ''
 end
 
+local function foldmethod()
+  return ' [' .. vim.opt.foldmethod:get() .. ']'
+end
+
 local function definition()
   local mode = mia.line.mode_info()
   local desc, title, title_hl = buf_info()
@@ -91,6 +95,7 @@ local function definition()
     { peek, hl = 'stlErrorInfo', pad = true },
     { '%=%<' },
     { node_tree, hl = 'stlNodeTree' },
+    { foldmethod, hl = 'stlNodeTree' },
     { ' %y ', hl = 'stlTypeInfo' },
     { cursor_info, hl = mode.hl, pad = true },
   }
