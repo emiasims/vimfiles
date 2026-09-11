@@ -26,19 +26,32 @@ M['textDocument/semanticTokens/full'] = function(params, handler)
 
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local tokens = {}
-  local prev_line, prev_char = 0, 0
+  local prev_row, prev_col = 0, 0
+
+  -- semantic tokens are delta-encoded against the previous token
+  local function add_hl(row, col, len)
+    local drow = row - prev_row
+    local dcol = drow == 0 and col - prev_col or col
+    vim.list_extend(tokens, { drow, dcol, len, 0, 0 })
+    prev_row, prev_col = row, col
+  end
+
+  local function find_tag(line, ...) return line:find('</?[^>]+>', ...) end
 
   for i, line in ipairs(lines) do
     local row = i - 1
-    local s, e = line:find('</?[^>]+>')
+    local init = 1
+    local s, e = find_tag(line, init)
     while s do
-      local col = s - 1
-      local len = e - s + 1
-      local dl = row - prev_line
-      local dc = dl == 0 and (col - prev_char) or col
-      vim.list_extend(tokens, { dl, dc, len, 0, 0 })
-      prev_line, prev_char = row, col
-      s, e = line:find('</?[%w%-]+>', e)
+      if line:sub(s, s + 3) == '<!--' then
+        -- jump past the whole comment so tag-like text inside it is ignored
+        local close = line:find('-->', s + 4, true)
+        init = close and close + 3 or e + 1
+      else
+        add_hl(row, s - 1, e - s + 1)
+        init = e + 1
+      end
+      s, e = find_tag(line, init)
     end
   end
 
@@ -72,7 +85,7 @@ local function attach_xml_highlighter(bufnr)
   end
 end
 
-vim.api.nvim_set_hl(0, "@lsp.type.tag", { link = "Tag" })
+vim.api.nvim_set_hl(0, '@lsp.type.tag', { link = 'Tag' })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'markdown',
