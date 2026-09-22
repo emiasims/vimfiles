@@ -112,7 +112,7 @@ local function custom_highlights(colors)
 end
 
 require('catppuccin').setup({
-  integrations = { snacks = true, notify = true },
+  integrations = { snacks = true, notify = true, gitsigns = true },
   custom_highlights = custom_highlights,
 })
 require('catppuccin').load('macchiato')
