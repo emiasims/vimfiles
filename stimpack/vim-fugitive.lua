@@ -22,6 +22,7 @@ ctx.keymap.sets({
   { 'gst', 'Git status <C-r>=expand("%:h")<Cr>' },
   { 'gpl', 'Git pull' },
   { 'gps', 'Git push' },
+  { 'gca', 'Git commit --amend' },
   { 'gcim', "Git commit -m ''<Left>", eat = '%s' },
   { 'gco', 'Git checkout %' },
   { 'gad', 'Git add %' },
