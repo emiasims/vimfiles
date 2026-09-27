@@ -33,6 +33,22 @@ function stimpack.add(specs, opts)
   end
 end
 
+function stimpack.dev(package, src, opts)
+  opts = opts or {}
+  if not src:find(':') and not src:find('^/') then
+    src = ('git@github.com:%s.git'):format(src)
+  end
+  local name = opts.name or spec_name(src)
+  local dir = ('%s/pack/%s/opt/%s'):format(vim.fn.stdpath('config'), package, name)
+  if not vim.uv.fs_stat(dir) then
+    local res = vim.system({ 'git', 'clone', src, dir }):wait()
+    if res.code ~= 0 then
+      return errmsg(false, 'cloning %s: %s', src, res.stderr)
+    end
+  end
+  vim.cmd.packadd(name)
+end
+
 local function install(packs)
   if #packs == 0 then
     return
@@ -88,8 +104,7 @@ function stimpack.manifest()
   return manifest
 end
 
--- UIEnter never fires in a headless nvim, so out-of-process tooling
--- (stimpack_ui's update child) needs a way to load the deferred packs
+-- UIEnter never fires in a headless nvim
 local flushed = false
 function stimpack.flush()
   if flushed then return end

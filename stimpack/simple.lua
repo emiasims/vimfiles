@@ -14,7 +14,6 @@ stimpack.add({
   'lewis6991/nvim-test',
   'nvim-lua/popup.nvim',
   'nvim-lua/plenary.nvim',
-  'JuliaEditorSupport/julia-vim',
   'lewis6991/async.nvim',
   'wellle/targets.vim',
   'mbbill/undotree',
