@@ -80,7 +80,7 @@ vim
     list = true,
     termguicolors = true,
     title = true,
-    titlestring = 'nvim %f',
+    titlestring = [[nvim %{%exists('g:session') ? substitute(g:session.name, '%', '%%', 'g') : '%f'%}]],
 
     wrap = false,
     shell = 'bash',
