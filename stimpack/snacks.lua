@@ -310,7 +310,7 @@ mia.keymap({
   { 'z-', '<Cmd>Pick spelling<Cr>', desc = 'Pick spelling' },
 })
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
 
 ctx.keymap.sets({
   mode = 'ca',
@@ -343,5 +343,5 @@ ctx.keymap.sets({
 })
 
 ctx.keymap.set('n', '<C-p>', {
-  { 'opt.buftype() == "" and opt.modifiable()', put_register },
+  { "opt.buftype() == '' and opt.modifiable()", put_register },
 }, { desc = 'Pick register & put' })

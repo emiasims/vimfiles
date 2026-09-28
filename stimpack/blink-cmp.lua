@@ -38,26 +38,28 @@ blink.setup({
   },
 })
 
-local ctx = require('ctxmap')
-ctx.context.add('blink_visible', blink.is_visible)
+local ctx = require('ctx')
+ctx.library.add('blink', {
+  visible = function() return blink.is_visible() end,
+})
 
 ctx.keymap.set('c', '<Tab>', {
-  { 'blink_visible', '<C-n>', remap = true },
-  { 'fn.pumvisible()', '<C-n>' },
+  { 'blink.visible', '<C-n>', remap = true },
+  { 'fn.pumvisible', '<C-n>' },
 }, { default = vim.fn.wildtrigger })
 
-ctx.keymap.set('c', '<S-Tab>', { 'blink_visible', '<C-p>', remap = true })
+ctx.keymap.set('c', '<S-Tab>', { 'blink.visible', '<C-p>', remap = true })
 
 ctx.keymap.set({ 'i', 'c' }, '<C-.>', {
-  { 'blink_visible', '<C-y><Cmd>lua vim.defer_fn(require("blink.cmp").show, 1)<Cr>', remap = true },
-  { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+  { 'blink.visible', '<C-y><Cmd>lua vim.defer_fn(require("blink.cmp").show, 1)<Cr>', remap = true },
+  { 'fn.pumvisible', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
 }, { default = '<Cmd>lua require("blink.cmp").show()<Cr>' })
 
 ctx.keymap.set('c', '<S-Space>', {
-  { 'fn.pumvisible()', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
-  { 'blink_visible', '<C-y><Cmd>lua vim.schedule(require("blink.cmp").show)<Cr>', remap = true },
+  { 'fn.pumvisible', '<C-y><Cmd>lua require("blink.cmp").show()<Cr>' },
+  { 'blink.visible', '<C-y><Cmd>lua vim.schedule(require("blink.cmp").show)<Cr>', remap = true },
 }, { default = '<Cmd>lua require("blink.cmp").show()<Cr>' })
 
 -- have defaults in _ctxmap.lua
-ctx.keymap.add('i', '<Esc>', { 'blink_visible', '<C-e>', remap = true })
-ctx.keymap.add('c', ' ', { 'blink_visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' })
+ctx.keymap.add('i', '<Esc>', { 'blink.visible', '<C-e>', remap = true })
+ctx.keymap.add('c', ' ', { 'blink.visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' })

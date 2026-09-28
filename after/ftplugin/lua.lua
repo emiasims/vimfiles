@@ -9,15 +9,16 @@ mia.keymap.set({
   vim
     .iter(vim.fn.range(97, 122))
     :map(vim.fn.nr2char)
-    :map(function(c)
-      return { ('<C-v><C-%s>'):format(c), ('<lt>C-%s>'):format(c) }
-    end)
+    :map(function(c) return { ('<C-v><C-%s>'):format(c), ('<lt>C-%s>'):format(c) } end)
     :totable(),
 })
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
 ctx.keymap.set('n', '~', {
-  { 'ts.is_node("false")', 'ciwtrue<Esc>`[' },
-  { 'ts.is_node("true")', 'ciwfalse<Esc>`[' },
+  { "ts.is_node('false')", 'ciwtrue<Esc>`[' },
+  { "ts.is_node('true')", 'ciwfalse<Esc>`[' },
 }, { buffer = true })
-ctx.keymap.set('ia', 'as', { 'text.before("%-%-as$")', '[[@as]]<Left><Left>' }, { buffer = true })
+ctx.keymap.set('ia', 'as', {
+  function() return require('ctx.library.text').before('%-%-as$') end,
+  '[[@as]]<Left><Left>',
+}, { buffer = true })

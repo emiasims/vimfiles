@@ -1,9 +1,9 @@
 stimpack.add({ 'tpope/vim-fugitive' }, { start = true })
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
 
 ctx.keymap.sets({
-  ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
+  ctx = "cmd.start() and abbr.trigger(' ')",
   mode = 'ca',
   { 'gau', 'Git add --update' },
   { 'gst', 'Git status' },

@@ -8,3 +8,5 @@ vim.b.update_bufinfo = function(info)
     dir = dir,
   }
 end
+
+vim.keymap.set('t', '<C-z>', '<Nop>', { buffer = true })

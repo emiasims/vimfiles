@@ -23,7 +23,7 @@ stimpack.add({
   'brenoprata10/nvim-highlight-colors',
 })
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
 ctx.keymap.set('ca', 'lg', { 'cmd.start', 'LazyGit' })
 
 require('mini.cursorword').setup()

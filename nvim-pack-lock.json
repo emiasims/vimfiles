@@ -80,10 +80,6 @@
       "rev": "5c7b0263797dfd1bd6202f2b219f3b53a80b2187",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
     },
-    "opencode.nvim": {
-      "rev": "2ddeebd3212596b51bf078e6ff52862655b80419",
-      "src": "https://github.com/nickjvandyke/opencode.nvim"
-    },
     "otter.nvim": {
       "rev": "f4a033d4e2bd86d4f09386a73d3861538601253d",
       "src": "https://github.com/jmbuhr/otter.nvim"

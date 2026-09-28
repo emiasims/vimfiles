@@ -1,40 +1,39 @@
-stimpack.dev('mia', 'emiasims/ctxmap.nvim')
+stimpack.dev('mia', 'emiasims/ctx.map', { name = 'ctx.map' })
 
 mia.keymap({
-  { '<F1>', '<Plug>(ctxmap-debug)', mode = { 'n', 't', '!' } },
+  { '<F1>', '<Plug>(ctx-debug)', mode = { 'n', 't', '!' } },
   { 'g0', '0', mode = { 'n', 'x', 'o' } },
   { 'g$', '$', mode = { 'n', 'x', 'o' } },
 })
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
+local text = require('ctx.library.text')
 
-ctx.setup({
-  fix_abbr_expansion = true,
-  contexts = {
-    ws_precursor = 'text.before("^%s*$")',
-    cmd_start_sp = 'cmd.start(lhs, map) and abbr.trigger(" ")',
-    autopair = {
-      allowed = 'text.after("%W") or text.eol()',
-      quote_allowed = '(text.before("%W") or text.sol()) and autopair.allowed()',
-      complete = 'text.after(vim.pesc(lhs))',
+local pares = { '()', '[]', '{}', "''", '""' }
 
-      pares = { '()', '[]', '{}', "''", '""' },
-      pat = function(pair)
-        local l, r = pair:sub(1, 1), pair:sub(2, 2)
-        return vim.pesc(l) .. '(%s*)%#%1' .. vim.pesc(r)
-      end,
-      nlpat = function(pair)
-        local l, r = pair:sub(1, 1), pair:sub(2, 2)
-        return vim.pesc(l) .. '%s*\n%s*%#%s*\n%s*' .. vim.pesc(r)
-      end,
-      in_pair = 'vim.iter(autopair.pares):map(autopair.pat):any(text.line)',
-      in_nlpair = 'vim.iter(autopair.pares):map(autopair.nlpat):any(lines.surround(1))',
-    },
-  },
+local function pair_pat(pair)
+  local l, r = pair:sub(1, 1), pair:sub(2, 2)
+  return vim.pesc(l) .. '(%s*)%#%1' .. vim.pesc(r)
+end
+
+local function nlpair_pat(pair)
+  local l, r = pair:sub(1, 1), pair:sub(2, 2)
+  return vim.pesc(l) .. '%s*\n%s*%#%s*\n%s*' .. vim.pesc(r)
+end
+
+local allowed = function() return text.after('%W') or text.eol() end
+ctx.library.add('autopair', {
+  allowed = allowed,
+  quote_allowed = function() return (text.before('%W') or text.sol()) and allowed() end,
+  complete = function() return text.after(vim.pesc(ctx.keymap.current().lhs)) end,
+  in_pair = function() return vim.iter(pares):map(pair_pat):any(text.line) end,
+  in_nlpair = function()
+    return vim.iter(pares):map(nlpair_pat):any(function(pat) return text.lines(pat, 1) end)
+  end,
 })
 
 ctx.keymap.set({ 'n', 'x', 'o' }, '0', {
-  { 'text.before("^%s+$")', '0' },
+  { "text.before('^%s+$')", '0' },
   { 'opt.wrap', 'g^' },
 }, { default = '0^' })
 
@@ -45,9 +44,8 @@ ctx.keymap.set('x', '$', { 'opt.wrap', 'g$h' }, { default = '$h' })
 ctx.keymap.set('n', '<C-h>', { 'win.left', 'gT9<C-w>l' }, { default = '<C-w>h' })
 ctx.keymap.set('n', '<C-l>', { 'win.right', 'gt9<C-w>h' }, { default = '<C-w>l' })
 
-ctx.keymap.set('i', '<Esc>', { 'fn.pumvisible()', '<C-e>' })
-ctx.keymap.set('i', '<Cr>', { 'fn.pumvisible()', '<C-y>' })
-
+ctx.keymap.set('i', '<Esc>', { 'fn.pumvisible', '<C-e>' })
+ctx.keymap.set('i', '<Cr>', { 'fn.pumvisible', '<C-y>' })
 
 -- autopairs
 ctx.keymap.add('i', '<Cr>', { 'autopair.in_pair', '<Cr><C-c>O' })
@@ -70,8 +68,8 @@ ctx.keymap.sets({
   { "'", '<C-]><C-g>U<Right>' },
 })
 
-ctx.keymap.set({ 'i', 's' }, '"', { 'autopair.quote_allowed', '""<C-]><C-g>U<Left>' }, { clear = false })
-ctx.keymap.set({ 'i', 's' }, "'", { 'autopair.quote_allowed', "''<C-]><C-g>U<Left>" }, { clear = false })
+ctx.keymap.add({ 'i', 's' }, '"', { 'autopair.quote_allowed', '""<C-]><C-g>U<Left>' })
+ctx.keymap.add({ 'i', 's' }, "'", { 'autopair.quote_allowed', "''<C-]><C-g>U<Left>" })
 ctx.keymap.set({ 'i', 's' }, ' ', { 'autopair.in_pair', '  <C-g>U<Left>' })
 ctx.keymap.set({ 'i', 's' }, '<BS>', {
   { 'autopair.in_pair', '<BS><Del>' },
@@ -83,7 +81,7 @@ ctx.keymap.set('c', ' ', { 'cmd.start', 'lua ' })
 
 ctx.keymap.sets({
   mode = 'ca',
-  ctx = 'cmd.start(lhs, map) and abbr.trigger(" ")',
+  ctx = "cmd.start() and abbr.trigger(' ')",
   { 'eq', 'vsp|TSEditQuery' },
   { 'eqa', 'vsp|TSEditQueryUserAfter' },
   { 'T', 'vsplit|term' },

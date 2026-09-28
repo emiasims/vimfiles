@@ -44,8 +44,8 @@ elseif bufname:match('/lib/python3') then
   }
 end
 
-local ctx = require('ctxmap')
+local ctx = require('ctx')
 ctx.keymap.set('n', '~', {
-  { 'ts.is_node("false")', 'ciwTrue<Esc>`[' },
-  { 'ts.is_node("true")', 'ciwFalse<Esc>`[' },
+  { "ts.is_node('false')", 'ciwTrue<Esc>`[' },
+  { "ts.is_node('true')", 'ciwFalse<Esc>`[' },
 }, { buffer = true })
