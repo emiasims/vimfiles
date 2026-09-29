@@ -25,4 +25,9 @@ mia.augroup('bodgery', {
       end
     end,
   },
+
+  BufWinEnter = {
+    pattern = 'term://*//*:*claude*',
+    callback = function() vim.wo.list = false end,
+  },
 })

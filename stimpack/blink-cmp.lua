@@ -60,6 +60,6 @@ ctx.keymap.set('c', '<S-Space>', {
   { 'blink.visible', '<C-y><Cmd>lua vim.schedule(require("blink.cmp").show)<Cr>', remap = true },
 }, { default = '<Cmd>lua require("blink.cmp").show()<Cr>' })
 
--- have defaults in _ctxmap.lua
+-- have defaults in _ctx.keymap.lua
 ctx.keymap.add('i', '<Esc>', { 'blink.visible', '<C-e>', remap = true })
 ctx.keymap.add('c', ' ', { 'blink.visible', '<Cmd>lua require("blink.cmp").hide()<CR> ' })

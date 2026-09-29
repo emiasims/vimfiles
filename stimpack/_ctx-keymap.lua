@@ -1,4 +1,4 @@
-stimpack.dev('mia', 'emiasims/ctx.map', { name = 'ctx.map' })
+stimpack.dev('mia', 'emiasims/ctx.keymap')
 
 mia.keymap({
   { '<F1>', '<Plug>(ctx-debug)', mode = { 'n', 't', '!' } },
