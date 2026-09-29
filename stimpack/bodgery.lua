@@ -210,7 +210,7 @@ vim.schedule(function()
       local sessions = require('bodgery').sessions('claude', { fields = { 'cwd', 'title', 'live', 'bufnr' } })
 
       local groups, by_project = {}, {}
-      for _, s in ipairs(sessions) do
+      for s in sessions do
         local keep = s.title or s.live or s.bufnr or desktop[s.id] or not purge(s.id)
         local item = keep and session_item(s, desktop[s.id])
         if item and (opts.archived or not item.archived) then
