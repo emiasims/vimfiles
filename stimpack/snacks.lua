@@ -66,14 +66,21 @@ mia.augroup('snacks', {
     callback = function(ev)
       local name = ev.match:sub(8)
       if name == 'layout_box' then
-        local rel_path = vim.fs.relpath('~', vim.fn.getcwd())
-        -- the only time I see a 'layout_box' with my config is for snacks explorer
-        -- everything else is a floating window, which won't be on the tabline.
-        vim.b.update_bufinfo = {
-          type = 'dir',
-          name = rel_path and '~/' .. rel_path or vim.fn.getcwd(),
-          dir = false,
-        }
+        -- split layouts (explorer, sidebar sources) show up in the tabline. the picker
+        -- doesn't own the box yet at FileType, so look it up when bufinfo is read
+        vim.b.update_bufinfo = function(info)
+          local picker = vim
+            .iter(Snacks.picker.get({ tab = false }))
+            :find(function(p) return p.layout and p.layout.root.buf == info.bufnr end)
+          if not picker then
+            return
+          elseif picker.opts.source == 'explorer' then
+            local cwd = picker:cwd() or vim.fn.getcwd()
+            local rel_path = vim.fs.relpath('~', cwd)
+            return { type = 'dir', name = rel_path and '~/' .. rel_path or cwd, dir = false }
+          end
+          return { type = 'snacks', name = picker.title, tab_name = ('[%s]'):format(picker.title) }
+        end
       else
         vim.b.update_bufinfo = {
           type = 'snacks',
