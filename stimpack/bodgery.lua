@@ -98,20 +98,40 @@ local function archive_action(archived)
   end
 end
 
--- projects whose sessions are hidden in the picker
-local folded = {} ---@type table<string, true>
+--- Whether each project's sessions are hidden, keyed by project directory. Projects never
+--- folded or opened by hand take `fold`, or `fold(key)` when it's a function.
+---@param fold boolean|fun(key: string): boolean
+---@return table<string, boolean>
+local function fold_state(fold)
+  return setmetatable({}, {
+    __index = function(_, key)
+      if type(fold) == 'function' then
+        return fold(key)
+      end
+      return fold
+    end,
+  })
+end
 
----@param header table the project's item
----@param fold? true
-local function set_folded(picker, header, fold)
-  folded[header.project or ''] = fold
+--- Refinds with the picker's fold state, or `folded` in its place, keeping the cursor on `item`
+--- when it stays visible and on its project otherwise.
+---@param folded? table<string, boolean>
+local function refold(picker, item, folded)
+  picker.claude_folded = folded or picker.claude_folded
   picker.list:set_target()
+  local project = item.group and item.project or item.parent.project
   picker:find({
     on_done = function()
-      for item, idx in picker:iter() do
-        if item.group and item.project == header.project then
+      local header
+      for it, idx in picker:iter() do
+        if item.id and it.id == item.id then
           return picker.list:view(idx)
+        elseif it.group and it.project == project then
+          header = idx
         end
+      end
+      if header then
+        picker.list:view(header)
       end
     end,
   })
@@ -245,7 +265,6 @@ vim.schedule(function()
                 project = s.cwd,
                 current = s.cwd == cwd,
                 text = s.cwd and vim.fs.basename(s.cwd) or '(no directory)',
-                open = not folded[key],
               },
             }
             -- sessions arrive newest first, so the other groups stay in order of last activity
@@ -257,10 +276,17 @@ vim.schedule(function()
         end
       end
 
+      if not ctx.picker.claude_folded then
+        -- the current project is listed first when it has sessions
+        local fold_others = groups[1] ~= nil and groups[1].header.current
+        ctx.picker.claude_folded = fold_state(function(key) return fold_others and key ~= cwd end)
+      end
+
       local items = {}
       for i, group in ipairs(groups) do
         group.header.sort = ('%04d'):format(i)
         group.header.count = #group
+        group.header.open = not ctx.picker.claude_folded[group.header.project or '']
         for j, item in ipairs(group) do
           item.sort = ('%s.%04d'):format(group.header.sort, j)
         end
@@ -313,7 +339,18 @@ vim.schedule(function()
       claude_fold = function(picker, item)
         local header = item and (item.group and item or item.parent)
         if header then
-          set_folded(picker, header, true)
+          picker.claude_folded[header.project or ''] = true
+          refold(picker, header)
+        end
+      end,
+      claude_fold_all = function(picker, item)
+        if item then
+          refold(picker, item, fold_state(true))
+        end
+      end,
+      claude_unfold_all = function(picker, item)
+        if item then
+          refold(picker, item, fold_state(false))
         end
       end,
     },
@@ -333,6 +370,11 @@ vim.schedule(function()
           ['x'] = 'claude_archive',
           ['u'] = 'claude_unarchive',
           ['h'] = 'claude_fold',
+          ['zc'] = 'claude_fold',
+          ['zm'] = 'claude_fold_all',
+          ['zM'] = 'claude_fold_all',
+          ['zr'] = 'claude_unfold_all',
+          ['zR'] = 'claude_unfold_all',
           ['<S-CR>'] = 'claude_split',
           ['l'] = 'confirm',
         },
@@ -343,7 +385,8 @@ vim.schedule(function()
       if not item then
         return
       elseif item.group then
-        return set_folded(picker, item, item.open or nil)
+        picker.claude_folded[item.project or ''] = item.open
+        return refold(picker, item)
       end
       local shown = item.bufnr and vim.api.nvim_buf_is_valid(item.bufnr) and vim.fn.win_findbuf(item.bufnr) or {}
       if #shown > 0 then
