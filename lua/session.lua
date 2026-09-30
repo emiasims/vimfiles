@@ -296,7 +296,8 @@ end
 ---@return boolean
 function M._check_stale_on_exit()
   local sess = vim.g.session
-  if not sess or not sess.auto or not M._enabled then
+  -- the restarted server carries the session on
+  if not sess or not sess.auto or not M._enabled or vim.startswith(vim.v.exitreason, 'restart') then
     return false
   end
 
@@ -415,7 +416,7 @@ function M.setup()
     -- on vimenter, start a session or load one
     VimEnter = function()
       vim.o.swapfile = false
-      if vim.g.session or vim.fn.argc() ~= 1 or mia.is_tmpf(1) then
+      if vim.g.session or vim.v.startreason ~= 'normal' or vim.fn.argc() ~= 1 or mia.is_tmpf(1) then
         vim.schedule(M.prune)
         return
       end
@@ -423,9 +424,7 @@ function M.setup()
       -- terms dont load properly unless scheduled. idk why
       vim.schedule(function()
         if not vim.g.session then
-          -- FIXME: nvim init.lua, open session|options. save options session. restart.
-          -- loads init.lua session after options session, expect options sess
-          -- additionally: :Session enter not working as expected.
+          -- FIXME: :Session enter not working as expected.
           M.enter()
         end
         M.prune()

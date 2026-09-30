@@ -44,6 +44,8 @@ ctx.keymap.set('x', '$', { 'opt.wrap', 'g$h' }, { default = '$h' })
 ctx.keymap.set('n', '<C-h>', { 'win.left', 'gT9<C-w>l' }, { default = '<C-w>h' })
 ctx.keymap.set('n', '<C-l>', { 'win.right', 'gt9<C-w>h' }, { default = '<C-w>l' })
 
+ctx.keymap.set('n', 'ZR', { 'count', 'ZR' }, { default = '<Cmd>restart! Session load last<Cr>' })
+
 ctx.keymap.set('i', '<Esc>', { 'fn.pumvisible', '<C-e>' })
 ctx.keymap.set('i', '<Cr>', { 'fn.pumvisible', '<C-y>' })
 
@@ -116,7 +118,7 @@ ctx.keymap.sets({
   { 'mf', 'edit <C-r>=stdpath("config")<Cr>/lua/mia/<C-z>', eat = ' ' },
   { 'T', 'execute v:lua.mia.termopen()|startinsert' },
   { 'term', 'term fish' },
-  { 'res', 'restart Session load last' },
+  { 'res', 'restart! Session load last' },
 
   { 'wc', 'vnew | r# | setlocal | buftype=nofile | let &ft=getbufvar("#", "&ft")' },
   { 'tc', 'let s=&ssop | set ssop=blank,help,folds,winsize,localoptions | let f=tempname() | exe "mksession " . f | tabnew | exe "source " . f | call delete(f) | let &ssop=s' },
