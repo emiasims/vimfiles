@@ -191,6 +191,28 @@ vim.schedule(function()
     sort = { fields = { 'sort' } },
     archived = false,
     toggles = { archived = 'a' },
+
+    on_show = function(picker)
+      -- scheduled because bodgery clears a terminal's session after these events fire
+      local refresh = vim.schedule_wrap(function()
+        picker.list:set_target()
+        picker:find({ refresh = true })
+      end)
+      mia.augroup('claude_picker' .. picker.id, {
+        User = {
+          ClaudeSessionEnter = refresh,
+          ClaudeSessionLeave = refresh,
+          -- Claude appends titles to the transcript mid-session
+          ClaudeStatusChanged = refresh,
+        },
+        [{ 'TermClose', 'BufWipeout', 'BufWinEnter', 'BufWinLeave' }] = {
+          pattern = 'term://*//*:*claude*',
+          callback = refresh,
+        },
+      })
+    end,
+    on_close = function(picker) pcall(vim.api.nvim_del_augroup_by_name, 'mia.claude_picker' .. picker.id) end,
+
     filter = {
       -- re-run the finder when a search starts or ends, since searching shows folded sessions
       transform = function(_, filter)
