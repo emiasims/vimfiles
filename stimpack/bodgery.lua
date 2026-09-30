@@ -15,8 +15,11 @@ mia.augroup('bodgery', {
     ClaudeToolUsePre = function(ev)
       local input = ev.data.tool_input or {}
       local file = edit_tools[ev.data.tool_name] and (input.file_path or input.notebook_path)
-      local buf = file and vim.fn.bufadd(file)
-      if buf and not vim.api.nvim_buf_is_loaded(buf) then
+      if not file or vim.startswith(file, '/tmp/') or vim.startswith(file, '/private/tmp/') then
+        return
+      end
+      local buf = vim.fn.bufadd(file)
+      if not vim.api.nvim_buf_is_loaded(buf) then
         vim.fn.bufload(buf)
         vim.bo[buf].buflisted = true
         -- bufload skips BufRead autocmds, so no filetype and no LSP
