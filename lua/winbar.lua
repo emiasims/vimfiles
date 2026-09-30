@@ -32,6 +32,23 @@ mia.augroup('winbar', {
   OptionSet = {
     { pattern = 'buftype', callback = au_attach },
   },
+  User = {
+    ClaudeStatusChanged = function(ev)
+      local buf = ev.data.bufnr
+      if not (buf and api.nvim_buf_is_valid(buf)) then
+        return
+      end
+      local needs_input = ev.data.status ~= 'busy' and buf ~= api.nvim_get_current_buf()
+      vim.b[buf].claude_attention = needs_input and ev.data.status or nil
+      vim.cmd.redrawstatus({ bang = true })
+    end,
+  },
+  BufEnter = function(ev)
+    if vim.b[ev.buf].claude_attention then
+      vim.b[ev.buf].claude_attention = nil
+      vim.cmd.redrawstatus({ bang = true })
+    end
+  end,
 })
 
 local def = {
@@ -74,13 +91,17 @@ local def = {
           return info and info.pid and info
         end)
         :map(function(info)
+          local attention = vim.b[info.bufnr].claude_attention
           return {
-            info.type .. ':' .. info.bufnr,
+            {
+              info.type .. ':' .. info.bufnr,
+              on_click = bufnr ~= info.bufnr and function()
+                api.nvim_set_current_win(winid)
+                api.nvim_set_current_buf(info.bufnr)
+              end,
+            },
+            attention and { '●', hl = attention == 'waiting' and 'DiagnosticWarn' or 'DiagnosticInfo' },
             hl = bufnr == info.bufnr and 'Directory' or 'Comment',
-            on_click = bufnr ~= info.bufnr and function()
-              api.nvim_set_current_win(winid)
-              api.nvim_set_current_buf(info.bufnr)
-            end,
           }
         end)
         :totable(),
