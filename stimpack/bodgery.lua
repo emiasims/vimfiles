@@ -284,7 +284,8 @@ vim.schedule(function()
         }
       end
       local tree = Snacks.picker.format.tree(item, picker)[1]
-      local status = item.bufnr and '● ' or item.live and '○ ' or '  '
+      local shown = item.bufnr and vim.api.nvim_buf_is_valid(item.bufnr) and #vim.fn.win_findbuf(item.bufnr) > 0
+      local status = shown and '● ' or item.bufnr and '○ ' or item.live and '◌ ' or '  '
       local time = Snacks.picker.util.reltime(item.time)
       local width = vim.api.nvim_win_get_width(picker.list.win.win)
       local room = width - vim.api.nvim_strwidth(tree[1] .. status) - #time - 2
