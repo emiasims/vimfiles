@@ -401,6 +401,11 @@ vim.schedule(function()
       local win = vim
         .iter(vim.api.nvim_tabpage_list_wins(0))
         :find(function(w) return terms[vim.api.nvim_win_get_buf(w)] ~= nil end)
+      local term = win and terms[vim.api.nvim_win_get_buf(win)]
+      -- a running Claude keeps its cwd, so other projects' sessions get a new terminal
+      if term and term.cwd == item.project then
+        return require('bodgery').resume(item.id, term.bufnr)
+      end
       open_session(picker, item, win)
     end,
   }
